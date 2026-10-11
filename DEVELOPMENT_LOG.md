@@ -28,6 +28,12 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — Visual and main-menu polish pass
+
+- Sky: seeded stars and a smooth ember glow on the horizon. Parallax ruins: aerial haze that fades each layer toward fog near its feet (depth). New `Vignette` layer (dark corners, below the HUD).
+- Main menu: low mist, stone ledge, a lit candle in the foreground, gold ornament under the subtitle, crimson title shadow, wider gold focus frame.
+- Verified by re-rendering menu and arena captures and re-running the suite (37/37). Judged by eye only; this is still temporary procedural art (real sprites are Milestone 4).
+
 ## 2026-10-11 — Starting presets ("Choose your oath")
 
 ### Built

@@ -128,6 +128,23 @@ func _build_backdrop() -> void:
 	_ruins(196.0, 120.0, Color("17141c"), Color(0.549, 0.239, 0.133, 0.55), 7, 60.0)
 	_ruins(232.0, 90.0, Color("1d1922"), Color(0, 0, 0, 0), 11, 90.0)
 	_ruins(262.0, 60.0, Color("241f29"), Color(0, 0, 0, 0), 5, 130.0)
+	# Foreground: low mist, a stone ledge, and a distant candle glow.
+	var fg := Control.new()
+	fg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	fg.draw.connect(func():
+		for i in 54:
+			var t := float(i) / 53.0
+			fg.draw_rect(Rect2(0, 196 + i, 480, 1), Color(0.42, 0.30, 0.38, 0.03 + 0.10 * t))
+		fg.draw_rect(Rect2(0, 250, 480, 20), Palette.INK)
+		fg.draw_rect(Rect2(0, 250, 480, 1), Color(Palette.STONE_LIGHT, 0.5))
+		for k in 24:
+			fg.draw_rect(Rect2(k * 21 + 4, 256 + (k % 3) * 4, 14, 1), Color(Palette.STONE, 0.45))
+		for r in [34.0, 22.0, 12.0]:
+			fg.draw_circle(Vector2(412, 247), r, Color(Palette.GOLD, 0.05))
+		fg.draw_rect(Rect2(411, 240, 2, 8), Palette.BONE_DIM)
+		fg.draw_rect(Rect2(411, 237, 2, 3), Palette.GOLD_BRIGHT))
+	add_child(fg)
 	var ash := CPUParticles2D.new()
 	ash.position = Vector2(240, -6)
 	ash.amount = 60
@@ -199,6 +216,8 @@ func _build_title(root: Control) -> Control:
 	title.add_theme_font_size_override(&"font_size", 24)
 	title.add_theme_color_override(&"font_color", Palette.BONE)
 	title.add_theme_constant_override(&"outline_size", 4)
+	title.add_theme_color_override(&"font_shadow_color", Color(Palette.CRIMSON, 0.55))
+	title.add_theme_constant_override(&"shadow_offset_y", 2)
 	v.add_child(title)
 
 	var sub := Label.new()
@@ -207,8 +226,18 @@ func _build_title(root: Control) -> Control:
 	sub.add_theme_color_override(&"font_color", Palette.BONE_DIM)
 	v.add_child(sub)
 
+	var orn := Control.new()
+	orn.custom_minimum_size = Vector2(200, 8)
+	orn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	orn.draw.connect(func():
+		var m := 100.0
+		orn.draw_line(Vector2(m - 90, 4), Vector2(m - 8, 4), Color(Palette.GOLD, 0.7), 1.0)
+		orn.draw_line(Vector2(m + 8, 4), Vector2(m + 90, 4), Color(Palette.GOLD, 0.7), 1.0)
+		orn.draw_colored_polygon(PackedVector2Array([Vector2(m - 5, 4), Vector2(m, 0), Vector2(m + 5, 4), Vector2(m, 8)]), Palette.GOLD_BRIGHT))
+	v.add_child(orn)
+
 	var gap := Control.new()
-	gap.custom_minimum_size.y = 8
+	gap.custom_minimum_size.y = 6
 	v.add_child(gap)
 
 	_btn_continue = _menu_button(v, "Continue", _on_continue)

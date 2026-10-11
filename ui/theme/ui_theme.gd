@@ -31,6 +31,8 @@ static func _build() -> Theme:
 
 	var clear := Color(0, 0, 0, 0)
 	var focus := box(Color(Palette.NIGHT, 0.92), Palette.GOLD)
+	focus.border_width_left = 3
+	focus.border_width_right = 3
 	t.set_stylebox(&"normal", &"Button", box(clear, clear))
 	t.set_stylebox(&"hover", &"Button", focus)
 	t.set_stylebox(&"focus", &"Button", focus)

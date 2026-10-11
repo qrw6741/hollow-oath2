@@ -17,6 +17,10 @@ extends Node2D
 	set(v): window_color = v; queue_redraw()
 @export var seed_value := 3:
 	set(v): seed_value = v; queue_redraw()
+@export var haze := 0.30:
+	set(v): haze = v; queue_redraw()
+@export var haze_color := Color(0.30, 0.22, 0.30):
+	set(v): haze_color = v; queue_redraw()
 @export var spacing := 70.0:
 	set(v): spacing = maxf(10.0, v); queue_redraw()
 
@@ -38,6 +42,12 @@ func _draw() -> void:
 		elif kind <= 8:
 			_tree(x, h * 0.5, rng)
 		x += spacing * rng.randf_range(0.6, 1.4)
+	# Aerial haze: distant layers fade toward the fog colour near their feet.
+	if haze > 0.0:
+		var rows := int(max_height * 0.9)
+		for i in rows:
+			var t := float(i) / rows
+			draw_rect(Rect2(-200, int(base_y - max_height * 0.9) + i, width + 400, 1), Color(haze_color, haze * t * t))
 
 
 func _spire(x: float, w: float, h: float, rng: RandomNumberGenerator) -> void:
