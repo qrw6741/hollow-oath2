@@ -14,12 +14,14 @@ var _res: Button
 var _render: Button
 var _fps: Button
 var _vsync: Button
+var _icons: Button
+var _vibe: Button
 var _volume_label: Label
 var _back: Button
 
 
 func _ready() -> void:
-	add_theme_constant_override(&"separation", 4)
+	add_theme_constant_override(&"separation", 2)
 	alignment = BoxContainer.ALIGNMENT_CENTER
 
 	var title := Label.new()
@@ -33,6 +35,8 @@ func _ready() -> void:
 	_render = _button(func(): Settings.hires = not Settings.hires; _video_changed())
 	_fps = _button(func(): Settings.fps_cap = Settings.FPS_CAPS[(Settings.FPS_CAPS.find(Settings.fps_cap) + 1) % Settings.FPS_CAPS.size()]; _video_changed())
 	_vsync = _button(func(): Settings.vsync = not Settings.vsync; _video_changed())
+	_icons = _button(func(): Settings.pad_style = (Settings.pad_style + 1) % 3; InputPrompts.refresh(); _refresh())
+	_vibe = _button(func(): Settings.vibration = not Settings.vibration; _refresh())
 	_shake = _button(_toggle_shake)
 	_flashes = _button(_toggle_flashes)
 	_hitstop = _button(_toggle_hitstop)
@@ -49,6 +53,7 @@ func _ready() -> void:
 	minus.name = &"VolumeDown"
 	minus.text = "-"
 	minus.custom_minimum_size.x = 22
+	UITheme.compact(minus)
 	minus.pressed.connect(_change_volume.bind(-0.1))
 	vol.add_child(minus)
 	_volume_label = Label.new()
@@ -59,6 +64,7 @@ func _ready() -> void:
 	plus.name = &"VolumeUp"
 	plus.text = "+"
 	plus.custom_minimum_size.x = 22
+	UITheme.compact(plus)
 	plus.pressed.connect(_change_volume.bind(0.1))
 	vol.add_child(plus)
 
@@ -69,9 +75,10 @@ func _ready() -> void:
 
 func _button(cb: Callable) -> Button:
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(170, 15)
+	b.custom_minimum_size = Vector2(170, 13)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(cb)
+	UITheme.compact(b)
 	add_child(b)
 	return b
 
@@ -86,6 +93,8 @@ func _video_changed() -> void:
 
 
 func _refresh() -> void:
+	_icons.text = "Controller icons: %s" % ["Auto", "PlayStation", "Xbox"][Settings.pad_style]
+	_vibe.text = "Controller vibration: %s" % ("On" if Settings.vibration else "Off")
 	_display.text = "Display: %s" % ("Fullscreen" if Settings.fullscreen else "Windowed")
 	var r := Settings.RESOLUTIONS[Settings.resolution_index]
 	_res.text = "Window size: %dx%d" % [r.x, r.y]

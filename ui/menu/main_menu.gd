@@ -66,13 +66,11 @@ func _ready() -> void:
 	_status.add_theme_color_override(&"font_color", Palette.CRIMSON_BRIGHT)
 	root.add_child(_status)
 
-	var hint := Label.new()
-	hint.text = "Arrows / D-pad: move     Enter / A: select     Esc / B: back"
+	var hint := HintBar.new()
+	hint.spec = "dpad|Arrows:move,ui_accept:select,ui_cancel:back"
 	hint.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	hint.offset_top = -16
-	hint.offset_bottom = -4
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.add_theme_color_override(&"font_color", Palette.STONE_LIGHT)
+	hint.offset_bottom = -3
 	root.add_child(hint)
 
 	var ver := Label.new()

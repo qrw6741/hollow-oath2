@@ -52,3 +52,17 @@ static func _build() -> Theme:
 
 	t.set_stylebox(&"panel", &"PanelContainer", box(Color(Palette.NIGHT, 0.88), Palette.STONE, 1, Vector2(8, 5)))
 	return t
+
+
+## Same look as the shared theme, with less vertical padding (for long option lists).
+static func compact(b: Button) -> void:
+	var clear := Color(0, 0, 0, 0)
+	var pad := Vector2(8, 1)
+	var focus := box(Color(Palette.NIGHT, 0.92), Palette.GOLD, 1, pad)
+	focus.border_width_left = 3
+	focus.border_width_right = 3
+	b.add_theme_stylebox_override(&"normal", box(clear, clear, 1, pad))
+	b.add_theme_stylebox_override(&"hover", focus)
+	b.add_theme_stylebox_override(&"focus", focus)
+	b.add_theme_stylebox_override(&"disabled", box(clear, clear, 1, pad))
+	b.add_theme_stylebox_override(&"pressed", box(Palette.STONE_DARK, Palette.GOLD_BRIGHT, 1, pad))

@@ -29,6 +29,7 @@ func hit_stop(duration: float) -> void:
 
 
 func shake(strength: float, duration := 0.18) -> void:
+	InputPrompts.rumble(strength * 0.12, strength * 0.2, duration)
 	if Settings.screen_shake <= 0.0:
 		return
 	Events.screen_shake_requested.emit(strength * Settings.screen_shake, duration)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
 [ext_resource type="PackedScene" path="res://actors/enemies/hollow_penitent.tscn" id="penitent"]
 [ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
+[ext_resource type="Script" path="res://ui/hint_bar.gd" id="hintbar"]
 [ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
 
 [node name="TestArena" type="Node2D"]
@@ -214,15 +215,13 @@ theme_override_font_sizes/font_size = 8
 text = "Rest at the candle to set your respawn"
 horizontal_alignment = 1
 
-[node name="Hint2" type="Label" parent="."]
-offset_left = 190.0
-offset_top = 420.0
-offset_right = 370.0
+[node name="Hint2" type="HBoxContainer" parent="."]
+offset_left = 150.0
+offset_top = 418.0
+offset_right = 410.0
 offset_bottom = 432.0
-theme_override_colors/font_color = Color(0.651, 0.616, 0.541, 0.80)
-theme_override_font_sizes/font_size = 8
-text = "J light · K heavy · L dodge · I parry · R heal"
-horizontal_alignment = 1
+script = ExtResource("hintbar")
+spec = "attack_light:light,attack_heavy:heavy,dodge:dodge,parry:parry,heal:heal"
 
 [node name="Hint3" type="Label" parent="."]
 offset_left = 610.0

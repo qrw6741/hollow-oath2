@@ -28,6 +28,14 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — Controller prompts (PS5 icons)
+
+- New `InputPrompts` autoload tracks the last-used device (keyboard / PlayStation / Xbox-style; Sony pads are detected by name, with a manual override in Settings) and says which button each action uses. `Glyph` draws the prompt (Cross/Circle/Square/Triangle, L1/R1, Options, D-pad, or a keycap) with vector primitives, so no image files and crisp at any resolution. `HintBar` shows rows of "[icon] label" and redraws when the device changes.
+- Used in the HUD interact prompt, the in-arena controls hint, and the main-menu footer. Rumble on hits/parries (toggle in Settings). Settings: Controller icons, Controller vibration.
+- Button layout was already pad-complete via SDL's mapping (A=Cross etc.); no bindings changed.
+- Verified: suite 38/38 (new `test_input_prompts`), rendered keyboard / PlayStation / Xbox hint bars and the settings screen.
+- **Not verified on a real DualSense** (none available here): device-name detection, rumble feel, and whether Steam Input / wireless affect the reported name. The Auto icon choice falls back to Xbox letters if the name isn't recognised; set Controller icons to PlayStation to force it.
+
 ## 2026-10-11 — Video options (resolution / fps)
 
 - The game was rendered into a fixed 480x270 buffer and integer-scaled (chunky "480p" look). It now defaults to **High-res (smooth)**: the same 480x270 world rendered natively at the window size (canvas_items stretch, fractional scaling), so text and shapes are sharp at 1080p and above.

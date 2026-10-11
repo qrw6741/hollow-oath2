@@ -50,6 +50,8 @@ func _run() -> void:
 		# --- presets ---
 		test_presets_valid, test_preset_stats_applied, test_unsworn_is_bare_fists,
 		test_each_preset_combo_lands, test_preset_save_and_fallback, test_preset_screen_menu,
+		# --- controller prompts ---
+		test_input_prompts,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -933,3 +935,43 @@ func test_preset_screen_menu() -> void:
 	check(main.current_level() != null and main.current_level().player.preset.id == &"unsworn", "unsworn game starts")
 	check(saves.load_slot(1).data.preset_id == "unsworn", "saved with preset")
 	wipe_saves()
+
+
+# ------------------------------------------------------------------ controller prompts
+
+func test_input_prompts() -> void:
+	var ip: Node = get_tree().root.get_node("InputPrompts")
+	settings.pad_style = 1   # force PlayStation icons regardless of detected hardware
+	ip.set_device(ip.Device.PLAYSTATION, true)
+	var expect := {&"jump": "cross", &"attack_light": "square", &"attack_heavy": "triangle", &"dodge": "circle",
+		&"parry": "l1", &"heal": "r1", &"interact": "dpad_up", &"pause": "options"}
+	for a in expect:
+		var t: Dictionary = ip.token_for(a)
+		check(t.pad and t.id == expect[a], "%s -> %s on a PS pad (got %s)" % [a, expect[a], t])
+	check(ip.token_for(&"move_left").pad, "movement resolves to a pad token")
+	ip.set_device(ip.Device.KEYBOARD, true)
+	check(not ip.token_for(&"attack_light").pad and ip.token_for(&"attack_light").id == "J", "keyboard shows J for light attack")
+	# Real events switch the active device, both ways.
+	var jb := InputEventJoypadButton.new()
+	jb.button_index = JOY_BUTTON_A
+	jb.pressed = true
+	ip._input(jb)
+	check(ip.is_pad(), "pad button press switches prompts to the controller")
+	var kk := InputEventKey.new()
+	kk.keycode = KEY_J
+	kk.pressed = true
+	ip._input(kk)
+	check(not ip.is_pad(), "key press switches prompts back to keyboard")
+	# Every glyph kind and a hint bar build without errors in each style.
+	for style in [1, 2]:
+		settings.pad_style = style
+		ip.set_device(ip.Device.PLAYSTATION if style == 1 else ip.Device.XBOX, true)
+		var bar := HintBar.new()
+		bar.spec = "attack_light:light,attack_heavy:heavy,dodge:dodge,parry:parry,heal:heal,pause:pause,dpad|Arrows:move"
+		add_child(bar)
+		await frames(2)
+		var glyphs := bar.get_children().filter(func(n): return n is Glyph)
+		check(glyphs.size() == 7 and glyphs.all(func(g): return g.visible and g.size.x > 4.0), "style %d: seven visible glyphs" % style)
+		bar.queue_free()
+	settings.pad_style = 0
+	ip.set_device(ip.Device.KEYBOARD, true)

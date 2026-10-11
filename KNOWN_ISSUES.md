@@ -20,6 +20,9 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Controller
+- Never tested with a physical DualSense. Prompts for rebound buttons follow the bindings, but there is no in-game remapping UI yet. Pause menu has no button hint bar. L2/R2 and the touchpad are unbound.
+
 ## Video
 - Fps above 60 relies on Godot 2D physics interpolation; a one-frame smear may appear after teleports (respawn/rest). Untested on a real high-refresh monitor.
 - Art is still low-detail placeholder; High-res mode makes that more visible, not less.

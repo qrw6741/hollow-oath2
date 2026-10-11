@@ -13,6 +13,24 @@
 | Pause | Esc | Start |
 | Debug overlay | F3 | — |
 
+## PlayStation 5 / DualSense (and other controllers)
+Plug in or pair the pad and press any button: on-screen prompts switch to controller icons automatically (and back to keys when you touch the keyboard or mouse).
+
+| Action | DualSense | Xbox-style |
+|---|---|---|
+| Move | Left stick / D-pad | same |
+| Jump | Cross | A |
+| Light attack | Square | X |
+| Heavy attack | Triangle | Y |
+| Dodge roll | Circle | B |
+| Parry | L1 | LB |
+| Heal | R1 | RB |
+| Interact / rest | D-pad up | D-pad up |
+| Pause | Options | Menu |
+| Menus: select / back | Cross / Circle | A / B |
+
+Settings has *Controller icons* (Auto / PlayStation / Xbox, in case Auto guesses wrong) and *Controller vibration* (short rumble on hits and parries).
+
 ## Menus
 Arrow keys / D-pad / stick move the selection, **Enter** or **A** selects, **Esc** or **B** goes back; the mouse works too. Overwriting or deleting a save, and quitting to the main menu from the pause menu, ask you to press the button a second time ("Sure?") within 3 seconds.
 

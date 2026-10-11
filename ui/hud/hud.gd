@@ -9,6 +9,7 @@ var _health_bar: StatBar
 var _stamina_bar: StatBar
 var _vials: Control
 var _prompt: Label
+var _prompt_glyph: Glyph
 var _banner: Label
 var _death: ColorRect
 var _death_label: Label
@@ -66,6 +67,12 @@ func _build() -> void:
 	_prompt.position = Vector2(140, 236)
 	_prompt.size = Vector2(200, 12)
 	_prompt.visible = false
+	# Button glyph (keyboard key or controller icon) sits to the left of the prompt text.
+	var pg := Glyph.new()
+	pg.action = &"interact"
+	_prompt.add_child(pg)
+	_prompt_glyph = pg
+	_prompt.visibility_changed.connect(func(): pg.visible = _prompt.visible)
 
 	_banner = _label(root, "", 16, HORIZONTAL_ALIGNMENT_CENTER)
 	_banner.position = Vector2(0, 70)
@@ -147,8 +154,13 @@ func _draw_vials() -> void:
 
 
 func _on_prompt(text: String) -> void:
-	_prompt.text = "[%s]  %s" % [_key_name(&"interact"), text]
+	_prompt.text = text
 	_prompt.visible = true
+	_prompt_glyph.position = Vector2(_prompt.size.x / 2.0 - _prompt_half() - 16.0, 0.0)
+
+
+func _prompt_half() -> float:
+	return _prompt.get_theme_font(&"font").get_string_size(_prompt.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x / 2.0
 
 
 func _key_name(action: StringName) -> String:

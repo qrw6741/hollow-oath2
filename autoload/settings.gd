@@ -11,6 +11,8 @@ var flashes := true          ## Full-screen / hit flashes.
 var hit_stop := true         ## Freeze-frame on impact.
 var master_volume := 0.8
 var show_debug := false
+var vibration := true
+var pad_style := 0           ## Controller icons: 0 auto-detect, 1 PlayStation, 2 Xbox.
 
 ## Video. Presentation only; gameplay always simulates at a fixed 60 Hz.
 const RESOLUTIONS: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1600, 900), Vector2i(1920, 1080), Vector2i(2560, 1440), Vector2i(3840, 2160)]
@@ -35,6 +37,8 @@ func load_settings() -> void:
 	flashes = bool(cfg.get_value("accessibility", "flashes", flashes))
 	hit_stop = bool(cfg.get_value("accessibility", "hit_stop", hit_stop))
 	master_volume = clampf(float(cfg.get_value("audio", "master_volume", master_volume)), 0.0, 1.0)
+	vibration = bool(cfg.get_value("controller", "vibration", vibration))
+	pad_style = clampi(int(cfg.get_value("controller", "pad_style", pad_style)), 0, 2)
 	fullscreen = bool(cfg.get_value("video", "fullscreen", fullscreen))
 	resolution_index = clampi(int(cfg.get_value("video", "resolution_index", resolution_index)), 0, RESOLUTIONS.size() - 1)
 	hires = bool(cfg.get_value("video", "hires", hires))
@@ -51,6 +55,8 @@ func save_settings() -> void:
 	cfg.set_value("accessibility", "flashes", flashes)
 	cfg.set_value("accessibility", "hit_stop", hit_stop)
 	cfg.set_value("audio", "master_volume", master_volume)
+	cfg.set_value("controller", "vibration", vibration)
+	cfg.set_value("controller", "pad_style", pad_style)
 	cfg.set_value("video", "fullscreen", fullscreen)
 	cfg.set_value("video", "resolution_index", resolution_index)
 	cfg.set_value("video", "hires", hires)
