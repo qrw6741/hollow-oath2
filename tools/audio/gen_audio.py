@@ -276,6 +276,24 @@ def make_sfx():
     d = 1.3
     seal = lowpass(noise(int(d * SR)), 600) * env(int(d * SR), 0.4, 0.3) + tone(55, d) * env(int(d * SR), 0.3, 0.4) * 0.5
     sfx("gate_seal", reverb(seal, 0.3), 0.7)
+    # Village additions
+    d = 0.3
+    thr = sweep_bandpass(noise(int(d * SR)), 500, 1800, q=1.4) * env(int(d * SR), 0.06, 0.07)
+    thr += lowpass(noise(int(d * SR)), 3000) * env(int(d * SR), 0.01, 0.15) * 0.25 * (0.5 + 0.5 * np.sin(2 * np.pi * 30 * t_axis(d)))
+    sfx("throw", thr, 0.55)
+    d = 0.5
+    fz = highpass(noise(int(d * SR)), 2500) * env(int(d * SR), 0.005, 0.12) * (0.6 + 0.4 * np.sin(2 * np.pi * 47 * t_axis(d)))
+    sfx("fizzle", fz, 0.45)
+    sfx("bell_small", reverb(bell(392.0, 2.0, decay=1.0, cracked=0.4, seed=12), 0.25, 1.2, 0.4), 0.7)
+    d = 1.4
+    creak = sweep_bandpass(noise(int(d * SR)), 200, 600, q=6.0) * env(int(d * SR), 0.2, 0.5)
+    creak *= 0.6 + 0.4 * np.sin(2 * np.pi * 11 * t_axis(d))
+    sfx("door_open", mix(creak, thud(80, 40, 0.3, 0.6) * 0.6), 0.7)
+    sfx("door_locked", mix(thud(140, 80, 0.12, 0.8), tone(260, 0.15) * env(int(0.15 * SR), 0.002, 0.04) * 0.4), 0.6)
+    d = 1.8
+    gate = mix(thud(70, 35, 0.4, 0.9), lowpass(noise(int(d * SR)), 500) * env(int(d * SR), 0.3, 0.5) * 0.8)
+    sfx("gate_open", reverb(gate, 0.3), 0.8)
+
     t = t_axis(4.5)
     vic = np.zeros_like(t)
     for i, f in enumerate([146.8, 220, 293.7, 440, 587.3]):
@@ -364,6 +382,29 @@ def music_yard():
     write(os.path.join(MUS_DIR, "yard.wav"), out, sr, 0.55, do_fade=False)
 
 
+def music_village():
+    sr, dur = MSR, 64.0
+    n = int(sr * dur)
+    out = np.zeros(n)
+    out += loop_noise(n, sr, lo=120, hi=700, seed=31) * (0.3 + 0.7 * slow_lfo(n, 4, 0.7)) * 0.14
+    # Cold choir-like pad: detuned saws, A minor -> F -> G -> E, each 16 s.
+    chords = [[110.0, 130.8, 164.8], [87.3, 110.0, 130.8], [98.0, 123.5, 146.8], [82.4, 103.8, 123.5]]
+    seg = n // 4
+    for i, ch in enumerate(chords):
+        x = np.zeros(seg)
+        tt = np.arange(seg) / sr
+        for f in ch:
+            for dt in (0.996, 1.0, 1.005):
+                x += signal.sawtooth(2 * np.pi * f * 2 * dt * tt)
+        x = lowpass(x, 700, sr) / 9.0
+        a = np.minimum(1, tt / 3.0) * np.minimum(1, (seg / sr - tt) / 3.0)
+        place(out, x * a * 0.22, i * seg)
+    for i, (sec, f) in enumerate([(2, 220.0), (18, 174.6), (34, 196.0), (50, 164.8), (58, 220.0)]):
+        place(out, bell(f, 6.0, sr=sr, decay=3.2, cracked=0.2, seed=80 + i) * 0.13, int(sec * sr))
+    out = circular_reverb(out, 0.45, 4.0, 1.6, sr)
+    write(os.path.join(MUS_DIR, "village.wav"), out, sr, 0.55, do_fade=False)
+
+
 def music_boss():
     sr = MSR
     bpm = 120.0
@@ -424,6 +465,7 @@ if __name__ == "__main__":
     make_sfx()
     music_menu()
     music_yard()
+    music_village()
     music_boss()
     for d in (SFX_DIR, MUS_DIR):
         for f in sorted(os.listdir(d)):

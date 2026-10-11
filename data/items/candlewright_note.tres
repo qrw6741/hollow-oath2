@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"candlewright_note"
+display_name = "Candlewright's Note"
+description = "A wax-stained page in a careful hand: 'On the night, the liturgy is to be read from its last line to its first. The sworn will not notice. The Crown must not.'"
+kind = 2
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(0.9, 0.85, 0.7, 1)

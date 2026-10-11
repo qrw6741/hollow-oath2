@@ -47,6 +47,13 @@ extends Resource
 ## Enemies: may turn toward the target during the first part of startup.
 @export var track_during_startup := true
 
+@export_group("Projectile")
+## When set, this attack fires a projectile on its first active frame instead of using
+## the melee hitbox (damage / knockback / parryable below are given to the projectile).
+@export var projectile_speed := 0.0
+## Spawn point relative to the attacker's feet (x flipped by facing).
+@export var projectile_offset := Vector2(14, -22)
+
 @export_group("Feel")
 @export var hit_stop := 0.06
 @export var shake := 2.0
@@ -57,6 +64,10 @@ extends Resource
 @export var ai_weight := 1.0
 ## Chance (0-1) that an enemy continues into next_in_combo.
 @export var ai_chain_chance := 1.0
+
+
+func is_ranged() -> bool:
+	return projectile_speed > 0.0
 
 
 func total_frames() -> int:

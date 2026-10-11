@@ -225,6 +225,9 @@ func _normalize(d: Dictionary) -> Dictionary:
 	out["quick_item"] = q if inv.has(q) else ""
 	out["level_path"] = _str(d.get("level_path"), GameState.DEFAULT_LEVEL_PATH)
 	out["level_name"] = _str(d.get("level_name"), "")
+	var cl := _str(d.get("checkpoint_level"), "")
+	out["checkpoint_level"] = cl if cl.begins_with("res://world/levels/") else ""
+	out["level_entry"] = _str(d.get("level_entry"), "")
 	out["checkpoint_id"] = _str(d.get("checkpoint_id"), "")
 	var pos: Variant = d.get("respawn_position")
 	var pos_ok: bool = typeof(pos) == TYPE_ARRAY and (pos as Array).size() == 2 \

@@ -20,6 +20,12 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Forsaken Village / travel
+- Blockout quality: plain masonry blocks, no house details, no ladders; the rooftop climb uses three planks.
+- Not play-tested by a person: jump distances, enemy density (10 enemies) and the two candles' spacing are first guesses.
+- The chapel door is sealed: the village is the end of the current build.
+- No map, so the shortcut and routes are only signposted by the gate prompt.
+
 ## Audio
 - All audio is synthesised placeholder and has never been listened to by a person; volumes/mix are estimates.
 - Music loops start on a bell/drum hit; if the loop point is audible, the generator's loop lengths can be adjusted.
@@ -28,7 +34,6 @@
 - Bell-Warden balance is untested by a human (650 HP, damage 20-36 per hit, cooldowns). Tune in `data/enemies/bell_warden.tres` and `data/attacks/warden_*.tres`.
 - No boss music, sounds, intro cutscene or camera framing yet; the name banner is the intro.
 - The boss can be pressed against the gate pillar while the gate is open (only after the player has died, when it idles until the respawn reset).
-- The Warden's Bell Shard has no use yet (planned: opens the way to the Forsaken Village).
 
 ## Economy / inventory
 - Numbers (ember rewards, level costs, +8/+6/+4% steps, item effects) are first-pass and unplaytested; there is only one enemy type, so embers have little to spend on yet.

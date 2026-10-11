@@ -7,6 +7,8 @@ extends Node
 signal started(attack: AttackData)
 signal phase_changed(phase: Phase)
 signal hit_confirmed(target: Hurtbox, result: int, hit: HitData)
+## Ranged attacks: emitted once on the first active frame; the owner spawns the projectile.
+signal projectile_fired(attack: AttackData)
 signal finished(attack: AttackData)
 
 enum Phase { NONE, STARTUP, ACTIVE, RECOVERY }
@@ -62,7 +64,9 @@ func tick() -> void:
 		next = Phase.ACTIVE
 	if next != phase:
 		_set_phase(next)
-	if phase == Phase.ACTIVE:
+		if next == Phase.ACTIVE and a.is_ranged():
+			projectile_fired.emit(a)
+	if phase == Phase.ACTIVE and not a.is_ranged():
 		_check_hits()
 	if attack == a and frame >= a.total_frames():
 		attack = null

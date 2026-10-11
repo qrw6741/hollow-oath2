@@ -61,6 +61,9 @@ func _run() -> void:
 		test_boss_parry_riposte, test_boss_phase_two_and_leap, test_boss_resets_on_player_death, test_boss_defeat_persists,
 		# --- audio ---
 		test_audio_files_and_music_flow,
+		# --- village & transitions ---
+		test_levels_wired_correctly, test_bell_door_and_travel, test_respawn_across_levels, test_continue_in_village,
+		test_shortcut_gate, test_acolyte_projectile_parry_dodge, test_bell_bearer,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -1473,3 +1476,249 @@ func _gd_files(dir: String) -> Array:
 	for sub in d.get_directories():
 		out.append_array(_gd_files(dir.path_join(sub)))
 	return out
+
+
+# ------------------------------------------------------------------ village & transitions
+
+const YARD := "res://world/levels/test_arena.tscn"
+const VILLAGE := "res://world/levels/forsaken_village.tscn"
+
+
+func go_to_level(path: String, entry: StringName) -> void:
+	events.level_change_requested.emit(path, entry, false)
+	await frames(75)
+	level = main.current_level()
+	player = level.player
+
+
+func _scene_nodes(path: String) -> Array:
+	var inst: Node = load(path).instantiate()
+	var out := [inst]
+	var stack := [inst]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		for c in n.get_children():
+			out.append(c)
+			stack.append(c)
+	return out
+
+
+## Every exit leads to an existing level and an entry marker that exists there; pickup,
+## door, gate and candle ids are unique across the game.
+func test_levels_wired_correctly() -> void:
+	var ids := {}
+	for path in [YARD, VILLAGE]:
+		var nodes := _scene_nodes(path)
+		var root: Node = nodes[0]
+		check(root is Level, "%s is a Level" % path)
+		for n in nodes:
+			if n is LevelExit and n.target_level != "":
+				check(ResourceLoader.exists(n.target_level), "%s: exit %s target exists" % [path, n.name])
+				var found := false
+				var tn := _scene_nodes(n.target_level)
+				for m in tn:
+					if m is LevelEntry and m.entry_id == n.target_entry:
+						found = true
+				tn[0].free()
+				check(found, "%s: exit %s lands on entry '%s'" % [path, n.name, n.target_entry])
+			var key := ""
+			if n is ItemPickup:
+				key = "pickup:" + String(n.pickup_id)
+			elif n is OathCandle:
+				key = "candle:" + String(n.checkpoint_id)
+			elif n is ShortcutGate:
+				key = "gate:" + String(n.gate_id)
+			elif n is LevelExit and n.door_id != &"":
+				key = "door:" + String(n.door_id)
+			if key != "":
+				check(not ids.has(key), "unique id %s" % key)
+				ids[key] = true
+			if n is EnemySpawner:
+				check(n.enemy_scene != null, "%s: spawner %s has a scene" % [path, n.name])
+		root.free()
+	var v := _scene_nodes(VILLAGE)
+	var kinds := {}
+	for n in v:
+		if n is EnemySpawner:
+			kinds[n.enemy_scene.resource_path.get_file()] = true
+	check(kinds.has("ember_acolyte.tscn") and kinds.has("bell_bearer.tscn"), "village has both new enemy types")
+	v[0].free()
+
+
+func test_bell_door_and_travel() -> void:
+	await fresh_game()
+	game_state.set_flag(&"boss_defeated_bell_warden", true)
+	level.reset_enemies()
+	await place_player(2510.0, 448.0, 1)
+	var door: LevelExit = level.get_node("BellDoor")
+	check(not door.try_open(), "Bell Door is locked without the shard")
+	check(main.current_level().level_id == &"test_arena", "still in the yard")
+	game_state.add_item(&"warden_bell_shard", 1)
+	check(door.try_open(), "the shard opens the Bell Door")
+	await frames(75)
+	level = main.current_level()
+	player = level.player
+	check(level.level_id == &"forsaken_village", "arrived in the Forsaken Village")
+	check(absf(player.global_position.x - 92.0) < 6.0, "at the entry marker (%.0f)" % player.global_position.x)
+	check(game_state.level_path == VILLAGE, "level path recorded")
+	check(game_state.get_flag(&"door_open_bell_door", false), "door remembered as unlocked")
+	# Walk back out to the left: the Yard, at the Bell Door.
+	Input.action_press(&"move_left")
+	await frames(40)
+	Input.action_release(&"move_left")
+	await frames(75)
+	level = main.current_level()
+	player = level.player
+	check(level.level_id == &"test_arena", "walked back to the Yard")
+	check(absf(player.global_position.x - 2490.0) < 8.0, "arrived at the Bell Door (%.0f)" % player.global_position.x)
+	check(level.get_node("BellDoor").is_unlocked(), "door stays unlocked")
+
+
+func test_respawn_across_levels() -> void:
+	await fresh_game()
+	await place_player(170.0)
+	await press(&"interact")   # rest at the Yard Candle
+	await frames(60)
+	await go_to_level(VILLAGE, &"from_yard")
+	check(level.level_id == &"forsaken_village", "in the village")
+	await place_player(400.0)
+	player.receive_hit(damage(9999.0))
+	await frames(int(game_state.RESPAWN_DELAY * 60.0) + 90)
+	level = main.current_level()
+	player = level.player
+	check(level.level_id == &"test_arena", "death returns you to the level of your last candle")
+	check(player.global_position.distance_to(game_state.respawn_position) < 8.0 and not player.is_dead(), "respawned at the Yard Candle")
+	await frames(60)
+	check(main.hud._death.color.a < 0.05 and main.hud._fade.color.a < 0.05, "death screen cleared after a cross-level respawn")
+	# Rest in the village, die there: respawn in the village.
+	await go_to_level(VILLAGE, &"from_yard")
+	await place_player(2510.0)
+	await press(&"interact")   # Chapel Steps Candle
+	await frames(60)
+	check(game_state.checkpoint_level == VILLAGE, "village candle recorded")
+	await frames(70)
+	player.receive_hit(damage(9999.0))
+	await frames(int(game_state.RESPAWN_DELAY * 60.0) + 30)
+	level = main.current_level()
+	check(level.level_id == &"forsaken_village" and level.player.global_position.distance_to(game_state.respawn_position) < 8.0, "respawned at the village candle")
+
+
+func test_continue_in_village() -> void:
+	wipe_saves()
+	game_state.reset()
+	game_state.level_path = VILLAGE
+	game_state.level_entry = &"from_yard"
+	game_state.in_game = true
+	game_state.current_slot = 1
+	check(saves.save_slot(1), "saved in the village")
+	await menu_game()
+	events.load_game_requested.emit(1)
+	await frames(80)
+	level = main.current_level()
+	check(level != null and level.level_id == &"forsaken_village", "Continue loads the village")
+	check(absf(level.player.global_position.x - 92.0) < 6.0, "at the village entry")
+	# A legacy save (no checkpoint_level) keeps working.
+	var n: Dictionary = saves._normalize({"version": 1, "saved_at": 1, "has_checkpoint": true, "checkpoint_id": "yard_candle", "respawn_position": [182, 480]})
+	check(n.checkpoint_level == "" and n.level_entry == "", "legacy save gets empty travel fields")
+	wipe_saves()
+
+
+func test_shortcut_gate() -> void:
+	await fresh_game()
+	await go_to_level(VILLAGE, &"from_yard")
+	var gate: ShortcutGate = level.get_node("ShortcutGate")
+	check(not gate.is_open, "gate starts shut")
+	await place_player(600.0)
+	check(not gate.interact(player), "cannot raise it from the outskirts side")
+	# Try to walk through it.
+	Input.action_press(&"move_right")
+	await frames(40)
+	Input.action_release(&"move_right")
+	check(player.global_position.x < 660.0, "the shut gate blocks the passage (x %.0f)" % player.global_position.x)
+	await place_player(700.0)
+	check(gate.interact(player), "raised from the corridor side")
+	check(game_state.get_flag(&"gate_open_village_corridor", false), "shortcut remembered")
+	await frames(4)
+	await place_player(620.0, 480.0, 1)
+	Input.action_press(&"move_right")
+	await frames(40)
+	Input.action_release(&"move_right")
+	check(player.global_position.x > 680.0, "open gate lets you through (x %.0f)" % player.global_position.x)
+	# Reload: stays open.
+	await go_to_level(VILLAGE, &"from_yard")
+	check(level.get_node("ShortcutGate").is_open, "gate still open after reloading the level")
+
+
+func test_acolyte_projectile_parry_dodge() -> void:
+	await fresh_game()
+	await place_player(300.0, 480.0, 1)
+	var a: EnemyBase = load("res://actors/enemies/ember_acolyte.tscn").instantiate()
+	a.position = Vector2(450, 480)
+	a.start_facing = -1
+	a.patrol_distance = 0.0
+	level.add_child(a)
+	await frames(3)
+	check(a is RangedEnemy, "acolyte uses the ranged brain")
+	a.target = player
+	a._cooldown = 9999
+	a.facing = -1
+	var hp := player.health.current
+	a._start_attack(load("res://data/attacks/acolyte_throw.tres"))
+	await frames(40)
+	check(get_tree().get_nodes_in_group(&"projectiles").size() >= 1, "the throw launches a projectile")
+	await frames(60)
+	check(player.health.current < hp, "burning wax hurts (%.0f)" % (hp - player.health.current))
+	# Parry: a projectile arriving during the parry window is deflected.
+	# (Remove the acolyte first so its next throw cannot interfere with the timing.)
+	a.queue_free()
+	for q in get_tree().get_nodes_in_group(&"projectiles"):
+		q.queue_free()
+	await frames(90)
+	player.health.restore_full()
+	var h := HitData.make(18.0, null, Vector2(-80, -40))
+	var p := Projectile.spawn(level, player.global_position + Vector2(22, -16), Vector2(-170, 0), h, null)
+	player.facing = 1
+	await press(&"parry")
+	await frames(20)
+	check(player.health.current == player.health.max_health, "parried projectile does no damage")
+	check(not is_instance_valid(p), "parried projectile is destroyed")
+	# Dodge: i-frames let it pass through.
+	await frames(40)
+	await press(&"dodge")
+	while not player.is_dodge_invulnerable():
+		await get_tree().physics_frame
+	var p2 := Projectile.spawn(level, player.global_position + Vector2(6, -16), Vector2(-170, 0), h, null)
+	await frames(8)
+	check(player.health.current == player.health.max_health, "dodging through takes no damage")
+	check(is_instance_valid(p2) and p2.global_position.x < player.global_position.x + 10.0, "projectile flies on past a dodging player")
+
+
+func test_bell_bearer() -> void:
+	await fresh_game()
+	await place_player(400.0, 480.0, 1)
+	var b: EnemyBase = load("res://actors/enemies/bell_bearer.tscn").instantiate()
+	b.position = Vector2(440, 480)
+	b.start_facing = -1
+	b.patrol_distance = 0.0
+	level.add_child(b)
+	await frames(3)
+	b.target = player
+	b._cooldown = 9999
+	# A light hit does not stagger it (high poise).
+	var h := damage(12.0)
+	h.poise_damage = 12.0
+	b.receive_hit(h)
+	check(b.state != EnemyBase.State.STAGGER, "one light hit does not stagger a Bell-Bearer")
+	# The chain swing cannot be parried.
+	await frames(10)
+	b.facing = -1
+	var atk: AttackData = load("res://data/attacks/bearer_swing.tres")
+	check(not atk.parryable, "chain swing is unparryable")
+	var hp := player.health.current
+	b._start_attack(atk)
+	while b.attack_runner.frame < atk.startup_frames - 4:
+		await get_tree().physics_frame
+	await press(&"parry")
+	await frames(14)
+	check(player.health.current < hp, "parrying the chain swing does not help (hp %.0f)" % player.health.current)
+	b.queue_free()

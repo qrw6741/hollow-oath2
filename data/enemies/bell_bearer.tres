@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/bearer_slam.tres" id="2_slam"]
+[ext_resource type="Resource" path="res://data/attacks/bearer_swing.tres" id="3_swing"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="4_shard"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"bell_bearer"
+display_name = "Bell-Bearer"
+lore = "Penitents who hauled the village bells to the chapel on the Night of Unbinding. They never set them down."
+max_health = 240.0
+max_poise = 140.0
+poise_regen_delay_frames = 120
+poise_regen_per_second = 30.0
+patrol_speed = 22.0
+chase_speed = 40.0
+detection_range = 190.0
+vertical_detection = 60.0
+leash_range = 320.0
+attacks = [ExtResource("2_slam"), ExtResource("3_swing")]
+attack_cooldown_min = 50
+attack_cooldown_max = 100
+recover_frames = 30
+backstep_speed = 40.0
+stagger_frames = 50
+parry_stagger_frames = 110
+ember_reward = 220
+drop_item = ExtResource("4_shard")
+drop_chance = 0.25
+drop_count = 1

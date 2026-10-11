@@ -30,6 +30,10 @@ const STRENGTH_DAMAGE := 0.04
 ## True while a modal menu (candle / inventory) owns input; the pause menu stays out of the way.
 var ui_modal := false
 var level_path := DEFAULT_LEVEL_PATH
+## Level holding the last rested candle ("" = same as level_path, for old saves).
+var checkpoint_level := ""
+## Entry marker to appear at when a level loads (set by exits; "" = checkpoint / default).
+var level_entry: StringName = &""
 var level_name := ""
 var has_checkpoint := false
 var checkpoint_id: StringName = &""
@@ -61,6 +65,13 @@ func _on_checkpoint_rested(id: StringName, pos: Vector2) -> void:
 	has_checkpoint = true
 	checkpoint_id = id
 	respawn_position = pos
+	checkpoint_level = level_path
+	level_entry = &""
+
+
+## The level the last candle is in.
+func checkpoint_level_path() -> String:
+	return checkpoint_level if checkpoint_level != "" else level_path
 
 
 func _on_player_died() -> void:
@@ -212,6 +223,8 @@ func reset() -> void:
 	ui_modal = false
 	level_path = DEFAULT_LEVEL_PATH
 	level_name = ""
+	checkpoint_level = ""
+	level_entry = &""
 	has_checkpoint = false
 	checkpoint_id = &""
 	respawn_position = Vector2.ZERO
@@ -241,6 +254,8 @@ func to_dict() -> Dictionary:
 		"quick_item": String(quick_item),
 		"level_path": level_path,
 		"level_name": level_name,
+		"checkpoint_level": checkpoint_level,
+		"level_entry": String(level_entry),
 		"has_checkpoint": has_checkpoint,
 		"checkpoint_id": String(checkpoint_id),
 		"respawn_position": [respawn_position.x, respawn_position.y],
@@ -262,6 +277,8 @@ func apply_dict(d: Dictionary, slot: int) -> void:
 	quick_item = StringName(d.get("quick_item", ""))
 	level_path = String(d.get("level_path", DEFAULT_LEVEL_PATH))
 	level_name = String(d.get("level_name", ""))
+	checkpoint_level = String(d.get("checkpoint_level", ""))
+	level_entry = StringName(d.get("level_entry", ""))
 	has_checkpoint = bool(d.get("has_checkpoint", false))
 	checkpoint_id = StringName(d.get("checkpoint_id", ""))
 	var p: Array = d.get("respawn_position", [0.0, 0.0])

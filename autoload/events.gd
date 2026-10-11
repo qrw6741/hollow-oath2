@@ -18,6 +18,9 @@ signal game_saved(slot: int)
 signal save_failed(slot: int, reason: String)
 
 # --- World ---
+## A level exit (or a respawn at a candle in another level) wants a different level.
+signal level_change_requested(level_path: String, entry_id: StringName, respawn: bool)
+signal level_entered(level_path: String)
 signal checkpoint_rested(checkpoint_id: StringName, respawn_position: Vector2)
 signal enemy_killed(enemy: Node2D)
 

@@ -75,6 +75,15 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Die: on respawn the boss is at full health and the gate is open.
 - [ ] Win: banner, +1500 embers, Warden's Bell Shard, gate opens; boss never returns after resting or reloading.
 
+## Forsaken Village
+- [ ] Bell Door (back of the boss arena) is locked without the Bell Shard and opens with it; you arrive at the village edge.
+- [ ] Walking off the left edge of the village returns you to the Bell Door.
+- [ ] Rest at the Village Gate Candle; die in the village: you respawn there. Rest only in the Yard, die in the village: you respawn in the Yard.
+- [ ] Rooftop climb is possible; the corridor gate cannot be raised from the outskirts, can be from inside, and stays open.
+- [ ] Ember Acolytes keep distance and throw wax; parry it (glint), or dodge through it.
+- [ ] Bell-Bearers ring before attacking; the slam can be parried, the red chain swing cannot.
+- [ ] The chapel door says the build ends here.
+
 ## Build
 - [ ] Windows .exe launches from a folder with no Godot installed.
 - [ ] Holds ~60 FPS (F3) with all enemies active.

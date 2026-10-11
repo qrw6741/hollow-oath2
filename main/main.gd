@@ -31,6 +31,7 @@ func _ready() -> void:
 	Events.new_game_requested.connect(start_new_game)
 	Events.load_game_requested.connect(continue_slot)
 	Events.quit_to_menu_requested.connect(return_to_menu)
+	Events.level_change_requested.connect(change_level)
 
 	if show_menu_on_start:
 		_enter_menu()
@@ -106,6 +107,30 @@ func _begin_game() -> void:
 	GameState.level_name = lvl.display_name
 	GameState.in_game = true
 	Events.session_started.emit()
+
+
+## Moves the session to another level (through an exit, or to respawn at a candle that
+## is in a different level). Covered by the fade; autosaves on arrival through an exit.
+func change_level(path: String, entry_id: StringName, respawn := false) -> void:
+	if _busy or not GameState.in_game:
+		return
+	_busy = true
+	get_tree().paused = false
+	await _fade_to(1.0, 0.45)
+	GameState.level_entry = entry_id
+	var scene := _level_scene(path)
+	var lvl := load_level(scene)
+	GameState.level_path = scene.resource_path
+	GameState.level_name = lvl.display_name
+	await get_tree().process_frame
+	if respawn:
+		lvl.player._iframes = 60
+		Events.player_respawned.emit(lvl.player)
+	else:
+		SaveSystem.autosave()
+	Events.level_entered.emit(GameState.level_path)
+	await _fade_to(0.0, 0.45)
+	_busy = false
 
 
 ## Only levels inside LEVEL_DIR that exist are accepted; anything else (an edited or

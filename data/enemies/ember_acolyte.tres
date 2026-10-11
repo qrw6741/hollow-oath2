@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/acolyte_throw.tres" id="2_throw"]
+[ext_resource type="Resource" path="res://data/attacks/acolyte_swipe.tres" id="3_swipe"]
+[ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="4_band"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"ember_acolyte"
+display_name = "Ember Acolyte"
+lore = "A novice of the Candlewrights, still tending the censers of a liturgy no one hears. The burning wax it flings was meant to seal oaths."
+max_health = 45.0
+max_poise = 18.0
+patrol_speed = 24.0
+chase_speed = 48.0
+detection_range = 240.0
+vertical_detection = 90.0
+leash_range = 300.0
+attacks = [ExtResource("2_throw"), ExtResource("3_swipe")]
+attack_cooldown_min = 50
+attack_cooldown_max = 90
+recover_frames = 16
+backstep_speed = 60.0
+stagger_frames = 40
+parry_stagger_frames = 90
+ember_reward = 60
+drop_item = ExtResource("4_band")
+drop_chance = 0.15
+drop_count = 1

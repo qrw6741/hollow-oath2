@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
@@ -13,6 +13,8 @@
 [ext_resource type="Script" path="res://world/pickups/item_pickup.gd" id="pickup"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
 [ext_resource type="PackedScene" path="res://actors/bosses/bell_warden.tscn" id="warden"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
 [ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
 [ext_resource type="Resource" path="res://data/items/rusted_key.tres" id="it_key"]
@@ -207,6 +209,24 @@ script = ExtResource("bossarena")
 boss_scene = ExtResource("warden")
 boss_offset = Vector2(440, 0)
 gate_height = 96.0
+
+[node name="BellDoor" type="Area2D" parent="."]
+position = Vector2(2530, 448)
+script = ExtResource("exit")
+target_level = "res://world/levels/forsaken_village.tscn"
+target_entry = &"from_yard"
+mode = 1
+size = Vector2(30, 60)
+required_item = &"warden_bell_shard"
+door_id = &"bell_door"
+display_name = "the Bell Door"
+locked_text = "A bell-shaped lock. Something must ring true in it."
+unlock_text = "THE SHARD HUMS. THE LOCK GIVES WAY."
+
+[node name="FromVillage" type="Marker2D" parent="."]
+position = Vector2(2490, 448)
+script = ExtResource("entry")
+entry_id = &"bell_door"
 
 [node name="PickupBandages" type="Area2D" parent="."]
 position = Vector2(520, 480)

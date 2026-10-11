@@ -65,6 +65,12 @@ AttackRunner.hit_confirmed(target, result, hit) → owner reacts (hit-stop, or e
 - `Main` validates the saved level path (must exist inside `res://world/levels/`) and falls back to the start level.
 - Session flow lives in `Main` (`start_new_game`, `continue_slot`, `return_to_menu`) behind `Events.new_game_requested / load_game_requested / quit_to_menu_requested`; `GameState.session_id` invalidates timers from an ended session (e.g. a pending respawn).
 
+## Levels and travel
+- Each level is a `Level` scene in `world/levels/`. `LevelExit` (walk-through edge or interact door, optionally needing a key item) emits `Events.level_change_requested(path, entry_id, respawn)`; `Main.change_level` fades, swaps the level, records `GameState.level_path` / `level_entry`, and autosaves on arrival.
+- Spawn rule (`Level.spawn_position`): the `LevelEntry` named by `GameState.level_entry`, else the last candle if it is in this level, else `default_spawn`.
+- Death respawns at the last candle even in another level: `Level._on_respawn_requested` sees `GameState.checkpoint_level_path()` differs and asks Main to load that level with `respawn = true` (Main then emits `player_respawned`, clearing the death screen and autosaving).
+- Persistent world changes are flags in `GameState.flags`: `pickup_<id>`, `door_open_<id>`, `gate_open_<id>`, `boss_defeated_<id>`. Ids must be unique game-wide (a test checks this).
+
 ## Rules learned the hard way
 - **Do not `preload()` scenes in scripts that have a `class_name`.** Class compilation can trigger a load cycle that leaves resources half-initialised. Reference scenes through `@export var x: PackedScene` (set in the .tscn) or `load()` at runtime. Preloading plain scripts is fine.
 - Tests must run as a scene (`res://tests/run_tests.tscn`), not with `-s`, so autoloads exist when scripts compile.

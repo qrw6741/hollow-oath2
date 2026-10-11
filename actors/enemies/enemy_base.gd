@@ -41,6 +41,7 @@ func _ready() -> void:
 		poise = data.max_poise
 	health.died.connect(_on_died)
 	attack_runner.hit_confirmed.connect(_on_attack_hit)
+	attack_runner.projectile_fired.connect(_fire_projectile)
 	_ledge_ray = RayCast2D.new()
 	_ledge_ray.collision_mask = 1
 	_ledge_ray.target_position = Vector2(0, 20)
@@ -287,6 +288,30 @@ func _on_attack_hit(_target: Hurtbox, result: int, hit: HitData) -> void:
 			on_parried()
 		HitData.Result.HIT:
 			GameFeel.hit_stop(hit.hit_stop)
+
+
+## Ranged attacks: launch a projectile at the target's chest (straight line, slight drop).
+func _fire_projectile(a: AttackData) -> void:
+	var from := global_position + Vector2(a.projectile_offset.x * facing, a.projectile_offset.y)
+	var aim := from + Vector2(facing * 100.0, 0.0)
+	if target:
+		aim = target.global_position + Vector2(0, -18)
+	var dir := (aim - from).normalized()
+	# Never shoot backwards or steeply: keep the throw readable and dodgeable.
+	if signf(dir.x) != float(facing):
+		dir = Vector2(facing, 0)
+	dir.y = clampf(dir.y, -0.45, 0.45)
+	dir = dir.normalized()
+	var hit := HitData.new()
+	hit.damage = a.damage
+	hit.poise_damage = a.poise_damage
+	hit.knockback = Vector2(a.knockback.x * facing, a.knockback.y)
+	hit.parryable = a.parryable
+	hit.attack_id = a.id
+	hit.hit_stop = a.hit_stop
+	hit.shake = a.shake
+	Projectile.spawn(get_parent(), from, dir * a.projectile_speed, hit, self)
+	Audio.sfx_at(&"throw", from)
 
 
 func _update_poise(delta: float) -> void:
