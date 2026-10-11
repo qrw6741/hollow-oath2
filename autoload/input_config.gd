@@ -26,8 +26,24 @@ const DEFAULTS := {
 
 
 func _ready() -> void:
+	_ensure_ui_pad_buttons()
 	reset_to_defaults()
 	_load_custom()
+
+
+## Godot's built-in ui_accept / ui_cancel do not always carry controller buttons
+## (observed: none at all), which made menus unusable on a pad. Add them explicitly:
+## Cross / A confirms, Circle / B cancels.
+func _ensure_ui_pad_buttons() -> void:
+	for pair in [[&"ui_accept", JOY_BUTTON_A], [&"ui_cancel", JOY_BUTTON_B]]:
+		var has := false
+		for ev in InputMap.action_get_events(pair[0]):
+			if ev is InputEventJoypadButton and ev.button_index == pair[1]:
+				has = true
+		if not has:
+			var e := InputEventJoypadButton.new()
+			e.button_index = pair[1]
+			InputMap.action_add_event(pair[0], e)
 
 
 func reset_to_defaults() -> void:

@@ -71,7 +71,7 @@ func _button(text: String, cb: Callable) -> Button:
 func _unhandled_input(event: InputEvent) -> void:
 	if not GameState.in_game:
 		return
-	if event.is_action_pressed(&"pause"):
+	if event.is_action_pressed(&"pause") or (get_tree().paused and event.is_action_pressed(&"ui_cancel")):
 		if not get_tree().paused:
 			_pause()
 		elif _settings.visible:

@@ -51,7 +51,7 @@ func _run() -> void:
 		test_presets_valid, test_preset_stats_applied, test_unsworn_is_bare_fists,
 		test_each_preset_combo_lands, test_preset_save_and_fallback, test_preset_screen_menu,
 		# --- controller prompts ---
-		test_input_prompts,
+		test_input_prompts, test_menu_works_with_controller,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -975,3 +975,45 @@ func test_input_prompts() -> void:
 		bar.queue_free()
 	settings.pad_style = 0
 	ip.set_device(ip.Device.KEYBOARD, true)
+
+
+func test_menu_works_with_controller() -> void:
+	wipe_saves()
+	make_save(1, 0, "Pad Place")
+	await menu_game()
+	var cont := menu_button("Continue")
+	check(cont.has_focus(), "Continue focused")
+	var ev := InputEventJoypadButton.new()
+	ev.button_index = JOY_BUTTON_A
+	ev.pressed = true
+	Input.parse_input_event(ev)
+	await frames(2)
+	ev = ev.duplicate()
+	ev.pressed = false
+	Input.parse_input_event(ev)
+	await frames(100)
+	check(main.current_level() != null, "Cross/A on Continue starts the game")
+	# Pause with Options, move down with D-pad, confirm Settings with Cross, back with Circle.
+	var pm := main.get_node("PauseMenu")
+	var tap := func(btn: int):
+		var e := InputEventJoypadButton.new()
+		e.button_index = btn
+		e.pressed = true
+		Input.parse_input_event(e)
+		await frames(3)
+		var r := InputEventJoypadButton.new()
+		r.button_index = btn
+		r.pressed = false
+		Input.parse_input_event(r)
+		await frames(3)
+	await tap.call(JOY_BUTTON_START)
+	check(get_tree().paused, "Options opens the pause menu")
+	await tap.call(JOY_BUTTON_DPAD_DOWN)
+	await tap.call(JOY_BUTTON_A)
+	check(pm._settings.visible, "Cross on Settings opens it in the pause menu")
+	await tap.call(JOY_BUTTON_B)
+	check(not pm._settings.visible and pm._main_page.visible, "Circle closes settings")
+	check(pm._resume_btn.has_focus(), "focus back on Resume (focus: %s)" % [pm.get_viewport().gui_get_focus_owner()])
+	await tap.call(JOY_BUTTON_A)   # focus returns to Resume
+	check(not get_tree().paused, "Cross on Resume closes the pause menu")
+	wipe_saves()

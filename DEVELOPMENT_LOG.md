@@ -28,6 +28,12 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — Fix: controller could not operate menus
+
+- Bug (reported by user on a real pad): pressing Cross on Continue/Settings did nothing, also in the pause menu. Root cause: Godot's built-in `ui_accept`/`ui_cancel` carried **no joypad buttons** in this project (confirmed by dumping InputMap), so only D-pad navigation worked. My earlier "controller compatible" claim was wrong for menus; the in-game actions were fine.
+- Fix: `InputConfig` adds Cross/A to `ui_accept` and Circle/B to `ui_cancel`; pause menu also treats Circle as back/resume.
+- New test `test_menu_works_with_controller` simulates pad events: Cross on Continue starts the game; Options pauses; D-pad + Cross opens Settings; Circle closes it; Cross on Resume resumes. Suite 39/39. Still not run on a physical DualSense.
+
 ## 2026-10-11 — Controller prompts (PS5 icons)
 
 - New `InputPrompts` autoload tracks the last-used device (keyboard / PlayStation / Xbox-style; Sony pads are detected by name, with a manual override in Settings) and says which button each action uses. `Glyph` draws the prompt (Cross/Circle/Square/Triangle, L1/R1, Options, D-pad, or a keycap) with vector primitives, so no image files and crisp at any resolution. `HintBar` shows rows of "[icon] label" and redraws when the device changes.
