@@ -28,9 +28,10 @@
 2. Build terrain with `StoneBlock` nodes (set `size`; tick `one_way` for platforms).
 3. Add hazards (`SpikePit`), `OathCandle` instances (unique `checkpoint_id`), `EnemySpawner`s.
 4. Background: copy the `Background` ParallaxBackground from `test_arena.tscn` and change seeds/colours.
-5. Point `Main.start_level` at it (room transitions arrive in M8).
+5. Point `Main.start_level` at it (room transitions arrive in M8). Levels must live in `res://world/levels/` — saves only accept paths there.
+6. Anything that must persist (boss defeated, shortcut opened): `GameState.set_flag(&"name", true)` / `get_flag(&"name")`. Flags are saved automatically at the next autosave. See "Persistence" in `docs/ARCHITECTURE.md` before adding other kinds of saved data.
 
 ## Checklist after any content change
-- Run `res://tests/run_tests.tscn` (must be 18+/0 failed).
+- Run `res://tests/run_tests.tscn` (must end with 0 failed; currently 31 tests).
 - Do the relevant part of `docs/TESTING_CHECKLIST.md`.
 - Log it in `DEVELOPMENT_LOG.md`; record placeholders in `KNOWN_ISSUES.md`.

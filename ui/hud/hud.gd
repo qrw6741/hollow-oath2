@@ -17,11 +17,16 @@ var _debug: Label
 var _flasks := 0
 var _flasks_max := 0
 var _banner_tween: Tween
+var _death_tween: Tween
+var _saved_label: Label
+var _saved_tween: Tween
 
 
 func _ready() -> void:
 	layer = 10
 	_build()
+	Events.session_started.connect(_on_session_started)
+	Events.game_saved.connect(_on_game_saved)
 	Events.player_spawned.connect(_bind_player)
 	Events.flasks_changed.connect(_on_flasks)
 	Events.interact_prompt_shown.connect(_on_prompt)
@@ -84,6 +89,12 @@ func _build() -> void:
 	_fade.color = Color(0, 0, 0, 0)
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_fade)
+
+	_saved_label = _label(root, "Progress saved", 8, HORIZONTAL_ALIGNMENT_RIGHT)
+	_saved_label.position = Vector2(332, 252)
+	_saved_label.size = Vector2(140, 12)
+	_saved_label.add_theme_color_override(&"font_color", Palette.GOLD)
+	_saved_label.modulate.a = 0.0
 
 	_debug = _label(root, "", 8, HORIZONTAL_ALIGNMENT_RIGHT)
 	_debug.position = Vector2(280, 6)
@@ -160,7 +171,10 @@ func show_banner(text: String) -> void:
 
 func _on_player_died() -> void:
 	_prompt.visible = false
+	if _death_tween:
+		_death_tween.kill()
 	var t := create_tween()
+	_death_tween = t
 	t.tween_interval(0.5)
 	t.tween_property(_death, ^"color:a", 0.55, 0.8)
 	t.parallel().tween_property(_death_label, ^"modulate:a", 1.0, 0.8)
@@ -173,6 +187,29 @@ func _on_player_respawned(_p: Node2D) -> void:
 	_death_label.modulate.a = 0.0
 	var t := create_tween()
 	t.tween_property(_fade, ^"color:a", 0.0, 0.7)
+
+
+## A new session (new game / continue) must never inherit the old one's death
+## screen, fade or banner — e.g. when quitting to the menu from the death screen.
+func _on_session_started() -> void:
+	for t in [_death_tween, _banner_tween, _saved_tween]:
+		if t:
+			t.kill()
+	_death.color.a = 0.0
+	_death_label.modulate.a = 0.0
+	_fade.color.a = 0.0
+	_banner.modulate.a = 0.0
+	_saved_label.modulate.a = 0.0
+	_prompt.visible = false
+
+
+func _on_game_saved(_slot: int) -> void:
+	if _saved_tween:
+		_saved_tween.kill()
+	_saved_tween = create_tween()
+	_saved_tween.tween_property(_saved_label, ^"modulate:a", 1.0, 0.2)
+	_saved_tween.tween_interval(1.4)
+	_saved_tween.tween_property(_saved_label, ^"modulate:a", 0.0, 0.6)
 
 
 func _process(_delta: float) -> void:

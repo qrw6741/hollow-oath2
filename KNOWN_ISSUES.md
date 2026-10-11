@@ -12,12 +12,19 @@
 - Default Godot font for UI.
 
 ## Missing (planned)
-- Save/load to disk (Milestone 5). Checkpoint state lives only in memory; quitting resets progress.
-- Main menu, settings screen, remapping UI (Milestone 10; remapping backend exists).
+- Remapping UI (Milestone 10; the remapping backend exists). The settings screen currently has screen shake, hit flashes, hit-stop and master volume.
+- Saves currently contain: checkpoint, deaths, play time, current level and world flags. Inventory, equipment, quests and map discovery will be added as those systems arrive (the save format is versioned for this).
+- Enemies killed since your last rest are not saved (by design: they revive on rest and on death anyway).
 - Air dodge is not available (deliberate for now — decide in playtest).
 - Enemies do not block the player's body (player passes through enemies; only attacks deal damage). Deliberate for M1; revisit with final sprites.
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
+
+## Save system notes
+- Verified: unit tests for corruption/tampering/backup recovery/newer versions/write failure, an in-process menu flow test, and a two-process write-then-read check on Linux. **Not yet tried on Windows** (Windows cannot rename over an existing file, so the code has a remove-then-rename fallback; the backup file covers that moment, but it has only been exercised on Linux).
+- Hand-editing a save file makes it fail its checksum and count as damaged (it falls back to the backup). This is intentional integrity protection, not a bug.
+- Progress is saved at candles and respawns only, so quitting mid-fight loses everything since the last rest ("Progress since your last rest is lost" warning in the pause menu).
+- Menu text uses the default Godot font (custom pixel font planned).
 
 ## Minor
 - With hit-stop on, overlapping hits supersede rather than extend the freeze (intended, but very short freezes may feel clipped).

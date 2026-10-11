@@ -1,9 +1,16 @@
 extends CanvasLayer
-## Pause menu with accessibility toggles. Runs while the tree is paused.
+## Pause menu. Runs while the tree is paused; only available during a game session.
+## Esc / Start toggles it; inside Settings, Esc goes back one level first.
 
+const CONFIRM_MS := 3000
 
-var _panel: Control
-var _buttons: Array[Button] = []
+var _panel: ColorRect
+var _main_page: VBoxContainer
+var _settings: SettingsPanel
+var _resume_btn: Button
+var _menu_btn: Button
+var _hint: Label
+var _armed_until := 0
 
 
 func _ready() -> void:
@@ -15,83 +22,110 @@ func _ready() -> void:
 
 func _build() -> void:
 	_panel = ColorRect.new()
-	(_panel as ColorRect).color = Color(Palette.INK, 0.82)
+	_panel.color = Color(Palette.INK, 0.93)
 	_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_panel.theme = UITheme.get_theme()
 	add_child(_panel)
 
-	var box := VBoxContainer.new()
-	box.position = Vector2(170, 70)
-	box.size = Vector2(140, 140)
-	box.add_theme_constant_override(&"separation", 4)
-	_panel.add_child(box)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_panel.add_child(center)
+
+	_main_page = VBoxContainer.new()
+	_main_page.add_theme_constant_override(&"separation", 4)
+	center.add_child(_main_page)
 
 	var title := Label.new()
 	title.text = "PAUSED"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override(&"font_size", 16)
-	title.add_theme_color_override(&"font_color", Palette.BONE)
-	box.add_child(title)
+	_main_page.add_child(title)
 
-	_add_button(box, "Resume", _resume)
-	_add_button(box, "", _toggle_shake, &"shake")
-	_add_button(box, "", _toggle_flashes, &"flashes")
-	_add_button(box, "", _toggle_hitstop, &"hitstop")
-	_add_button(box, "Quit to Desktop", func(): get_tree().quit())
-	_refresh()
+	_resume_btn = _button("Resume", _resume)
+	_button("Settings", _open_settings)
+	_menu_btn = _button("Quit to Main Menu", _on_quit_to_menu)
+	_button("Quit to Desktop", func(): get_tree().quit())
+
+	_hint = Label.new()
+	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hint.add_theme_color_override(&"font_color", Palette.STONE_LIGHT)
+	_hint.custom_minimum_size.y = 10
+	_main_page.add_child(_hint)
+
+	_settings = SettingsPanel.new()
+	_settings.back_requested.connect(_close_settings)
+	_settings.visible = false
+	center.add_child(_settings)
 
 
-func _add_button(parent: Node, text: String, cb: Callable, key: StringName = &"") -> void:
+func _button(text: String, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
-	b.set_meta(&"key", key)
-	b.focus_mode = Control.FOCUS_ALL
+	b.custom_minimum_size = Vector2(130, 16)
+	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(cb)
-	parent.add_child(b)
-	_buttons.append(b)
-
-
-func _refresh() -> void:
-	for b in _buttons:
-		match b.get_meta(&"key"):
-			&"shake": b.text = "Screen shake: %s" % ("On" if Settings.screen_shake > 0.0 else "Off")
-			&"flashes": b.text = "Hit flashes: %s" % ("On" if Settings.flashes else "Off")
-			&"hitstop": b.text = "Hit-stop: %s" % ("On" if Settings.hit_stop else "Off")
-
-
-func _toggle_shake() -> void:
-	Settings.screen_shake = 0.0 if Settings.screen_shake > 0.0 else 1.0
-	Settings.save_settings()
-	_refresh()
-
-
-func _toggle_flashes() -> void:
-	Settings.flashes = not Settings.flashes
-	Settings.save_settings()
-	_refresh()
-
-
-func _toggle_hitstop() -> void:
-	Settings.hit_stop = not Settings.hit_stop
-	Settings.save_settings()
-	_refresh()
+	_main_page.add_child(b)
+	return b
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not GameState.in_game:
+		return
 	if event.is_action_pressed(&"pause"):
-		if get_tree().paused:
-			_resume()
-		else:
+		if not get_tree().paused:
 			_pause()
+		elif _settings.visible:
+			_settings._on_back()
+		else:
+			_resume()
 		get_viewport().set_input_as_handled()
+
+
+func _process(_delta: float) -> void:
+	if _armed_until > 0 and Time.get_ticks_msec() > _armed_until:
+		_disarm()
 
 
 func _pause() -> void:
 	get_tree().paused = true
 	GameFeel.reset()
 	_panel.visible = true
-	_buttons[0].grab_focus()
+	_main_page.visible = true
+	_settings.visible = false
+	_disarm()
+	_resume_btn.grab_focus()
 
 
 func _resume() -> void:
 	get_tree().paused = false
 	_panel.visible = false
+	_disarm()
+
+
+func _open_settings() -> void:
+	_main_page.visible = false
+	_settings.visible = true
+	_settings.focus_first()
+
+
+func _close_settings() -> void:
+	_settings.visible = false
+	_main_page.visible = true
+	_resume_btn.grab_focus()
+
+
+func _on_quit_to_menu() -> void:
+	if _armed_until == 0:
+		_armed_until = Time.get_ticks_msec() + CONFIRM_MS
+		_menu_btn.text = "Sure?"
+		_hint.text = "Progress since your last rest is lost"
+		return
+	_disarm()
+	_resume()
+	Events.quit_to_menu_requested.emit()
+
+
+func _disarm() -> void:
+	_armed_until = 0
+	_menu_btn.text = "Quit to Main Menu"
+	_hint.text = ""

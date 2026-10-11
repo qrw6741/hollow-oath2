@@ -9,6 +9,14 @@ signal respawn_requested
 signal player_respawned(player: Node2D)
 signal flasks_changed(current: int, maximum: int)
 
+# --- Session / menus ---
+signal new_game_requested(slot: int)
+signal load_game_requested(slot: int)
+signal quit_to_menu_requested
+signal session_started
+signal game_saved(slot: int)
+signal save_failed(slot: int, reason: String)
+
 # --- World ---
 signal checkpoint_rested(checkpoint_id: StringName, respawn_position: Vector2)
 signal enemy_killed(enemy: Node2D)

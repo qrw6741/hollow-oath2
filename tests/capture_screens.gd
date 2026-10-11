@@ -39,6 +39,7 @@ func press(a: StringName, hold := 2) -> void:
 
 func _run() -> void:
 	main = load("res://main/main.tscn").instantiate()
+	main.show_menu_on_start = false
 	get_tree().root.add_child(main)
 	await frames(20)
 	player = main.current_level().player

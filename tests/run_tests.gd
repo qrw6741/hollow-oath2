@@ -15,6 +15,7 @@ var player: Player
 var events: Node
 var game_state: Node
 var settings: Node
+var saves: Node
 
 
 func _ready() -> void:
@@ -28,6 +29,10 @@ func _run() -> void:
 	settings = get_tree().root.get_node("Settings")
 	settings.hit_stop = false
 	settings.screen_shake = 0.0
+	# Tests must never touch the player's real saves.
+	saves = get_tree().root.get_node("SaveSystem")
+	saves.save_dir = "user://test_saves"
+	wipe_saves()
 
 	var tests := [
 		test_health_component, test_stamina_component, test_attack_data,
@@ -35,6 +40,13 @@ func _run() -> void:
 		test_dodge_iframes, test_enemy_hits_player, test_parry_and_riposte,
 		test_heal, test_heal_without_vials, test_checkpoint_rest, test_death_and_respawn,
 		test_enemy_ai_engages, test_enemy_dies_and_resets, test_spike_pit, test_hit_stop_and_fx_cleanup,
+		# --- saving & menus ---
+		test_save_roundtrip, test_save_corruption_cases, test_save_backup_recovery,
+		test_save_future_and_malformed, test_save_write_failure,
+		test_autosave_on_rest, test_no_autosave_without_slot,
+		test_menu_flow_end_to_end, test_death_then_quit_is_clean,
+		test_menu_overwrite_confirmation, test_menu_delete, test_menu_corrupt_slot,
+		test_pause_menu,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -46,6 +58,8 @@ func _run() -> void:
 		else:
 			print("  FAIL  ", _current)
 	await _teardown()
+	wipe_saves()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_saves"))
 	print("\n%d passed, %d failed" % [_passed, _failed.size()])
 	for f in _failed:
 		print("   - ", f)
@@ -85,6 +99,7 @@ func fresh_game() -> void:
 	await _teardown()
 	game_state.reset()
 	main = load("res://main/main.tscn").instantiate()
+	main.show_menu_on_start = false
 	get_tree().root.add_child(main)
 	await frames(6)
 	level = main.current_level()
@@ -418,3 +433,379 @@ func test_hit_stop_and_fx_cleanup() -> void:
 	check(Engine.time_scale == 1.0, "time scale restored")
 	var fx := main.get_node("World/FX")
 	check(fx.get_child_count() == 0, "hit FX freed (%d left)" % fx.get_child_count())
+
+
+# ------------------------------------------------------------------ save / menu helpers
+
+func wipe_saves() -> void:
+	for slot in range(1, 4):
+		saves.delete_slot(slot)
+
+
+func write_raw(slot: int, text: String, suffix := "") -> void:
+	DirAccess.make_dir_recursive_absolute(saves.save_dir)
+	var f := FileAccess.open(saves.slot_path(slot) + suffix, FileAccess.WRITE)
+	f.store_string(text)
+	f.close()
+
+
+func read_raw(slot: int, suffix := "") -> String:
+	return FileAccess.get_file_as_string(saves.slot_path(slot) + suffix)
+
+
+## Writes a valid save for [param slot] using the real GameState -> SaveSystem path.
+func make_save(slot: int, deaths := 0, place := "Test Place") -> void:
+	game_state.reset()
+	game_state.deaths = deaths
+	game_state.level_name = place
+	game_state.play_time = 75.0
+	saves.save_slot(slot)
+	game_state.reset()
+
+
+## Starts the real game *with* the main menu showing.
+func menu_game() -> void:
+	await _teardown()
+	game_state.reset()
+	main = load("res://main/main.tscn").instantiate()
+	get_tree().root.add_child(main)
+	await frames(6)
+
+
+func menu_button(path_name: String) -> Button:
+	return main.menu.find_child(path_name, true, false) as Button
+
+
+# ------------------------------------------------------------------ save tests
+
+func test_save_roundtrip() -> void:
+	wipe_saves()
+	game_state.reset()
+	game_state.deaths = 4
+	game_state.play_time = 123.5
+	game_state.level_name = "The Penitent's Yard"
+	game_state.has_checkpoint = true
+	game_state.checkpoint_id = &"yard_candle"
+	game_state.respawn_position = Vector2(182.25, 480.0)
+	game_state.set_flag(&"boss_1_defeated", true)
+	check(saves.save_slot(2), "save succeeds")
+	check(not FileAccess.file_exists(saves.slot_path(2) + ".tmp"), "no temp file left behind")
+	game_state.reset()
+	var r: Dictionary = saves.load_slot(2)
+	check(r.status == saves.Status.OK, "loads OK")
+	check(not r.recovered, "not flagged as recovered")
+	check(int(r.data.saved_at) > 0, "timestamp recorded")
+	game_state.apply_dict(r.data, 2)
+	check(game_state.deaths == 4 and is_equal_approx(game_state.play_time, 123.5), "numbers restored")
+	check(game_state.level_name == "The Penitent's Yard", "level name restored")
+	check(game_state.has_checkpoint and game_state.checkpoint_id == &"yard_candle", "checkpoint restored")
+	check(game_state.respawn_position == Vector2(182.25, 480.0), "respawn position restored exactly")
+	check(game_state.get_flag(&"boss_1_defeated") == true and game_state.get_flag(&"nope") == false, "flags restored")
+	check(game_state.current_slot == 2, "slot remembered")
+	check(saves.load_slot(1).status == saves.Status.EMPTY, "other slots untouched")
+	check(saves.most_recent_slot() == 2, "most recent slot found")
+	wipe_saves()
+	game_state.reset()
+
+
+func test_save_corruption_cases() -> void:
+	wipe_saves()
+	make_save(1, 4)
+	var good := read_raw(1)
+	check(good.contains('"deaths": 4'), "test assumption: deaths line present")
+	var cases := {
+		"garbage text": "this is not json at all {{{",
+		"empty file": "",
+		"truncated": good.substr(0, good.length() / 2),
+		"valid JSON, wrong shape": "[1, 2, 3]",
+		"tampered value": good.replace('"deaths": 4', '"deaths": 5'),
+		"missing checksum": '{"data": {"version": 1}}',
+	}
+	for label in cases:
+		wipe_saves()
+		write_raw(1, cases[label])
+		var r: Dictionary = saves.load_slot(1)
+		check(r.status == saves.Status.CORRUPT, "%s is reported CORRUPT (got %d)" % [label, r.status])
+		check(FileAccess.file_exists(saves.slot_path(1)), "%s: damaged file is kept, not deleted" % label)
+	wipe_saves()
+
+
+func test_save_backup_recovery() -> void:
+	wipe_saves()
+	make_save(1, 1)
+	make_save(1, 2)
+	check(FileAccess.file_exists(saves.slot_path(1) + ".bak"), "second save keeps a backup of the first")
+	var bak: Dictionary = saves._decode(read_raw(1, ".bak"))
+	check(bak.status == saves.Status.OK and bak.data.deaths == 1, "backup holds the previous save")
+	check(saves.load_slot(1).data.deaths == 2, "main file holds the newest save")
+	# Damage the main file: the game must fall back to the backup.
+	write_raw(1, "broken!!")
+	var r: Dictionary = saves.load_slot(1)
+	check(r.status == saves.Status.OK and r.recovered, "recovered from backup")
+	check(r.data.deaths == 1, "recovered data is the backup's")
+	check(FileAccess.file_exists(saves.slot_path(1) + ".corrupt"), "damaged file set aside for inspection")
+	var again: Dictionary = saves.load_slot(1)
+	check(again.status == saves.Status.OK and not again.recovered, "slot is healthy again afterwards")
+	# Main file missing entirely (crash mid-swap): also recovered.
+	DirAccess.remove_absolute(saves.slot_path(1))
+	check(saves.load_slot(1).status == saves.Status.OK, "recovers when only the backup exists")
+	# A damaged main file must not overwrite a good backup on the next save.
+	write_raw(1, "broken again")
+	game_state.reset()
+	game_state.deaths = 9
+	saves.save_slot(1)
+	check(saves.load_slot(1).data.deaths == 9, "saving over a damaged file works")
+	wipe_saves()
+	game_state.reset()
+
+
+func test_save_future_and_malformed() -> void:
+	wipe_saves()
+	# A save from a newer game build must be refused but never modified.
+	var future_text: String = saves._encode({"version": 99, "deaths": 3})
+	write_raw(2, future_text)
+	var r: Dictionary = saves.load_slot(2)
+	check(r.status == saves.Status.TOO_NEW, "newer version reported TOO_NEW")
+	check(read_raw(2) == future_text, "newer save file left untouched")
+	# Missing and wrongly-typed fields fall back to defaults instead of crashing.
+	write_raw(3, saves._encode({
+		"version": 1, "deaths": "lots", "play_time": -5, "respawn_position": [1],
+		"has_checkpoint": true, "checkpoint_id": "x", "flags": 3, "level_path": 7, "level_name": null}))
+	var m: Dictionary = saves.load_slot(3)
+	check(m.status == saves.Status.OK, "malformed fields still load")
+	check(m.data.deaths == 0 and m.data.play_time == 0.0, "bad numbers become defaults")
+	check(m.data.has_checkpoint == false, "checkpoint without a valid position is dropped")
+	check(m.data.flags is Dictionary and m.data.flags.is_empty(), "bad flags become empty")
+	check(m.data.level_path == game_state.DEFAULT_LEVEL_PATH, "bad level path becomes default")
+	# No version at all is corruption, not 'version 0'.
+	write_raw(1, saves._encode({"deaths": 1}))
+	check(saves.load_slot(1).status == saves.Status.CORRUPT, "missing version is CORRUPT")
+	wipe_saves()
+
+
+func test_save_write_failure() -> void:
+	# Make the save "folder" impossible to create: its parent is a regular file.
+	var blocker := "user://test_saves_blocker"
+	var f := FileAccess.open(blocker, FileAccess.WRITE)
+	f.store_string("x")
+	f.close()
+	var real_dir: String = saves.save_dir
+	saves.save_dir = blocker + "/sub"
+	var failed := [""]
+	events.save_failed.connect(func(_s, reason): failed[0] = reason, CONNECT_ONE_SHOT)
+	game_state.reset()
+	game_state.deaths = 3
+	check(not saves.save_slot(1), "save reports failure")
+	check(failed[0] != "", "save_failed signal emitted (%s)" % failed[0])
+	check(game_state.deaths == 3, "game state unaffected by a failed save")
+	saves.save_dir = real_dir
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(blocker))
+	game_state.reset()
+
+
+func test_autosave_on_rest() -> void:
+	await fresh_game()
+	wipe_saves()
+	game_state.current_slot = 1
+	var saved := [0]
+	events.game_saved.connect(func(s): saved[0] = s, CONNECT_ONE_SHOT)
+	await place_player(170.0)
+	await press(&"interact")
+	await frames(4)
+	check(saved[0] == 1, "game_saved emitted for slot 1")
+	var r: Dictionary = saves.load_slot(1)
+	check(r.status == saves.Status.OK, "slot written")
+	check(r.data.has_checkpoint and r.data.checkpoint_id == "yard_candle", "checkpoint is in the save")
+	check(r.data.level_path == game_state.DEFAULT_LEVEL_PATH, "level path saved (%s)" % r.data.level_path)
+	wipe_saves()
+
+
+func test_no_autosave_without_slot() -> void:
+	await fresh_game()
+	wipe_saves()
+	check(game_state.current_slot == 0, "dev session has no slot")
+	await place_player(170.0)
+	await press(&"interact")
+	await frames(4)
+	for slot in range(1, 4):
+		check(saves.load_slot(slot).status == saves.Status.EMPTY, "slot %d still empty" % slot)
+
+
+# ------------------------------------------------------------------ menu tests
+
+func test_menu_flow_end_to_end() -> void:
+	wipe_saves()
+	await menu_game()
+	check(main.current_level() == null, "no level while the menu is showing")
+	check(main.menu.visible and not main.hud.visible, "menu visible, HUD hidden")
+	check(not game_state.in_game, "not in game")
+	check(menu_button("Continue").disabled, "Continue disabled with no saves")
+	check(menu_button("LoadGame").disabled, "Load Game disabled with no saves")
+	check(not menu_button("NewGame").disabled, "New Game available")
+
+	# New game in slot 2.
+	events.new_game_requested.emit(2)
+	await frames(100)
+	level = main.current_level()
+	check(level != null, "level loaded")
+	if level == null:
+		return
+	player = level.player
+	check(game_state.in_game and game_state.current_slot == 2, "session active on slot 2")
+	check(saves.load_slot(2).status == saves.Status.OK, "new game wrote its slot immediately")
+	check(not main.menu.visible and main.hud.visible, "menu closed, HUD shown")
+	check(game_state.level_name == "The Penitent's Yard", "level name recorded")
+
+	# Rest at the candle, die, respawn: deaths are persisted.
+	await place_player(170.0)
+	await press(&"interact")
+	await frames(4)
+	player.receive_hit(damage(500))
+	await frames(int(game_state.RESPAWN_DELAY * 60.0) + 14)
+	check(game_state.deaths == 1, "death counted")
+	var r: Dictionary = saves.load_slot(2)
+	check(r.data.deaths == 1 and r.data.checkpoint_id == "yard_candle", "death count and checkpoint saved")
+
+	# Quit to menu: world gone, state closed.
+	events.quit_to_menu_requested.emit()
+	await frames(100)
+	check(main.current_level() == null and not game_state.in_game, "back at the menu")
+	check(main.menu.visible and not main.hud.visible, "menu visible again")
+	check(not menu_button("Continue").disabled, "Continue now enabled")
+	check(menu_button("Continue").has_focus(), "Continue is focused so Enter/A resumes immediately")
+
+	# Continue: everything is restored.
+	game_state.reset()   # prove the data comes from the file, not memory
+	menu_button("Continue").pressed.emit()
+	await frames(100)
+	level = main.current_level()
+	check(level != null, "continue loads the level")
+	if level == null:
+		return
+	player = level.player
+	check(player.global_position.distance_to(Vector2(182.0, 480.0)) < 12.0, "player respawns beside the candle (%s)" % player.global_position)
+	check(game_state.deaths == 1 and game_state.checkpoint_id == &"yard_candle" and game_state.current_slot == 2, "state restored from file")
+	check(player.health.current == 100.0 and player.flasks == player.max_flasks, "full vitals")
+	check(game_state.play_time > 0.0, "play time tracked")
+	wipe_saves()
+
+
+func test_death_then_quit_is_clean() -> void:
+	wipe_saves()
+	await fresh_game()
+	player.receive_hit(damage(500))
+	await frames(10)
+	var respawned := [false]
+	events.player_respawned.connect(func(_p): respawned[0] = true)
+	main.return_to_menu()
+	await frames(60)
+	check(not game_state.in_game and main.menu.visible, "in menu during pending respawn")
+	events.new_game_requested.emit(1)
+	await frames(130)   # well past the old session's respawn timer
+	check(not respawned[0], "stale respawn from the old session never fires")
+	level = main.current_level()
+	check(level != null and level.player.health.current == 100.0 and not level.player.is_dead(), "new session player is alive")
+	check(main.hud._fade.color.a < 0.01 and main.hud._death.color.a < 0.01, "death screen did not leak into the new session")
+	check(game_state.deaths == 0, "deaths reset for the new game")
+	wipe_saves()
+
+
+func test_menu_overwrite_confirmation() -> void:
+	wipe_saves()
+	make_save(1, 7, "Old Place")
+	await menu_game()
+	check(not menu_button("Continue").disabled, "Continue enabled")
+	check(main.menu._continue_info.text.contains("Slot 1") and main.menu._continue_info.text.contains("Old Place"), "continue info (%s)" % main.menu._continue_info.text)
+	main.menu._open_slots(0)   # NEW
+	await frames(2)
+	var rows: Array = main.menu._rows
+	check(rows[0].act.text == "Overwrite" and rows[1].act.text == "Begin", "occupied slot says Overwrite, empty says Begin")
+	check(rows[0].del.visible and not rows[1].del.visible, "delete only offered on occupied slots")
+	var before := read_raw(1)
+	rows[0].act.pressed.emit()
+	await frames(30)
+	check(rows[0].act.text == "Sure?", "first press asks for confirmation")
+	check(main.current_level() == null and read_raw(1) == before, "nothing happened yet")
+	rows[0].act.pressed.emit()
+	await frames(100)
+	check(main.current_level() != null, "second press starts the new game")
+	check(saves.load_slot(1).data.deaths == 0, "slot was overwritten")
+	wipe_saves()
+
+
+func test_menu_delete() -> void:
+	wipe_saves()
+	make_save(3, 2)
+	await menu_game()
+	main.menu._open_slots(1)   # LOAD
+	await frames(2)
+	var rows: Array = main.menu._rows
+	check(rows[0].act.disabled and not rows[2].act.disabled, "only occupied slot is loadable")
+	rows[2].del.pressed.emit()
+	await frames(2)
+	check(rows[2].del.text == "Sure?" and FileAccess.file_exists(saves.slot_path(3)), "delete needs confirmation")
+	rows[2].del.pressed.emit()
+	await frames(2)
+	check(not FileAccess.file_exists(saves.slot_path(3)), "second press deletes")
+	check(main.menu.screen == 0, "returns to title when no saves remain")
+	check(menu_button("Continue").disabled and menu_button("LoadGame").disabled, "Continue and Load disabled again")
+	wipe_saves()
+
+
+func test_menu_corrupt_slot() -> void:
+	wipe_saves()
+	write_raw(1, "garbage")
+	await menu_game()
+	check(menu_button("Continue").disabled, "a damaged save never offers Continue")
+	check(not menu_button("LoadGame").disabled, "damaged slot still reachable to delete it")
+	main.menu._open_slots(1)
+	await frames(2)
+	var row: Dictionary = main.menu._rows[0]
+	check(row.info.text.contains("damaged"), "row explains the problem (%s)" % row.info.text)
+	check(row.act.disabled and row.del.visible, "cannot load, can delete")
+	# Forcing a load must fail gracefully and stay in the menu.
+	events.load_game_requested.emit(1)
+	await frames(60)
+	check(main.current_level() == null and main.menu.visible, "stays in menu")
+	check(main.menu._status.text != "", "tells the player (%s)" % main.menu._status.text)
+	wipe_saves()
+
+
+func test_pause_menu() -> void:
+	await fresh_game()
+	var pm := main.get_node("PauseMenu")
+	var press_pause := func(down: bool):
+		var ev := InputEventAction.new()
+		ev.action = &"pause"
+		ev.pressed = down
+		Input.parse_input_event(ev)
+	press_pause.call(true)
+	press_pause.call(false)
+	await frames(3)
+	check(get_tree().paused, "Esc pauses during a session")
+	press_pause.call(true)
+	press_pause.call(false)
+	await frames(3)
+	check(not get_tree().paused, "Esc resumes")
+	# Quit to menu needs a second press.
+	pm._pause()
+	pm._on_quit_to_menu()
+	check(pm._menu_btn.text == "Sure?" and get_tree().paused, "quit to menu asks first")
+	pm._on_quit_to_menu()
+	await frames(100)
+	check(not get_tree().paused, "game unpaused after quitting to menu")
+	check(main.current_level() == null and main.menu.visible, "arrived at main menu")
+	# Pause must be unavailable in the menu.
+	press_pause.call(true)
+	press_pause.call(false)
+	await frames(3)
+	check(not get_tree().paused, "Esc does not pause inside the main menu")
+	# Volume buttons change the setting (no disk write; restored afterwards).
+	var panel := SettingsPanel.new()
+	get_tree().root.add_child(panel)
+	var v: float = settings.master_volume
+	panel._change_volume(-0.1)
+	check(is_equal_approx(settings.master_volume, clampf(snappedf(v - 0.1, 0.1), 0.0, 1.0)), "volume steps down")
+	settings.master_volume = v
+	settings.apply_audio()
+	panel.queue_free()

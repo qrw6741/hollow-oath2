@@ -25,7 +25,7 @@ func load_settings() -> void:
 	flashes = bool(cfg.get_value("accessibility", "flashes", flashes))
 	hit_stop = bool(cfg.get_value("accessibility", "hit_stop", hit_stop))
 	master_volume = clampf(float(cfg.get_value("audio", "master_volume", master_volume)), 0.0, 1.0)
-	_apply_audio()
+	apply_audio()
 
 
 func save_settings() -> void:
@@ -35,10 +35,10 @@ func save_settings() -> void:
 	cfg.set_value("accessibility", "hit_stop", hit_stop)
 	cfg.set_value("audio", "master_volume", master_volume)
 	cfg.save(PATH)
-	_apply_audio()
+	apply_audio()
 	changed.emit()
 
 
-func _apply_audio() -> void:
+func apply_audio() -> void:
 	var bus := AudioServer.get_bus_index("Master")
 	AudioServer.set_bus_volume_db(bus, linear_to_db(maxf(master_volume, 0.0001)))

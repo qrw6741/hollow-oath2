@@ -10,7 +10,7 @@
 ## Scene tree at runtime
 ```
 root
-├─ Events, Settings, InputConfig, GameFeel, GameState   (autoloads)
+├─ Events, Settings, InputConfig, GameFeel, GameState, SaveSystem   (autoloads)
 └─ Main (main.gd)                    persistent across level changes
    ├─ World (Node2D)
    │  ├─ <Level> (level.gd)          swapped by Main.load_level()
@@ -21,7 +21,9 @@ root
    │  ├─ FX  (group "fx_layer": sparks, damage numbers)
    │  └─ Camera (camera_rig.gd)
    ├─ HUD (CanvasLayer 10)
-   └─ PauseMenu (CanvasLayer 20, process always)
+   ├─ MainMenu (CanvasLayer 5; title / slots / settings)
+   ├─ PauseMenu (CanvasLayer 20, process always)
+   └─ fade layer (CanvasLayer 50, created by Main)
 ```
 
 ## Combat flow
@@ -52,8 +54,16 @@ AttackRunner.hit_confirmed(target, result, hit) → owner reacts (hit-stop, or e
 - **EnemyBase** (`enemy_base.gd`): PATROL ⇄ IDLE → CHASE → ATTACK → RECOVER → CHASE; STAGGER, PARRIED, RETURN, DEAD. Subclass hooks: `choose_attack`, `on_target_acquired`, `on_attack_started`, `on_staggered`, `on_parried`, `on_died`.
 - **Bosses (M6)** will get a `BossBase` extending EnemyBase with explicit phase states, scripted intros and a persistent "defeated" flag in GameState.
 
-## Persistence (planned M5)
-`GameState` will serialise to `user://save_<slot>.json` with a `version` field and migration functions per version; corrupted files are moved aside and reported, never crash the game. Only durable state is saved (checkpoint, unlocks, inventory, flags) — never mid-combat state.
+## Persistence
+`SaveSystem` (autoload) owns files; `GameState` owns what goes into them (`to_dict()` / `apply_dict()`).
+- Three slots: `<user dir>/saves/slot_N.json` = `{ "checksum": sha256, "data": { "version": 1, ... } }`.
+- **Write**: temp file → read back and verify → copy the current good file to `.bak` → swap in. A failed write never damages the existing save and reports via `Events.save_failed`.
+- **Read**: main file → if damaged/missing, `.bak` (the damaged file is kept as `.corrupt`) → else status CORRUPT. A save from a newer game version is TOO_NEW and is never modified.
+- **Versioning**: `CURRENT_VERSION` + `_migrate(data, from_version)` upgrades one version at a time; `_normalize()` forces every field to a valid type with defaults, so malformed or hand-edited values cannot crash the game. To add data: add it to `GameState.to_dict/apply_dict` and `_normalize`; bump the version and add a `_migrate` arm only if old saves need transforming.
+- **Autosave** on `checkpoint_rested` and `player_respawned`, only when a slot is active (`GameState.current_slot > 0`). Dev/test sessions have slot 0 and never write.
+- Only durable state is saved — never mid-combat state.
+- `Main` validates the saved level path (must exist inside `res://world/levels/`) and falls back to the start level.
+- Session flow lives in `Main` (`start_new_game`, `continue_slot`, `return_to_menu`) behind `Events.new_game_requested / load_game_requested / quit_to_menu_requested`; `GameState.session_id` invalidates timers from an ended session (e.g. a pending respawn).
 
 ## Rules learned the hard way
 - **Do not `preload()` scenes in scripts that have a `class_name`.** Class compilation can trigger a load cycle that leaves resources half-initialised. Reference scenes through `@export var x: PackedScene` (set in the .tscn) or `load()` at runtime. Preloading plain scripts is fine.

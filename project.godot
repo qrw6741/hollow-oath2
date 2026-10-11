@@ -11,6 +11,8 @@ config/version="0.1.0-m1"
 run/main_scene="res://main/main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="TheHollowOath"
 
 [autoload]
 
@@ -19,6 +21,7 @@ Settings="*res://autoload/settings.gd"
 InputConfig="*res://autoload/input_config.gd"
 GameFeel="*res://autoload/game_feel.gd"
 GameState="*res://autoload/game_state.gd"
+SaveSystem="*res://autoload/save_system.gd"
 
 [display]
 

@@ -39,6 +39,18 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Spikes: one hit (20), thrown upward, can climb out.
 - [ ] Death: "THE OATH BREAKS", fade, respawn beside the last candle (or the start if none), full health/vials, enemies revived, brief invulnerability.
 
+## Saving and menus
+- [ ] Fresh install: main menu opens; Continue and Load Game are greyed out; New Game works.
+- [ ] New Game → pick slot 1 → game starts; quit and relaunch → Continue is enabled and shows slot 1, place and play time.
+- [ ] Rest at a candle: "Progress saved" appears bottom-right. Quit to menu, Continue: you spawn beside that candle with full health and vials.
+- [ ] Die, wait for respawn, quit and Continue: the death count is kept.
+- [ ] Walk away from a candle, quit to menu without resting: Continue returns you to the *candle*, not where you quit (expected).
+- [ ] Slots screen: Overwrite and Delete both need a second press; waiting 3 s resets them. Esc / B goes back.
+- [ ] Quit to Main Menu from the pause menu asks "Sure?"; the death screen never appears in the next session.
+- [ ] Damaged save: close the game, open `slot_1.json` in a text editor, delete half of it, relaunch → it recovers from the backup, or says "damaged" and offers Delete — never crashes.
+- [ ] Settings changes (shake / flashes / hit-stop / volume) survive a relaunch.
+- [ ] Keyboard-only and gamepad-only navigation of every menu works; the focused item is always visible.
+
 ## Build
 - [ ] Windows .exe launches from a folder with no Godot installed.
 - [ ] Holds ~60 FPS (F3) with all enemies active.
