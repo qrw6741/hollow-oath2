@@ -20,6 +20,10 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Audio
+- All audio is synthesised placeholder and has never been listened to by a person; volumes/mix are estimates.
+- Music loops start on a bell/drum hit; if the loop point is audible, the generator's loop lengths can be adjusted.
+
 ## Boss
 - Bell-Warden balance is untested by a human (650 HP, damage 20-36 per hit, cooldowns). Tune in `data/enemies/bell_warden.tres` and `data/attacks/warden_*.tres`.
 - No boss music, sounds, intro cutscene or camera framing yet; the name banner is the intro.
@@ -31,7 +35,6 @@
 - No shops/NPCs, no equipment swapping, and no item uses beyond four consumables; the Rusted Key opens nothing yet.
 - Candle menu opens automatically after resting (about 1 second), with no option to disable it yet.
 - Items can be used in the pack while paused; healing at full health is blocked, but there is no cooldown or use animation (instant).
-- Embers recovered or lost do not play any sound (no audio yet).
 
 ## Controller
 - Never tested with a physical DualSense. Prompts for rebound buttons follow the bindings, but there is no in-game remapping UI yet. Pause menu has no button hint bar. L2/R2 and the touchpad are unbound.

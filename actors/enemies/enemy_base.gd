@@ -152,6 +152,7 @@ func _start_attack(a: AttackData) -> void:
 	_set_state(State.ATTACK)
 	velocity.x = 0.0
 	attack_runner.start(a, facing)
+	play_attack_sound(a)
 	on_attack_started(a)
 
 
@@ -309,8 +310,19 @@ func _on_died() -> void:
 	collision_layer = 0
 	GameFeel.spark(global_position + Vector2(0, -16), Palette.EMBER, 22)
 	died.emit(self)
+	play_death_sound()
 	Events.enemy_killed.emit(self)
 	on_died()
+
+
+# ------------------------------------------------------------------ sounds (virtual)
+
+func play_attack_sound(_a: AttackData) -> void:
+	Audio.sfx_at(&"enemy_windup", global_position)
+
+
+func play_death_sound() -> void:
+	Audio.sfx_at(&"enemy_death", global_position)
 
 
 # ------------------------------------------------------------------ virtual hooks

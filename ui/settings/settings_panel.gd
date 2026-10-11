@@ -17,6 +17,8 @@ var _vsync: Button
 var _icons: Button
 var _vibe: Button
 var _volume_label: Label
+var _music_label: Label
+var _sfx_label: Label
 var _back: Button
 
 
@@ -42,32 +44,14 @@ func _ready() -> void:
 	_flashes = _button(_toggle_flashes)
 	_hitstop = _button(_toggle_hitstop)
 
+	# Volumes: master / music / effects on one row.
 	var vol := HBoxContainer.new()
 	vol.alignment = BoxContainer.ALIGNMENT_CENTER
-	vol.add_theme_constant_override(&"separation", 6)
+	vol.add_theme_constant_override(&"separation", 3)
 	add_child(vol)
-	var lab := Label.new()
-	lab.text = "Volume"
-	lab.custom_minimum_size.x = 60
-	vol.add_child(lab)
-	var minus := Button.new()
-	minus.name = &"VolumeDown"
-	minus.text = "-"
-	minus.custom_minimum_size.x = 22
-	UITheme.compact(minus)
-	minus.pressed.connect(_change_volume.bind(-0.1))
-	vol.add_child(minus)
-	_volume_label = Label.new()
-	_volume_label.custom_minimum_size.x = 34
-	_volume_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vol.add_child(_volume_label)
-	var plus := Button.new()
-	plus.name = &"VolumeUp"
-	plus.text = "+"
-	plus.custom_minimum_size.x = 22
-	UITheme.compact(plus)
-	plus.pressed.connect(_change_volume.bind(0.1))
-	vol.add_child(plus)
+	_volume_label = _volume_group(vol, "Volume", "master_volume", &"VolumeDown", &"VolumeUp")
+	_music_label = _volume_group(vol, "Music", "music_volume", &"MusicDown", &"MusicUp")
+	_sfx_label = _volume_group(vol, "Effects", "sfx_volume", &"SfxDown", &"SfxUp")
 
 	_back = _button(_on_back)
 	_back.text = "Back"
@@ -107,6 +91,8 @@ func _refresh() -> void:
 	_flashes.text = "Hit flashes: %s" % ("On" if Settings.flashes else "Off")
 	_hitstop.text = "Hit-stop: %s" % ("On" if Settings.hit_stop else "Off")
 	_volume_label.text = "%d%%" % roundi(Settings.master_volume * 100.0)
+	_music_label.text = "%d%%" % roundi(Settings.music_volume * 100.0)
+	_sfx_label.text = "%d%%" % roundi(Settings.sfx_volume * 100.0)
 
 
 func _toggle_shake() -> void:
@@ -124,9 +110,39 @@ func _toggle_hitstop() -> void:
 	_refresh()
 
 
-func _change_volume(step: float) -> void:
-	Settings.master_volume = clampf(snappedf(Settings.master_volume + step, 0.1), 0.0, 1.0)
+func _volume_group(row: HBoxContainer, text: String, prop: String, down_name: StringName, up_name: StringName) -> Label:
+	var lab := Label.new()
+	lab.text = text
+	lab.add_theme_color_override(&"font_color", Palette.BONE_DIM)
+	row.add_child(lab)
+	var minus := Button.new()
+	minus.name = down_name
+	minus.text = "-"
+	minus.custom_minimum_size.x = 16
+	UITheme.compact(minus)
+	minus.pressed.connect(_change_volume.bind(prop, -0.1))
+	row.add_child(minus)
+	var val := Label.new()
+	val.custom_minimum_size.x = 28
+	val.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	row.add_child(val)
+	var plus := Button.new()
+	plus.name = up_name
+	plus.text = "+"
+	plus.custom_minimum_size.x = 16
+	UITheme.compact(plus)
+	plus.pressed.connect(_change_volume.bind(prop, 0.1))
+	row.add_child(plus)
+	var gap := Control.new()
+	gap.custom_minimum_size.x = 6
+	row.add_child(gap)
+	return val
+
+
+func _change_volume(prop: String, step: float) -> void:
+	Settings.set(prop, clampf(snappedf(float(Settings.get(prop)) + step, 0.1), 0.0, 1.0))
 	Settings.apply_audio()
+	Audio.sfx(&"ui_move")
 	_refresh()
 
 

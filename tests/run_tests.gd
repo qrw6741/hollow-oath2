@@ -59,6 +59,8 @@ func _run() -> void:
 		# --- boss ---
 		test_boss_data_valid, test_boss_dormant_until_gate, test_boss_fight_seals_gate, test_boss_attacks_player,
 		test_boss_parry_riposte, test_boss_phase_two_and_leap, test_boss_resets_on_player_death, test_boss_defeat_persists,
+		# --- audio ---
+		test_audio_files_and_music_flow,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -836,7 +838,7 @@ func test_pause_menu() -> void:
 	var panel := SettingsPanel.new()
 	get_tree().root.add_child(panel)
 	var v: float = settings.master_volume
-	panel._change_volume(-0.1)
+	panel._change_volume("master_volume", -0.1)
 	check(is_equal_approx(settings.master_volume, clampf(snappedf(v - 0.1, 0.1), 0.0, 1.0)), "volume steps down")
 	settings.master_volume = v
 	settings.apply_audio()
@@ -1419,3 +1421,55 @@ func test_boss_defeat_persists() -> void:
 	await frames(8)
 	level = main.current_level()
 	check(not is_instance_valid(arena().boss), "beaten boss absent after reload")
+
+
+# ------------------------------------------------------------------ audio
+
+## Every sound name used in code must exist as a file; music loops; tracks follow the game.
+func test_audio_files_and_music_flow() -> void:
+	var audio: Node = get_tree().root.get_node("Audio")
+	var re := RegEx.new()
+	re.compile("(sfx|sfx_at|sting|music)\\(&\"([a-z0-9_]+)\"")
+	var used := {}
+	for dir in ["res://actors", "res://autoload", "res://ui", "res://world", "res://main"]:
+		for f in _gd_files(dir):
+			for m in re.search_all(FileAccess.get_file_as_string(f)):
+				used[m.get_string(2)] = m.get_string(1)
+	check(used.size() >= 25, "found the sound calls in code (%d)" % used.size())
+	for sname in used:
+		var folder := "music" if used[sname] == "music" else "sfx"
+		check(ResourceLoader.exists("res://assets/audio/%s/%s.wav" % [folder, sname]), "sound file exists: %s/%s" % [folder, sname])
+	for track in [&"menu", &"yard", &"boss"]:
+		var st: AudioStreamWAV = audio._stream(audio.MUSIC_DIR, track, true)
+		check(st != null and st.loop_mode == AudioStreamWAV.LOOP_FORWARD and st.loop_end > st.mix_rate * 20, "%s loops" % track)
+	# Music follows the game.
+	await fresh_game()
+	await frames(4)
+	check(audio.current_music == &"yard", "level plays its music (%s)" % audio.current_music)
+	await enter_boss_arena()
+	check(audio.current_music == &"boss", "boss fight switches to boss music")
+	arena().boss.receive_hit(damage(99999.0))
+	await frames(4)
+	check(audio.current_music == &"", "victory silences the music for the sting")
+	await menu_game()
+	check(audio.current_music == &"menu", "menu music in the main menu")
+	# Volume settings reach the buses.
+	var mv: float = settings.music_volume
+	settings.music_volume = 0.5
+	settings.apply_audio()
+	check(is_equal_approx(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music")), linear_to_db(0.5)), "music volume applied to the Music bus")
+	settings.music_volume = mv
+	settings.apply_audio()
+
+
+func _gd_files(dir: String) -> Array:
+	var out := []
+	var d := DirAccess.open(dir)
+	if d == null:
+		return out
+	for f in d.get_files():
+		if f.ends_with(".gd"):
+			out.append(dir.path_join(f))
+	for sub in d.get_directories():
+		out.append_array(_gd_files(dir.path_join(sub)))
+	return out

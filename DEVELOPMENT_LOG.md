@@ -28,6 +28,13 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — Placeholder audio
+
+- 35 sound effects and 3 looping music tracks, all synthesised by `tools/audio/gen_audio.py` (deterministic). `Audio` autoload with Music/SFX buses, pooled players, positional sounds, music crossfades. Volume / Music / Effects sliders in Settings. Details in `docs/AUDIO.md`.
+- Hooked: player combat and movement, enemy wind-ups and deaths, the Bell-Warden (bell toll telegraph, stomps, leap landing, roar, death), economy and world events, menu ticks, music per context.
+- Tests: 56 (new `test_audio_files_and_music_flow`: every sound name used in code exists, music loops, music follows menu / level / boss / victory, volume reaches the bus).
+- **Not verified by ear.** No audio output here; levels were set from measured peak/RMS. Needs a listen and a rebalance.
+
 ## 2026-10-11 — Intro boss: the Bell-Warden; ember counter reverted
 
 - **HUD**: removed the LV plaque; the ember counter is back to the plain icon + number (user request).

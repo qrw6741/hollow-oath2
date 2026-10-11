@@ -89,6 +89,10 @@ func _ready() -> void:
 	health.died.connect(_on_died)
 	attack_runner.hit_confirmed.connect(_on_attack_hit)
 	_add_lantern()
+	var snd := Node.new()
+	snd.name = &"Sounds"
+	snd.set_script(load("res://actors/player/player_sounds.gd"))
+	add_child(snd)
 	_emit_spawned.call_deferred()
 
 

@@ -94,6 +94,7 @@ func _enter_menu() -> void:
 	GameFeel.reset()
 	hud.visible = false
 	menu.open()
+	Audio.music(&"menu")
 
 
 func _begin_game() -> void:

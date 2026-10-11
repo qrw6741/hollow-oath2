@@ -10,6 +10,8 @@ var screen_shake := 1.0      ## 0 = off, 1 = full.
 var flashes := true          ## Full-screen / hit flashes.
 var hit_stop := true         ## Freeze-frame on impact.
 var master_volume := 0.8
+var music_volume := 0.7
+var sfx_volume := 0.9
 var show_debug := false
 var vibration := true
 ## Open the candle (level-up) menu automatically after resting. Not saved; tests turn it off.
@@ -39,6 +41,8 @@ func load_settings() -> void:
 	flashes = bool(cfg.get_value("accessibility", "flashes", flashes))
 	hit_stop = bool(cfg.get_value("accessibility", "hit_stop", hit_stop))
 	master_volume = clampf(float(cfg.get_value("audio", "master_volume", master_volume)), 0.0, 1.0)
+	music_volume = clampf(float(cfg.get_value("audio", "music_volume", music_volume)), 0.0, 1.0)
+	sfx_volume = clampf(float(cfg.get_value("audio", "sfx_volume", sfx_volume)), 0.0, 1.0)
 	vibration = bool(cfg.get_value("controller", "vibration", vibration))
 	pad_style = clampi(int(cfg.get_value("controller", "pad_style", pad_style)), 0, 2)
 	fullscreen = bool(cfg.get_value("video", "fullscreen", fullscreen))
@@ -57,6 +61,8 @@ func save_settings() -> void:
 	cfg.set_value("accessibility", "flashes", flashes)
 	cfg.set_value("accessibility", "hit_stop", hit_stop)
 	cfg.set_value("audio", "master_volume", master_volume)
+	cfg.set_value("audio", "music_volume", music_volume)
+	cfg.set_value("audio", "sfx_volume", sfx_volume)
 	cfg.set_value("controller", "vibration", vibration)
 	cfg.set_value("controller", "pad_style", pad_style)
 	cfg.set_value("video", "fullscreen", fullscreen)
@@ -71,8 +77,12 @@ func save_settings() -> void:
 
 
 func apply_audio() -> void:
-	var bus := AudioServer.get_bus_index("Master")
-	AudioServer.set_bus_volume_db(bus, linear_to_db(maxf(master_volume, 0.0001)))
+	var audio := get_node_or_null(^"/root/Audio")
+	if audio:
+		audio.apply_volumes()
+	else:
+		var bus := AudioServer.get_bus_index("Master")
+		AudioServer.set_bus_volume_db(bus, linear_to_db(maxf(master_volume, 0.0001)))
 
 
 ## Applies window mode, resolution, render mode, frame cap and vsync. Safe to call

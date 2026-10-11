@@ -73,6 +73,12 @@ func _sense() -> void:
 
 
 ## Dormant (or waiting for a target): stand still and face the arena entrance / the player.
+func _physics_process(delta: float) -> void:
+	super(delta)
+	if state == State.CHASE and is_on_floor() and absf(velocity.x) > 20.0 and state_frame % 26 == 0:
+		Audio.sfx_at(&"boss_stomp", global_position, -10.0)
+
+
 func _state_patrol(delta: float) -> void:
 	velocity.x = move_toward(velocity.x, 0.0, 600.0 * delta)
 	if active and target:
@@ -107,6 +113,7 @@ func _state_attack(delta: float) -> void:
 			leaping = false
 			velocity.x = 0.0
 			GameFeel.shake(6.0, 0.3)
+			Audio.sfx_at(&"boss_land", global_position)
 			GameFeel.spark(global_position, Palette.DUST, 20)
 		else:
 			velocity.x = _leap_vx
@@ -158,6 +165,7 @@ func _enter_phase2() -> void:
 
 ## The roar pushes a nearby player away (no damage) so phase 2 starts with space.
 func _roar_shove() -> void:
+	Audio.sfx_at(&"boss_roar", global_position)
 	GameFeel.shake(5.0, 0.4)
 	var p := get_tree().get_first_node_in_group(&"player") as Player
 	if p and not p.is_dead():
@@ -172,6 +180,25 @@ func _on_died() -> void:
 	leaping = false
 	GameState.set_flag(defeat_flag(), true)
 	Events.boss_defeated.emit(boss_id)
+
+
+# ------------------------------------------------------------------ sounds
+
+## The Bell-Warden tolls its bell during every overhead wind-up: an audio telegraph.
+func play_attack_sound(a: AttackData) -> void:
+	match a.animation:
+		&"smash":
+			Audio.sfx_at(&"boss_bell", global_position, -2.0)
+		&"charge":
+			Audio.sfx_at(&"boss_stomp", global_position)
+		&"leap":
+			Audio.sfx_at(&"swing_heavy", global_position, 0.0, 0.6)
+		_:
+			Audio.sfx_at(&"swing_heavy", global_position, -2.0, 0.7)
+
+
+func play_death_sound() -> void:
+	Audio.sfx_at(&"boss_death", global_position)
 
 
 ## Virtual hook for subclasses / visuals.

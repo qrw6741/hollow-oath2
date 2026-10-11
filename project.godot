@@ -23,6 +23,7 @@ InputPrompts="*res://autoload/input_prompts.gd"
 GameFeel="*res://autoload/game_feel.gd"
 GameState="*res://autoload/game_state.gd"
 SaveSystem="*res://autoload/save_system.gd"
+Audio="*res://autoload/audio.gd"
 
 [display]
 

@@ -129,6 +129,7 @@ func open() -> void:
 func close() -> void:
 	if not is_open:
 		return
+	Audio.sfx(&"ui_back")
 	is_open = false
 	_panel.visible = false
 	get_tree().paused = _was_paused

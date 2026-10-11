@@ -4,6 +4,11 @@ extends Button
 ## choice is obvious from across the room (and for gamepad users). Same API as Button.
 
 
+func _ready() -> void:
+	pressed.connect(func(): Audio.sfx(&"ui_select", -3.0))
+	focus_entered.connect(func(): if is_visible_in_tree(): Audio.sfx(&"ui_move", -6.0))
+
+
 func _draw() -> void:
 	if disabled or not (has_focus() or is_hovered()):
 		return

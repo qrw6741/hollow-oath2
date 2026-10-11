@@ -10,6 +10,8 @@ extends Node2D
 @export var player_scene: PackedScene
 ## Camera limits in world pixels.
 @export var bounds := Rect2(0, 0, 1920, 540)
+## Looping music / ambience for this level (file in assets/audio/music/).
+@export var music: StringName = &"yard"
 ## Fallback spawn if no checkpoint has been rested at.
 @export var default_spawn := Vector2(96, 470)
 
@@ -27,6 +29,7 @@ func _ready() -> void:
 	player.position = GameState.respawn_position if GameState.has_checkpoint else default_spawn
 	add_child(player)
 	_spawn_remnant()
+	Audio.music(music)
 	Events.respawn_requested.connect(_on_respawn_requested)
 	Events.checkpoint_rested.connect(_on_checkpoint_rested)
 	if display_name != "":
