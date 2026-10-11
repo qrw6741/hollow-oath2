@@ -12,13 +12,18 @@
 - UI fonts are stand-ins chosen from the fonts installed on the dev machine.
 
 ## Missing (planned)
-- Remapping UI (Milestone 10; the remapping backend exists). The settings screen currently has screen shake, hit flashes, hit-stop and master volume.
 - Saves currently contain: checkpoint, deaths, play time, current level and world flags. Inventory, equipment, quests and map discovery will be added as those systems arrive (the save format is versioned for this).
 - Enemies killed since your last rest are not saved (by design: they revive on rest and on death anyway).
 - Air dodge is not available (deliberate for now — decide in playtest).
 - Enemies do not block the player's body (player passes through enemies; only attacks deal damage). Deliberate for M1; revisit with final sprites.
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
+
+## Remapping / difficulty
+- L2 / R2 (analog triggers) cannot be bound yet; only digital buttons are accepted on the controller column.
+- Esc always cancels listening, so Esc cannot be assigned through the menu (it is Pause by default; *Reset controls* restores it).
+- Rebinding the keyboard column replaces all keys of that action (e.g. Dodge "L / Shift" becomes just the new key).
+- Difficulty sliders are untuned beyond the obvious maths; no "difficulty" label is shown on saves.
 
 ## Prologue ending
 - There is no way back from Vaelmoor, Awake to the Hollow areas except dying (which returns you to your last candle) — decide whether that is intended.
@@ -51,7 +56,7 @@
 - Items can be used in the pack while paused; healing at full health is blocked, but there is no cooldown or use animation (instant).
 
 ## Controller
-- Never tested with a physical DualSense. Prompts for rebound buttons follow the bindings, but there is no in-game remapping UI yet. Pause menu has no button hint bar. L2/R2 and the touchpad are unbound.
+- Never tested with a physical DualSense. Prompts for rebound buttons follow the bindings, and can be changed in Settings → Controls (remapping not yet tried on a physical pad). Pause menu has no button hint bar. L2/R2 and the touchpad are unbound.
 
 ## Video
 - Fps above 60 relies on Godot 2D physics interpolation; a one-frame smear may appear after teleports (respawn/rest). Untested on a real high-refresh monitor.

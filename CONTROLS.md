@@ -50,4 +50,4 @@ Arrow keys / D-pad / stick move the selection, **Enter** or **A** selects, **Esc
 - **Resting** at an Oath Candle restores everything, sets your respawn point and revives enemies.
 
 ## Remapping
-Bindings are defined in `autoload/input_config.gd` and can be rebound at runtime via `InputConfig.rebind()` (saved to `user://input.cfg`). A remapping menu is planned for Milestone 10.
+Rebind any action in **Settings → Controls**: pick the keyboard or controller cell and press the new key/button (Esc cancels). Using a binding another action had swaps them. *Reset controls to defaults* restores everything. Bindings are saved to `user://input.cfg`; defaults live in `autoload/input_config.gd`.

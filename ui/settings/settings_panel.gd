@@ -1,8 +1,11 @@
 class_name SettingsPanel
 extends VBoxContainer
-## Accessibility and audio options. Shared by the main menu and the pause menu.
-## These change presentation only — they never alter combat timing or difficulty.
-## Values apply immediately and are written to disk when the panel is left.
+## Settings, shared by the main menu and the pause menu, in three tabs:
+##   Display  — window, resolution, graphics, frame rate, vsync
+##   Game     — difficulty and accessibility, feedback effects, controller, volumes
+##   Controls — rebind every action on keyboard and controller (ControlsPanel)
+## Switch tabs with the tab buttons or Parry / Heal (L1 / R1). Values apply immediately and
+## are written to disk when the panel is left.
 
 signal back_requested
 
@@ -20,6 +23,13 @@ var _volume_label: Label
 var _music_label: Label
 var _sfx_label: Label
 var _back: Button
+var _dmg: Button
+var _ehp: Button
+var _assist: Button
+var _tab_btns: Array[Button] = []
+var _pages: Array[VBoxContainer] = []
+var _controls: ControlsPanel
+var page := 0
 
 
 func _ready() -> void:
@@ -33,43 +43,95 @@ func _ready() -> void:
 	add_child(title)
 	add_child(UITheme.rule(180))
 
-	_display = _button(func(): Settings.fullscreen = not Settings.fullscreen; _video_changed())
-	_res = _button(func(): Settings.resolution_index = (Settings.resolution_index + 1) % Settings.RESOLUTIONS.size(); _video_changed())
-	_render = _button(func(): Settings.hires = not Settings.hires; _video_changed())
-	_fps = _button(func(): Settings.fps_cap = Settings.FPS_CAPS[(Settings.FPS_CAPS.find(Settings.fps_cap) + 1) % Settings.FPS_CAPS.size()]; _video_changed())
-	_vsync = _button(func(): Settings.vsync = not Settings.vsync; _video_changed())
-	_icons = _button(func(): Settings.pad_style = (Settings.pad_style + 1) % 3; InputPrompts.refresh(); _refresh())
-	_vibe = _button(func(): Settings.vibration = not Settings.vibration; _refresh())
-	_shake = _button(_toggle_shake)
-	_flashes = _button(_toggle_flashes)
-	_hitstop = _button(_toggle_hitstop)
-
+	var tabs := HBoxContainer.new()
+	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
+	tabs.add_theme_constant_override(&"separation", 10)
+	add_child(tabs)
+	for i in 3:
+		var t := FancyButton.new()
+		t.text = ["Display", "Game", "Controls"][i]
+		t.custom_minimum_size = Vector2(64, 14)
+		t.focus_mode = Control.FOCUS_NONE
+		t.add_theme_font_override(&"font", UITheme.title_font())
+		UITheme.compact(t)
+		t.pressed.connect(show_page.bind(i))
+		tabs.add_child(t)
+		_tab_btns.append(t)
+	for i in 3:
+		var pg := VBoxContainer.new()
+		pg.add_theme_constant_override(&"separation", 2)
+		add_child(pg)
+		_pages.append(pg)
+	var p0 := _pages[0]
+	_display = _button(func(): Settings.fullscreen = not Settings.fullscreen; _video_changed(), p0)
+	_res = _button(func(): Settings.resolution_index = (Settings.resolution_index + 1) % Settings.RESOLUTIONS.size(); _video_changed(), p0)
+	_render = _button(func(): Settings.hires = not Settings.hires; _video_changed(), p0)
+	_fps = _button(func(): Settings.fps_cap = Settings.FPS_CAPS[(Settings.FPS_CAPS.find(Settings.fps_cap) + 1) % Settings.FPS_CAPS.size()]; _video_changed(), p0)
+	_vsync = _button(func(): Settings.vsync = not Settings.vsync; _video_changed(), p0)
+	var p1 := _pages[1]
+	_dmg = _button(func(): Settings.damage_taken_pct = _cycle(Settings.DAMAGE_STEPS, Settings.damage_taken_pct); _refresh(), p1)
+	_ehp = _button(func(): Settings.enemy_health_pct = _cycle(Settings.ENEMY_HP_STEPS, Settings.enemy_health_pct); _refresh(), p1)
+	_assist = _button(func(): Settings.parry_assist = not Settings.parry_assist; _refresh(), p1)
+	_shake = _button(_toggle_shake, p1)
+	_flashes = _button(_toggle_flashes, p1)
+	_hitstop = _button(_toggle_hitstop, p1)
+	_icons = _button(func(): Settings.pad_style = (Settings.pad_style + 1) % 3; InputPrompts.refresh(); _refresh(), p1)
+	_vibe = _button(func(): Settings.vibration = not Settings.vibration; _refresh(), p1)
 	# Volumes: master / music / effects on one row.
 	var vol := HBoxContainer.new()
 	vol.alignment = BoxContainer.ALIGNMENT_CENTER
 	vol.add_theme_constant_override(&"separation", 3)
-	add_child(vol)
+	p1.add_child(vol)
 	_volume_label = _volume_group(vol, "Volume", "master_volume", &"VolumeDown", &"VolumeUp")
 	_music_label = _volume_group(vol, "Music", "music_volume", &"MusicDown", &"MusicUp")
 	_sfx_label = _volume_group(vol, "Effects", "sfx_volume", &"SfxDown", &"SfxUp")
+	_controls = ControlsPanel.new()
+	_pages[2].add_child(_controls)
 
 	_back = _button(_on_back)
 	_back.text = "Back"
 	_refresh()
+	show_page(0, false)
 
 
-func _button(cb: Callable) -> Button:
+func _cycle(steps: Array, cur: int) -> int:
+	var i := steps.find(cur)
+	return steps[(i + 1) % steps.size()]
+
+
+func show_page(i: int, focus := true) -> void:
+	page = i
+	for k in _pages.size():
+		_pages[k].visible = k == i
+		_tab_btns[k].add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT if k == i else Palette.DUST)
+	if focus:
+		focus_first()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_visible_in_tree() or (_controls and _controls.listening):
+		return
+	if event.is_action_pressed(&"parry") or event.is_action_pressed(&"heal"):
+		var step := -1 if event.is_action_pressed(&"parry") else 1
+		show_page(wrapi(page + step, 0, _pages.size()))
+		get_viewport().set_input_as_handled()
+
+
+func _button(cb: Callable, parent: Control = null) -> Button:
 	var b := FancyButton.new()
-	b.custom_minimum_size = Vector2(170, 13)
+	b.custom_minimum_size = Vector2(190, 13)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(cb)
 	UITheme.compact(b)
-	add_child(b)
+	(parent if parent else self).add_child(b)
 	return b
 
 
 func focus_first() -> void:
-	_display.grab_focus()
+	match page:
+		0: _display.grab_focus()
+		1: _dmg.grab_focus()
+		2: _controls.focus_first()
 
 
 func _video_changed() -> void:
@@ -78,6 +140,9 @@ func _video_changed() -> void:
 
 
 func _refresh() -> void:
+	_dmg.text = "Damage you take: %d%%" % Settings.damage_taken_pct
+	_ehp.text = "Enemy health: %d%%" % Settings.enemy_health_pct
+	_assist.text = "Parry assist (wider window): %s" % ("On" if Settings.parry_assist else "Off")
 	_icons.text = "Controller icons: %s" % ["Auto", "PlayStation", "Xbox"][Settings.pad_style]
 	_vibe.text = "Controller vibration: %s" % ("On" if Settings.vibration else "Off")
 	_display.text = "Display: %s" % ("Fullscreen" if Settings.fullscreen else "Windowed")

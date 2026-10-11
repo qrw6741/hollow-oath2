@@ -28,6 +28,19 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-12 — Fast travel, button remapping, difficulty & accessibility
+
+- **Fast travel**: resting at a candle offers *Travel*, listing every lit candle grouped by area (lit candles were already on the map). Travelling makes that candle your respawn point and moves you there through the usual fade.
+- **Settings split into tabs**: Display / Game / Controls (switch with the tabs, or Parry / Heal = L1 / R1).
+- **Controls tab (remapping)**: every action shows its keyboard and controller binding (PlayStation or Xbox names). Select a cell, press the new key / mouse button / controller button; Esc cancels (also times out after 5 s). Taking a binding another action used swaps the two and says so. *Reset controls to defaults*. Saved to `user://input.cfg`; HUD prompts update immediately. Controller movement stays on stick + D-pad.
+- **Difficulty / accessibility (Game tab)**: *Damage you take* 50–200 %, *Enemy health* 50–150 % (bosses included), *Parry assist* (+4 frames on every parry window). Saved in settings.cfg under `[gameplay]`.
+- Test runner: `TEST_ONLY=test_a,test_b` runs a subset.
+
+### Verified
+- **Automated suite: 74/74 pass** (new: fast travel, remapping incl. listen → key press → saved file → jump still works → swap → Esc cancel → reset, difficulty scaling + parry assist window length, settings tabs with L1/R1).
+- Rendered captures of all three tabs and the listening state reviewed.
+- Not verified: remapping with a physical controller; nothing has been played on Windows by a human yet.
+
 ## 2026-10-12 — Icons instead of text
 
 - `IconArt` (ui/icons/icon_art.gd): 17 vector icons on a 16x16 grid: every item (bandage, ember shard, tonic, rusted key, bell shard, penitent's tear, Candlewright's note, Canon's seal), every weapon (Oathblade, twin blades, sword and shield, bare hands), every armour (mail with sash, leathers, plate, bone-cloth wraps) and a Status sigil. No image files: crisp at any resolution, no download cost.

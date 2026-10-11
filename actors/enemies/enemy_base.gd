@@ -37,7 +37,7 @@ func _ready() -> void:
 	facing = start_facing
 	home = global_position
 	if data:
-		health.set_max(data.max_health)
+		health.set_max(data.max_health * Settings.enemy_health_pct / 100.0)
 		poise = data.max_poise
 	health.died.connect(_on_died)
 	attack_runner.hit_confirmed.connect(_on_attack_hit)

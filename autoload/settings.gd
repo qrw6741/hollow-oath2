@@ -14,6 +14,14 @@ var music_volume := 0.7
 var sfx_volume := 0.9
 var show_debug := false
 var vibration := true
+## Difficulty / accessibility. These DO change combat, on purpose, and are labelled so.
+const DAMAGE_STEPS := [50, 75, 100, 125, 150, 200]
+const ENEMY_HP_STEPS := [50, 75, 100, 125, 150]
+var damage_taken_pct := 100
+var enemy_health_pct := 100
+## Adds PARRY_ASSIST_FRAMES to every parry window.
+var parry_assist := false
+const PARRY_ASSIST_FRAMES := 4
 ## Open the candle (level-up) menu automatically after resting. Not saved; tests turn it off.
 var candle_menu_on_rest := true
 var pad_style := 0           ## Controller icons: 0 auto-detect, 1 PlayStation, 2 Xbox.
@@ -44,6 +52,11 @@ func load_settings() -> void:
 	music_volume = clampf(float(cfg.get_value("audio", "music_volume", music_volume)), 0.0, 1.0)
 	sfx_volume = clampf(float(cfg.get_value("audio", "sfx_volume", sfx_volume)), 0.0, 1.0)
 	vibration = bool(cfg.get_value("controller", "vibration", vibration))
+	var dt := int(cfg.get_value("gameplay", "damage_taken_pct", damage_taken_pct))
+	damage_taken_pct = dt if DAMAGE_STEPS.has(dt) else 100
+	var eh := int(cfg.get_value("gameplay", "enemy_health_pct", enemy_health_pct))
+	enemy_health_pct = eh if ENEMY_HP_STEPS.has(eh) else 100
+	parry_assist = bool(cfg.get_value("gameplay", "parry_assist", parry_assist))
 	pad_style = clampi(int(cfg.get_value("controller", "pad_style", pad_style)), 0, 2)
 	fullscreen = bool(cfg.get_value("video", "fullscreen", fullscreen))
 	resolution_index = clampi(int(cfg.get_value("video", "resolution_index", resolution_index)), 0, RESOLUTIONS.size() - 1)
@@ -64,6 +77,9 @@ func save_settings() -> void:
 	cfg.set_value("audio", "music_volume", music_volume)
 	cfg.set_value("audio", "sfx_volume", sfx_volume)
 	cfg.set_value("controller", "vibration", vibration)
+	cfg.set_value("gameplay", "damage_taken_pct", damage_taken_pct)
+	cfg.set_value("gameplay", "enemy_health_pct", enemy_health_pct)
+	cfg.set_value("gameplay", "parry_assist", parry_assist)
 	cfg.set_value("controller", "pad_style", pad_style)
 	cfg.set_value("video", "fullscreen", fullscreen)
 	cfg.set_value("video", "resolution_index", resolution_index)

@@ -74,6 +74,76 @@ func rebind(action: StringName, event: InputEvent) -> void:
 	_save_custom()
 
 
+## Movement keeps its stick + D-pad on a controller; only its keys can be remapped.
+const MOVE_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down"]
+## Actions shown on the Controls page, in order (debug_toggle is not remappable).
+const REMAPPABLE: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down",
+	&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal", &"interact",
+	&"use_item", &"inventory", &"map", &"pause"]
+const ACTION_NAMES := {
+	&"move_left": "Move left", &"move_right": "Move right", &"move_up": "Look up / climb",
+	&"move_down": "Crouch / drop", &"jump": "Jump", &"attack_light": "Light attack",
+	&"attack_heavy": "Heavy attack", &"dodge": "Dodge", &"parry": "Parry",
+	&"heal": "Heal", &"interact": "Interact", &"use_item": "Use quick item",
+	&"inventory": "Inventory", &"map": "Map", &"pause": "Pause",
+}
+
+
+static func is_pad_event(ev: InputEvent) -> bool:
+	return ev is InputEventJoypadButton or ev is InputEventJoypadMotion
+
+
+## Binds [param event] to [param action] (replacing that action's bindings of the same kind).
+## If another remappable action already used it, the two swap: that action takes this
+## action's previous binding. Returns the swapped action's name ("" if none).
+## On a controller, movement actions are ignored when checking (the D-pad doubles as menu
+## navigation and Interact = D-pad up by default).
+func rebind_swap(action: StringName, event: InputEvent) -> StringName:
+	var pad := is_pad_event(event)
+	var desc := _descriptor_of(event)
+	var previous: Array[InputEvent] = []
+	for ev in InputMap.action_get_events(action):
+		if is_pad_event(ev) == pad:
+			previous.append(ev)
+	var swapped: StringName = &""
+	for other in REMAPPABLE:
+		if other == action or (pad and MOVE_ACTIONS.has(other)):
+			continue
+		for ev in InputMap.action_get_events(other):
+			if is_pad_event(ev) == pad and _descriptor_of(ev) == desc:
+				InputMap.action_erase_event(other, ev)
+				if not previous.is_empty():
+					InputMap.action_add_event(other, previous[0])
+				swapped = other
+	rebind(action, event)
+	return swapped
+
+
+## Restores every default binding and forgets the saved custom ones.
+func reset_all() -> void:
+	reset_to_defaults()
+	_save_custom()
+
+
+## The names of an action's bindings for one device kind, e.g. ["L", "Shift"] or ["l1"].
+## Pad entries are InputPrompts button ids ("cross", "l1", "dpad_up") or "stick".
+func binding_names(action: StringName, pad: bool) -> Array[String]:
+	var out: Array[String] = []
+	for ev in InputMap.action_get_events(action):
+		if is_pad_event(ev) != pad:
+			continue
+		if ev is InputEventKey:
+			out.append(OS.get_keycode_string(ev.physical_keycode if ev.physical_keycode != 0 else ev.keycode))
+		elif ev is InputEventMouseButton:
+			out.append({MOUSE_BUTTON_LEFT: "Mouse L", MOUSE_BUTTON_RIGHT: "Mouse R", MOUSE_BUTTON_MIDDLE: "Mouse M"}.get(ev.button_index, "Mouse %d" % ev.button_index))
+		elif ev is InputEventJoypadButton:
+			out.append(InputPrompts._button_id(ev.button_index))
+		elif ev is InputEventJoypadMotion:
+			if not out.has("stick"):
+				out.append("stick")
+	return out
+
+
 func _save_custom() -> void:
 	var cfg := ConfigFile.new()
 	for action: StringName in DEFAULTS:

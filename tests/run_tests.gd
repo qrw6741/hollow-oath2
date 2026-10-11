@@ -69,8 +69,17 @@ func _run() -> void:
 		test_map_exploration_and_screen, test_prologue_ending,
 		# --- equipment screen ---
 		test_equipment_screen,
+		# --- systems ---
+		test_fast_travel,
+		test_remapping,
+		test_difficulty_options,
+		test_settings_tabs,
 	]
+	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
+	var only := OS.get_environment("TEST_ONLY")
 	for t: Callable in tests:
+		if only != "" and not only.split(",").has(t.get_method()):
+			continue
 		_current = t.get_method()
 		var before := _failed.size()
 		await t.call()
@@ -1976,3 +1985,141 @@ func test_equipment_screen() -> void:
 	check(im.tab == InventoryMenu.Tab.EQUIPMENT, "L1 / parry switches back")
 	await tap_action(&"inventory")
 	check(not im.is_open and not get_tree().paused, "closes and resumes")
+
+
+func test_fast_travel() -> void:
+	await fresh_game()
+	settings.candle_menu_on_rest = true
+	game_state.set_flag(&"candle_lit_village_gate_candle", true)
+	await place_player(170.0)
+	await press(&"interact")
+	await frames(70)
+	var cm: CandleMenu = main.get_node("CandleMenu")
+	check(cm.is_open, "candle menu open")
+	var dests := CandleMenu.travel_destinations()
+	check(dests.size() == 2 and dests.any(func(d): return d.id == "village_gate_candle"), "lit candles are destinations (%d)" % dests.size())
+	check(not dests.any(func(d): return d.id == "chapel_steps_candle"), "unlit candles are not")
+	cm._travel_btn.pressed.emit()
+	await frames(2)
+	check(cm.travel_open and cm._travel_list.get_child_count() >= 3, "travel list shows areas and candles")
+	var target: Dictionary = dests.filter(func(d): return d.id == "village_gate_candle")[0]
+	cm.travel_to(target)
+	await frames(80)
+	level = main.current_level()
+	check(level.level_id == &"forsaken_village", "travelled to the village")
+	check(level.player.global_position.distance_to(Vector2(222, 480)) < 8.0, "standing at the Village Gate Candle (%s)" % level.player.global_position)
+	check(game_state.checkpoint_level == VILLAGE and game_state.checkpoint_id == &"village_gate_candle", "that candle is now the respawn point")
+	check(not get_tree().paused and not game_state.ui_modal, "game resumes after travelling")
+	settings.candle_menu_on_rest = false
+
+
+func test_remapping() -> void:
+	await fresh_game()
+	var input_config := get_tree().root.get_node("InputConfig")
+	input_config.reset_all()
+	var cp := ControlsPanel.new()
+	get_tree().root.add_child(cp)
+	await frames(2)
+	check(cp._kb.size() == 15 and cp._pad[&"move_left"].disabled, "a row per action; pad movement is fixed")
+	check((cp._kb[&"jump"] as Button).text == "Space", "jump shows Space (%s)" % cp._kb[&"jump"].text)
+	# Rebind jump to G via the listening flow.
+	cp.start_listening(&"jump", false)
+	await frames(8)
+	var k := InputEventKey.new()
+	k.physical_keycode = KEY_G
+	k.pressed = true
+	Input.parse_input_event(k)
+	await frames(3)
+	var ku := InputEventKey.new()
+	ku.physical_keycode = KEY_G
+	Input.parse_input_event(ku)
+	await frames(2)
+	check(not cp.listening, "listening ends after a key")
+	var has_g := InputMap.action_get_events(&"jump").any(func(e): return e is InputEventKey and e.physical_keycode == KEY_G)
+	var has_space := InputMap.action_get_events(&"jump").any(func(e): return e is InputEventKey and e.physical_keycode == KEY_SPACE)
+	check(has_g and not has_space, "jump is now G (keyboard binding replaced)")
+	check(InputMap.action_get_events(&"jump").any(func(e): return e is InputEventJoypadButton), "jump keeps its controller button")
+	var cfg := ConfigFile.new()
+	cfg.load("user://input.cfg")
+	check(("k:%d" % KEY_G) in cfg.get_value("bindings", "jump", []), "saved to input.cfg")
+	# Pressing G now jumps.
+	await place_player(400.0)
+	await press(&"jump", 6)
+	check(player.velocity.y < 0.0 or player.global_position.y < 470.0, "the jump action still works")
+	# Swap: bind dodge's pad button (Circle) to parry -> dodge takes L1.
+	var b := InputEventJoypadButton.new()
+	b.button_index = JOY_BUTTON_B
+	cp.apply_binding(&"parry", b)
+	var parry_pad := InputMap.action_get_events(&"parry").filter(func(e): return e is InputEventJoypadButton)
+	var dodge_pad := InputMap.action_get_events(&"dodge").filter(func(e): return e is InputEventJoypadButton)
+	check(parry_pad.size() == 1 and parry_pad[0].button_index == JOY_BUTTON_B, "parry is now Circle")
+	check(dodge_pad.size() == 1 and dodge_pad[0].button_index == JOY_BUTTON_LEFT_SHOULDER, "dodge swapped to L1")
+	check(cp._note.text.contains("Dodge"), "the swap is reported (%s)" % cp._note.text)
+	# Escape cancels listening without changing anything.
+	cp.start_listening(&"heal", false)
+	await frames(8)
+	var esc := InputEventKey.new()
+	esc.physical_keycode = KEY_ESCAPE
+	esc.pressed = true
+	Input.parse_input_event(esc)
+	await frames(3)
+	check(not cp.listening and InputMap.action_get_events(&"heal").any(func(e): return e is InputEventKey and e.physical_keycode == KEY_R), "Esc cancels")
+	cp.reset_defaults()
+	check(InputMap.action_get_events(&"jump").any(func(e): return e is InputEventKey and e.physical_keycode == KEY_SPACE), "reset restores Space")
+	check(InputMap.action_get_events(&"dodge").any(func(e): return e is InputEventJoypadButton and e.button_index == JOY_BUTTON_B), "reset restores Circle dodge")
+	cp.queue_free()
+	await frames(2)
+
+
+func test_difficulty_options() -> void:
+	await fresh_game()
+	await place_player(400.0)
+	settings.damage_taken_pct = 50
+	var hp := player.health.current
+	player.receive_hit(damage(20))
+	check(is_equal_approx(player.health.current, hp - 10.0), "50% damage taken halves hits (%.1f)" % (hp - player.health.current))
+	settings.damage_taken_pct = 200
+	await frames(60)   # past the post-hit invulnerability
+	hp = player.health.current
+	player.receive_hit(damage(10))
+	check(is_equal_approx(player.health.current, hp - 20.0), "200% doubles them (%.1f)" % (hp - player.health.current))
+	settings.damage_taken_pct = 100
+	settings.enemy_health_pct = 150
+	var e := await spawn_enemy(600.0)
+	check(is_equal_approx(e.health.max_health, e.data.max_health * 1.5), "enemy health 150% (%.0f)" % e.health.max_health)
+	e.queue_free()
+	settings.enemy_health_pct = 100
+	# Parry window: without assist it closes after parry_window_frames; with assist 4 later.
+	for assist in [false, true]:
+		settings.parry_assist = assist
+		await frames(40)
+		Input.action_press(&"parry")
+		var last_active := -1
+		for i in 30:
+			await get_tree().physics_frame
+			if i == 2:
+				Input.action_release(&"parry")
+			if player.is_parry_active():
+				last_active = player.state_frame
+		var want: int = player.parry_window_frames + (4 if assist else 0)
+		check(last_active == want, "parry window ends at frame %d (want %d, assist %s)" % [last_active, want, assist])
+	settings.parry_assist = false
+
+
+func test_settings_tabs() -> void:
+	await fresh_game()
+	var panel := SettingsPanel.new()
+	get_tree().root.add_child(panel)
+	await frames(2)
+	check(panel._pages[0].visible and not panel._pages[1].visible, "starts on Display")
+	await tap_action(&"heal")
+	check(panel.page == 1 and panel._pages[1].visible, "R1 / Heal moves to the Game tab")
+	panel._dmg.pressed.emit()
+	check(settings.damage_taken_pct == 125, "damage option cycles (%d)" % settings.damage_taken_pct)
+	settings.damage_taken_pct = 100
+	await tap_action(&"heal")
+	check(panel.page == 2 and panel._controls.is_visible_in_tree(), "then Controls")
+	await tap_action(&"parry")
+	check(panel.page == 1, "L1 / Parry goes back")
+	panel.queue_free()
+	await frames(2)

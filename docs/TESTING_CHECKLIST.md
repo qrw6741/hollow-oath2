@@ -49,6 +49,9 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Quit to Main Menu from the pause menu asks "Sure?"; the death screen never appears in the next session.
 - [ ] Damaged save: close the game, open `slot_1.json` in a text editor, delete half of it, relaunch → it recovers from the backup, or says "damaged" and offers Delete — never crashes.
 - [ ] Settings changes (shake / flashes / hit-stop / volume) survive a relaunch.
+- [ ] Settings → Controls: rebind Jump on keyboard and on the controller, play, relaunch — bindings kept; HUD prompts show the new buttons; Reset restores.
+- [ ] Settings → Game: Damage 50% / Enemy health 50% / Parry assist feel right; survive a relaunch.
+- [ ] Candle → Travel to another lit candle in another area; die → respawn at the travelled-to candle.
 - [ ] Keyboard-only and gamepad-only navigation of every menu works; the focused item is always visible.
 
 ## Presets

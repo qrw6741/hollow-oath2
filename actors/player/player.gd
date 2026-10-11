@@ -373,7 +373,7 @@ func _state_parry(delta: float) -> void:
 
 
 func is_parry_active() -> bool:
-	return state == State.PARRY and not _parried and state_frame <= parry_window_frames
+	return state == State.PARRY and not _parried and state_frame <= parry_window_frames + (Settings.PARRY_ASSIST_FRAMES if Settings.parry_assist else 0)
 
 
 func _start_heal() -> void:
@@ -448,7 +448,7 @@ func receive_hit(hit: HitData) -> int:
 		return HitData.Result.PARRIED
 	if is_invulnerable(hit.environmental):
 		return HitData.Result.IGNORED
-	health.take_damage(hit.damage * damage_taken_mult)
+	health.take_damage(hit.damage * damage_taken_mult * Settings.damage_taken_pct / 100.0)
 	GameFeel.spark(global_position + Vector2(0, -14), Palette.CRIMSON_BRIGHT, 12)
 	GameFeel.shake(4.0, 0.22)
 	GameFeel.hit_stop(0.08)
