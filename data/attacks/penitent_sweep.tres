@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"penitent_sweep"
+display_name = "Penitent — Low Sweep"
+animation = &"sweep"
+startup_frames = 20
+active_frames = 6
+recovery_frames = 34
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 20.0
+poise_damage = 0.0
+stamina_cost = 0.0
+knockback = Vector2(120, -60)
+hitbox_size = Vector2(44, 18)
+hitbox_offset = Vector2(20, -8)
+lunge_speed = 60.0
+lunge_start_frame = 16
+lunge_frames = 6
+track_during_startup = false
+hit_stop = 0.08
+shake = 3.0
+ai_min_range = 0.0
+ai_max_range = 0.0
+ai_weight = 0.0

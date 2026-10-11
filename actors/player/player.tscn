@@ -1,0 +1,62 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://actors/player/player.gd" id="1_player"]
+[ext_resource type="Resource" path="res://data/weapons/oathblade.tres" id="2_weapon"]
+[ext_resource type="Script" path="res://systems/combat/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://systems/combat/stamina_component.gd" id="4_stamina"]
+[ext_resource type="Script" path="res://systems/combat/hurtbox.gd" id="5_hurtbox"]
+[ext_resource type="Script" path="res://systems/combat/hitbox.gd" id="6_hitbox"]
+[ext_resource type="Script" path="res://systems/combat/attack_runner.gd" id="7_runner"]
+[ext_resource type="Script" path="res://actors/player/player_visual.gd" id="8_visual"]
+
+[sub_resource type="RectangleShape2D" id="body_shape"]
+size = Vector2(10, 26)
+
+[sub_resource type="RectangleShape2D" id="hurt_shape"]
+size = Vector2(10, 24)
+
+[sub_resource type="RectangleShape2D" id="hit_shape"]
+size = Vector2(32, 20)
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+floor_snap_length = 3.0
+script = ExtResource("1_player")
+weapon = ExtResource("2_weapon")
+
+[node name="Body" type="CollisionShape2D" parent="."]
+position = Vector2(0, -13)
+shape = SubResource("body_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("3_health")
+max_health = 100.0
+
+[node name="Stamina" type="Node" parent="."]
+script = ExtResource("4_stamina")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("5_hurtbox")
+
+[node name="Shape" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -12)
+shape = SubResource("hurt_shape")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 16
+script = ExtResource("6_hitbox")
+
+[node name="Shape" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(20, -14)
+shape = SubResource("hit_shape")
+
+[node name="AttackRunner" type="Node" parent="." node_paths=PackedStringArray("hitbox")]
+script = ExtResource("7_runner")
+hitbox = NodePath("../Hitbox")
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("8_visual")

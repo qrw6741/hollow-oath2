@@ -1,0 +1,24 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://main/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://world/camera_rig.gd" id="2_camera"]
+[ext_resource type="PackedScene" path="res://ui/hud/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://ui/pause/pause_menu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://world/levels/test_arena.tscn" id="5_arena"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_main")
+start_level = ExtResource("5_arena")
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="FX" type="Node2D" parent="World" groups=["fx_layer"]]
+z_index = 20
+
+[node name="Camera" type="Camera2D" parent="World"]
+process_callback = 0
+script = ExtResource("2_camera")
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("4_pause")]

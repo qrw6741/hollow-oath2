@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"oathblade_heavy"
+display_name = "Oathblade — Sentence"
+animation = &"heavy"
+startup_frames = 20
+active_frames = 6
+recovery_frames = 26
+chain_open_frame = 14
+dodge_cancel_frame = 12
+damage = 32.0
+poise_damage = 45.0
+stamina_cost = 28.0
+knockback = Vector2(180, -80)
+hitbox_size = Vector2(40, 30)
+hitbox_offset = Vector2(22, -16)
+lunge_speed = 150.0
+lunge_start_frame = 14
+lunge_frames = 8
+hit_stop = 0.11
+shake = 4.5

@@ -1,0 +1,117 @@
+extends Node
+## Registers the default input map at startup and provides runtime remapping.
+## Defaults live here (not in project.godot) so remapping, resetting and saving
+## all work from a single source of truth. Custom bindings persist to user://input.cfg.
+
+const PATH := "user://input.cfg"
+
+## action -> list of default events descriptors.
+## "k:<keycode>"  keyboard (physical), "m:<button>" mouse, "j:<button>" joypad button,
+## "a:<axis>:<sign>" joypad axis.
+const DEFAULTS := {
+	&"move_left": ["k:%d" % KEY_A, "k:%d" % KEY_LEFT, "a:%d:-1" % JOY_AXIS_LEFT_X, "j:%d" % JOY_BUTTON_DPAD_LEFT],
+	&"move_right": ["k:%d" % KEY_D, "k:%d" % KEY_RIGHT, "a:%d:1" % JOY_AXIS_LEFT_X, "j:%d" % JOY_BUTTON_DPAD_RIGHT],
+	&"move_up": ["k:%d" % KEY_W, "k:%d" % KEY_UP, "a:%d:-1" % JOY_AXIS_LEFT_Y, "j:%d" % JOY_BUTTON_DPAD_UP],
+	&"move_down": ["k:%d" % KEY_S, "k:%d" % KEY_DOWN, "a:%d:1" % JOY_AXIS_LEFT_Y, "j:%d" % JOY_BUTTON_DPAD_DOWN],
+	&"jump": ["k:%d" % KEY_SPACE, "j:%d" % JOY_BUTTON_A],
+	&"attack_light": ["k:%d" % KEY_J, "m:%d" % MOUSE_BUTTON_LEFT, "j:%d" % JOY_BUTTON_X],
+	&"attack_heavy": ["k:%d" % KEY_K, "m:%d" % MOUSE_BUTTON_RIGHT, "j:%d" % JOY_BUTTON_Y],
+	&"dodge": ["k:%d" % KEY_L, "k:%d" % KEY_SHIFT, "j:%d" % JOY_BUTTON_B],
+	&"parry": ["k:%d" % KEY_I, "k:%d" % KEY_Q, "j:%d" % JOY_BUTTON_LEFT_SHOULDER],
+	&"heal": ["k:%d" % KEY_R, "j:%d" % JOY_BUTTON_RIGHT_SHOULDER],
+	&"interact": ["k:%d" % KEY_E, "j:%d" % JOY_BUTTON_DPAD_UP],
+	&"pause": ["k:%d" % KEY_ESCAPE, "j:%d" % JOY_BUTTON_START],
+	&"debug_toggle": ["k:%d" % KEY_F3],
+}
+
+
+func _ready() -> void:
+	reset_to_defaults()
+	_load_custom()
+
+
+func reset_to_defaults() -> void:
+	for action: StringName in DEFAULTS:
+		if InputMap.has_action(action):
+			InputMap.action_erase_events(action)
+		else:
+			InputMap.add_action(action, 0.4)
+		for desc: String in DEFAULTS[action]:
+			var ev := _event_from(desc)
+			if ev:
+				InputMap.action_add_event(action, ev)
+
+
+## Replace all keyboard/mouse bindings (or all joypad bindings) of an action with [param event].
+func rebind(action: StringName, event: InputEvent) -> void:
+	if not InputMap.has_action(action):
+		return
+	var is_pad := event is InputEventJoypadButton or event is InputEventJoypadMotion
+	for existing in InputMap.action_get_events(action):
+		var existing_pad := existing is InputEventJoypadButton or existing is InputEventJoypadMotion
+		if existing_pad == is_pad:
+			InputMap.action_erase_event(action, existing)
+	InputMap.action_add_event(action, event)
+	_save_custom()
+
+
+func _save_custom() -> void:
+	var cfg := ConfigFile.new()
+	for action: StringName in DEFAULTS:
+		var list: Array[String] = []
+		for ev in InputMap.action_get_events(action):
+			var d := _descriptor_of(ev)
+			if d != "":
+				list.append(d)
+		cfg.set_value("bindings", String(action), list)
+	cfg.save(PATH)
+
+
+func _load_custom() -> void:
+	var cfg := ConfigFile.new()
+	if cfg.load(PATH) != OK:
+		return
+	for action: StringName in DEFAULTS:
+		var list = cfg.get_value("bindings", String(action), null)
+		if typeof(list) != TYPE_ARRAY or (list as Array).is_empty():
+			continue
+		InputMap.action_erase_events(action)
+		for desc in list:
+			var ev := _event_from(str(desc))
+			if ev:
+				InputMap.action_add_event(action, ev)
+
+
+func _event_from(desc: String) -> InputEvent:
+	var parts := desc.split(":")
+	match parts[0]:
+		"k":
+			var k := InputEventKey.new()
+			k.physical_keycode = int(parts[1]) as Key
+			return k
+		"m":
+			var m := InputEventMouseButton.new()
+			m.button_index = int(parts[1]) as MouseButton
+			return m
+		"j":
+			var j := InputEventJoypadButton.new()
+			j.button_index = int(parts[1]) as JoyButton
+			return j
+		"a":
+			var a := InputEventJoypadMotion.new()
+			a.axis = int(parts[1]) as JoyAxis
+			a.axis_value = float(parts[2])
+			return a
+	return null
+
+
+func _descriptor_of(ev: InputEvent) -> String:
+	if ev is InputEventKey:
+		return "k:%d" % (ev.physical_keycode if ev.physical_keycode != 0 else ev.keycode)
+	if ev is InputEventMouseButton:
+		return "m:%d" % ev.button_index
+	if ev is InputEventJoypadButton:
+		return "j:%d" % ev.button_index
+	if ev is InputEventJoypadMotion:
+		return "a:%d:%d" % [ev.axis, signi(roundi(ev.axis_value))]
+	return ""

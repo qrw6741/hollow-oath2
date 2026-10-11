@@ -1,0 +1,235 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/hazards/spike_pit.gd" id="spikes"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="PackedScene" path="res://actors/enemies/training_dummy.tscn" id="dummy"]
+[ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_penitent.tscn" id="penitent"]
+[ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
+[ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
+
+[node name="TestArena" type="Node2D"]
+script = ExtResource("level")
+level_id = &"test_arena"
+display_name = "The Penitent's Yard"
+bounds = Rect2(0, 0, 1920, 540)
+default_spawn = Vector2(96, 480)
+
+[node name="Background" type="ParallaxBackground" parent="."]
+
+[node name="Sky" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0, 0)
+
+[node name="SkyDraw" type="Node2D" parent="Background/Sky"]
+script = ExtResource("sky")
+
+[node name="Far" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.15, 0.1)
+
+[node name="Ruins" type="Node2D" parent="Background/Far"]
+script = ExtResource("ruins")
+base_y = 215.0
+max_height = 150.0
+color = Color(0.090, 0.078, 0.110, 1)
+window_color = Color(0.549, 0.239, 0.133, 0.55)
+seed_value = 7
+spacing = 60.0
+width = 900.0
+
+[node name="Mid" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.4, 0.3)
+
+[node name="Ruins" type="Node2D" parent="Background/Mid"]
+script = ExtResource("ruins")
+base_y = 250.0
+max_height = 120.0
+color = Color(0.114, 0.098, 0.133, 1)
+seed_value = 11
+spacing = 90.0
+width = 1400.0
+
+[node name="Near" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.7, 0.6)
+
+[node name="Ruins" type="Node2D" parent="Background/Near"]
+script = ExtResource("ruins")
+base_y = 330.0
+max_height = 100.0
+color = Color(0.141, 0.122, 0.161, 1)
+seed_value = 5
+spacing = 130.0
+width = 2000.0
+
+[node name="Darkness" type="CanvasModulate" parent="."]
+color = Color(0.66, 0.62, 0.72, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="WallLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(32, 540)
+style = 0
+seed_value = 3
+
+[node name="WallRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1888, 0)
+script = ExtResource("block")
+size = Vector2(32, 540)
+style = 0
+seed_value = 4
+
+[node name="FloorA" type="StaticBody2D" parent="Geometry"]
+position = Vector2(32, 480)
+script = ExtResource("block")
+size = Vector2(528, 60)
+style = 0
+seed_value = 5
+
+[node name="PitFloor" type="StaticBody2D" parent="Geometry"]
+position = Vector2(560, 520)
+script = ExtResource("block")
+size = Vector2(56, 20)
+style = 1
+seed_value = 6
+
+[node name="FloorB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(616, 480)
+script = ExtResource("block")
+size = Vector2(984, 60)
+style = 0
+seed_value = 7
+
+[node name="RaisedLedge" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1600, 448)
+script = ExtResource("block")
+size = Vector2(288, 92)
+style = 0
+seed_value = 8
+
+[node name="Ceiling" type="StaticBody2D" parent="Geometry"]
+position = Vector2(32, 0)
+script = ExtResource("block")
+size = Vector2(300, 36)
+style = 1
+seed_value = 9
+
+[node name="Overhang" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1440, 150)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 10
+
+[node name="PlankA" type="StaticBody2D" parent="Geometry"]
+position = Vector2(760, 410)
+script = ExtResource("block")
+size = Vector2(112, 6)
+style = 2
+seed_value = 11
+one_way = true
+
+[node name="PlankB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(900, 352)
+script = ExtResource("block")
+size = Vector2(96, 6)
+style = 2
+seed_value = 12
+one_way = true
+
+[node name="PlankC" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1040, 296)
+script = ExtResource("block")
+size = Vector2(120, 6)
+style = 2
+seed_value = 13
+one_way = true
+
+[node name="PlankD" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1190, 410)
+script = ExtResource("block")
+size = Vector2(104, 6)
+style = 2
+seed_value = 14
+one_way = true
+
+[node name="PenitentSpikes" type="Area2D" parent="Geometry"]
+position = Vector2(560, 520)
+script = ExtResource("spikes")
+width = 56.0
+
+[node name="OathCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(160, 480)
+checkpoint_id = &"yard_candle"
+display_name = "Yard Candle"
+
+[node name="TrainingDummy" parent="." instance=ExtResource("dummy")]
+position = Vector2(330, 480)
+
+[node name="Penitent1" type="Marker2D" parent="."]
+position = Vector2(830, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 64.0
+start_facing = -1
+
+[node name="Penitent2" type="Marker2D" parent="."]
+position = Vector2(1360, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 48.0
+start_facing = -1
+
+[node name="Penitent3" type="Marker2D" parent="."]
+position = Vector2(1760, 448)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 0.0
+start_facing = -1
+
+[node name="Ash" type="CPUParticles2D" parent="."]
+position = Vector2(960, -10)
+amount = 70
+lifetime = 14.0
+preprocess = 14.0
+emission_shape = 3
+emission_rect_extents = Vector2(980, 4)
+direction = Vector2(0.3, 1)
+spread = 25.0
+gravity = Vector2(6, 10)
+initial_velocity_min = 4.0
+initial_velocity_max = 12.0
+color = Color(0.553, 0.525, 0.494, 0.55)
+z_index = 5
+
+[node name="Hint1" type="Label" parent="."]
+offset_left = 110.0
+offset_top = 400.0
+offset_right = 290.0
+offset_bottom = 412.0
+theme_override_colors/font_color = Color(0.651, 0.616, 0.541, 0.80)
+theme_override_font_sizes/font_size = 8
+text = "Rest at the candle to set your respawn"
+horizontal_alignment = 1
+
+[node name="Hint2" type="Label" parent="."]
+offset_left = 190.0
+offset_top = 420.0
+offset_right = 370.0
+offset_bottom = 432.0
+theme_override_colors/font_color = Color(0.651, 0.616, 0.541, 0.80)
+theme_override_font_sizes/font_size = 8
+text = "J light · K heavy · L dodge · I parry · R heal"
+horizontal_alignment = 1
+
+[node name="Hint3" type="Label" parent="."]
+offset_left = 610.0
+offset_top = 440.0
+offset_right = 790.0
+offset_bottom = 452.0
+theme_override_colors/font_color = Color(0.651, 0.616, 0.541, 0.80)
+theme_override_font_sizes/font_size = 8
+text = "Parry the glinting blade, then strike"
+horizontal_alignment = 1

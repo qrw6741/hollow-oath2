@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/training_dummy.gd" id="1_dummy"]
+[ext_resource type="Script" path="res://systems/combat/hurtbox.gd" id="2_hurtbox"]
+
+[sub_resource type="RectangleShape2D" id="hurt_shape"]
+size = Vector2(14, 34)
+
+[node name="TrainingDummy" type="Node2D"]
+script = ExtResource("1_dummy")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("2_hurtbox")
+
+[node name="Shape" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -17)
+shape = SubResource("hurt_shape")

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/penitent_overhead.tres" id="2_over"]
+[ext_resource type="Resource" path="res://data/attacks/penitent_thrust.tres" id="3_thrust"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"hollow_penitent"
+display_name = "Hollow Penitent"
+lore = "Villagers who swore the Hollow Oath on the night of the catastrophe. The oath kept their bodies; it did not keep them."
+max_health = 75.0
+max_poise = 40.0
+poise_regen_delay_frames = 90
+poise_regen_per_second = 30.0
+patrol_speed = 32.0
+chase_speed = 72.0
+detection_range = 170.0
+vertical_detection = 60.0
+leash_range = 320.0
+attacks = [ExtResource("2_over"), ExtResource("3_thrust")]
+attack_cooldown_min = 30
+attack_cooldown_max = 70
+recover_frames = 24
+backstep_speed = 70.0
+stagger_frames = 40
+parry_stagger_frames = 100

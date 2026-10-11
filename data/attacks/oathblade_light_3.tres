@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"oathblade_light_3"
+display_name = "Oathblade — Verdict"
+animation = &"slash"
+startup_frames = 11
+active_frames = 5
+recovery_frames = 22
+chain_open_frame = 10
+dodge_cancel_frame = 8
+damage = 20.0
+poise_damage = 25.0
+stamina_cost = 18.0
+knockback = Vector2(140, -60)
+hitbox_size = Vector2(38, 24)
+hitbox_offset = Vector2(21, -14)
+lunge_speed = 110.0
+lunge_start_frame = 8
+lunge_frames = 6
+hit_stop = 0.08
+shake = 3.0
