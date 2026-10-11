@@ -9,7 +9,7 @@
 - **All art is TEMPORARY procedural art** drawn in code (`*_visual.gd`, `StoneBlock`, backgrounds). Final Aseprite sprites arrive in Milestone 4 (protagonist) and Milestone 5 (first region).
 - **No audio at all** — no SFX or music. Volume setting exists but nothing plays.
 - In-world control hints in the test arena are hard-coded to default keys.
-- Default Godot font for UI.
+- UI fonts are stand-ins chosen from the fonts installed on the dev machine.
 
 ## Missing (planned)
 - Remapping UI (Milestone 10; the remapping backend exists). The settings screen currently has screen shake, hit flashes, hit-stop and master volume.
@@ -44,7 +44,7 @@
 - Verified: unit tests for corruption/tampering/backup recovery/newer versions/write failure, an in-process menu flow test, and a two-process write-then-read check on Linux. **Not yet tried on Windows** (Windows cannot rename over an existing file, so the code has a remove-then-rename fallback; the backup file covers that moment, but it has only been exercised on Linux).
 - Hand-editing a save file makes it fail its checksum and count as damaged (it falls back to the backup). This is intentional integrity protection, not a bug.
 - Progress is saved at candles and respawns only, so quitting mid-fight loses everything since the last rest ("Progress since your last rest is lost" warning in the pause menu).
-- Menu text uses the default Godot font (custom pixel font planned).
+- Menu text now uses Lora / GFS Baskerville (bundled, OFL). Text is smooth, not pixel-art, and looks softer in the 480x270 Pixel graphics mode.
 
 ## Minor
 - With hit-stop on, overlapping hits supersede rather than extend the freeze (intended, but very short freezes may feel clipped).

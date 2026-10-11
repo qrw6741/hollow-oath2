@@ -183,9 +183,11 @@ func _centered(parent: Control, separation := 4) -> VBoxContainer:
 
 
 func _menu_button(parent: Control, text: String, cb: Callable, width := 130.0) -> Button:
-	var b := Button.new()
+	var b := FancyButton.new()
 	b.text = text
-	b.custom_minimum_size = Vector2(width, 16)
+	b.custom_minimum_size = Vector2(width, 18)
+	b.add_theme_font_override(&"font", UITheme.title_font())
+	b.add_theme_font_size_override(&"font_size", 10)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(cb)
 	parent.add_child(b)
@@ -211,8 +213,7 @@ func _build_title(root: Control) -> Control:
 	var title := Label.new()
 	title.text = "THE HOLLOW OATH"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override(&"font_size", 24)
-	title.add_theme_color_override(&"font_color", Palette.BONE)
+	UITheme.title(title, 28, Palette.BONE)
 	title.add_theme_constant_override(&"outline_size", 4)
 	title.add_theme_color_override(&"font_shadow_color", Color(Palette.CRIMSON, 0.55))
 	title.add_theme_constant_override(&"shadow_offset_y", 2)
@@ -262,14 +263,16 @@ func _build_slots(root: Control) -> Control:
 	v.get_parent().name = &"SlotsScreen"
 	_slots_title = Label.new()
 	_slots_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_slots_title.add_theme_font_size_override(&"font_size", 12)
+	UITheme.title(_slots_title, 13)
 	v.add_child(_slots_title)
+	v.add_child(UITheme.rule(200))
 
 	for i in SaveSystem.SLOT_COUNT:
 		var slot := i + 1
 		var panel := PanelContainer.new()
 		panel.custom_minimum_size = Vector2(380, 34)
 		v.add_child(panel)
+		UITheme.frame(panel)
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override(&"separation", 6)
 		panel.add_child(h)
@@ -277,12 +280,12 @@ func _build_slots(root: Control) -> Control:
 		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		info.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		h.add_child(info)
-		var act := Button.new()
+		var act := FancyButton.new()
 		act.name = &"Action"
 		act.custom_minimum_size = Vector2(66, 20)
 		act.pressed.connect(_on_slot_action.bind(slot))
 		h.add_child(act)
-		var del := Button.new()
+		var del := FancyButton.new()
 		del.name = &"Delete"
 		del.text = "Delete"
 		del.custom_minimum_size = Vector2(46, 20)
@@ -309,8 +312,9 @@ func _build_preset(root: Control) -> Control:
 	var title := Label.new()
 	title.text = "CHOOSE YOUR OATH"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override(&"font_size", 12)
+	UITheme.title(title, 13)
 	v.add_child(title)
+	v.add_child(UITheme.rule(200))
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override(&"separation", 8)
 	v.add_child(h)
@@ -320,7 +324,7 @@ func _build_preset(root: Control) -> Control:
 	h.add_child(left)
 	for i in Presets.IDS.size():
 		var pr := Presets.get_preset(Presets.IDS[i])
-		var b := Button.new()
+		var b := FancyButton.new()
 		b.name = "Preset_%s" % pr.id
 		b.text = pr.display_name
 		b.custom_minimum_size = Vector2(112, 22)
@@ -335,6 +339,7 @@ func _build_preset(root: Control) -> Control:
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(332, 198)
 	h.add_child(panel)
+	UITheme.frame(panel)
 	var pv := HBoxContainer.new()
 	pv.add_theme_constant_override(&"separation", 6)
 	panel.add_child(pv)
@@ -353,8 +358,7 @@ func _build_preset(root: Control) -> Control:
 	info.add_theme_constant_override(&"separation", 3)
 	pv.add_child(info)
 	_pv_name = Label.new()
-	_pv_name.add_theme_font_size_override(&"font_size", 12)
-	_pv_name.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
+	UITheme.title(_pv_name, 13, Palette.GOLD_BRIGHT)
 	info.add_child(_pv_name)
 	_pv_tag = Label.new()
 	_pv_tag.add_theme_color_override(&"font_color", Palette.BONE_DIM)
@@ -362,7 +366,7 @@ func _build_preset(root: Control) -> Control:
 	info.add_child(_pv_tag)
 	_pv_desc = Label.new()
 	_pv_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_pv_desc.add_theme_constant_override(&"line_spacing", -3)
+	_pv_desc.add_theme_constant_override(&"line_spacing", -1)
 	_pv_desc.custom_minimum_size.x = 226
 	info.add_child(_pv_desc)
 	_pv_stats = Label.new()
@@ -370,7 +374,7 @@ func _build_preset(root: Control) -> Control:
 	info.add_child(_pv_stats)
 	_pv_perks = Label.new()
 	_pv_perks.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_pv_perks.add_theme_constant_override(&"line_spacing", -3)
+	_pv_perks.add_theme_constant_override(&"line_spacing", -1)
 	_pv_perks.custom_minimum_size.x = 226
 	info.add_child(_pv_perks)
 	return c
@@ -421,6 +425,9 @@ func _show_screen(s: Screen) -> void:
 	_disarm()
 	for key in _screens:
 		(_screens[key] as Control).visible = (key == s)
+	var cur := _screens[s] as Control
+	cur.modulate.a = 0.0
+	create_tween().tween_property(cur, "modulate:a", 1.0, 0.18)
 	match s:
 		Screen.TITLE:
 			_refresh_title()

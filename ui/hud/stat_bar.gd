@@ -48,6 +48,7 @@ func _draw() -> void:
 		draw_rect(Rect2(2, 2, inner * tr, h - 4), trail_color)
 	draw_rect(Rect2(2, 2, inner * vr, h - 4), fill_color)
 	draw_rect(Rect2(2, 2, inner * vr, 1), fill_color.lightened(0.25))
-	# Ornamental end caps.
-	draw_rect(Rect2(-1, -1, 2, h + 2), Palette.BONE_DIM)
-	draw_rect(Rect2(w - 1, -1, 2, h + 2), Palette.BONE_DIM)
+	# Frame and ornamental end caps.
+	draw_rect(Rect2(0, 0, w, h), Color(Palette.STONE_LIGHT, 0.9), false, 1.0)
+	for x in [0.0, w]:
+		draw_colored_polygon(PackedVector2Array([Vector2(x - 3, h / 2.0), Vector2(x, h / 2.0 - 3), Vector2(x + 3, h / 2.0), Vector2(x, h / 2.0 + 3)]), Palette.GOLD)

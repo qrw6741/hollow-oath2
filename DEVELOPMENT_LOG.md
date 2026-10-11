@@ -28,6 +28,14 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — UI upgrade pass
+
+- **Fonts**: Lora (variable, heavier weight) for text and GFS Baskerville for titles and menu choices, both SIL OFL, bundled in `assets/fonts/` (credits in `docs/CREDITS.md`). Everything previously used Godot's default font.
+- **Framing**: dark panels with stone border and gold corner brackets (`UITheme.frame` / `draw_panel`), gold rule with diamond under headings, `FancyButton` (gold diamonds beside the focused/hovered choice), fade-in when switching menu screens.
+- **HUD**: bars with framed gold-diamond end caps; plaque top right with level (`LV n`) and ember count; framed quick-item slot with its button glyph; area banners and death text in the title face with rules; pause menu now shows level / embers / deaths / play time.
+- Verified by rendered captures of title, slots, preset, settings, pause, candle, pack and HUD; suite 47/47 unchanged. Fonts were chosen from what is installed on the build machine (no network for downloads): they can be swapped by replacing the two files and the two functions in `ui/theme/ui_theme.gd`.
+- Not done: custom pixel icons for items (items still have no icon art), animated bar effects, proper widescreen/ultrawide layout testing (UI is laid out for 16:9), localisation.
+
 ## 2026-10-11 — Embers (currency), levelling and inventory
 
 - **Embers**: awarded by kills (`EnemyData.ember_reward`, Penitent = 45). Shown top right. Dying drops all carried embers as a glowing stain where you last stood safely (never inside a hazard); touching it recovers them; dying again before that destroys the older stain. The stain is saved.

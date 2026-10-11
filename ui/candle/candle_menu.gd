@@ -40,17 +40,20 @@ func _build() -> void:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override(&"separation", 3)
 	c.add_child(v)
+	v.draw.connect(func(): UITheme.draw_panel(v, Rect2(Vector2(-22, -14), v.size + Vector2(44, 28))))
+	v.resized.connect(v.queue_redraw)
 	var title := Label.new()
 	title.text = "THE OATH BURNS"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override(&"font_size", 14)
+	UITheme.title(title, 16)
 	v.add_child(title)
+	v.add_child(UITheme.rule(220))
 	_info = Label.new()
 	_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_info.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
 	v.add_child(_info)
 	for stat in GameState.STAT_NAMES:
-		var b := Button.new()
+		var b := FancyButton.new()
 		b.custom_minimum_size = Vector2(210, 17)
 		b.pressed.connect(_on_buy.bind(stat))
 		UITheme.compact(b)
@@ -61,13 +64,13 @@ func _build() -> void:
 	_msg.add_theme_color_override(&"font_color", Palette.BONE_DIM)
 	_msg.custom_minimum_size.y = 10
 	v.add_child(_msg)
-	_inv_btn = Button.new()
+	_inv_btn = FancyButton.new()
 	_inv_btn.text = "Pack"
 	_inv_btn.custom_minimum_size = Vector2(210, 17)
 	_inv_btn.pressed.connect(func(): Events.inventory_menu_requested.emit())
 	UITheme.compact(_inv_btn)
 	v.add_child(_inv_btn)
-	_leave_btn = Button.new()
+	_leave_btn = FancyButton.new()
 	_leave_btn.text = "Leave"
 	_leave_btn.custom_minimum_size = Vector2(210, 17)
 	_leave_btn.pressed.connect(close)

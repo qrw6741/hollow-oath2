@@ -27,8 +27,9 @@ func _ready() -> void:
 	var title := Label.new()
 	title.text = "SETTINGS"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override(&"font_size", 12)
+	UITheme.title(title, 13)
 	add_child(title)
+	add_child(UITheme.rule(180))
 
 	_display = _button(func(): Settings.fullscreen = not Settings.fullscreen; _video_changed())
 	_res = _button(func(): Settings.resolution_index = (Settings.resolution_index + 1) % Settings.RESOLUTIONS.size(); _video_changed())
@@ -74,7 +75,7 @@ func _ready() -> void:
 
 
 func _button(cb: Callable) -> Button:
-	var b := Button.new()
+	var b := FancyButton.new()
 	b.custom_minimum_size = Vector2(170, 13)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(cb)

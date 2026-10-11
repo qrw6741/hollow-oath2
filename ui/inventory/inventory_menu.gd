@@ -45,26 +45,28 @@ func _build() -> void:
 	_title = Label.new()
 	_title.text = "PACK"
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title.add_theme_font_size_override(&"font_size", 12)
+	UITheme.title(_title, 14)
 	v.add_child(_title)
+	v.add_child(UITheme.rule(220))
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override(&"separation", 8)
 	v.add_child(h)
 	var left := PanelContainer.new()
 	left.custom_minimum_size = Vector2(150, 160)
 	h.add_child(left)
+	UITheme.frame(left)
 	_list = VBoxContainer.new()
 	_list.add_theme_constant_override(&"separation", 1)
 	left.add_child(_list)
 	var right := PanelContainer.new()
 	right.custom_minimum_size = Vector2(230, 160)
 	h.add_child(right)
+	UITheme.frame(right)
 	var rv := VBoxContainer.new()
 	rv.add_theme_constant_override(&"separation", 4)
 	right.add_child(rv)
 	_name = Label.new()
-	_name.add_theme_font_size_override(&"font_size", 12)
-	_name.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
+	UITheme.title(_name, 13, Palette.GOLD_BRIGHT)
 	rv.add_child(_name)
 	_kind = Label.new()
 	_kind.add_theme_color_override(&"font_color", Palette.BONE_DIM)
@@ -91,7 +93,7 @@ func _build() -> void:
 
 
 func _btn(parent: Control, text: String, cb: Callable) -> Button:
-	var b := Button.new()
+	var b := FancyButton.new()
 	b.text = text
 	b.custom_minimum_size = Vector2(130, 15)
 	b.pressed.connect(cb)
@@ -145,7 +147,7 @@ func _rebuild() -> void:
 		if n <= 0:
 			continue
 		var item := Items.get_item(id)
-		var b := Button.new()
+		var b := FancyButton.new()
 		b.text = "%s%s%s" % [item.display_name, "  x%d" % n if n > 1 else "", "   [quick]" if id == GameState.quick_item else ""]
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size = Vector2(140, 14)

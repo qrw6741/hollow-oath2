@@ -10,6 +10,7 @@ var _settings: SettingsPanel
 var _resume_btn: Button
 var _menu_btn: Button
 var _hint: Label
+var _summary: Label
 var _armed_until := 0
 
 
@@ -35,12 +36,19 @@ func _build() -> void:
 	_main_page = VBoxContainer.new()
 	_main_page.add_theme_constant_override(&"separation", 4)
 	center.add_child(_main_page)
+	_main_page.draw.connect(func(): UITheme.draw_panel(_main_page, Rect2(Vector2(-18, -14), _main_page.size + Vector2(36, 28))))
+	_main_page.resized.connect(_main_page.queue_redraw)
 
 	var title := Label.new()
 	title.text = "PAUSED"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override(&"font_size", 16)
+	UITheme.title(title, 18)
 	_main_page.add_child(title)
+	_main_page.add_child(UITheme.rule(130))
+	_summary = Label.new()
+	_summary.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_summary.add_theme_color_override(&"font_color", Palette.BONE_DIM)
+	_main_page.add_child(_summary)
 
 	_resume_btn = _button("Resume", _resume)
 	_button("Inventory", func(): Events.inventory_menu_requested.emit())
@@ -61,9 +69,11 @@ func _build() -> void:
 
 
 func _button(text: String, cb: Callable) -> Button:
-	var b := Button.new()
+	var b := FancyButton.new()
 	b.text = text
-	b.custom_minimum_size = Vector2(130, 16)
+	b.custom_minimum_size = Vector2(150, 18)
+	b.add_theme_font_override(&"font", UITheme.title_font())
+	b.add_theme_font_size_override(&"font_size", 10)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(cb)
 	_main_page.add_child(b)
@@ -89,6 +99,9 @@ func _process(_delta: float) -> void:
 
 
 func _pause() -> void:
+	var secs := int(GameState.play_time)
+	_summary.text = "Level %d   -   %d embers   -   %d death%s   -   %02d:%02d" % [
+		GameState.level(), GameState.embers, GameState.deaths, "" if GameState.deaths == 1 else "s", secs / 3600, (secs / 60) % 60]
 	get_tree().paused = true
 	GameFeel.reset()
 	_panel.visible = true

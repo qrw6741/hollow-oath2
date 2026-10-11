@@ -21,10 +21,11 @@ var _banner_tween: Tween
 var _death_tween: Tween
 var _saved_label: Label
 var _ember_label: Label
+var _level_label: Label
 var _ember_gain: Label
 var _ember_shown := 0.0
 var _ember_tween: Tween
-var _quick_box: HBoxContainer
+var _quick_box: PanelContainer
 var _quick_label: Label
 var _saved_tween: Tween
 
@@ -45,6 +46,7 @@ func _ready() -> void:
 	Events.embers_gained.connect(_on_embers_gained)
 	Events.inventory_changed.connect(_refresh_quick)
 	Events.item_picked.connect(func(id, n): _toast("%s  x%d" % [Items.get_item(id).display_name, n]))
+	Events.stats_changed.connect(_sync_economy)
 	Events.session_started.connect(_sync_economy)
 	Events.player_spawned.connect(func(_p): _sync_economy())
 
@@ -53,6 +55,7 @@ func _build() -> void:
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.theme = UITheme.get_theme()
 	add_child(root)
 
 	_health_bar = StatBar.new()
@@ -74,9 +77,23 @@ func _build() -> void:
 	_vials.draw.connect(_draw_vials)
 	root.add_child(_vials)
 
-	# Embers (currency), top right.
+	# Embers (currency) and level, top right, in a small dark plaque.
+	var plaque := Control.new()
+	plaque.position = Vector2(480 - 158, 6)
+	plaque.size = Vector2(148, 19)
+	plaque.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	plaque.draw.connect(func():
+		plaque.draw_rect(Rect2(Vector2.ZERO, plaque.size), Color(0.05, 0.045, 0.065, 0.78))
+		plaque.draw_rect(Rect2(Vector2.ZERO, plaque.size), Color(Palette.STONE, 0.8), false, 1.0)
+		plaque.draw_line(Vector2(38, 3), Vector2(38, 16), Color(Palette.STONE, 0.8), 1.0)
+		plaque.draw_rect(Rect2(-2, 8, 3, 3), Palette.GOLD))
+	root.add_child(plaque)
+	_level_label = _label(root, "LV 1", 8, HORIZONTAL_ALIGNMENT_CENTER)
+	_level_label.add_theme_color_override(&"font_color", Palette.BONE_DIM)
+	_level_label.position = Vector2(480 - 158, 9)
+	_level_label.size = Vector2(38, 12)
 	var ember_icon := Control.new()
-	ember_icon.position = Vector2(480 - 26, 10)
+	ember_icon.position = Vector2(480 - 26, 9)
 	ember_icon.size = Vector2(12, 12)
 	ember_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ember_icon.draw.connect(func():
@@ -85,24 +102,28 @@ func _build() -> void:
 		ember_icon.draw_colored_polygon(PackedVector2Array([Vector2(4, 11), Vector2(6, 4), Vector2(8, 11)]), Palette.GOLD_BRIGHT))
 	root.add_child(ember_icon)
 	_ember_label = _label(root, "0", 10, HORIZONTAL_ALIGNMENT_RIGHT)
-	_ember_label.position = Vector2(480 - 140, 9)
-	_ember_label.size = Vector2(108, 14)
+	_ember_label.position = Vector2(480 - 148, 8)
+	_ember_label.size = Vector2(118, 14)
 	_ember_label.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
 	_ember_gain = _label(root, "", 8, HORIZONTAL_ALIGNMENT_RIGHT)
-	_ember_gain.position = Vector2(480 - 140, 24)
-	_ember_gain.size = Vector2(108, 12)
+	_ember_gain.position = Vector2(480 - 168, 27)
+	_ember_gain.size = Vector2(158, 12)
 	_ember_gain.add_theme_color_override(&"font_color", Palette.EMBER)
 	_ember_gain.modulate.a = 0.0
 
 	# Quick-use item, bottom left.
-	_quick_box = HBoxContainer.new()
-	_quick_box.position = Vector2(12, 250)
-	_quick_box.add_theme_constant_override(&"separation", 4)
+	_quick_box = PanelContainer.new()
+	_quick_box.position = Vector2(10, 246)
 	_quick_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_quick_box.add_theme_stylebox_override(&"panel", UITheme.box(Color(0.05, 0.045, 0.065, 0.78), Color(Palette.STONE, 0.8), 1, Vector2(4, 2)))
+	var qrow := HBoxContainer.new()
+	qrow.add_theme_constant_override(&"separation", 4)
+	qrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_quick_box.add_child(qrow)
 	var qg := Glyph.new()
 	qg.action = &"use_item"
-	_quick_box.add_child(qg)
-	_quick_label = _label(_quick_box, "", 8, HORIZONTAL_ALIGNMENT_LEFT)
+	qrow.add_child(qg)
+	_quick_label = _label(qrow, "", 8, HORIZONTAL_ALIGNMENT_LEFT)
 	root.add_child(_quick_box)
 
 	_prompt = _label(root, "", 8, HORIZONTAL_ALIGNMENT_CENTER)
@@ -120,8 +141,12 @@ func _build() -> void:
 	_banner = _label(root, "", 16, HORIZONTAL_ALIGNMENT_CENTER)
 	_banner.position = Vector2(0, 70)
 	_banner.size = Vector2(480, 24)
-	_banner.add_theme_color_override(&"font_color", Palette.BONE)
+	UITheme.title(_banner, 20, Palette.BONE)
 	_banner.modulate.a = 0.0
+	for ry in [-8.0, 32.0]:
+		var rl := UITheme.rule(150)
+		rl.position = Vector2(165, ry)
+		_banner.add_child(rl)
 
 	_death = ColorRect.new()
 	_death.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -131,7 +156,7 @@ func _build() -> void:
 	_death_label = _label(root, "THE OATH BREAKS", 24, HORIZONTAL_ALIGNMENT_CENTER)
 	_death_label.position = Vector2(0, 118)
 	_death_label.size = Vector2(480, 30)
-	_death_label.add_theme_color_override(&"font_color", Palette.CRIMSON_BRIGHT)
+	UITheme.title(_death_label, 30, Palette.CRIMSON_BRIGHT)
 	_death_label.modulate.a = 0.0
 
 	_fade = ColorRect.new()
@@ -199,6 +224,7 @@ func _draw_vials() -> void:
 func _sync_economy() -> void:
 	_ember_shown = float(GameState.embers)
 	_ember_label.text = str(GameState.embers)
+	_level_label.text = "LV %d" % GameState.level()
 	_refresh_quick()
 
 
