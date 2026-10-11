@@ -1441,10 +1441,10 @@ func test_audio_files_and_music_flow() -> void:
 	check(used.size() >= 25, "found the sound calls in code (%d)" % used.size())
 	for sname in used:
 		var folder := "music" if used[sname] == "music" else "sfx"
-		check(ResourceLoader.exists("res://assets/audio/%s/%s.wav" % [folder, sname]), "sound file exists: %s/%s" % [folder, sname])
+		check(ResourceLoader.exists("res://assets/audio/%s/%s.ogg" % [folder, sname]), "sound file exists: %s/%s" % [folder, sname])
 	for track in [&"menu", &"yard", &"boss"]:
-		var st: AudioStreamWAV = audio._stream(audio.MUSIC_DIR, track, true)
-		check(st != null and st.loop_mode == AudioStreamWAV.LOOP_FORWARD and st.loop_end > st.mix_rate * 20, "%s loops" % track)
+		var st: AudioStreamOggVorbis = audio._stream(audio.MUSIC_DIR, track, true)
+		check(st != null and st.loop and st.get_length() > 20.0, "%s loops" % track)
 	# Music follows the game.
 	await fresh_game()
 	await frames(4)

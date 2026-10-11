@@ -13,8 +13,13 @@ import numpy as np
 from scipy import signal
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-SFX_DIR = os.path.join(ROOT, "assets", "audio", "sfx")
-MUS_DIR = os.path.join(ROOT, "assets", "audio", "music")
+# Synthesised WAVs go to a build folder Godot ignores; the game ships Ogg Vorbis
+# encoded from them (ffmpeg + libvorbis), which keeps the download small.
+BUILD = os.path.join(ROOT, "tools", "audio", "build")
+SFX_DIR = os.path.join(BUILD, "sfx")
+MUS_DIR = os.path.join(BUILD, "music")
+OUT_SFX = os.path.join(ROOT, "assets", "audio", "sfx")
+OUT_MUS = os.path.join(ROOT, "assets", "audio", "music")
 SR = 44100
 MSR = 22050
 rng = np.random.default_rng(7)
@@ -350,7 +355,7 @@ def loop_noise(n, sr=MSR, lo=None, hi=None, seed=1):
 
 
 def music_menu():
-    sr, dur = MSR, 48.0
+    sr, dur = MSR, 32.0
     n = int(sr * dur)
     out = np.zeros(n)
     # Drone: D2 + A2, slow swell
@@ -359,7 +364,7 @@ def music_menu():
     out += lowpass(loop_tone(146.8, n, kind="saw"), 400, sr) * 0.05 * slow_lfo(n, 1, 2.0)
     out += loop_noise(n, sr, hi=700, seed=11) * 0.05 * (0.5 + 0.5 * slow_lfo(n, 4))
     # Bell motif: D minor, sparse
-    motif = [(0, 293.7), (4, 349.2), (8, 440.0), (12, 392.0), (16, 349.2), (20, 293.7), (26, 220.0), (32, 293.7), (36, 349.2), (40, 466.2), (44, 440.0)]
+    motif = [(0, 293.7), (3, 349.2), (6, 440.0), (9, 392.0), (12, 349.2), (15, 293.7), (19, 220.0), (22, 293.7), (25, 349.2), (27.5, 466.2), (30, 440.0)]
     for i, (beat, f) in enumerate(motif):
         b = bell(f, 4.0, sr=sr, decay=2.2, seed=40 + i) * 0.18
         place(out, b, int(beat * sr))
@@ -368,7 +373,7 @@ def music_menu():
 
 
 def music_yard():
-    sr, dur = MSR, 60.0
+    sr, dur = MSR, 36.0
     n = int(sr * dur)
     out = np.zeros(n)
     wind = loop_noise(n, sr, lo=150, hi=900, seed=21) * (0.3 + 0.7 * slow_lfo(n, 3)) * 0.18
@@ -376,14 +381,14 @@ def music_yard():
     out += wind + gust
     out += loop_tone(55.0, n) * 0.08 * slow_lfo(n, 2, 0.4)
     out += loop_tone(82.4, n) * 0.05 * slow_lfo(n, 3, 2.2)
-    for i, (sec, f) in enumerate([(5, 196.0), (21, 174.6), (38, 196.0), (51, 146.8)]):
+    for i, (sec, f) in enumerate([(3, 196.0), (12, 174.6), (21, 196.0), (30, 146.8)]):
         place(out, bell(f, 6.0, sr=sr, decay=3.0, cracked=0.3, seed=60 + i) * 0.12, int(sec * sr))
     out = circular_reverb(out, 0.4, 3.5, 1.4, sr)
     write(os.path.join(MUS_DIR, "yard.wav"), out, sr, 0.55, do_fade=False)
 
 
 def music_village():
-    sr, dur = MSR, 64.0
+    sr, dur = MSR, 40.0
     n = int(sr * dur)
     out = np.zeros(n)
     out += loop_noise(n, sr, lo=120, hi=700, seed=31) * (0.3 + 0.7 * slow_lfo(n, 4, 0.7)) * 0.14
@@ -399,7 +404,7 @@ def music_village():
         x = lowpass(x, 700, sr) / 9.0
         a = np.minimum(1, tt / 3.0) * np.minimum(1, (seg / sr - tt) / 3.0)
         place(out, x * a * 0.22, i * seg)
-    for i, (sec, f) in enumerate([(2, 220.0), (18, 174.6), (34, 196.0), (50, 164.8), (58, 220.0)]):
+    for i, (sec, f) in enumerate([(2, 220.0), (11, 174.6), (21, 196.0), (31, 164.8), (37, 220.0)]):
         place(out, bell(f, 6.0, sr=sr, decay=3.2, cracked=0.2, seed=80 + i) * 0.13, int(sec * sr))
     out = circular_reverb(out, 0.45, 4.0, 1.6, sr)
     write(os.path.join(MUS_DIR, "village.wav"), out, sr, 0.55, do_fade=False)
@@ -467,7 +472,19 @@ if __name__ == "__main__":
     music_yard()
     music_village()
     music_boss()
-    for d in (SFX_DIR, MUS_DIR):
-        for f in sorted(os.listdir(d)):
-            p = os.path.join(d, f)
-            print("%-40s %7.1f KB" % (os.path.relpath(p, ROOT), os.path.getsize(p) / 1024))
+    import subprocess
+    open(os.path.join(BUILD, ".gdignore"), "w").close()
+    total = 0
+    # SFX: 24 kHz, Vorbis q0. Music: 22.05 kHz, Vorbis q0. (q-1 is larger on noisy ambience.)
+    # Sizes matter: the Windows build must stay under a 30 MB download. (ambient material hides artefacts).
+    for src, dst, extra in ((SFX_DIR, OUT_SFX, ["-ar", "24000", "-q:a", "0"]), (MUS_DIR, OUT_MUS, ["-q:a", "0"])):
+        os.makedirs(dst, exist_ok=True)
+        for f in sorted(os.listdir(src)):
+            if not f.endswith(".wav"):
+                continue
+            out = os.path.join(dst, f[:-4] + ".ogg")
+            subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", os.path.join(src, f),
+                            "-c:a", "libvorbis"] + extra + [out], check=True)
+            total += os.path.getsize(out)
+            print("%-40s %7.1f KB" % (os.path.relpath(out, ROOT), os.path.getsize(out) / 1024))
+    print("total %.1f KB" % (total / 1024))

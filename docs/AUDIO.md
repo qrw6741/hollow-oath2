@@ -3,7 +3,7 @@
 All sound is **placeholder, synthesised in code** by `tools/audio/gen_audio.py` (sine waves, noise, filters, a simple reverb). No samples, so there is nothing to license. Regenerate after editing the script:
 
 ```
-python3 tools/audio/gen_audio.py      # needs numpy + scipy
+python3 tools/audio/gen_audio.py      # needs numpy, scipy and ffmpeg with libvorbis
 ```
 
 Files: `assets/audio/sfx/*.wav` (44.1 kHz mono) and `assets/audio/music/*.wav` (22.05 kHz mono, sample-exact loops; reverb tails wrap so there is no seam). To replace a sound with a real one, overwrite the `.wav` with the same name.

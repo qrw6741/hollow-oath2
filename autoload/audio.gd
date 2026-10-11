@@ -1,6 +1,6 @@
 extends Node
 ## Sound effects and music. TEMPORARY AUDIO: every sound is synthesised by
-## tools/audio/gen_audio.py (see docs/AUDIO.md); swap the .wav files to replace them.
+## tools/audio/gen_audio.py (see docs/AUDIO.md); swap the .ogg files to replace them.
 ##
 ##   Audio.sfx(&"parry")                    — non-positional (UI, the player's own body)
 ##   Audio.sfx_at(&"enemy_death", position) — positional, panned/attenuated from the camera
@@ -112,12 +112,14 @@ func _stream(dir: String, sname: StringName, loop := false) -> AudioStream:
 	var key := dir + String(sname)
 	if _streams.has(key):
 		return _streams[key]
-	var path := dir + String(sname) + ".wav"
+	var path := dir + String(sname) + ".ogg"
 	var s: AudioStream = null
 	if ResourceLoader.exists(path):
 		s = load(path)
 	else:
 		push_warning("Audio: missing sound %s" % path)
+	if s is AudioStreamOggVorbis and loop:
+		(s as AudioStreamOggVorbis).loop = true
 	if s is AudioStreamWAV and loop:
 		var w := s as AudioStreamWAV
 		w.loop_mode = AudioStreamWAV.LOOP_FORWARD

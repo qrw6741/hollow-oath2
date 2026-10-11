@@ -28,6 +28,11 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — Fix: split download did not launch; back to one file
+
+- Reported on Windows: "Couldn't load project data ... Is the .pck file missing?" The two-zip build extracted into two folders, separating the exe from its .pck. **First real launch report on Windows**: the error means the exe itself started.
+- Fix: audio converted from WAV/QOA to Ogg Vorbis (sfx 24 kHz q0, music 22 kHz q0) and the ambient loops shortened (menu 32 s, yard 36 s, village 40 s); audio went from ~3.1 MB to ~0.8 MB. The build is again one self-contained .exe in one zip under the 30 MB upload limit. 63/63 tests pass.
+
 ## 2026-10-11 — The Forsaken Village (second area) and level travel
 
 - **Travel system**: `LevelExit` (walk / door, key items, sealed doors), `LevelEntry`, `Main.change_level` with fade and autosave, entry-or-candle spawn rule, death respawn at a candle in another level, `checkpoint_level` / `level_entry` saved (old saves normalise to empty = previous behaviour).
