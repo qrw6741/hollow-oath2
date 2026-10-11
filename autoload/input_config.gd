@@ -20,6 +20,8 @@ const DEFAULTS := {
 	&"parry": ["k:%d" % KEY_I, "k:%d" % KEY_Q, "j:%d" % JOY_BUTTON_LEFT_SHOULDER],
 	&"heal": ["k:%d" % KEY_R, "j:%d" % JOY_BUTTON_RIGHT_SHOULDER],
 	&"interact": ["k:%d" % KEY_E, "j:%d" % JOY_BUTTON_DPAD_UP],
+	&"use_item": ["k:%d" % KEY_F, "j:%d" % JOY_BUTTON_RIGHT_STICK],
+	&"inventory": ["k:%d" % KEY_TAB, "j:%d" % JOY_BUTTON_BACK],
 	&"pause": ["k:%d" % KEY_ESCAPE, "j:%d" % JOY_BUTTON_START],
 	&"debug_toggle": ["k:%d" % KEY_F3],
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
@@ -10,6 +10,10 @@
 [ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
 [ext_resource type="Script" path="res://ui/hint_bar.gd" id="hintbar"]
 [ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
+[ext_resource type="Script" path="res://world/pickups/item_pickup.gd" id="pickup"]
+[ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Resource" path="res://data/items/rusted_key.tres" id="it_key"]
 
 [node name="TestArena" type="Node2D"]
 script = ExtResource("level")
@@ -168,6 +172,27 @@ display_name = "Yard Candle"
 
 [node name="TrainingDummy" parent="." instance=ExtResource("dummy")]
 position = Vector2(330, 480)
+
+[node name="PickupBandages" type="Area2D" parent="."]
+position = Vector2(520, 480)
+script = ExtResource("pickup")
+item = ExtResource("it_band")
+count = 2
+pickup_id = &"yard_bandages"
+
+[node name="PickupShard" type="Area2D" parent="."]
+position = Vector2(1080, 480)
+script = ExtResource("pickup")
+item = ExtResource("it_shard")
+count = 1
+pickup_id = &"yard_shard"
+
+[node name="PickupKey" type="Area2D" parent="."]
+position = Vector2(1560, 480)
+script = ExtResource("pickup")
+item = ExtResource("it_key")
+count = 1
+pickup_id = &"yard_key"
 
 [node name="Penitent1" type="Marker2D" parent="."]
 position = Vector2(830, 480)

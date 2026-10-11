@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
 [ext_resource type="Resource" path="res://data/attacks/penitent_overhead.tres" id="2_over"]
 [ext_resource type="Resource" path="res://data/attacks/penitent_thrust.tres" id="3_thrust"]
+[ext_resource type="Resource" path="res://data/items/penitents_tear.tres" id="4_tear"]
 
 [resource]
 script = ExtResource("1_enemy")
@@ -25,3 +26,7 @@ recover_frames = 24
 backstep_speed = 70.0
 stagger_frames = 40
 parry_stagger_frames = 100
+ember_reward = 45
+drop_item = ExtResource("4_tear")
+drop_chance = 0.3
+drop_count = 1

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"ember_shard"
+display_name = "Ember Shard"
+description = "A fragment of the dying kingdom's fire. Crush it to claim 120 embers at once."
+kind = 0
+effect = 3
+effect_amount = 120.0
+max_stack = 9
+icon_color = Color(0.92, 0.55, 0.22, 1)

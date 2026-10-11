@@ -58,6 +58,15 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] The Unsworn: bare torso, fists only; takes noticeably more damage; Hollow Palm riposte hits very hard.
 - [ ] Quit, then Continue: the same preset is restored.
 
+## Embers and inventory
+- [ ] Killing an enemy adds embers (counter top right ticks up, +N appears).
+- [ ] Die with embers: counter goes to 0, a glowing stain appears where you fell; walk into it to get them back.
+- [ ] Die twice without recovering: only the newest stain exists.
+- [ ] Rest at the candle: menu opens; buy Vigor/Endurance/Strength; bars grow; Pack and Leave work; Esc / Circle leaves.
+- [ ] Pick up the bandages / shard / key with E; they do not come back after resting or reloading the save.
+- [ ] Tab opens the pack; Use a bandage when hurt; quick item shows bottom left; F uses it.
+- [ ] Quit and Continue: embers, stain, level, pack and quick item are restored.
+
 ## Build
 - [ ] Windows .exe launches from a folder with no Godot installed.
 - [ ] Holds ~60 FPS (F3) with all enemies active.

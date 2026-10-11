@@ -18,6 +18,8 @@ var phase := Phase.NONE
 var frame := 0
 var facing := 1
 var damage_multiplier := 1.0
+## Permanent bonus from character stats (Strength), applied to every hit.
+var damage_bonus := 1.0
 var _hit_ids := {}
 
 
@@ -124,7 +126,7 @@ func _check_hits() -> void:
 			continue
 		_hit_ids[id] = true
 		var hit := HitData.new()
-		hit.damage = attack.damage * damage_multiplier
+		hit.damage = attack.damage * damage_multiplier * damage_bonus
 		hit.poise_damage = attack.poise_damage
 		hit.knockback = Vector2(attack.knockback.x * facing, attack.knockback.y)
 		hit.source = me as Node2D

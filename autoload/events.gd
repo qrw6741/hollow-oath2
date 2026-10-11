@@ -21,6 +21,17 @@ signal save_failed(slot: int, reason: String)
 signal checkpoint_rested(checkpoint_id: StringName, respawn_position: Vector2)
 signal enemy_killed(enemy: Node2D)
 
+# --- Economy / inventory ---
+signal embers_changed(total: int)
+signal embers_gained(amount: int)
+signal ember_drop_changed
+signal inventory_changed
+signal item_picked(item_id: StringName, count: int)
+signal item_used(item_id: StringName)
+signal stats_changed
+signal inventory_menu_requested
+signal inventory_menu_closed
+
 # --- Interaction / UI ---
 signal interact_prompt_shown(text: String)
 signal interact_prompt_hidden

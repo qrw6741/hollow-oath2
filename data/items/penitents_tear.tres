@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"penitents_tear"
+display_name = "Penitent's Tear"
+description = "A bead of hardened sorrow dropped by a Hollow Penitent. It is warm. Collectors would call it lore; the dead would call it theirs."
+kind = 2
+effect = 0
+effect_amount = 0.0
+max_stack = 9
+icon_color = Color(0.7, 0.8, 0.95, 1)

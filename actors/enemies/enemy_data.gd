@@ -32,3 +32,11 @@ extends Resource
 @export var stagger_frames := 40
 ## Frames the enemy stays open to a riposte after being parried.
 @export var parry_stagger_frames := 100
+
+@export_group("Rewards")
+## Embers (currency) awarded on death.
+@export var ember_reward := 0
+## Optional item drop, rolled once per kill.
+@export var drop_item: ItemData
+@export_range(0.0, 1.0) var drop_chance := 0.0
+@export var drop_count := 1

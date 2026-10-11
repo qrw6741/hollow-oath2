@@ -26,7 +26,7 @@ godot --headless --path . --export-release "Windows Desktop" build/windows/TheHo
 godot --headless --path . --fixed-fps 60 res://tests/run_tests.tscn
 ```
 
-37 automated tests drive the real scenes with simulated input: 18 gameplay tests (movement, combo, stamina, dodge i-frames, parry + riposte, healing, checkpoint, death/respawn, AI, spikes, hit-stop) 13 save/menu tests and 6 preset tests (round trip, corruption, tampering, backup recovery, newer-version and malformed saves, write failure, autosave, the full menu → play → die → quit → continue flow, overwrite/delete confirmation, pause menu). Exit code 0 = all pass. Windows shortcut: `tools\run_tests.bat` (edit the Godot path inside first).
+47 automated tests drive the real scenes with simulated input: 18 gameplay tests (movement, combo, stamina, dodge i-frames, parry + riposte, healing, checkpoint, death/respawn, AI, spikes, hit-stop) 13 save/menu tests, 6 preset tests and 9 economy / controller tests (round trip, corruption, tampering, backup recovery, newer-version and malformed saves, write failure, autosave, the full menu → play → die → quit → continue flow, overwrite/delete confirmation, pause menu). Exit code 0 = all pass. Windows shortcut: `tools\run_tests.bat` (edit the Godot path inside first).
 
 Cross-process save check (two separate game launches; the second must restore what the first saved):
 

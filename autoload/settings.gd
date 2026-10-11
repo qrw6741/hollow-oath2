@@ -12,6 +12,8 @@ var hit_stop := true         ## Freeze-frame on impact.
 var master_volume := 0.8
 var show_debug := false
 var vibration := true
+## Open the candle (level-up) menu automatically after resting. Not saved; tests turn it off.
+var candle_menu_on_rest := true
 var pad_style := 0           ## Controller icons: 0 auto-detect, 1 PlayStation, 2 Xbox.
 
 ## Video. Presentation only; gameplay always simulates at a fixed 60 Hz.

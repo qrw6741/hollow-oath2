@@ -29,6 +29,7 @@ func _run() -> void:
 	settings = get_tree().root.get_node("Settings")
 	settings.hit_stop = false
 	settings.screen_shake = 0.0
+	settings.candle_menu_on_rest = false   # menu has its own test; others must not pause on rest
 	# Tests must never touch the player's real saves.
 	saves = get_tree().root.get_node("SaveSystem")
 	saves.save_dir = "user://test_saves"
@@ -52,6 +53,9 @@ func _run() -> void:
 		test_each_preset_combo_lands, test_preset_save_and_fallback, test_preset_screen_menu,
 		# --- controller prompts ---
 		test_input_prompts, test_menu_works_with_controller,
+		# --- economy & inventory ---
+		test_items_valid, test_ember_reward_and_drop_roll, test_ember_drop_and_recover, test_level_up,
+		test_inventory_rules, test_item_pickup_persists, test_economy_save_roundtrip, test_candle_and_inventory_menus,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -89,6 +93,21 @@ func press(action: StringName, hold := 2) -> void:
 	Input.action_press(action)
 	await frames(hold)
 	Input.action_release(action)
+
+
+## Sends a real input event (unlike press(), which only sets polled state), so
+## _unhandled_input handlers see it.
+func tap_action(action: StringName) -> void:
+	var e := InputEventAction.new()
+	e.action = action
+	e.pressed = true
+	Input.parse_input_event(e)
+	await frames(3)
+	var r := InputEventAction.new()
+	r.action = action
+	r.pressed = false
+	Input.parse_input_event(r)
+	await frames(2)
 
 
 func _teardown() -> void:
@@ -1009,6 +1028,7 @@ func test_menu_works_with_controller() -> void:
 	await tap.call(JOY_BUTTON_START)
 	check(get_tree().paused, "Options opens the pause menu")
 	await tap.call(JOY_BUTTON_DPAD_DOWN)
+	await tap.call(JOY_BUTTON_DPAD_DOWN)   # Resume, Inventory, Settings
 	await tap.call(JOY_BUTTON_A)
 	check(pm._settings.visible, "Cross on Settings opens it in the pause menu")
 	await tap.call(JOY_BUTTON_B)
@@ -1017,3 +1037,217 @@ func test_menu_works_with_controller() -> void:
 	await tap.call(JOY_BUTTON_A)   # focus returns to Resume
 	check(not get_tree().paused, "Cross on Resume closes the pause menu")
 	wipe_saves()
+
+
+# ------------------------------------------------------------------ economy & inventory tests
+
+func test_items_valid() -> void:
+	for id in Items.IDS:
+		var it := Items.get_item(id)
+		check(it != null and it.id == id, "%s loads with matching id" % id)
+		if it:
+			check(it.validate().is_empty(), "%s validates (%s)" % [id, it.validate()])
+	check(Items.get_item(&"nope") == null, "unknown item id gives null")
+	var pen: EnemyData = load("res://data/enemies/hollow_penitent.tres")
+	check(pen.ember_reward > 0, "penitent awards embers")
+
+
+func test_ember_reward_and_drop_roll() -> void:
+	await fresh_game()
+	var e: EnemyBase = level.get_node("Penitent1").enemy
+	var reward: int = e.data.ember_reward
+	e.receive_hit(damage(1000))
+	await frames(3)
+	check(game_state.embers == reward, "kill awards %d embers (got %d)" % [reward, game_state.embers])
+	# Guaranteed drop path.
+	var d: EnemyData = e.data.duplicate()
+	d.drop_chance = 1.0
+	d.drop_item = Items.get_item(&"ash_bandage")
+	d.drop_count = 2
+	var e2: EnemyBase = level.get_node("Penitent2").enemy
+	e2.data = d
+	e2.receive_hit(damage(1000))
+	await frames(3)
+	check(game_state.item_count(&"ash_bandage") == 2, "guaranteed drop lands in the pack")
+	check(game_state.embers == reward * 2, "second kill adds embers")
+
+
+func test_ember_drop_and_recover() -> void:
+	await fresh_game()
+	await place_player(170.0)
+	await press(&"interact")
+	await frames(60)
+	await place_player(700.0)
+	game_state.embers = 0
+	game_state.add_embers(250)
+	player.receive_hit(damage(500))
+	await frames(3)
+	check(game_state.embers == 0, "carried embers are lost on death")
+	check(int(game_state.ember_drop.get("amount", 0)) == 250, "drop remembers the amount")
+	check(absf(float(game_state.ember_drop.x) - 700.0) < 30.0, "drop is where the player fell (%s)" % game_state.ember_drop)
+	await frames(int(game_state.RESPAWN_DELAY * 60.0) + 10)
+	var rems := get_tree().get_nodes_in_group(&"ember_remnant").filter(func(r): return not r.is_queued_for_deletion())
+	check(rems.size() == 1, "one remnant after respawn")
+	# Dying again before recovering destroys the older stain.
+	game_state.add_embers(30)
+	await place_player(900.0)
+	await frames(70)   # respawn invulnerability must run out
+	player.receive_hit(damage(500))
+	await frames(int(game_state.RESPAWN_DELAY * 60.0) + 12)
+	check(int(game_state.ember_drop.get("amount", 0)) == 30, "second death replaces the stain (%s)" % game_state.ember_drop)
+	rems = get_tree().get_nodes_in_group(&"ember_remnant").filter(func(r): return not r.is_queued_for_deletion())
+	check(rems.size() == 1, "still exactly one remnant")
+	# Walk into it.
+	var rx: float = rems[0].global_position.x
+	await place_player(rx - 2.0)
+	await frames(40)   # a fresh stain arms after ~30 frames
+	check(game_state.embers == 30 and game_state.ember_drop.is_empty(), "touching the remnant restores embers (%d)" % game_state.embers)
+	rems = get_tree().get_nodes_in_group(&"ember_remnant").filter(func(r): return not r.is_queued_for_deletion())
+	check(rems.is_empty(), "remnant is consumed")
+
+
+func test_level_up() -> void:
+	await fresh_game()
+	check(game_state.level() == 1 and game_state.level_cost() == 60, "level 1 costs 60")
+	check(not game_state.buy_stat("vigor"), "cannot buy without embers")
+	game_state.add_embers(500)
+	var hp0 := player.health.max_health
+	check(game_state.buy_stat("vigor"), "buy vigor")
+	player.apply_stats(true)
+	check(game_state.level() == 2 and game_state.embers == 440, "level 2, 60 spent")
+	check(player.health.max_health == hp0 + 8.0 and player.health.current == player.health.max_health, "vigor +8 health, gained health granted")
+	check(game_state.level_cost() > 60, "next level costs more (%d)" % game_state.level_cost())
+	var sta0 := player.stamina.max_stamina
+	game_state.buy_stat("endurance")
+	game_state.buy_stat("strength")
+	player.apply_stats(true)
+	check(player.stamina.max_stamina == sta0 + 6.0, "endurance +6 stamina")
+	check(is_equal_approx(player.attack_runner.damage_bonus, 1.04), "strength +4% damage")
+	check(not game_state.buy_stat("bogus"), "unknown stat rejected")
+	# Strength really changes damage on the dummy.
+	await place_player(300.0, 480.0, 1)
+	var dummy := level.get_node("TrainingDummy")
+	await press(&"attack_light")
+	await frames(40)
+	check(dummy._combo_total > 0.0 and absf(dummy._combo_total - 12.0 * 1.04) < 0.2, "light hit deals boosted damage (%.2f)" % dummy._combo_total)
+
+
+func test_inventory_rules() -> void:
+	await fresh_game()
+	check(game_state.add_item(&"ash_bandage", 3) == 3 and game_state.item_count(&"ash_bandage") == 3, "add items")
+	check(game_state.quick_item == &"ash_bandage", "first usable item becomes the quick item")
+	check(game_state.add_item(&"ash_bandage", 20) == 6, "stack capped at max (9)")
+	check(game_state.add_item(&"nope", 1) == 0, "unknown item rejected")
+	check(not game_state.remove_item(&"ash_bandage", 99), "cannot remove more than carried")
+	# Using at full health does nothing and keeps the item.
+	check(not Items.use(&"ash_bandage", player) and game_state.item_count(&"ash_bandage") == 9, "no use at full health")
+	player.health.take_damage(50.0)
+	var before := player.health.current
+	check(Items.use(&"ash_bandage", player), "bandage used when hurt")
+	check(player.health.current == before + 30.0 and game_state.item_count(&"ash_bandage") == 8, "heals 30 and consumes one")
+	game_state.add_item(&"ember_shard", 1)
+	var e0: int = game_state.embers
+	check(Items.use(&"ember_shard", player) and game_state.embers == e0 + 120, "ember shard grants embers")
+	game_state.add_item(&"rusted_key", 1)
+	check(not Items.use(&"rusted_key", player), "key items are not usable")
+	# Quick-use key.
+	player.health.take_damage(40.0)
+	var cnt: int = game_state.item_count(&"ash_bandage")
+	await press(&"use_item")
+	await frames(3)
+	check(game_state.item_count(&"ash_bandage") == cnt - 1, "quick-use input consumes the quick item")
+	# Dead players cannot use items.
+	player.health.take_damage(1000.0)
+	await frames(2)
+	check(not Items.use(&"ash_bandage", player), "no item use while dead")
+
+
+func test_item_pickup_persists() -> void:
+	await fresh_game()
+	var pk: ItemPickup = level.get_node("PickupBandages")
+	check(pk.take(), "take pickup")
+	check(game_state.item_count(&"ash_bandage") == 2, "pack has the bandages")
+	check(game_state.get_flag(&"pickup_yard_bandages", false), "taken flag set")
+	# Reload the level with the same game state: the pickup must stay gone.
+	var data: Dictionary = game_state.to_dict()
+	await _teardown()
+	game_state.apply_dict(saves._normalize(data), 0)
+	main = load("res://main/main.tscn").instantiate()
+	main.show_menu_on_start = false
+	get_tree().root.add_child(main)
+	await frames(6)
+	level = main.current_level()
+	check(not level.has_node("PickupBandages") or level.get_node("PickupBandages").is_queued_for_deletion(), "taken pickup does not return")
+	check(game_state.item_count(&"ash_bandage") == 2, "items survived the reload")
+	check(level.has_node("PickupShard") and not level.get_node("PickupShard").is_queued_for_deletion(), "untaken pickup is still there")
+
+
+func test_economy_save_roundtrip() -> void:
+	wipe_saves()
+	game_state.reset()
+	game_state.preset_id = &"duelist"
+	game_state.embers = 321
+	game_state.ember_drop = {"level_id": "test_arena", "x": 412.5, "y": 480.0, "amount": 99}
+	game_state.stats = {"vigor": 2, "endurance": 1, "strength": 3}
+	game_state.add_item(&"ash_bandage", 4)
+	game_state.add_item(&"rusted_key", 1)
+	game_state.quick_item = &"ash_bandage"
+	game_state.in_game = true
+	game_state.current_slot = 2
+	check(saves.save_slot(2), "saved")
+	game_state.reset()
+	var r: Dictionary = saves.load_slot(2)
+	check(r.status == saves.Status.OK, "loads")
+	game_state.apply_dict(r.data, 2)
+	check(game_state.embers == 321 and game_state.ember_drop.amount == 99 and is_equal_approx(float(game_state.ember_drop.x), 412.5), "embers and stain restored")
+	check(game_state.stats.vigor == 2 and game_state.stats.endurance == 1 and game_state.stats.strength == 3 and game_state.level() == 7, "stats restored")
+	check(game_state.item_count(&"ash_bandage") == 4 and game_state.item_count(&"rusted_key") == 1 and game_state.quick_item == &"ash_bandage", "pack restored")
+	# Hostile / damaged values are cleaned, never crash.
+	var bad := {"version": 1, "saved_at": 1, "embers": -50, "ember_drop": {"amount": "lots"},
+		"stats": {"vigor": 9999, "endurance": "x"}, "inventory": {"ash_bandage": 500, "ghost_item": 3, "ember_shard": -2}, "quick_item": "ghost_item"}
+	var n: Dictionary = saves._normalize(bad)
+	check(n.embers == 0 and n.ember_drop.is_empty(), "negative embers / bad drop cleaned")
+	check(n.stats.vigor == 99 and n.stats.endurance == 0, "stats clamped")
+	check(n.inventory.size() == 1 and n.inventory.ash_bandage == 9, "inventory: unknown dropped, stack capped (%s)" % n.inventory)
+	check(n.quick_item == "", "quick item must be carried")
+	# A save from before this feature still loads with defaults.
+	var old := {"version": 1, "saved_at": 1, "deaths": 2}
+	var o: Dictionary = saves._normalize(old)
+	check(o.embers == 0 and o.inventory.is_empty() and o.stats.vigor == 0, "legacy save gets economy defaults")
+	game_state.reset()
+	wipe_saves()
+
+
+func test_candle_and_inventory_menus() -> void:
+	await fresh_game()
+	settings.candle_menu_on_rest = true
+	game_state.add_embers(400)
+	game_state.add_item(&"ash_bandage", 2)
+	await place_player(170.0)
+	await press(&"interact")
+	await frames(70)
+	var cm: CandleMenu = main.get_node("CandleMenu")
+	var im: InventoryMenu = main.get_node("InventoryMenu")
+	check(cm.is_open and get_tree().paused and game_state.ui_modal, "candle menu opens after resting and pauses")
+	var hp0 := player.health.max_health
+	cm._rows["vigor"].pressed.emit()
+	await frames(2)
+	check(game_state.level() == 2 and player.health.max_health == hp0 + 8.0, "buying vigor in the menu applies it")
+	check(game_state.embers == 340, "cost deducted (%d)" % game_state.embers)
+	# Open the pack from the candle menu, close it, and we are back in the candle menu still paused.
+	cm._inv_btn.pressed.emit()
+	await frames(3)
+	check(im.is_open and get_tree().paused, "pack opens over the candle menu")
+	check(im._list.get_child_count() >= 1, "pack lists the bandages")
+	im.close()
+	await frames(2)
+	check(not im.is_open and cm.is_open and get_tree().paused and game_state.ui_modal, "closing the pack returns to the candle menu")
+	cm.close()
+	await frames(2)
+	check(not get_tree().paused and not game_state.ui_modal, "leaving unpauses")
+	# Pack from gameplay with the Inventory action.
+	await tap_action(&"inventory")
+	check(im.is_open and get_tree().paused, "inventory action opens the pack")
+	await tap_action(&"inventory")
+	check(not im.is_open and not get_tree().paused, "inventory action closes it and unpauses")
+	settings.candle_menu_on_rest = false

@@ -20,6 +20,7 @@ var _cooldowns := {}
 
 
 func _ready() -> void:
+	add_to_group(&"hazards")
 	collision_layer = 0
 	collision_mask = 8 | 16   # player_hurtbox | enemy_hurtbox
 	monitoring = true

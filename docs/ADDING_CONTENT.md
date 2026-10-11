@@ -30,6 +30,13 @@
 4. If you need a new attack animation key, add its pose to `player_visual.gd` (`SWINGS`, `TWIN` or `FISTS`).
 5. Run the tests: `test_presets_valid` and `test_each_preset_combo_lands` cover every registered preset automatically.
 
+## A new item
+1. Duplicate a file in `data/items/`; set id, text, kind, effect, amount, stack size, colour.
+2. Add the id to `Items.IDS` in `systems/items/items.gd` (order = order in the pack).
+3. To place it in a level: add an `ItemPickup` (Area2D with `world/pickups/item_pickup.gd`), assign `item`, `count` and a **unique** `pickup_id` (it becomes the saved "taken" flag).
+4. To drop it from an enemy: set `drop_item`, `drop_chance`, `drop_count` in that enemy's `.tres`. Embers: `ember_reward`.
+5. New effects: add to `ItemData.Effect` and handle in `Items.use`.
+
 ## A new level
 1. New scene, root `Node2D` with `world/levels/level.gd`. Set `level_id`, `display_name`, `bounds`, `default_spawn`.
 2. Build terrain with `StoneBlock` nodes (set `size`; tick `one_way` for platforms).

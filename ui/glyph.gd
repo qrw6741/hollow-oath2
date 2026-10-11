@@ -87,6 +87,10 @@ func _draw() -> void:
 				_text("≡" if _id == "options" else "···", s)
 		"dpad_up", "dpad_down", "dpad_left", "dpad_right", "dpad":
 			_dpad(c, _id)
+		"r3", "l3":
+			draw_circle(c, 5.6, C_FACE)
+			draw_arc(c, 5.6, 0, TAU, 20, C_RING, 0.8)
+			_text(_id.to_upper(), s)
 		"stick_l":
 			draw_circle(c, 5.6, C_FACE)
 			draw_arc(c, 5.6, 0, TAU, 20, C_RING, 0.8)

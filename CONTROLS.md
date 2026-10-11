@@ -10,6 +10,8 @@
 | Parry | I or Q | LB |
 | Heal (Ember Vial) | R | RB |
 | Interact / Rest at candle | E | D-pad up |
+| Inventory (pack) | Tab | Create / Select |
+| Use quick item | F | R3 (press right stick) |
 | Pause | Esc | Start |
 | Debug overlay | F3 | — |
 
@@ -27,6 +29,8 @@ Plug in or pair the pad and press any button: on-screen prompts switch to contro
 | Heal | R1 | RB |
 | Interact / rest | D-pad up | D-pad up |
 | Pause | Options | Menu |
+| Pack | Create (Share) | View |
+| Quick item | R3 | RS click |
 | Menus: select / back | Cross / Circle | A / B |
 
 Settings has *Controller icons* (Auto / PlayStation / Xbox, in case Auto guesses wrong) and *Controller vibration* (short rumble on hits and parries).

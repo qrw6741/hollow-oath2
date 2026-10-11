@@ -26,6 +26,7 @@ func _ready() -> void:
 	player.preset = Presets.get_preset(GameState.preset_id)
 	player.position = GameState.respawn_position if GameState.has_checkpoint else default_spawn
 	add_child(player)
+	_spawn_remnant()
 	Events.respawn_requested.connect(_on_respawn_requested)
 	Events.checkpoint_rested.connect(_on_checkpoint_rested)
 	if display_name != "":
@@ -46,3 +47,17 @@ func _on_respawn_requested() -> void:
 	reset_enemies()
 	var pos := GameState.respawn_position if GameState.has_checkpoint else default_spawn
 	player.respawn_at(pos)
+	_spawn_remnant()
+
+
+## Places the recoverable stain of lost embers if it belongs to this level.
+func _spawn_remnant() -> void:
+	for r in get_tree().get_nodes_in_group(&"ember_remnant"):
+		r.queue_free()
+	var d: Dictionary = GameState.ember_drop
+	if d.is_empty() or String(d.get("level_id", "")) != String(level_id):
+		return
+	var rem := EmberRemnant.new()
+	rem.amount = int(d.get("amount", 0))
+	rem.position = Vector2(float(d.get("x", 0.0)), float(d.get("y", 0.0)))
+	add_child(rem)

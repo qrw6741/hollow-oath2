@@ -93,6 +93,8 @@ func _button_id(b: int) -> String:
 		JOY_BUTTON_RIGHT_SHOULDER: return "r1"
 		JOY_BUTTON_START: return "options"
 		JOY_BUTTON_BACK: return "create"
+		JOY_BUTTON_RIGHT_STICK: return "r3"
+		JOY_BUTTON_LEFT_STICK: return "l3"
 		JOY_BUTTON_DPAD_UP: return "dpad_up"
 		JOY_BUTTON_DPAD_DOWN: return "dpad_down"
 		JOY_BUTTON_DPAD_LEFT: return "dpad_left"

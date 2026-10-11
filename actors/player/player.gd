@@ -74,6 +74,8 @@ var _parried := false
 var _last_hit_id := 0
 ## Multiplies all damage taken (armour). Set from the preset.
 var damage_taken_mult := 1.0
+## Last standing spot that was not a hazard; lost embers fall here.
+var last_safe_position := Vector2.ZERO
 
 const BUFFERED: Array[StringName] = [&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal"]
 
@@ -83,6 +85,7 @@ func _ready() -> void:
 	if preset:
 		_apply_preset()
 	flasks = max_flasks
+	last_safe_position = global_position
 	health.died.connect(_on_died)
 	attack_runner.hit_confirmed.connect(_on_attack_hit)
 	_add_lantern()
@@ -102,6 +105,26 @@ func _apply_preset() -> void:
 	dodge_stamina = preset.dodge_stamina
 	parry_window_frames = preset.parry_window_frames
 	parry_stamina = preset.parry_stamina
+	apply_stats(false)
+
+
+## Applies Vigor / Endurance / Strength on top of the preset. With [param heal_gain],
+## newly gained maximum health is also granted as current health (after a level-up).
+func apply_stats(heal_gain := true) -> void:
+	if preset == null:
+		return
+	var old_max := health.max_health
+	var vig := int(GameState.stats.get("vigor", 0))
+	var end := int(GameState.stats.get("endurance", 0))
+	var stre := int(GameState.stats.get("strength", 0))
+	health.set_max(preset.max_health + vig * GameState.VIGOR_HEALTH, false)
+	if heal_gain and health.max_health > old_max:
+		health.heal(health.max_health - old_max)
+	stamina.max_stamina = preset.max_stamina + end * GameState.ENDURANCE_STAMINA
+	attack_runner.damage_bonus = 1.0 + stre * GameState.STRENGTH_DAMAGE
+	if not heal_gain:
+		health.current = health.max_health
+		stamina.restore_full()
 
 
 ## Faint personal light so the player reads clearly in dark rooms.
@@ -125,6 +148,10 @@ func _emit_spawned() -> void:
 
 func _physics_process(delta: float) -> void:
 	_read_input()
+	if is_on_floor() and state != State.DEAD and not _on_hazard():
+		last_safe_position = global_position
+	if Input.is_action_just_pressed(&"use_item") and state == State.FREE and not GameState.ui_modal:
+		Items.use(GameState.quick_item, self)
 	state_frame += 1
 	if _iframes > 0:
 		_iframes -= 1
@@ -464,6 +491,16 @@ func find_riposte_target() -> Node2D:
 		if absf(d.x) <= riposte_reach and absf(d.y) <= 24.0 and (absf(d.x) < 10.0 or signf(d.x) == float(facing)):
 			return e
 	return null
+
+
+func _on_hazard() -> bool:
+	for h in get_tree().get_nodes_in_group(&"hazards"):
+		for c in h.get_children():
+			if c is CollisionShape2D and c.shape is RectangleShape2D:
+				var size: Vector2 = c.shape.size
+				if Rect2(c.global_position - size / 2.0, size).grow(10.0).has_point(global_position):
+					return true
+	return false
 
 
 func _on_died() -> void:

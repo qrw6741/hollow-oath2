@@ -20,6 +20,13 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Economy / inventory
+- Numbers (ember rewards, level costs, +8/+6/+4% steps, item effects) are first-pass and unplaytested; there is only one enemy type, so embers have little to spend on yet.
+- No shops/NPCs, no equipment swapping, and no item uses beyond four consumables; the Rusted Key opens nothing yet.
+- Candle menu opens automatically after resting (about 1 second), with no option to disable it yet.
+- Items can be used in the pack while paused; healing at full health is blocked, but there is no cooldown or use animation (instant).
+- Embers recovered or lost do not play any sound (no audio yet).
+
 ## Controller
 - Never tested with a physical DualSense. Prompts for rebound buttons follow the bindings, but there is no in-game remapping UI yet. Pause menu has no button hint bar. L2/R2 and the touchpad are unbound.
 

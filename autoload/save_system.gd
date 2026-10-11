@@ -199,6 +199,30 @@ func _normalize(d: Dictionary) -> Dictionary:
 	out["deaths"] = maxi(0, int(_num(d.get("deaths"), 0.0)))
 	var pid := _str(d.get("preset_id"), "sworn_knight")
 	out["preset_id"] = pid if Presets.is_valid_id(pid) else "sworn_knight"
+	out["embers"] = maxi(0, int(_num(d.get("embers"), 0.0)))
+	var drop := {}
+	var rd: Variant = d.get("ember_drop")
+	if typeof(rd) == TYPE_DICTIONARY and rd.has("amount") and rd.has("x") and rd.has("y") \
+		and typeof(rd["amount"]) in [TYPE_INT, TYPE_FLOAT] and int(rd["amount"]) > 0 \
+		and typeof(rd["x"]) in [TYPE_INT, TYPE_FLOAT] and typeof(rd["y"]) in [TYPE_INT, TYPE_FLOAT]:
+		drop = {"level_id": _str(rd.get("level_id"), ""), "x": float(rd["x"]), "y": float(rd["y"]), "amount": int(rd["amount"])}
+	out["ember_drop"] = drop
+	var st := {"vigor": 0, "endurance": 0, "strength": 0}
+	if typeof(d.get("stats")) == TYPE_DICTIONARY:
+		for k in st:
+			st[k] = clampi(int(_num(d["stats"].get(k), 0.0)), 0, 99)
+	out["stats"] = st
+	var inv := {}
+	if typeof(d.get("inventory")) == TYPE_DICTIONARY:
+		for k in d["inventory"]:
+			var item := Items.get_item(StringName(str(k)))
+			if item != null and typeof(d["inventory"][k]) in [TYPE_INT, TYPE_FLOAT]:
+				var n := clampi(int(d["inventory"][k]), 0, item.max_stack)
+				if n > 0:
+					inv[String(k)] = n
+	out["inventory"] = inv
+	var q := _str(d.get("quick_item"), "")
+	out["quick_item"] = q if inv.has(q) else ""
 	out["level_path"] = _str(d.get("level_path"), GameState.DEFAULT_LEVEL_PATH)
 	out["level_name"] = _str(d.get("level_name"), "")
 	out["checkpoint_id"] = _str(d.get("checkpoint_id"), "")

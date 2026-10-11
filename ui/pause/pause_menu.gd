@@ -18,6 +18,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
 	_panel.visible = false
+	Events.inventory_menu_closed.connect(func(): if _panel.visible and _main_page.visible: _resume_btn.grab_focus())
 
 
 func _build() -> void:
@@ -42,6 +43,7 @@ func _build() -> void:
 	_main_page.add_child(title)
 
 	_resume_btn = _button("Resume", _resume)
+	_button("Inventory", func(): Events.inventory_menu_requested.emit())
 	_button("Settings", _open_settings)
 	_menu_btn = _button("Quit to Main Menu", _on_quit_to_menu)
 	_button("Quit to Desktop", func(): get_tree().quit())
@@ -69,7 +71,7 @@ func _button(text: String, cb: Callable) -> Button:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not GameState.in_game:
+	if not GameState.in_game or GameState.ui_modal:
 		return
 	if event.is_action_pressed(&"pause") or (get_tree().paused and event.is_action_pressed(&"ui_cancel")):
 		if not get_tree().paused:

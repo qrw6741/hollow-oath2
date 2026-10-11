@@ -28,6 +28,16 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — Embers (currency), levelling and inventory
+
+- **Embers**: awarded by kills (`EnemyData.ember_reward`, Penitent = 45). Shown top right. Dying drops all carried embers as a glowing stain where you last stood safely (never inside a hazard); touching it recovers them; dying again before that destroys the older stain. The stain is saved.
+- **Level up** at the Oath Candle: resting opens a menu (after a short delay) to buy Vigor (+8 health), Endurance (+6 stamina) or Strength (+4% damage). Level = 1 + points; each point costs more (60, 96, 144, 204...). Works on top of any preset.
+- **Inventory**: `ItemData` resources (`data/items/`, registry `Items`): Ash Bandage (heal 30), Pale Tonic (+40 stamina), Ember Shard (+120 embers), Rusted Key (key item, no use yet), Penitent's Tear (lore, 30% drop from Penitents). Stack caps; pack screen (Tab / Create) with Use and quick-item slot (F / R3); also reachable from the pause and candle menus. World pickups (`ItemPickup`, press interact) are remembered as saved flags; 3 placed in the arena.
+- **Saves**: embers, stain, stats, inventory, quick item added (no version bump; `_normalize` clamps/cleans bad values and fills defaults for older saves).
+- Tests: 47 total (8 new economy/inventory tests, including death → stain → recovery, replacing a stain, level-up maths, damage boost on the dummy, use rules, pickup persistence, save round-trip + hostile data, candle/pack menu flow). Rendered captures of HUD, pickup, stain, candle menu, pack.
+- Bugs caught by tests: a fresh stain overlapped the still-dying player's body and was collected instantly (now arms after 30 frames and polls overlap); input events vs polled input in tests.
+- Not verified: balance (costs, rewards, damage bonus), the feel of the stain pickup and menus with a real pad, anything on Windows.
+
 ## 2026-10-11 — Fix: controller could not operate menus
 
 - Bug (reported by user on a real pad): pressing Cross on Continue/Settings did nothing, also in the pause menu. Root cause: Godot's built-in `ui_accept`/`ui_cancel` carried **no joypad buttons** in this project (confirmed by dumping InputMap), so only D-pad navigation worked. My earlier "controller compatible" claim was wrong for menus; the in-game actions were fine.

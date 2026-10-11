@@ -20,6 +20,12 @@ var _flasks_max := 0
 var _banner_tween: Tween
 var _death_tween: Tween
 var _saved_label: Label
+var _ember_label: Label
+var _ember_gain: Label
+var _ember_shown := 0.0
+var _ember_tween: Tween
+var _quick_box: HBoxContainer
+var _quick_label: Label
 var _saved_tween: Tween
 
 
@@ -35,6 +41,12 @@ func _ready() -> void:
 	Events.banner_requested.connect(show_banner)
 	Events.player_died.connect(_on_player_died)
 	Events.player_respawned.connect(_on_player_respawned)
+	Events.embers_changed.connect(_on_embers_changed)
+	Events.embers_gained.connect(_on_embers_gained)
+	Events.inventory_changed.connect(_refresh_quick)
+	Events.item_picked.connect(func(id, n): _toast("%s  x%d" % [Items.get_item(id).display_name, n]))
+	Events.session_started.connect(_sync_economy)
+	Events.player_spawned.connect(func(_p): _sync_economy())
 
 
 func _build() -> void:
@@ -61,6 +73,37 @@ func _build() -> void:
 	_vials.size = Vector2(80, 12)
 	_vials.draw.connect(_draw_vials)
 	root.add_child(_vials)
+
+	# Embers (currency), top right.
+	var ember_icon := Control.new()
+	ember_icon.position = Vector2(480 - 26, 10)
+	ember_icon.size = Vector2(12, 12)
+	ember_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ember_icon.draw.connect(func():
+		ember_icon.draw_circle(Vector2(6, 7), 5.5, Color(Palette.EMBER, 0.18))
+		ember_icon.draw_colored_polygon(PackedVector2Array([Vector2(2, 11), Vector2(6, 0), Vector2(10, 11)]), Color(Palette.EMBER, 0.95))
+		ember_icon.draw_colored_polygon(PackedVector2Array([Vector2(4, 11), Vector2(6, 4), Vector2(8, 11)]), Palette.GOLD_BRIGHT))
+	root.add_child(ember_icon)
+	_ember_label = _label(root, "0", 10, HORIZONTAL_ALIGNMENT_RIGHT)
+	_ember_label.position = Vector2(480 - 140, 9)
+	_ember_label.size = Vector2(108, 14)
+	_ember_label.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
+	_ember_gain = _label(root, "", 8, HORIZONTAL_ALIGNMENT_RIGHT)
+	_ember_gain.position = Vector2(480 - 140, 24)
+	_ember_gain.size = Vector2(108, 12)
+	_ember_gain.add_theme_color_override(&"font_color", Palette.EMBER)
+	_ember_gain.modulate.a = 0.0
+
+	# Quick-use item, bottom left.
+	_quick_box = HBoxContainer.new()
+	_quick_box.position = Vector2(12, 250)
+	_quick_box.add_theme_constant_override(&"separation", 4)
+	_quick_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var qg := Glyph.new()
+	qg.action = &"use_item"
+	_quick_box.add_child(qg)
+	_quick_label = _label(_quick_box, "", 8, HORIZONTAL_ALIGNMENT_LEFT)
+	root.add_child(_quick_box)
 
 	_prompt = _label(root, "", 8, HORIZONTAL_ALIGNMENT_CENTER)
 	_prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
@@ -151,6 +194,38 @@ func _draw_vials() -> void:
 		_vials.draw_circle(Vector2(x + 3, 6), 2.5, body)
 		if full:
 			_vials.draw_circle(Vector2(x + 2.3, 5.2), 0.8, Palette.GOLD_BRIGHT)
+
+
+func _sync_economy() -> void:
+	_ember_shown = float(GameState.embers)
+	_ember_label.text = str(GameState.embers)
+	_refresh_quick()
+
+
+func _on_embers_changed(total: int) -> void:
+	if _ember_tween:
+		_ember_tween.kill()
+	_ember_tween = create_tween()
+	_ember_tween.tween_method(func(v: float): _ember_shown = v; _ember_label.text = str(roundi(v)), _ember_shown, float(total), 0.5)
+
+
+func _on_embers_gained(amount: int) -> void:
+	_ember_gain.text = "+%d" % amount
+	_ember_gain.modulate.a = 1.0
+	create_tween().tween_property(_ember_gain, "modulate:a", 0.0, 1.6).set_delay(0.6)
+
+
+func _refresh_quick() -> void:
+	var item := Items.get_item(GameState.quick_item)
+	_quick_box.visible = item != null and GameState.item_count(GameState.quick_item) > 0
+	if _quick_box.visible:
+		_quick_label.text = "%s  x%d" % [item.display_name, GameState.item_count(GameState.quick_item)]
+
+
+func _toast(text: String) -> void:
+	_ember_gain.text = text
+	_ember_gain.modulate.a = 1.0
+	create_tween().tween_property(_ember_gain, "modulate:a", 0.0, 1.6).set_delay(1.2)
 
 
 func _on_prompt(text: String) -> void:

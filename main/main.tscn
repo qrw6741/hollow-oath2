@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://main/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://world/camera_rig.gd" id="2_camera"]
@@ -8,6 +8,9 @@
 [ext_resource type="PackedScene" path="res://ui/menu/main_menu.tscn" id="6_menu"]
 
 [ext_resource type="Script" path="res://fx/vignette.gd" id="7_vig"]
+
+[ext_resource type="Script" path="res://ui/candle/candle_menu.gd" id="8_candle"]
+[ext_resource type="Script" path="res://ui/inventory/inventory_menu.gd" id="9_inv"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_main")
@@ -30,3 +33,9 @@ script = ExtResource("2_camera")
 
 [node name="Vignette" type="CanvasLayer" parent="."]
 script = ExtResource("7_vig")
+
+[node name="CandleMenu" type="CanvasLayer" parent="."]
+script = ExtResource("8_candle")
+
+[node name="InventoryMenu" type="CanvasLayer" parent="."]
+script = ExtResource("9_inv")

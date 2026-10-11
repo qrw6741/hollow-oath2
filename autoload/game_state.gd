@@ -14,6 +14,21 @@ var current_slot := 0
 
 ## Chosen starting preset (see Presets). Fixed for the life of a save slot.
 var preset_id: StringName = &"sworn_knight"
+## Embers: the currency. Lost on death (dropped where you fell, recoverable once).
+var embers := 0
+## {} or { level_id, x, y, amount } — the one recoverable stain of lost embers.
+var ember_drop := {}
+## Character growth: points spent per stat. Level = 1 + total points.
+var stats := {"vigor": 0, "endurance": 0, "strength": 0}
+## item id (String) -> count.
+var inventory := {}
+var quick_item: StringName = &""
+const STAT_NAMES := ["vigor", "endurance", "strength"]
+const VIGOR_HEALTH := 8.0
+const ENDURANCE_STAMINA := 6.0
+const STRENGTH_DAMAGE := 0.04
+## True while a modal menu (candle / inventory) owns input; the pause menu stays out of the way.
+var ui_modal := false
 var level_path := DEFAULT_LEVEL_PATH
 var level_name := ""
 var has_checkpoint := false
@@ -33,6 +48,7 @@ var _respawn_pending := false
 func _ready() -> void:
 	Events.player_died.connect(_on_player_died)
 	Events.checkpoint_rested.connect(_on_checkpoint_rested)
+	Events.enemy_killed.connect(_on_enemy_killed)
 
 
 func _process(delta: float) -> void:
@@ -52,12 +68,123 @@ func _on_player_died() -> void:
 		return
 	_respawn_pending = true
 	deaths += 1
+	_drop_embers()
 	var sid := session_id
 	await get_tree().create_timer(RESPAWN_DELAY, false).timeout
 	if sid != session_id:
 		return  # The session ended (quit to menu / new game) while we waited.
 	_respawn_pending = false
 	Events.respawn_requested.emit()
+
+
+# ------------------------------------------------------------------ economy
+
+func _on_enemy_killed(enemy: Node) -> void:
+	var d: EnemyData = enemy.get("data") as EnemyData
+	if d == null:
+		return
+	if d.ember_reward > 0:
+		add_embers(d.ember_reward)
+	if d.drop_item != null and d.drop_chance > 0.0 and randf() < d.drop_chance:
+		add_item(d.drop_item.id, d.drop_count)
+
+
+func add_embers(amount: int) -> void:
+	if amount <= 0:
+		return
+	embers += amount
+	Events.embers_gained.emit(amount)
+	Events.embers_changed.emit(embers)
+
+
+func spend_embers(amount: int) -> bool:
+	if amount < 0 or amount > embers:
+		return false
+	embers -= amount
+	Events.embers_changed.emit(embers)
+	return true
+
+
+## On death all carried embers fall where the player last stood safely.
+## Dying again before recovering them destroys the older stain.
+func _drop_embers() -> void:
+	if embers <= 0:
+		return
+	var p := get_tree().get_first_node_in_group(&"player") as Player
+	var pos := Vector2.ZERO
+	if p:
+		pos = p.last_safe_position
+	var lv := get_tree().get_first_node_in_group(&"level")
+	ember_drop = {"level_id": String(lv.get("level_id")) if lv else "", "x": pos.x, "y": pos.y, "amount": embers}
+	embers = 0
+	Events.embers_changed.emit(embers)
+	Events.ember_drop_changed.emit()
+
+
+## Called by the remnant when touched. Returns the embers recovered.
+func recover_drop() -> int:
+	if ember_drop.is_empty():
+		return 0
+	var amount := int(ember_drop.get("amount", 0))
+	ember_drop = {}
+	add_embers(amount)
+	Events.ember_drop_changed.emit()
+	return amount
+
+
+func level() -> int:
+	var total := 0
+	for s in STAT_NAMES:
+		total += int(stats.get(s, 0))
+	return 1 + total
+
+
+## Embers needed to go from the current level to the next.
+func level_cost() -> int:
+	var n := level() - 1
+	return 60 + 30 * n + 6 * n * n
+
+
+func buy_stat(stat: String) -> bool:
+	if not STAT_NAMES.has(stat):
+		return false
+	if not spend_embers(level_cost()):
+		return false
+	stats[stat] = int(stats.get(stat, 0)) + 1
+	Events.stats_changed.emit()
+	return true
+
+
+func add_item(id: StringName, count := 1) -> int:
+	var item := Items.get_item(id)
+	if item == null or count <= 0:
+		return 0
+	var have := int(inventory.get(String(id), 0))
+	var added := mini(count, item.max_stack - have)
+	if added <= 0:
+		return 0
+	inventory[String(id)] = have + added
+	if quick_item == &"" and item.is_usable():
+		quick_item = id
+	Events.item_picked.emit(id, added)
+	Events.inventory_changed.emit()
+	return added
+
+
+func remove_item(id: StringName, count := 1) -> bool:
+	var have := int(inventory.get(String(id), 0))
+	if count <= 0 or have < count:
+		return false
+	if have == count:
+		inventory.erase(String(id))
+	else:
+		inventory[String(id)] = have - count
+	Events.inventory_changed.emit()
+	return true
+
+
+func item_count(id: StringName) -> int:
+	return int(inventory.get(String(id), 0))
 
 
 # ------------------------------------------------------------------ flags
@@ -77,6 +204,12 @@ func reset() -> void:
 	in_game = false
 	current_slot = 0
 	preset_id = &"sworn_knight"
+	embers = 0
+	ember_drop = {}
+	stats = {"vigor": 0, "endurance": 0, "strength": 0}
+	inventory = {}
+	quick_item = &""
+	ui_modal = false
 	level_path = DEFAULT_LEVEL_PATH
 	level_name = ""
 	has_checkpoint = false
@@ -101,6 +234,11 @@ func to_dict() -> Dictionary:
 		"play_time": play_time,
 		"deaths": deaths,
 		"preset_id": String(preset_id),
+		"embers": embers,
+		"ember_drop": ember_drop.duplicate(true),
+		"stats": stats.duplicate(true),
+		"inventory": inventory.duplicate(true),
+		"quick_item": String(quick_item),
 		"level_path": level_path,
 		"level_name": level_name,
 		"has_checkpoint": has_checkpoint,
@@ -117,6 +255,11 @@ func apply_dict(d: Dictionary, slot: int) -> void:
 	play_time = float(d.get("play_time", 0.0))
 	deaths = int(d.get("deaths", 0))
 	preset_id = StringName(d.get("preset_id", "sworn_knight"))
+	embers = int(d.get("embers", 0))
+	ember_drop = (d.get("ember_drop", {}) as Dictionary).duplicate(true)
+	stats = (d.get("stats", stats) as Dictionary).duplicate(true)
+	inventory = (d.get("inventory", {}) as Dictionary).duplicate(true)
+	quick_item = StringName(d.get("quick_item", ""))
 	level_path = String(d.get("level_path", DEFAULT_LEVEL_PATH))
 	level_name = String(d.get("level_name", ""))
 	has_checkpoint = bool(d.get("has_checkpoint", false))
