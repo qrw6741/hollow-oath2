@@ -34,5 +34,8 @@ The test arena, **The Penitent's Yard [in game]**, is planned to become the chur
 - The Night of Unbinding.
 - An unknown span later: the Oathbound wakes.
 
+## Bosses
+- **The Bell-Warden [in game]** — the churchyard's bell-ringer, who swore first and loudest on the Night of Unbinding. He still keeps the yard and wears the cracked Yard Bell as a helm so that nothing else will ever ring it; he fights with its iron clapper. Intro boss at the end of the Penitent's Yard. Drops the **Warden's Bell Shard [in game]**.
+
 ## Items written so far
 - **Oathblade [in game]** — "A plain straight sword issued to every sworn knight of the old kingdom. The engraving on its fuller has been scratched away by its last owner."

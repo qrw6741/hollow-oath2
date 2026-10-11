@@ -21,6 +21,13 @@ signal save_failed(slot: int, reason: String)
 signal checkpoint_rested(checkpoint_id: StringName, respawn_position: Vector2)
 signal enemy_killed(enemy: Node2D)
 
+# --- Bosses ---
+signal boss_fight_started(boss: Node)
+signal boss_phase_changed(boss: Node, phase: int)
+## victory = false when the player died or the fight was reset.
+signal boss_fight_ended(victory: bool)
+signal boss_defeated(boss_id: StringName)
+
 # --- Economy / inventory ---
 signal embers_changed(total: int)
 signal embers_gained(amount: int)

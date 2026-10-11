@@ -28,6 +28,17 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — Intro boss: the Bell-Warden; ember counter reverted
+
+- **HUD**: removed the LV plaque; the ember counter is back to the plain icon + number (user request).
+- **Boss framework** (`actors/bosses/boss_base.gd`, `BossBase` extends `EnemyBase`): dormant until its arena starts the fight, no leash, two phases (below 50%: roar that shoves the player back, new attack pool, +30% speed, shorter cooldowns), leap attacks that land on the hit frame, defeat flag in `GameState.flags` (`boss_defeated_<id>`).
+- **Boss arena** (`world/boss/boss_arena.gd`): fog gate at the entrance; the fight starts when the player is inside the arena zone (polled, armed 30 frames after a spawn), the gate seals, HUD boss bar appears. Player death ends the fight; on respawn/rest the boss is recreated at full health and the gate reopens. Victory opens the gate for good, banner "THE BELL FALLS SILENT", immediate autosave.
+- **The Bell-Warden**: 650 HP, poise 95. Phase 1: Clapper Smash (parryable, glint), Sweeping Toll -> Backhand, Shoulder Charge (unparryable, red aura). Phase 2 adds the three-hit Toll combo and the Falling Bell leap (unparryable; red ring marks the landing). Reward 1500 embers + Warden's Bell Shard (key item).
+- **Level**: the Penitent's Yard now continues through a gate into a 640 px boss arena (right wall moved to x 2560); new Bell-Gate Candle just before the gate; third Penitent moved off the ledge.
+- Tests: 55 (8 new): data, dormant until the gate, sealing, the boss lands a hit, parry -> riposte on the boss, phase 2 + leap landing on the player, reset on player death, defeat persists through rest and a save reload. Rendered captures of gate, intro, smash glint, charge aura, roar, leap marker, victory.
+- Bugs caught by tests: teleporting past a thin trigger skipped the fight (now a polled zone); on respawn the physics server still reported the dead player inside the arena and restarted the fight (now armed after 30 frames); a boss struck from outside the zone started fighting without sealing the gate (all fight starts now go through one event).
+- **Not verified**: difficulty/fairness with a human player (numbers are first pass), feel of the leap and charge with a real pad, Windows.
+
 ## 2026-10-11 — UI upgrade pass
 
 - **Fonts**: Lora (variable, heavier weight) for text and GFS Baskerville for titles and menu choices, both SIL OFL, bundled in `assets/fonts/` (credits in `docs/CREDITS.md`). Everything previously used Godot's default font.

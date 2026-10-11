@@ -20,6 +20,12 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Boss
+- Bell-Warden balance is untested by a human (650 HP, damage 20-36 per hit, cooldowns). Tune in `data/enemies/bell_warden.tres` and `data/attacks/warden_*.tres`.
+- No boss music, sounds, intro cutscene or camera framing yet; the name banner is the intro.
+- The boss can be pressed against the gate pillar while the gate is open (only after the player has died, when it idles until the respawn reset).
+- The Warden's Bell Shard has no use yet (planned: opens the way to the Forsaken Village).
+
 ## Economy / inventory
 - Numbers (ember rewards, level costs, +8/+6/+4% steps, item effects) are first-pass and unplaytested; there is only one enemy type, so embers have little to spend on yet.
 - No shops/NPCs, no equipment swapping, and no item uses beyond four consumables; the Rusted Key opens nothing yet.

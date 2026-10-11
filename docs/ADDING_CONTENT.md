@@ -37,6 +37,13 @@
 4. To drop it from an enemy: set `drop_item`, `drop_chance`, `drop_count` in that enemy's `.tres`. Embers: `ember_reward`.
 5. New effects: add to `ItemData.Effect` and handle in `Items.use`.
 
+## A new boss
+1. Make attack `.tres` files (set `parryable = false` for attacks the player must dodge; animation `&"leap"` makes the boss jump and land on the hit frame).
+2. Make an `EnemyData` for it (health, poise, phase-1 `attacks`, `ember_reward`, `drop_item`).
+3. Copy `actors/bosses/bell_warden.tscn`, set `boss_id` (unique; it becomes the saved defeat flag), `phase2_attacks`, `phase2_threshold`, and a visual script.
+4. In the level, add a `BossArena` node at the bottom of the arena entrance; set `boss_scene`, `boss_offset`, `gate_height`, `trigger_width`, `victory_text`. Put solid geometry above the gate opening.
+5. Put an Oath Candle just before the gate.
+
 ## A new level
 1. New scene, root `Node2D` with `world/levels/level.gd`. Set `level_id`, `display_name`, `bounds`, `default_spawn`.
 2. Build terrain with `StoneBlock` nodes (set `size`; tick `one_way` for platforms).

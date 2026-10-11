@@ -21,11 +21,14 @@ var _banner_tween: Tween
 var _death_tween: Tween
 var _saved_label: Label
 var _ember_label: Label
-var _level_label: Label
 var _ember_gain: Label
 var _ember_shown := 0.0
 var _ember_tween: Tween
 var _quick_box: PanelContainer
+var _boss_box: Control
+var _boss_name: Label
+var _boss_bar: StatBar
+var _boss: BossBase
 var _quick_label: Label
 var _saved_tween: Tween
 
@@ -47,6 +50,8 @@ func _ready() -> void:
 	Events.inventory_changed.connect(_refresh_quick)
 	Events.item_picked.connect(func(id, n): _toast("%s  x%d" % [Items.get_item(id).display_name, n]))
 	Events.stats_changed.connect(_sync_economy)
+	Events.boss_fight_started.connect(_on_boss_fight_started)
+	Events.boss_fight_ended.connect(_on_boss_fight_ended)
 	Events.session_started.connect(_sync_economy)
 	Events.player_spawned.connect(func(_p): _sync_economy())
 
@@ -77,23 +82,9 @@ func _build() -> void:
 	_vials.draw.connect(_draw_vials)
 	root.add_child(_vials)
 
-	# Embers (currency) and level, top right, in a small dark plaque.
-	var plaque := Control.new()
-	plaque.position = Vector2(480 - 158, 6)
-	plaque.size = Vector2(148, 19)
-	plaque.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	plaque.draw.connect(func():
-		plaque.draw_rect(Rect2(Vector2.ZERO, plaque.size), Color(0.05, 0.045, 0.065, 0.78))
-		plaque.draw_rect(Rect2(Vector2.ZERO, plaque.size), Color(Palette.STONE, 0.8), false, 1.0)
-		plaque.draw_line(Vector2(38, 3), Vector2(38, 16), Color(Palette.STONE, 0.8), 1.0)
-		plaque.draw_rect(Rect2(-2, 8, 3, 3), Palette.GOLD))
-	root.add_child(plaque)
-	_level_label = _label(root, "LV 1", 8, HORIZONTAL_ALIGNMENT_CENTER)
-	_level_label.add_theme_color_override(&"font_color", Palette.BONE_DIM)
-	_level_label.position = Vector2(480 - 158, 9)
-	_level_label.size = Vector2(38, 12)
+	# Embers (currency), top right.
 	var ember_icon := Control.new()
-	ember_icon.position = Vector2(480 - 26, 9)
+	ember_icon.position = Vector2(480 - 26, 10)
 	ember_icon.size = Vector2(12, 12)
 	ember_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ember_icon.draw.connect(func():
@@ -102,12 +93,12 @@ func _build() -> void:
 		ember_icon.draw_colored_polygon(PackedVector2Array([Vector2(4, 11), Vector2(6, 4), Vector2(8, 11)]), Palette.GOLD_BRIGHT))
 	root.add_child(ember_icon)
 	_ember_label = _label(root, "0", 10, HORIZONTAL_ALIGNMENT_RIGHT)
-	_ember_label.position = Vector2(480 - 148, 8)
-	_ember_label.size = Vector2(118, 14)
+	_ember_label.position = Vector2(480 - 140, 9)
+	_ember_label.size = Vector2(108, 14)
 	_ember_label.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
 	_ember_gain = _label(root, "", 8, HORIZONTAL_ALIGNMENT_RIGHT)
-	_ember_gain.position = Vector2(480 - 168, 27)
-	_ember_gain.size = Vector2(158, 12)
+	_ember_gain.position = Vector2(480 - 168, 24)
+	_ember_gain.size = Vector2(136, 12)
 	_ember_gain.add_theme_color_override(&"font_color", Palette.EMBER)
 	_ember_gain.modulate.a = 0.0
 
@@ -125,6 +116,23 @@ func _build() -> void:
 	qrow.add_child(qg)
 	_quick_label = _label(qrow, "", 8, HORIZONTAL_ALIGNMENT_LEFT)
 	root.add_child(_quick_box)
+
+	# Boss bar, bottom centre.
+	_boss_box = Control.new()
+	_boss_box.position = Vector2(124, 232)
+	_boss_box.size = Vector2(240, 28)
+	_boss_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_boss_box.visible = false
+	root.add_child(_boss_box)
+	_boss_name = _label(_boss_box, "", 10, HORIZONTAL_ALIGNMENT_LEFT)
+	UITheme.title(_boss_name, 10, Palette.BONE)
+	_boss_name.position = Vector2(0, 0)
+	_boss_name.size = Vector2(240, 13)
+	_boss_bar = StatBar.new()
+	_boss_bar.position = Vector2(0, 15)
+	_boss_bar.size = Vector2(240, 6)
+	_boss_bar.fill_color = Palette.CRIMSON
+	_boss_box.add_child(_boss_bar)
 
 	_prompt = _label(root, "", 8, HORIZONTAL_ALIGNMENT_CENTER)
 	_prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
@@ -221,10 +229,36 @@ func _draw_vials() -> void:
 			_vials.draw_circle(Vector2(x + 2.3, 5.2), 0.8, Palette.GOLD_BRIGHT)
 
 
+func _on_boss_fight_started(b: Node) -> void:
+	var boss := b as BossBase
+	if boss == null:
+		return
+	if is_instance_valid(_boss) and _boss.health.changed.is_connected(_boss_bar.set_values):
+		_boss.health.changed.disconnect(_boss_bar.set_values)
+	_boss = boss
+	_boss_name.text = boss.data.display_name
+	_boss_bar.px_per_point = 236.0 / maxf(1.0, boss.health.max_health)
+	_boss_bar.value = boss.health.current
+	_boss_bar.set_values(boss.health.current, boss.health.max_health)
+	boss.health.changed.connect(_boss_bar.set_values)
+	_boss_box.modulate.a = 0.0
+	_boss_box.visible = true
+	create_tween().tween_property(_boss_box, "modulate:a", 1.0, 0.6)
+	_prompt.visible = false
+
+
+func _on_boss_fight_ended(victory: bool) -> void:
+	if not _boss_box.visible:
+		return
+	var t := create_tween()
+	t.tween_interval(1.6 if victory else 0.8)
+	t.tween_property(_boss_box, "modulate:a", 0.0, 0.8)
+	t.tween_callback(func(): _boss_box.visible = false)
+
+
 func _sync_economy() -> void:
 	_ember_shown = float(GameState.embers)
 	_ember_label.text = str(GameState.embers)
-	_level_label.text = "LV %d" % GameState.level()
 	_refresh_quick()
 
 
@@ -314,6 +348,7 @@ func _on_session_started() -> void:
 	_banner.modulate.a = 0.0
 	_saved_label.modulate.a = 0.0
 	_prompt.visible = false
+	_boss_box.visible = false
 
 
 func _on_game_saved(_slot: int) -> void:

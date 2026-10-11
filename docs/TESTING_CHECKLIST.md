@@ -67,6 +67,14 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Tab opens the pack; Use a bandage when hurt; quick item shows bottom left; F uses it.
 - [ ] Quit and Continue: embers, stain, level, pack and quick item are restored.
 
+## Boss: the Bell-Warden
+- [ ] Bell-Gate Candle just before the fog; the boss stands still until you pass the fog.
+- [ ] Entering seals the gate (red fog), name banner and boss bar appear; you cannot walk back out.
+- [ ] Smash shows a glint and can be parried, then riposted. Charge and leap glow red and cannot be parried; the leap shows where it lands.
+- [ ] At half health it roars, pushes you back, and fights faster with the leap and the three-hit combo.
+- [ ] Die: on respawn the boss is at full health and the gate is open.
+- [ ] Win: banner, +1500 embers, Warden's Bell Shard, gate opens; boss never returns after resting or reloading.
+
 ## Build
 - [ ] Windows .exe launches from a folder with no Godot installed.
 - [ ] Holds ~60 FPS (F3) with all enemies active.

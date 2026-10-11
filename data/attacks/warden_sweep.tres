@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+[ext_resource type="Resource" path="res://data/attacks/warden_backhand.tres" id="2_next"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"warden_sweep"
+display_name = "Bell-Warden — Sweeping Toll"
+animation = &"sweep"
+startup_frames = 24
+active_frames = 6
+recovery_frames = 26
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 24.0
+poise_damage = 0.0
+stamina_cost = 0.0
+knockback = Vector2(120, -40)
+parryable = true
+hitbox_size = Vector2(66, 30)
+hitbox_offset = Vector2(30, -20)
+lunge_speed = 0.0
+lunge_start_frame = 0
+lunge_frames = 0
+track_during_startup = true
+hit_stop = 0.08
+shake = 4.0
+ai_min_range = 0
+ai_max_range = 68
+ai_weight = 1.2
+ai_chain_chance = 0.55
+next_in_combo = ExtResource("2_next")

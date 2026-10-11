@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
@@ -11,6 +11,8 @@
 [ext_resource type="Script" path="res://ui/hint_bar.gd" id="hintbar"]
 [ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
 [ext_resource type="Script" path="res://world/pickups/item_pickup.gd" id="pickup"]
+[ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
+[ext_resource type="PackedScene" path="res://actors/bosses/bell_warden.tscn" id="warden"]
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
 [ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
 [ext_resource type="Resource" path="res://data/items/rusted_key.tres" id="it_key"]
@@ -19,7 +21,7 @@
 script = ExtResource("level")
 level_id = &"test_arena"
 display_name = "The Penitent's Yard"
-bounds = Rect2(0, 0, 1920, 540)
+bounds = Rect2(0, 0, 2592, 540)
 default_spawn = Vector2(96, 480)
 
 [node name="Background" type="ParallaxBackground" parent="."]
@@ -41,7 +43,7 @@ color = Color(0.090, 0.078, 0.110, 1)
 window_color = Color(0.549, 0.239, 0.133, 0.55)
 seed_value = 7
 spacing = 60.0
-width = 900.0
+width = 1200.0
 
 [node name="Mid" type="ParallaxLayer" parent="Background"]
 motion_scale = Vector2(0.4, 0.3)
@@ -53,7 +55,7 @@ max_height = 120.0
 color = Color(0.114, 0.098, 0.133, 1)
 seed_value = 11
 spacing = 90.0
-width = 1400.0
+width = 1800.0
 
 [node name="Near" type="ParallaxLayer" parent="Background"]
 motion_scale = Vector2(0.7, 0.6)
@@ -65,7 +67,7 @@ max_height = 100.0
 color = Color(0.141, 0.122, 0.161, 1)
 seed_value = 5
 spacing = 130.0
-width = 2000.0
+width = 2600.0
 
 [node name="Darkness" type="CanvasModulate" parent="."]
 color = Color(0.66, 0.62, 0.72, 1)
@@ -79,12 +81,33 @@ size = Vector2(32, 540)
 style = 0
 seed_value = 3
 
-[node name="WallRight" type="StaticBody2D" parent="Geometry"]
+[node name="GatePillar" type="StaticBody2D" parent="Geometry"]
 position = Vector2(1888, 0)
+script = ExtResource("block")
+size = Vector2(28, 352)
+style = 0
+seed_value = 4
+
+[node name="ArenaFloor" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1888, 448)
+script = ExtResource("block")
+size = Vector2(704, 92)
+style = 0
+seed_value = 21
+
+[node name="ArenaCeiling" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1916, 0)
+script = ExtResource("block")
+size = Vector2(644, 24)
+style = 1
+seed_value = 22
+
+[node name="WallRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2560, 0)
 script = ExtResource("block")
 size = Vector2(32, 540)
 style = 0
-seed_value = 4
+seed_value = 23
 
 [node name="FloorA" type="StaticBody2D" parent="Geometry"]
 position = Vector2(32, 480)
@@ -173,6 +196,18 @@ display_name = "Yard Candle"
 [node name="TrainingDummy" parent="." instance=ExtResource("dummy")]
 position = Vector2(330, 480)
 
+[node name="GateCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(1700, 448)
+checkpoint_id = &"bellgate_candle"
+display_name = "Bell-Gate Candle"
+
+[node name="BellWardenArena" type="Node2D" parent="."]
+position = Vector2(1888, 448)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("warden")
+boss_offset = Vector2(440, 0)
+gate_height = 96.0
+
 [node name="PickupBandages" type="Area2D" parent="."]
 position = Vector2(520, 480)
 script = ExtResource("pickup")
@@ -209,7 +244,7 @@ patrol_distance = 48.0
 start_facing = -1
 
 [node name="Penitent3" type="Marker2D" parent="."]
-position = Vector2(1760, 448)
+position = Vector2(1480, 480)
 script = ExtResource("spawner")
 enemy_scene = ExtResource("penitent")
 patrol_distance = 0.0

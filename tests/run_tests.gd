@@ -56,6 +56,9 @@ func _run() -> void:
 		# --- economy & inventory ---
 		test_items_valid, test_ember_reward_and_drop_roll, test_ember_drop_and_recover, test_level_up,
 		test_inventory_rules, test_item_pickup_persists, test_economy_save_roundtrip, test_candle_and_inventory_menus,
+		# --- boss ---
+		test_boss_data_valid, test_boss_dormant_until_gate, test_boss_fight_seals_gate, test_boss_attacks_player,
+		test_boss_parry_riposte, test_boss_phase_two_and_leap, test_boss_resets_on_player_death, test_boss_defeat_persists,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -1251,3 +1254,168 @@ func test_candle_and_inventory_menus() -> void:
 	await tap_action(&"inventory")
 	check(not im.is_open and not get_tree().paused, "inventory action closes it and unpauses")
 	settings.candle_menu_on_rest = false
+
+
+# ------------------------------------------------------------------ boss tests
+
+func arena() -> BossArena:
+	return level.get_node("BellWardenArena") as BossArena
+
+
+## Puts the player inside the arena (past the trigger) and waits for the fight to start.
+func enter_boss_arena(x := 1990.0) -> BossBase:
+	await place_player(x, 448.0, 1)
+	await frames(36)   # the trigger arms 30 frames after the boss spawns
+	return arena().boss
+
+
+func test_boss_data_valid() -> void:
+	for id in ["warden_smash", "warden_sweep", "warden_backhand", "warden_charge", "warden_leap", "warden_toll", "warden_toll_2", "warden_toll_3"]:
+		var a: AttackData = load("res://data/attacks/%s.tres" % id)
+		check(a != null and a.validate().is_empty(), "%s valid (%s)" % [id, a.validate() if a else "missing"])
+	check(not load("res://data/attacks/warden_charge.tres").parryable and not load("res://data/attacks/warden_leap.tres").parryable, "charge and leap are unparryable")
+	check(load("res://data/attacks/warden_smash.tres").parryable, "smash is parryable")
+	var b: BossBase = load("res://actors/bosses/bell_warden.tscn").instantiate()
+	check(b.boss_id == &"bell_warden" and b.phase2_attacks.size() >= 3, "boss scene configured")
+	check(b.data.ember_reward >= 1000 and b.data.drop_item != null and b.data.drop_chance == 1.0, "boss reward configured")
+	b.free()
+
+
+func test_boss_dormant_until_gate() -> void:
+	await fresh_game()
+	await frames(4)
+	var boss := arena().boss
+	check(is_instance_valid(boss) and not boss.active, "boss spawned dormant")
+	var x0 := boss.global_position.x
+	await place_player(1700.0, 448.0, 1)
+	await frames(90)
+	check(not boss.active and not arena().fight_active, "boss ignores a player outside the gate")
+	check(absf(boss.global_position.x - x0) < 2.0, "dormant boss stays put")
+	check(not main.hud._boss_box.visible, "no boss bar outside the fight")
+
+
+func test_boss_fight_seals_gate() -> void:
+	await fresh_game()
+	await frames(4)
+	var boss := await enter_boss_arena()
+	check(arena().fight_active and boss.active, "walking in starts the fight")
+	check(not arena()._barrier_shape.disabled, "fog gate seals")
+	check(main.hud._boss_box.visible and main.hud._boss_name.text == "The Bell-Warden", "boss bar shown with name")
+	# Try to run back out through the gate.
+	Input.action_press(&"move_left")
+	await frames(90)
+	Input.action_release(&"move_left")
+	check(player.global_position.x > 1900.0, "cannot leave through the sealed gate (x %.0f)" % player.global_position.x)
+
+
+func test_boss_attacks_player() -> void:
+	await fresh_game()
+	await frames(4)
+	var boss := await enter_boss_arena(2260.0)
+	var hit := [false]
+	player.health.damaged.connect(func(_a): hit[0] = true)
+	for i in 400:
+		if hit[0]:
+			break
+		await get_tree().physics_frame
+	check(hit[0], "the boss lands an attack on an idle player")
+	check(boss.state != EnemyBase.State.IDLE or hit[0], "boss engaged")
+
+
+func test_boss_parry_riposte() -> void:
+	await fresh_game()
+	await frames(4)
+	var boss := await enter_boss_arena(2290.0)
+	boss._cooldown = 9999
+	await frames(2)
+	player.facing = 1
+	boss.facing = -1
+	var atk: AttackData = load("res://data/attacks/warden_smash.tres")
+	boss._start_attack(atk)
+	while boss.attack_runner.frame < atk.startup_frames - 4:
+		await get_tree().physics_frame
+	await press(&"parry")
+	await frames(10)
+	check(boss.state == EnemyBase.State.PARRIED, "smash can be parried (state %s)" % boss.state_name())
+	check(player.health.current == player.health.max_health, "parry negates the smash")
+	check(boss.is_riposte_ready(), "riposte window open on the boss")
+	var hp := boss.health.current
+	await press(&"attack_light")
+	await frames(24)
+	check(hp - boss.health.current >= 60.0, "riposte hits the boss hard (%.0f)" % (hp - boss.health.current))
+
+
+func test_boss_phase_two_and_leap() -> void:
+	await fresh_game()
+	await frames(4)
+	var boss := await enter_boss_arena(2150.0)
+	boss._cooldown = 9999
+	var speed1: float = boss.data.chase_speed
+	var h := damage(boss.health.max_health * 0.52)
+	h.poise_damage = 0.0
+	boss.receive_hit(h)
+	await frames(2)
+	check(boss.phase == 2 and boss.roaring, "below half health the boss roars into phase 2")
+	check(boss.data.attacks.any(func(a): return a.id == &"warden_leap"), "phase 2 adds the leap")
+	check(boss.data.chase_speed > speed1, "phase 2 is faster")
+	await frames(boss.roar_frames + 4)
+	check(not boss.roaring, "roar ends")
+	# Leap at a player 140px away: it must leave the ground and land near the player.
+	boss._cooldown = 9999
+	await place_player(boss.global_position.x - 140.0, 448.0, 1)
+	boss.facing = -1
+	var hp := player.health.current
+	var left_ground := [false]
+	boss._start_attack(load("res://data/attacks/warden_leap.tres"))
+	for i in 90:
+		if boss.leaping and boss.global_position.y < 440.0:
+			left_ground[0] = true
+		await get_tree().physics_frame
+	check(left_ground[0], "leap leaves the ground")
+	check(absf(boss.global_position.x - player.global_position.x) < 48.0, "leap lands on the player (dx %.0f)" % (boss.global_position.x - player.global_position.x))
+	check(player.health.current < hp, "landing shockwave hurts")
+
+
+func test_boss_resets_on_player_death() -> void:
+	await fresh_game()
+	await frames(4)
+	var boss := await enter_boss_arena()
+	boss.receive_hit(damage(200.0))
+	player.receive_hit(damage(9999.0))
+	await frames(4)
+	check(not arena().fight_active, "fight ends when the player dies")
+	await frames(int(game_state.RESPAWN_DELAY * 60.0) + 20)
+	var fresh := arena().boss
+	check(is_instance_valid(fresh) and fresh != boss, "boss recreated on respawn")
+	check(fresh.health.current == fresh.health.max_health and not fresh.active and fresh.phase == 1, "boss back to full, dormant, phase 1")
+	check(arena()._barrier_shape.disabled, "gate open again")
+	await frames(60)
+	check(not main.hud._boss_box.visible, "boss bar hidden after the reset")
+
+
+func test_boss_defeat_persists() -> void:
+	await fresh_game()
+	await frames(4)
+	var boss := await enter_boss_arena()
+	var e0: int = game_state.embers
+	boss.receive_hit(damage(99999.0))
+	await frames(4)
+	check(boss.is_dead(), "boss dies")
+	check(game_state.get_flag(&"boss_defeated_bell_warden", false), "defeat flag saved")
+	check(game_state.embers == e0 + 1500, "boss embers awarded (%d)" % (game_state.embers - e0))
+	check(game_state.item_count(&"warden_bell_shard") == 1, "boss drops its bell shard")
+	check(not arena().fight_active and arena()._barrier_shape.disabled, "gate opens on victory")
+	await frames(30)
+	level.reset_enemies()   # what resting does
+	await frames(4)
+	check(not is_instance_valid(arena().boss), "a beaten boss never respawns")
+	# Through a save round trip too.
+	var data: Dictionary = game_state.to_dict()
+	await _teardown()
+	game_state.apply_dict(saves._normalize(data), 0)
+	main = load("res://main/main.tscn").instantiate()
+	main.show_menu_on_start = false
+	get_tree().root.add_child(main)
+	await frames(8)
+	level = main.current_level()
+	check(not is_instance_valid(arena().boss), "beaten boss absent after reload")

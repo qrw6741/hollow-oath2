@@ -2,7 +2,7 @@ class_name Items
 extends RefCounted
 ## Registry and rules for items. Order of IDS = order in the inventory list.
 
-const IDS: Array[StringName] = [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"penitents_tear"]
+const IDS: Array[StringName] = [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard", &"penitents_tear"]
 const DIR := "res://data/items/"
 
 static var _cache := {}
