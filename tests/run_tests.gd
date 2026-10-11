@@ -67,6 +67,8 @@ func _run() -> void:
 		# --- catacombs, second boss, map ---
 		test_catacombs_travel_and_water, test_drown_shaft_kills, test_breakable_wall, test_canon_boss,
 		test_map_exploration_and_screen, test_prologue_ending,
+		# --- equipment screen ---
+		test_equipment_screen,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -1931,3 +1933,38 @@ func test_prologue_ending() -> void:
 	await place_player(1200.0, 460.0, 1)
 	await frames(6)
 	check(not main.hud._msg_panel.visible, "walking away closes the text")
+
+
+func test_equipment_screen() -> void:
+	for id in Presets.IDS:
+		var pr := Presets.get_preset(id)
+		check(pr.armor_name != "" and pr.armor_description != "", "%s has an armour name and description" % id)
+	var ob: WeaponData = load("res://data/weapons/oathblade.tres")
+	var s := WeaponStats.summary(ob, 1.0)
+	check(s.light == [12, 13, 20] and s.light_total == 45, "Oathblade light combo 12/13/20 (%s)" % [s.light])
+	var s3 := WeaponStats.summary(ob, 1.12)
+	check(s3.light == [13, 15, 22], "Strength scales the shown damage (%s)" % [s3.light])
+	check(WeaponStats.summary(load("res://data/weapons/fists.tres"), 1.0).light.size() == 4, "fists show a four-hit combo")
+	game_state.reset()
+	game_state.preset_id = &"unsworn"
+	await fresh_game(&"unsworn")
+	game_state.stats = {"vigor": 1, "endurance": 0, "strength": 0}
+	var im: InventoryMenu = main.get_node("InventoryMenu")
+	await tap_action(&"inventory")
+	check(im.is_open and im.tab == InventoryMenu.Tab.EQUIPMENT, "inventory opens on the equipment tab")
+	check(im._slots.weapon.text == "Bare Hands" and im._slots.armour.text == "Bone-cloth Wraps", "slots show the equipped weapon and armour")
+	check(im._preview.get("preset") == Presets.get_preset(&"unsworn"), "character preview shows your preset")
+	im._slots.armour.grab_focus()
+	await frames(2)
+	var texts := im._d_grid.get_children().map(func(n): return n.text)
+	check(texts.has("Damage taken") and texts.any(func(t): return t.begins_with("130%")), "armour details show damage taken (%s)" % [texts])
+	im._slots.status.grab_focus()
+	await frames(2)
+	texts = im._d_grid.get_children().map(func(n): return n.text)
+	check(im._d_sub.text.contains("Level 2") and texts.has("Vigor"), "status shows level and attributes")
+	await tap_action(&"heal")
+	check(im.tab == InventoryMenu.Tab.ITEMS and im._pages[1].visible and not im._pages[0].visible, "R1 / heal switches to the items tab")
+	await tap_action(&"parry")
+	check(im.tab == InventoryMenu.Tab.EQUIPMENT, "L1 / parry switches back")
+	await tap_action(&"inventory")
+	check(not im.is_open and not get_tree().paused, "closes and resumes")

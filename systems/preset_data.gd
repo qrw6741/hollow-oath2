@@ -21,6 +21,8 @@ enum WeaponLook { SWORD, TWIN, SWORD_SHIELD, FISTS }
 @export var flask_heal := 45.0
 
 @export_group("Armour")
+@export var armor_name := ""
+@export_multiline var armor_description := ""
 ## Multiplies all damage taken. Armour is a trade-off, not a free upgrade:
 ## heavier armour also slows movement (run_speed_mult).
 @export var damage_taken_mult := 1.0

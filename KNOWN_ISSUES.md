@@ -46,7 +46,7 @@
 
 ## Economy / inventory
 - Numbers (ember rewards, level costs, +8/+6/+4% steps, item effects) are first-pass and unplaytested; there is only one enemy type, so embers have little to spend on yet.
-- No shops/NPCs, no equipment swapping, and no item uses beyond four consumables; the Rusted Key opens nothing yet.
+- No shops/NPCs, no equipment swapping (the equipment screen shows your preset's one weapon and armour), and no item uses beyond four consumables; the Rusted Key opens nothing yet.
 - Candle menu opens automatically after resting (about 1 second), with no option to disable it yet.
 - Items can be used in the pack while paused; healing at full health is blocked, but there is no cooldown or use animation (instant).
 

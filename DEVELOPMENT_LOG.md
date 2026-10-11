@@ -28,6 +28,13 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-12 — Equipment & status screen
+
+- The pack became a two-tab character screen (`ui/inventory/inventory_menu.gd`). **Equipment**: your character drawn large on a pedestal (current preset look), name, level and embers; slots for Weapon, Armour, Quick item and Status. Weapon details: damage of every light-combo hit, heavy, aerial, riposte (Strength bonus included), stamina per swing, poise damage, speed and reach. Armour: damage taken, base health/stamina, vials and heal, run speed, dodge cost, parry window. Status: health, stamina, Vigor/Endurance/Strength and what they add, embers and next level cost, deaths and time. **Items**: the old pack. L1/R1 (Parry/Heal) or clicking switches tabs.
+- Presets gained `armor_name` / `armor_description` (Oathsworn Mail, Candlewright Leathers, Bulwark Plate, Bone-cloth Wraps). `WeaponStats` turns attack data into the displayed numbers.
+- Tests: 70 (new `test_equipment_screen`: armour text for all presets, Oathblade 12/13/20, Strength scaling, four-hit fists, slots/preview follow the preset, armour and status rows, tab switching, close).
+- Not done: you still own exactly the weapon and armour of your preset; there is no equipment swapping yet.
+
 ## 2026-10-11 — The end of the prologue: the light, and Vaelmoor awake
 
 - After the Drowned Canon falls, a pillar of light rises in the Drowned Choir (`ShiningLight`, spawned by `BossArena` after `light_delay`; it stays on later visits). Walking into it lifts the player into the light, the music cuts to the victory sting, and the screen fades through warm white (`Main.teleport`) into a new area.
