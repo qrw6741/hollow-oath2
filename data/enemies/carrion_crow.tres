@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/crow_dive.tres" id="a0"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"carrion_crow"
+display_name = "Carrion Crow"
+lore = "They follow the road for what falls on it. Lately, that has been the sworn."
+max_health = 32.0
+max_poise = 15.0
+poise_regen_delay_frames = 90
+poise_regen_per_second = 30.0
+patrol_speed = 36.0
+chase_speed = 95.0
+detection_range = 190.0
+vertical_detection = 160.0
+leash_range = 360.0
+attacks = [ExtResource("a0")]
+attack_cooldown_min = 50
+attack_cooldown_max = 110
+recover_frames = 40
+backstep_speed = 0.0
+stagger_frames = 30
+parry_stagger_frames = 100
+ember_reward = 30

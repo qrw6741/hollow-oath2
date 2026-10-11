@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/marshal_thrust.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/marshal_sweep.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/attacks/marshal_charge.tres" id="a2"]
+[ext_resource type="Resource" path="res://data/items/marshals_crest.tres" id="drop"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"hollow_marshal"
+display_name = "Sir Orren, the Hollow Marshal"
+lore = "Marshal of the Crown's road. He swore to hold the crossroads against anything that came, and has held it against everything since."
+max_health = 900.0
+max_poise = 100.0
+poise_regen_delay_frames = 90
+poise_regen_per_second = 30.0
+patrol_speed = 30.0
+chase_speed = 56.0
+detection_range = 800.0
+vertical_detection = 300.0
+leash_range = 99999.0
+attacks = [ExtResource("a0"), ExtResource("a1"), ExtResource("a2")]
+attack_cooldown_min = 40
+attack_cooldown_max = 80
+recover_frames = 28
+backstep_speed = 50.0
+stagger_frames = 55
+parry_stagger_frames = 120
+ember_reward = 3200
+drop_item = ExtResource("drop")
+drop_chance = 1.0
+drop_count = 1

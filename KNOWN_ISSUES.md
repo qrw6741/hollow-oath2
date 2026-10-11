@@ -19,6 +19,14 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## After the prologue
+- The Marshal, the road and the new enemies are untested by a human: expect balance changes. The Marshal's banner window and the crows' damage are the most likely to need tuning.
+- The road ends at a sealed gate ("coming in the next build"); there is no area beyond the Crossroads yet.
+- Dialogue is text only (no portraits, no voices); the typing blip is a placeholder sound. Conversations cannot be re-read once finished (Ommen's story pages are said once, in order; only idle lines repeat).
+- NPCs and the candles share the Interact button: stand a few steps from the candle to talk to Ommen (they are placed ~80 px apart on purpose).
+- The shop has unlimited stock and no selling. Embers are the only currency.
+- Placeholder art for Wenna, Ommen, the pikeman, crow and Marshal is procedural.
+
 ## New enemies
 - Moth, Oathguard and Mimic balance is untested by a human. Moth dive parry timing is at contact (later than the glint), unlike ground enemies.
 - Flying enemies do not path around walls; they slide along them. A parried moth over water/the drowned shaft falls in (it does not drown; it lies on the bottom).

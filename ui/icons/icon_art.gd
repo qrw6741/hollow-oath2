@@ -13,7 +13,7 @@ const OUTLINE := Color(0.05, 0.04, 0.06, 0.9)
 
 static func has_icon(id: StringName) -> bool:
 	return id in [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard",
-		&"penitents_tear", &"candlewright_note", &"canon_seal", &"oathblade", &"twin_blades",
+		&"penitents_tear", &"candlewright_note", &"canon_seal", &"pilgrims_draught", &"marshals_crest", &"oathblade", &"twin_blades",
 		&"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark",
 		&"armor_unsworn", &"status"]
 
@@ -30,6 +30,8 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"penitents_tear": _tear(ci, t)
 		&"candlewright_note": _note(ci)
 		&"canon_seal": _seal(ci)
+		&"pilgrims_draught": _draught(ci)
+		&"marshals_crest": _crest(ci)
 		&"oathblade": _sword(ci, Vector2(3, 13), Vector2(13, 3), true)
 		&"twin_blades": _twin(ci)
 		&"sword_and_shield": _sword_shield(ci)
@@ -76,6 +78,26 @@ static func _tonic(ci: CanvasItem) -> void:
 	_poly(ci, [Vector2(4.2, 9.5), Vector2(11.8, 9.5), Vector2(11.6, 13.5), Vector2(4.4, 13.5)], Color("8fd07a"), false)
 	ci.draw_rect(Rect2(6.2, 1, 3.6, 1.6), Color("6d523b"))
 	ci.draw_line(Vector2(5.5, 10.5), Vector2(6.5, 12.5), Color(1, 1, 1, 0.6), 0.6)
+
+
+static func _draught(ci: CanvasItem) -> void:
+	# A round-bellied flask of red wine with a corked neck and a herb sprig.
+	_poly(ci, [Vector2(6.5, 2.5), Vector2(9.5, 2.5), Vector2(9.5, 6), Vector2(12.5, 9.5), Vector2(12, 13.5), Vector2(4, 13.5), Vector2(3.5, 9.5), Vector2(6.5, 6)], Color(0.85, 0.8, 0.8, 0.5))
+	_poly(ci, [Vector2(4.1, 9.8), Vector2(11.9, 9.8), Vector2(11.6, 13.1), Vector2(4.4, 13.1)], Color("a8323e"), false)
+	ci.draw_rect(Rect2(6.2, 1.2, 3.6, 1.8), Color("6d523b"))
+	ci.draw_line(Vector2(5.2, 10.8), Vector2(6.2, 12.4), Color(1, 1, 1, 0.5), 0.6)
+	ci.draw_line(Vector2(10.4, 3.2), Vector2(12.6, 1.6), Color("6fa05a"), 0.8)
+
+
+static func _crest(ci: CanvasItem) -> void:
+	# A brass plume-holder: a crowned shield with three candle flames.
+	_poly(ci, [Vector2(3, 4), Vector2(13, 4), Vector2(13, 9), Vector2(8, 14), Vector2(3, 9)], Color("b9964a"))
+	_poly(ci, [Vector2(4.5, 5.5), Vector2(11.5, 5.5), Vector2(11.5, 8.6), Vector2(8, 12), Vector2(4.5, 8.6)], Color("7a6130"), false)
+	for x in [5.8, 8.0, 10.2]:
+		ci.draw_rect(Rect2(x - 0.4, 7.0, 0.8, 2.2), Color("efe6cf"))
+		ci.draw_circle(Vector2(x, 6.4), 0.7, Color("ffcc66"))
+	ci.draw_line(Vector2(5, 2.4), Vector2(11, 2.4), Color("e0702a"), 0.9)
+	ci.draw_line(Vector2(6, 1.4), Vector2(10, 1.4), Color("e0702a"), 0.9)
 
 
 static func _key(ci: CanvasItem) -> void:

@@ -1,0 +1,366 @@
+[gd_scene load_steps=23 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/roadside_pikeman.tscn" id="pikeman"]
+[ext_resource type="PackedScene" path="res://actors/enemies/carrion_crow.tscn" id="crow"]
+[ext_resource type="PackedScene" path="res://actors/enemies/oathguard.tscn" id="oathguard"]
+[ext_resource type="PackedScene" path="res://actors/enemies/mimic.tscn" id="mimic"]
+[ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
+[ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
+[ext_resource type="Script" path="res://world/pickups/item_pickup.gd" id="pickup"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/hazards/water_zone.gd" id="water"]
+[ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
+[ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
+[ext_resource type="PackedScene" path="res://actors/bosses/hollow_marshal.tscn" id="marshal"]
+[ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Resource" path="res://data/items/stamina_tonic.tres" id="it_tonic"]
+[ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
+
+[node name="VaelmoorRoad" type="Node2D"]
+script = ExtResource("level")
+level_id = &"vaelmoor_road"
+display_name = "The Vaelmoor Road"
+bounds = Rect2(0, 0, 3600, 540)
+music = &"yard"
+music_pitch = 1.2
+map_origin = Vector2(2000, -1400)
+default_spawn = Vector2(120, 480)
+
+[node name="Background" type="ParallaxBackground" parent="."]
+
+[node name="Sky" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0, 0)
+
+[node name="SkyDraw" type="Node2D" parent="Background/Sky"]
+script = ExtResource("sky")
+moon_pos = Vector2(380, 60)
+daylight = true
+
+[node name="Far" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.1, 0.1)
+
+[node name="Citadel" type="Node2D" parent="Background/Far"]
+script = ExtResource("ruins")
+base_y = 215.0
+max_height = 150.0
+color = Color(0.5, 0.55, 0.66, 1)
+seed_value = 71
+spacing = 90.0
+width = 2400.0
+haze = 0.55
+haze_color = Color(0.92, 0.88, 0.8, 1)
+
+[node name="Mid" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.35, 0.3)
+
+[node name="Hills" type="Node2D" parent="Background/Mid"]
+script = ExtResource("ruins")
+base_y = 255.0
+max_height = 70.0
+color = Color(0.34, 0.46, 0.34, 1)
+seed_value = 73
+spacing = 120.0
+width = 2600.0
+haze = 0.4
+haze_color = Color(0.9, 0.88, 0.78, 1)
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(1, 0.98, 0.94, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 401
+
+[node name="GroundA" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(684, 60)
+style = 3
+seed_value = 402
+
+[node name="Rise" type="StaticBody2D" parent="Geometry"]
+position = Vector2(700, 460)
+script = ExtResource("block")
+size = Vector2(300, 80)
+style = 3
+seed_value = 403
+
+[node name="GroundB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1000, 480)
+script = ExtResource("block")
+size = Vector2(250, 60)
+style = 3
+seed_value = 404
+
+[node name="FordBed" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1250, 500)
+script = ExtResource("block")
+size = Vector2(500, 40)
+style = 3
+seed_value = 405
+
+[node name="GroundC" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1750, 480)
+script = ExtResource("block")
+size = Vector2(990, 60)
+style = 3
+seed_value = 406
+
+[node name="GatePillar" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2740, 0)
+script = ExtResource("block")
+size = Vector2(24, 384)
+style = 0
+seed_value = 407
+
+[node name="ArenaFloor" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2740, 480)
+script = ExtResource("block")
+size = Vector2(760, 60)
+style = 3
+seed_value = 408
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3500, 0)
+script = ExtResource("block")
+size = Vector2(100, 540)
+style = 1
+seed_value = 409
+
+[node name="BridgeStubL" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1250, 456)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 410
+one_way = true
+
+[node name="BridgeStubR" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1660, 456)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 411
+one_way = true
+
+[node name="CampLedge" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2260, 400)
+script = ExtResource("block")
+size = Vector2(100, 6)
+style = 2
+seed_value = 412
+one_way = true
+
+[node name="CrowPerch" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1130, 410)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 413
+one_way = true
+
+[node name="FordWater" type="Area2D" parent="."]
+position = Vector2(1250, 478)
+script = ExtResource("water")
+size = Vector2(500, 22)
+
+[node name="FromAwake" type="Marker2D" parent="."]
+position = Vector2(110, 480)
+script = ExtResource("entry")
+entry_id = &"from_awake"
+
+[node name="ToAwake" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/vaelmoor_awake.tscn"
+target_entry = &"from_road"
+size = Vector2(12, 80)
+
+[node name="CitadelRoad" type="Area2D" parent="."]
+position = Vector2(3440, 480)
+script = ExtResource("exit")
+mode = 1
+size = Vector2(30, 60)
+door_id = &"citadel_road"
+display_name = "the road to the Crownless Citadel"
+locked_text = "THE ROAD TO THE CITADEL  -  coming in the next build"
+sealed = true
+
+[node name="MarshalArena" type="Node2D" parent="."]
+position = Vector2(2764, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("marshal")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 560.0
+victory_text = "THE CROSSROADS FALL QUIET"
+
+[node name="WaysideCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(520, 480)
+checkpoint_id = &"wayside_candle"
+display_name = "Wayside Candle"
+
+[node name="CampCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(2090, 480)
+checkpoint_id = &"marshals_camp_candle"
+display_name = "Marshal's Camp Candle"
+
+[node name="Wenna" type="Area2D" parent="."]
+position = Vector2(360, 480)
+script = ExtResource("npc")
+npc_id = &"wenna"
+display_name = "Wenna"
+look = 0
+start_facing = -1
+shop_id = &"pedlar"
+
+[node name="OmmenWayside" type="Area2D" parent="."]
+position = Vector2(600, 480)
+script = ExtResource("npc")
+npc_id = &"ommen"
+display_name = "Hooded Figure"
+look = 1
+start_facing = -1
+
+[node name="OmmenCamp" type="Area2D" parent="."]
+position = Vector2(2170, 480)
+script = ExtResource("npc")
+npc_id = &"ommen"
+display_name = "Hooded Figure"
+look = 1
+start_facing = -1
+
+[node name="PikemanRise" type="Marker2D" parent="."]
+position = Vector2(820, 460)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 40.0
+start_facing = -1
+
+[node name="CrowFieldA" type="Marker2D" parent="."]
+position = Vector2(660, 385)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("crow")
+patrol_distance = 60.0
+start_facing = -1
+
+[node name="PikemanField" type="Marker2D" parent="."]
+position = Vector2(1120, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 50.0
+start_facing = -1
+
+[node name="CrowFieldB" type="Marker2D" parent="."]
+position = Vector2(1060, 370)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("crow")
+patrol_distance = 40.0
+start_facing = -1
+
+[node name="OathguardFord" type="Marker2D" parent="."]
+position = Vector2(1500, 500)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("oathguard")
+patrol_distance = 30.0
+start_facing = -1
+
+[node name="CrowFord" type="Marker2D" parent="."]
+position = Vector2(1380, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("crow")
+patrol_distance = 70.0
+start_facing = -1
+
+[node name="MimicBank" type="Marker2D" parent="."]
+position = Vector2(1850, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("mimic")
+patrol_distance = 0.0
+start_facing = 1
+spawn_id = &"road_bank_mimic"
+
+[node name="PikemanCampA" type="Marker2D" parent="."]
+position = Vector2(2380, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 40.0
+start_facing = -1
+
+[node name="PikemanCampB" type="Marker2D" parent="."]
+position = Vector2(2480, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 30.0
+start_facing = -1
+
+[node name="CrowCamp" type="Marker2D" parent="."]
+position = Vector2(2300, 370)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("crow")
+patrol_distance = 50.0
+start_facing = -1
+
+[node name="OathguardGate" type="Marker2D" parent="."]
+position = Vector2(2640, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("oathguard")
+patrol_distance = 30.0
+start_facing = -1
+
+[node name="FieldChest" type="Area2D" parent="."]
+position = Vector2(1005, 460)
+script = ExtResource("chest")
+chest_id = &"road_field_chest"
+count = 1
+embers = 200
+item = ExtResource("it_draught")
+
+[node name="PickupRoadBandages" type="Area2D" parent="."]
+position = Vector2(880, 460)
+script = ExtResource("pickup")
+item = ExtResource("it_band")
+count = 2
+pickup_id = &"road_bandages"
+
+[node name="PickupBankShard" type="Area2D" parent="."]
+position = Vector2(1790, 480)
+script = ExtResource("pickup")
+item = ExtResource("it_shard")
+count = 1
+pickup_id = &"road_bank_shard"
+
+[node name="PickupCampTonic" type="Area2D" parent="."]
+position = Vector2(2300, 400)
+script = ExtResource("pickup")
+item = ExtResource("it_tonic")
+count = 1
+pickup_id = &"road_camp_tonic"
+
+[node name="Petals" type="CPUParticles2D" parent="."]
+position = Vector2(1800, -10)
+amount = 70
+lifetime = 12.0
+preprocess = 12.0
+emission_shape = 3
+emission_rect_extents = Vector2(1800, 4)
+direction = Vector2(0.6, 1)
+spread = 30.0
+gravity = Vector2(8, 12)
+initial_velocity_min = 6.0
+initial_velocity_max = 16.0
+color = Color(1, 0.9, 0.75, 0.6)
+z_index = 5

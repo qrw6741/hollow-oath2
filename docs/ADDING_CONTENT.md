@@ -28,6 +28,11 @@
 - **ShieldEnemy** (`oathguard.tscn`): frontal hits while not mid-swing are BLOCKED and drain `max_guard` (poise_damage x0.8 + damage x0.6). Guard 0 = guard break (riposte window). `turn_delay` sets how slowly it turns.
 - **Mimic** (`mimic.tscn`): give its spawner a unique `spawn_id` (saved "slain" flag). Real chests are `world/pickups/treasure_chest.gd` (`chest_id`, `item`, `count`, `embers`). Generators have `chest(...)` and `enemy(..., spawn_id=...)` helpers.
 
+## NPCs, dialogue and shops
+- Place a `world/npcs/npc.gd` node (Area2D, origin = feet): `npc_id`, `display_name`, `look` (Pedlar / Figure; add a look by adding a `_draw_*` function), optional `shop_id`. Keep it ~80 px from any candle so the two interact zones do not overlap.
+- Lines live in `systems/dialogues.gd` (`conversation(npc_id)` returns `{speaker, lines}`; `finish()` records the talk in the flag `talks_<npc_id>`). Lines may be Strings or `{"who", "text"}`.
+- Shops: add an entry to `Shops.STOCK` (item id + price in embers) and a name in `Shops.NAMES`; give the Npc that `shop_id`. The shop opens after the conversation.
+
 ## A new preset (starting loadout)
 1. Create attack `.tres` files in `data/attacks/` and a weapon in `data/weapons/` (or reuse an existing weapon).
 2. Duplicate a file in `data/presets/`, set id, text, stats, `weapon`, colours, `armor_look` and `weapon_look`. Use `PackedStringArray("a", "b")` (no brackets) for `perks`/`drawbacks`.

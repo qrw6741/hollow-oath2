@@ -105,3 +105,11 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Holds ~60 FPS (F3) with all enemies active.
 - [ ] Gamepad works without configuration.
 - [ ] Alt-tab / window resize keeps crisp pixels.
+
+## After the prologue (new)
+- [ ] East edge of Vaelmoor, Awake -> the road; west edge of the road -> back.
+- [ ] Ommen at the First Light Candle: four visits give four different pages; the third gives his name. Standing at the candle vs next to him: Interact rests vs talks as expected.
+- [ ] Wenna: intro once, greeting afterwards, shop opens; buy each item; try buying with too few embers and with a full stack; leave with Cancel.
+- [ ] Walk the whole road: pikemen (thrust parryable, low sweep not - jump it), crows, the Oathguard in the ford, the Mimic on the bank (does the breath of ash read as a tell?), chests, both candles.
+- [ ] Sir Orren: all five attacks readable? Is phase 2 fair? Do the banner crows feel like an opening or a nuisance? Crest + embers on victory; Ommen's new line afterwards.
+- [ ] Fast travel to the Wayside / Camp candle from another area; die on the road -> respawn at the last road candle.

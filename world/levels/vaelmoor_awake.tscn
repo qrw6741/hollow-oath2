@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
 [ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
 [ext_resource type="Script" path="res://world/story/prologue_end.gd" id="prologue"]
+[ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
 
 [node name="VaelmoorAwake" type="Node2D"]
 script = ExtResource("level")
@@ -105,13 +106,6 @@ size = Vector2(360, 60)
 style = 3
 seed_value = 306
 
-[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
-position = Vector2(1896, 0)
-script = ExtResource("block")
-size = Vector2(24, 480)
-style = 1
-seed_value = 307
-
 [node name="Arrival" type="Marker2D" parent="."]
 position = Vector2(220, 480)
 script = ExtResource("entry")
@@ -126,17 +120,27 @@ display_name = "First Light Candle"
 position = Vector2(700, 460)
 script = ExtResource("tablet")
 title = "The Waking Stone"
-text = "You have walked out of the Hollow: the dream the oath built around the sworn on the Night of Unbinding. The Yard, the village, the drowned choir - all of it was the oath remembering itself. This is Vaelmoor as it is now, under a real sun. The road below leads toward the Crownless Citadel.\n\n(End of the prologue. The real journey continues in the next build.)"
+text = "You have walked out of the Hollow: the dream the oath built around the sworn on the Night of Unbinding. The Yard, the village, the drowned choir - all of it was the oath remembering itself. This is Vaelmoor as it is now, under a real sun. The road east leads on toward the Crownless Citadel."
 
-[node name="RoadGate" type="Area2D" parent="."]
-position = Vector2(1860, 480)
+[node name="RoadExit" type="Area2D" parent="."]
+position = Vector2(1884, 480)
 script = ExtResource("exit")
-mode = 1
-size = Vector2(30, 60)
-door_id = &"kingdom_road"
-display_name = "the road to the kingdom"
-locked_text = "THE ROAD AHEAD  -  coming in the next build"
-sealed = true
+target_level = "res://world/levels/vaelmoor_road.tscn"
+target_entry = &"from_awake"
+size = Vector2(12, 80)
+
+[node name="FromRoad" type="Marker2D" parent="."]
+position = Vector2(1790, 480)
+script = ExtResource("entry")
+entry_id = &"from_road"
+
+[node name="Ommen" type="Area2D" parent="."]
+position = Vector2(500, 480)
+script = ExtResource("npc")
+npc_id = &"ommen"
+display_name = "Hooded Figure"
+look = 1
+start_facing = -1
 
 [node name="PrologueEnd" type="Node" parent="."]
 script = ExtResource("prologue")

@@ -50,4 +50,6 @@ Arrow keys / D-pad / stick move the selection, **Enter** or **A** selects, **Esc
 - **Resting** at an Oath Candle restores everything, sets your respawn point and revives enemies.
 
 ## Remapping
+**Talking and shopping:** stand next to a character and press Interact (E / Dpad-up) to talk; Interact / Confirm / Light attack moves the conversation on, Cancel skips it. In a shop, Confirm buys one of the selected item; Cancel leaves.
+
 Rebind any action in **Settings → Controls**: pick the keyboard or controller cell and press the new key/button (Esc cancels). Using a binding another action had swaps them. *Reset controls to defaults* restores everything. Bindings are saved to `user://input.cfg`; defaults live in `autoload/input_config.gd`.

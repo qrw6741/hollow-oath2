@@ -76,6 +76,8 @@ func _run() -> void:
 		test_settings_tabs,
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
+		# --- after the prologue ---
+		test_dialogue_box, test_shop, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -2287,3 +2289,233 @@ func test_mimic_and_chest() -> void:
 	m2.queue_free()
 	sp.queue_free()
 	await frames(2)
+
+
+const ROAD := "res://world/levels/vaelmoor_road.tscn"
+const AWAKE := "res://world/levels/vaelmoor_awake.tscn"
+
+
+func test_dialogue_box() -> void:
+	await fresh_game()
+	var box: DialogueBox = main.get_node("DialogueBox")
+	events.dialogue_requested.emit("Tester", ["The first line of speech is deliberately long enough that it is still typing out when the first press arrives, which is the point of this test.", {"who": "Other", "text": "Second line."}])
+	await frames(2)
+	check(box.is_open and get_tree().paused and game_state.ui_modal, "dialogue opens, pauses, takes over input")
+	check(box._name.text == "Tester" and not box.line_done(), "speaker shown, line still typing")
+	await tap_action(&"interact")   # inside the arm window: ignored
+	check(box.index == 0 and not box.line_done(), "the opening press does not skip anything")
+	await frames(8)
+	await tap_action(&"interact")
+	check(box.index == 0 and box.line_done(), "first press finishes the typing")
+	await tap_action(&"interact")
+	check(box.index == 1 and box._name.text == "Other", "second press moves on; speaker can change")
+	await frames(60)
+	await tap_action(&"interact")
+	await tap_action(&"interact")
+	check(not box.is_open and not get_tree().paused and not game_state.ui_modal, "last press closes it and unpauses")
+	# Cancel skips the rest.
+	events.dialogue_requested.emit("Tester", ["a", "b", "c"])
+	await frames(14)
+	await tap_action(&"ui_cancel")
+	check(not box.is_open, "Cancel skips the conversation")
+
+
+func test_shop() -> void:
+	await fresh_game()
+	game_state.embers = 100
+	var shop: ShopMenu = main.get_node("ShopMenu")
+	events.shop_requested.emit(&"pedlar")
+	await frames(3)
+	check(shop.is_open and get_tree().paused and shop.rows.size() == 3, "the pedlar's shop opens with three wares")
+	var b0: int = game_state.item_count(&"ash_bandage")
+	var r := Shops.buy(&"pedlar", &"ash_bandage")
+	check(r.ok and game_state.embers == 60 and game_state.item_count(&"ash_bandage") == b0 + 1, "buying costs embers and gives the item")
+	var r2 := Shops.buy(&"pedlar", &"pilgrims_draught")
+	check(not r2.ok and game_state.embers == 60 and game_state.item_count(&"pilgrims_draught") == 0, "too poor: nothing is taken")
+	game_state.embers = 10000
+	for i in 12:
+		Shops.buy(&"pedlar", &"pilgrims_draught")
+	check(game_state.item_count(&"pilgrims_draught") == 5 and game_state.embers == 10000 - 5 * 150, "a full stack stops the sale without taking embers (%d)" % game_state.embers)
+	# The UI button buys too.
+	game_state.embers = 500
+	var before: int = game_state.item_count(&"stamina_tonic")
+	(shop.rows[1].button as Button).pressed.emit()
+	await frames(2)
+	check(game_state.item_count(&"stamina_tonic") == before + 1 and game_state.embers == 410, "the buy button works")
+	await tap_action(&"ui_cancel")
+	check(not shop.is_open and not get_tree().paused, "Cancel leaves the shop")
+	# The new items are valid and have icons.
+	for id in [&"pilgrims_draught", &"marshals_crest"]:
+		var it := Items.get_item(id)
+		check(it != null and it.validate().is_empty() and IconArt.has_icon(id), "%s valid with an icon" % id)
+
+
+func test_npc_story() -> void:
+	await fresh_game()
+	await go_to_level(AWAKE, &"arrival")
+	var box: DialogueBox = main.get_node("DialogueBox")
+	var ommen: Npc = level.get_node("Ommen")
+	await place_player(ommen.global_position.x - 24.0, 480.0, 1)
+	await frames(8)
+	await press(&"interact")
+	await frames(4)
+	check(box.is_open and box._name.text == "Hooded Figure" and box.lines.size() == 3, "the stranger speaks first (%s)" % box._name.text)
+	check(player.global_position.x < ommen.global_position.x and ommen.facing == -1, "he turns to face you")
+	box.close()
+	await frames(30)
+	check(Dialogues.talks(&"ommen") == 1, "the talk is counted")
+	# Pages advance with each visit; the name is given on the third.
+	await press(&"interact")
+	await frames(4)
+	check(box.is_open and box.lines[0].begins_with("Vaelmoor was held together"), "second page: the Hollow Oath")
+	box.close()
+	await frames(30)
+	await press(&"interact")
+	await frames(4)
+	check(box._name.text == "Ommen" and box.lines[0].begins_with("My name is Ommen"), "third page: he gives his name")
+	box.close()
+	await frames(30)
+	check(Dialogues.talks(&"ommen") == 3, "three talks so far")
+	# After the Marshal falls he has something new to say, once.
+	game_state.set_flag(&"boss_defeated_hollow_marshal", true)
+	var c := Dialogues.conversation(&"ommen")
+	check(c.lines[0].contains("crossroads are quiet"), "he reacts to the Marshal's fall")
+	Dialogues.finish(&"ommen")
+	check(Dialogues.talks(&"ommen") == 3 and not Dialogues.conversation(&"ommen").lines[0].contains("quiet"), "that line is only said once")
+	# The counter survives a save round trip as a number.
+	var n: Dictionary = saves._normalize(game_state.to_dict())
+	check(int(n.flags.get("talks_ommen", -1)) == 3, "talk counter is saved")
+	# Wenna: intro, then the shop opens after she speaks.
+	await go_to_level(ROAD, &"from_awake")
+	var wenna: Npc = level.get_node("Wenna")
+	await place_player(wenna.global_position.x - 30.0, 480.0, 1)
+	await frames(8)
+	game_state.embers = 200
+	await press(&"interact")
+	await frames(4)
+	check(box.is_open and box._name.text == "Wenna" and box.lines.size() == 3, "Wenna introduces herself")
+	box.close()
+	await frames(6)
+	check(main.get_node("ShopMenu").is_open, "her shop opens after she speaks")
+	main.get_node("ShopMenu").close()
+	await frames(30)
+	await press(&"interact")
+	await frames(4)
+	check(box.is_open and box.lines.size() == 1, "later she only greets you")
+	box.close()
+	await frames(4)
+	main.get_node("ShopMenu").close()
+
+
+func test_road_level() -> void:
+	await fresh_game()
+	await go_to_level(AWAKE, &"arrival")
+	await place_player(1860.0, 480.0, 1)
+	Input.action_press(&"move_right")
+	await frames(60)
+	Input.action_release(&"move_right")
+	await frames(80)
+	level = main.current_level()
+	check(level.level_id == &"vaelmoor_road", "the east edge of Vaelmoor, Awake leads to the road")
+	check(level.player.global_position.distance_to(Vector2(110, 480)) < 60.0, "arrive at the road start (%s)" % level.player.global_position)
+	player = level.player
+	# Back west again.
+	await place_player(60.0, 480.0, -1)
+	Input.action_press(&"move_left")
+	await frames(40)
+	Input.action_release(&"move_left")
+	await frames(80)
+	level = main.current_level()
+	check(level.level_id == &"vaelmoor_awake" and level.player.global_position.x > 1700.0, "and the west edge leads back")
+	await go_to_level(ROAD, &"from_awake")
+	var ks := {}
+	for e in level.get_children():
+		if e is EnemySpawner:
+			var nm: String = e.enemy_scene.resource_path.get_file()
+			ks[nm] = int(ks.get(nm, 0)) + 1
+	check(ks.get("roadside_pikeman.tscn", 0) == 4 and ks.get("carrion_crow.tscn", 0) == 4 and ks.get("oathguard.tscn", 0) == 2 and ks.get("mimic.tscn", 0) == 1, "the road is populated (%s)" % ks)
+	check(WorldMap.LEVELS.has(ROAD) and WorldMap.info(ROAD).candles.size() == 2, "the road is on the map with two candles")
+	var citadel: LevelExit = level.get_node("CitadelRoad")
+	check(citadel.sealed, "the Citadel road is sealed in this build")
+	# Resting at the wayside candle: a fast travel destination.
+	await place_player(500.0, 480.0, 1)
+	await press(&"interact")
+	await frames(60)
+	check(game_state.get_flag(&"candle_lit_wayside_candle", false), "the wayside candle can be rested at")
+	check(CandleMenu.travel_destinations().any(func(d): return d.id == "wayside_candle"), "and appears in fast travel")
+	# The field chest.
+	await place_player(1005.0, 460.0, 1)
+	await frames(6)
+	var emb: int = game_state.embers
+	await press(&"interact")
+	await frames(4)
+	check(game_state.embers == emb + 200 and game_state.item_count(&"pilgrims_draught") == 1, "the field chest holds embers and a draught")
+
+
+func test_road_enemies() -> void:
+	await fresh_game()
+	for x in enemies():
+		x.queue_free()
+	var a := {}
+	for id in ["crow_dive", "pike_thrust", "pike_trip", "marshal_thrust", "marshal_sweep", "marshal_charge", "marshal_vault", "marshal_banner"]:
+		var at: AttackData = load("res://data/attacks/%s.tres" % id)
+		check(at != null and at.validate().is_empty(), "%s valid" % id)
+	check(not load("res://data/attacks/pike_trip.tres").parryable and load("res://data/attacks/pike_thrust.tres").parryable, "the low sweep cannot be parried; the thrust can")
+	check(load("res://data/attacks/marshal_banner.tres").is_ranged(), "the banner call uses the ranged hook")
+	await place_player(400.0, 480.0, 1)
+	var pk := await spawn_scene("res://actors/enemies/roadside_pikeman.tscn", Vector2(440, 480), -1)
+	pk._start_attack(load("res://data/attacks/pike_thrust.tres"))
+	await frames(40)
+	check(player.health.current < player.health.max_health, "a pike thrust hurts")
+	check(pk.health.max_health == 90.0 and pk.data.ember_reward == 60, "pikeman stats")
+	pk.queue_free()
+	var cr := await spawn_scene("res://actors/enemies/carrion_crow.tscn", Vector2(500, 420), -1)
+	check(cr is FlyingEnemy and cr.data.ember_reward == 30, "a crow is a flying enemy")
+	cr.queue_free()
+	await frames(2)
+
+
+func test_marshal_boss() -> void:
+	await fresh_game()
+	await go_to_level(ROAD, &"from_awake")
+	var ar: BossArena = level.get_node("MarshalArena")
+	await place_player(2840.0, 480.0, 1)
+	await frames(40)
+	var boss := ar.boss as HollowMarshal
+	check(boss != null and ar.fight_active and boss.active, "walking through the gate starts the Marshal fight")
+	check(boss.boss_id == &"hollow_marshal" and boss.health.max_health == 900.0 and boss.phase2_attacks.size() == 5, "boss configured")
+	boss._cooldown = 99999
+	await frames(2)
+	# Thrust is parryable and hurts when it lands.
+	player.global_position = Vector2(boss.global_position.x - 70.0, 480.0)
+	player.facing = 1
+	boss.facing = -1
+	await frames(4)
+	var hp := player.health.current
+	boss._start_attack(load("res://data/attacks/marshal_thrust.tres"))
+	await frames(60)
+	check(player.health.current < hp, "an unanswered lance thrust lands")
+	# Phase 2.
+	boss.receive_hit(damage(boss.health.max_health * 0.55))
+	await frames(boss.roar_frames + 6)
+	check(boss.phase == 2 and boss.data.attacks.any(func(a): return a.id == &"marshal_banner"), "phase 2 adds the banner and the vault")
+	boss._cooldown = 99999
+	player.health.restore_full()
+	await place_player(boss.global_position.x - 150.0, 480.0, 1)
+	boss.facing = -1
+	boss._start_attack(load("res://data/attacks/marshal_banner.tres"))
+	await frames(60)
+	check(boss.alive_crows() == 2, "raising the banner calls two crows (%d)" % boss.alive_crows())
+	check(boss._crows.all(func(c): return c.data.ember_reward == 0), "summoned crows give no embers")
+	boss._start_attack(load("res://data/attacks/marshal_banner.tres"))
+	await frames(60)
+	check(boss.alive_crows() == 2, "never more than two at once")
+	# Victory: flag, crest, embers; crows vanish; Ommen reacts.
+	var e0: int = game_state.embers
+	boss.receive_hit(damage(99999.0))
+	await frames(6)
+	check(game_state.get_flag(&"boss_defeated_hollow_marshal", false) and game_state.item_count(&"marshals_crest") == 1, "Marshal defeated: flag + crest")
+	check(game_state.embers - e0 == 3200, "3200 embers (%d)" % (game_state.embers - e0))
+	await frames(6)
+	check(boss.alive_crows() == 0, "the crows fall with him")
+	check(Dialogues.conversation(&"ommen").lines[0].contains("crossroads are quiet"), "Ommen has something to say")

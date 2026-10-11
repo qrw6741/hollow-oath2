@@ -315,6 +315,24 @@ def make_sfx():
     wv = lowpass(noise(int(d * SR)), 700) * env(int(d * SR), 0.15, 0.6) + bandpass(noise(int(d * SR)), 1200, 4000) * env(int(d * SR), 0.2, 0.4) * 0.4
     sfx("wave", reverb(wv, 0.2), 0.75)
 
+    # Dialogue / shop / crow additions
+    d = 0.045
+    tt = t_axis(d)
+    blip = np.sin(2 * np.pi * 320 * tt) * np.exp(-tt / 0.018) + 0.4 * np.sin(2 * np.pi * 640 * tt) * np.exp(-tt / 0.012)
+    sfx("talk", lowpass(blip, 1800), 0.5)
+    d = 0.5
+    tt = t_axis(d)
+    coin = sum(a * np.sin(2 * np.pi * f * tt) * np.exp(-tt / dd) for f, a, dd in [(1568, 0.5, 0.18), (2093, 0.4, 0.14), (3136, 0.15, 0.08)])
+    coin[: int(0.07 * SR)] *= 0.0
+    c1 = sum(a * np.sin(2 * np.pi * f * tt) * np.exp(-tt / dd) for f, a, dd in [(1319, 0.5, 0.06), (1760, 0.3, 0.05)])
+    sfx("coin", mix(coin, c1), 0.6)
+    d = 0.42
+    tt = t_axis(d)
+    caw_f = 520 - 260 * (tt / d) + 40 * np.sin(2 * np.pi * 38 * tt)
+    caw = np.sin(2 * np.pi * np.cumsum(caw_f) / SR) + 0.5 * np.sign(np.sin(2 * np.pi * np.cumsum(caw_f) / SR))
+    caw = bandpass(caw + 0.3 * noise(len(tt)), 400, 2600) * env(len(tt), 0.02, 0.18)
+    sfx("caw", caw, 0.55)
+
     t = t_axis(4.5)
     vic = np.zeros_like(t)
     for i, f in enumerate([146.8, 220, 293.7, 440, 587.3]):

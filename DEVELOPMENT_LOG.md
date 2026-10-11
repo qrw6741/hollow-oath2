@@ -28,6 +28,24 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-12 — After the prologue: the Vaelmoor Road, NPCs, shop, Sir Orren
+
+- **The Vaelmoor Road** (new level, daylight, ~3600 px): Pilgrim's Rest (arrival, Wenna's stall, Wayside Candle), the Crow Fields (rise, chest, pikemen, crows), the Ford (wading, an Oathguard in the water, broken bridge planks), the Marshal's Camp (Camp Candle, a Mimic on the bank, pikemen, an Oathguard at the gate) and the Crossroads (boss). Reached from the east edge of Vaelmoor, Awake (the sealed gate is gone); the road's west edge leads back. On the world map; both candles are fast-travel destinations. The road to the Citadel is sealed ("next build").
+- **Dialogue system**: `DialogueBox` (typewriter, speaker plate, Interact / Confirm / Light attack to continue, Cancel skips; pauses the game) and `Dialogues` (all lines, chosen by NPC, how many times you have talked — saved as a flag — and story progress).
+- **NPCs**: `Npc` node. **Ommen** (hooded figure at candles: Awake, Wayside, Camp) tells the story one page per visit (the Oath, the Night, who he is, the road ahead), is "Hooded Figure" until the third talk, and has a one-time reaction after the Marshal falls, then idle lines. **Wenna the Pedlar** introduces herself once, then greets you and opens her shop.
+- **Shop**: `ShopMenu` + `Shops` (stock, prices, buy rules). Ash Bandage 40, Pale Tonic 90, Pilgrim's Draught 150 embers; full stacks and empty pockets are refused without taking embers.
+- **New items**: Pilgrim's Draught (heals 70), Marshal's Crest (key item, boss drop); icons added.
+- **New enemies**: Carrion Crow (flying, reuses FlyingEnemy), Roadside Pikeman (long pike thrust, parryable; low sweep, unparryable - jump it).
+- **Boss: Sir Orren, the Hollow Marshal** (900 hp): lance thrust and sweep (parryable, glint), couched charge (unparryable). Phase 2 adds a pole vault (unparryable) and **Raise the Banner** (calls two Carrion Crows, never more than two, no embers from them; a free opening). Drops the Marshal's Crest + 3200 embers. Third music pitch variant of the boss theme.
+- **Sound**: talk blip, coin, caw (3 new sounds). Audio regenerated as a whole (noise-based sounds differ slightly from before).
+- **Download size**: fonts subset to the characters used (Lora 212 -> 92 KB, GFS Baskerville 73 -> 7 KB; originals in tools/fonts_src, script tools/subset_fonts.sh), which pays for this chunk.
+- Generators: `tools/gen_enemy_data.py` (newer enemy data/scenes), `tools/levels/gen_vaelmoor_road.py`.
+
+### Verified
+- **Automated suite: 83/83 pass** (new: dialogue box flow, shop buying rules + UI, NPC story pages / name reveal / one-time Marshal reaction / saved counter / Wenna intro then shop, road level wiring + population + candle fast travel + chest, road enemy data, Marshal boss incl. banner crows cap + rewards).
+- Rendered captures (`tests/capture_road.tscn`): Ommen prompt + dialogue, Wenna, shop, the road's regions, pikeman / crow telegraphs, the Marshal's thrust, sweep, charge, roar, banner and crows - reviewed.
+- Not verified: balance and feel of the road and the Marshal (nobody has played them); dialogue text has not been read aloud or proofread by anyone but me; Windows build not launched on Windows.
+
 ## 2026-10-12 — New enemies: Gloam Moth, Oathguard, Mimic (+ treasure chests)
 
 - **Gloam Moth** (flying): hovers above and beside you, rears back with an eye glint, then dives in a straight line; after a dive it hangs dazed low — the time to hit it. Parried, it drops to the ground for a riposte. Village roofs / square, flooded nave.

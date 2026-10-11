@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"pilgrims_draught"
+display_name = "Pilgrim's Draught"
+description = "Red wine steeped with road-herbs, sold in stoppered flasks. Restores 70 health. Wenna swears it has never made anyone sicker."
+kind = 0
+effect = 1
+effect_amount = 70.0
+max_stack = 5
+icon_color = Color(0.75, 0.25, 0.3, 1)

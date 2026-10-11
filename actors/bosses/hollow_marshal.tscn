@@ -1,0 +1,69 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://actors/bosses/hollow_marshal.gd" id="1_boss"]
+[ext_resource type="Resource" path="res://data/enemies/hollow_marshal.tres" id="2_data"]
+[ext_resource type="Script" path="res://systems/combat/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://systems/combat/hurtbox.gd" id="4_hurtbox"]
+[ext_resource type="Script" path="res://systems/combat/hitbox.gd" id="5_hitbox"]
+[ext_resource type="Script" path="res://systems/combat/attack_runner.gd" id="6_runner"]
+[ext_resource type="Script" path="res://actors/bosses/hollow_marshal_visual.gd" id="7_visual"]
+[ext_resource type="Resource" path="res://data/attacks/marshal_thrust.tres" id="8_toll"]
+[ext_resource type="Resource" path="res://data/attacks/marshal_sweep.tres" id="9_sweep"]
+[ext_resource type="Resource" path="res://data/attacks/marshal_charge.tres" id="10_charge"]
+[ext_resource type="Resource" path="res://data/attacks/marshal_vault.tres" id="11_leap"]
+
+[ext_resource type="Resource" path="res://data/attacks/marshal_banner.tres" id="12_banner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/carrion_crow.tscn" id="13_crow"]
+
+[sub_resource type="RectangleShape2D" id="body_shape"]
+size = Vector2(22, 50)
+
+[sub_resource type="RectangleShape2D" id="hurt_shape"]
+size = Vector2(28, 54)
+
+[sub_resource type="RectangleShape2D" id="hit_shape"]
+size = Vector2(56, 48)
+
+[node name="HollowMarshal" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+floor_snap_length = 4.0
+script = ExtResource("1_boss")
+data = ExtResource("2_data")
+patrol_distance = 0.0
+boss_id = &"hollow_marshal"
+phase2_attacks = [ExtResource("8_toll"), ExtResource("9_sweep"), ExtResource("10_charge"), ExtResource("11_leap"), ExtResource("12_banner")]
+crow_scene = ExtResource("13_crow")
+music_pitch = 1.08
+
+[node name="Body" type="CollisionShape2D" parent="."]
+position = Vector2(0, -25)
+shape = SubResource("body_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("4_hurtbox")
+
+[node name="Shape" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -27)
+shape = SubResource("hurt_shape")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+script = ExtResource("5_hitbox")
+
+[node name="Shape" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(34, -26)
+shape = SubResource("hit_shape")
+
+[node name="AttackRunner" type="Node" parent="." node_paths=PackedStringArray("hitbox")]
+script = ExtResource("6_runner")
+hitbox = NodePath("../Hitbox")
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("7_visual")

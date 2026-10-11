@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Generates world/levels/vaelmoor_awake.tscn: the first daylight area, reached through the
 light that opens after the Drowned Canon falls. The end of the prologue (tutorial).
-Peaceful: no enemies. Arrival, the First Light Candle, an inscribed stone that explains
-where you are, rolling hills, and the sealed road onward (next build).
+Peaceful: no enemies. Arrival, the First Light Candle with the hooded figure Ommen, an
+inscribed stone that explains where you are, rolling hills, and the road east to the
+Vaelmoor Road (the first real-world area).
 Re-run after editing:  python3 tools/levels/gen_vaelmoor_awake.py
 """
 import os
@@ -20,6 +21,7 @@ ext = [
     ("Script", "res://world/transitions/level_entry.gd", "entry"),
     ("Script", "res://world/story/lore_tablet.gd", "tablet"),
     ("Script", "res://world/story/prologue_end.gd", "prologue"),
+    ("Script", "res://world/npcs/npc.gd", "npc"),
 ]
 nodes = []
 seed = [300]
@@ -100,7 +102,6 @@ block("HillB", 520, 460, 300, 80)
 block("HillC", 820, 440, 360, 100)
 block("HillD", 1180, 460, 380, 80)
 block("HillE", 1560, 480, 360, 60)
-block("CliffRight", 1896, 0, 24, 480, style=1)
 
 node('''
 [node name="Arrival" type="Marker2D" parent="."]
@@ -117,17 +118,27 @@ display_name = "First Light Candle"
 position = Vector2(700, 460)
 script = ExtResource("tablet")
 title = "The Waking Stone"
-text = "You have walked out of the Hollow: the dream the oath built around the sworn on the Night of Unbinding. The Yard, the village, the drowned choir - all of it was the oath remembering itself. This is Vaelmoor as it is now, under a real sun. The road below leads toward the Crownless Citadel.\\n\\n(End of the prologue. The real journey continues in the next build.)"
+text = "You have walked out of the Hollow: the dream the oath built around the sworn on the Night of Unbinding. The Yard, the village, the drowned choir - all of it was the oath remembering itself. This is Vaelmoor as it is now, under a real sun. The road east leads on toward the Crownless Citadel."
 
-[node name="RoadGate" type="Area2D" parent="."]
-position = Vector2(1860, 480)
+[node name="RoadExit" type="Area2D" parent="."]
+position = Vector2(1884, 480)
 script = ExtResource("exit")
-mode = 1
-size = Vector2(30, 60)
-door_id = &"kingdom_road"
-display_name = "the road to the kingdom"
-locked_text = "THE ROAD AHEAD  -  coming in the next build"
-sealed = true
+target_level = "res://world/levels/vaelmoor_road.tscn"
+target_entry = &"from_awake"
+size = Vector2(12, 80)
+
+[node name="FromRoad" type="Marker2D" parent="."]
+position = Vector2(1790, 480)
+script = ExtResource("entry")
+entry_id = &"from_road"
+
+[node name="Ommen" type="Area2D" parent="."]
+position = Vector2(500, 480)
+script = ExtResource("npc")
+npc_id = &"ommen"
+display_name = "Hooded Figure"
+look = 1
+start_facing = -1
 
 [node name="PrologueEnd" type="Node" parent="."]
 script = ExtResource("prologue")

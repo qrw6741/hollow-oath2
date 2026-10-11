@@ -10,6 +10,11 @@ The player is an **Oathbound** **[in game]** — a knight whose oath-mark is cra
 ## The prologue (draft, in game)
 - The first three areas are **the Hollow [in game]**: the dream the oath built around the sworn on the Night of Unbinding — the oath remembering itself. Defeating the Drowned Canon breaks it: a light opens and the Oathbound wakes in **Vaelmoor, Awake [in game]**, the real kingdom under a real sun. The Waking Stone says so; the road onward leads toward the Crownless Citadel.
 
+## After the prologue (draft, in game)
+- **The Vaelmoor Road [in game]** — the first real-world area, east of Vaelmoor, Awake: Pilgrim's Rest, the Crow Fields, the Ford and the Marshal's Camp, ending at the crossroads where Sir Orren holds the road. The road onward to the Crownless Citadel is sealed in this build.
+- **Ommen [in game]** — the hooded figure who tends the candles on the road. A Candlewright who signed the rewritten liturgy forty years before the Night and did not read it closely enough. He tells the story a page at a time, each time you speak to him (first as "Hooded Figure", then by name). He knows whose hand wrote the Candlewright's note and will not say.
+- **Wenna the Pedlar [in game]** — a living trader who walks the road because it is the only thing in Vaelmoor that still pays. Sells bandages, tonics and Pilgrim's Draughts for embers.
+
 ## Core mysteries (unresolved, revealed across regions)
 1. Who broke the oath — and was it broken, or *completed*?
 2. Why the player's oath cracked instead of hollowing.
@@ -48,6 +53,9 @@ The test arena, **The Penitent's Yard [in game]**, is the churchyard at the edge
 - **The Bell-Warden [in game]** — the churchyard's bell-ringer, who swore first and loudest on the Night of Unbinding. He still keeps the yard and wears the cracked Yard Bell as a helm so that nothing else will ever ring it; he fights with its iron clapper. Intro boss at the end of the Penitent's Yard. Drops the **Warden's Bell Shard [in game]**.
 
 - **The Drowned Canon [in game]** — a Candlewright canon who read the liturgy backwards in the catacomb chapel on the Night of Unbinding; the crypt flooded while he was still reading, and he has not stopped. Boss of the **Drowned Catacombs [in game]**, under the village chapel. Drops the **Canon's Wax Seal [in game]** (the Candlewright mark pressed upside down), which answers to the stair to the Ashen Cathedral.
+
+- **Sir Orren, the Hollow Marshal [in game]** — Marshal of the Crown's road. He swore to hold the crossroads against anything that came, and has held it against everything since. Lance, couched charge, and a tattered banner that calls the road's crows. Boss at the end of the Vaelmoor Road. Drops the **Marshal's Crest [in game]**.
+- **Carrion Crow [in game]**, **Roadside Pikeman [in game]** — the road's daylight enemies: crows that follow the road for what falls on it, and conscripts of the road watch whose courage "was told to follow".
 
 ## Items written so far
 - **Candlewright's Note [in game]** — 'On the night, the liturgy is to be read from its last line to its first. The sworn will not notice. The Crown must not.' (first hint at mystery 1)
