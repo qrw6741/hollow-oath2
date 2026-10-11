@@ -28,6 +28,23 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — Starting presets ("Choose your oath")
+
+### Built
+- Four selectable starting presets, picked after the slot on New Game: **Sworn Knight** (balanced sword, the old defaults), **Twin-Blade Duelist** (fast, fragile, 4-hit chain), **Bulwark** (plate, sword & shield, shield bash, long parry window, 4 flasks), **The Unsworn** (no armour, fists only: 4-hit jab/cross/hook/uppercut chain, haymaker, "Hollow Palm" riposte; low HP, takes +30% damage, big stamina, fast).
+- Data-driven: `PresetData` resources in `data/presets/`, registry `systems/presets.gd`, new weapons (`twin_blades`, `sword_and_shield`, `fists`) and their attack `.tres` files. `Player._apply_preset()` applies stats; damage multiplier applied in `receive_hit`.
+- Preset stored in the save (`preset_id`, no version bump: `_normalize` defaults missing/unknown ids to `sworn_knight`). `Events.new_game_requested` now carries the preset id.
+- Placeholder art for every look/weapon/attack animation in `player_visual.gd`; the Unsworn is a bare-torso, non-explicit figure with bone-cloth wraps. Selection screen shows an animated-preview figure, stats, perks and drawbacks.
+
+### Verified
+- Automated: suite is now 37 tests (6 new: preset validation, stats applied per preset, Unsworn bare/fists, each preset's light combo lands on the dummy, preset save round-trip + unknown/legacy fallback, preset screen flow). All pass headless on Linux.
+- Rendered captures (xvfb) of the selection screen and all four presets idle / light / heavy / parry reviewed by eye (`tests/capture_presets.tscn`).
+- A bug caught by this work: first draft of the preset `.tres` files had an invalid `PackedStringArray` literal, so they failed to load and the game silently fell back to defaults. The new tests now fail loudly if any preset does not load.
+
+### Not verified
+- Balance: numbers are first-pass, **not playtested by a human**. The Unsworn's real feel (reach, damage taken) needs hands-on testing.
+- Windows build re-exported but still not launched on Windows.
+
 ## 2026-10-11 — Milestone 1 vertical slice (v0.1.0-m1)
 
 ### Built

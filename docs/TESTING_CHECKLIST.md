@@ -51,6 +51,13 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Settings changes (shake / flashes / hit-stop / volume) survive a relaunch.
 - [ ] Keyboard-only and gamepad-only navigation of every menu works; the focused item is always visible.
 
+## Presets
+- [ ] New Game → slot → "Choose your oath" shows 4 presets; the preview figure and text change as you move; Esc goes back to slots.
+- [ ] Each preset starts with its own HP / stamina / flasks and looks different in game.
+- [ ] Each preset: light combo, heavy, aerial, dodge, parry + riposte all work and read clearly.
+- [ ] The Unsworn: bare torso, fists only; takes noticeably more damage; Hollow Palm riposte hits very hard.
+- [ ] Quit, then Continue: the same preset is restored.
+
 ## Build
 - [ ] Windows .exe launches from a folder with no Godot installed.
 - [ ] Holds ~60 FPS (F3) with all enemies active.

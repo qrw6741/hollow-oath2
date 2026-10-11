@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="PresetData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/preset_data.gd" id="1_preset"]
+[ext_resource type="Resource" path="res://data/weapons/oathblade.tres" id="2_weapon"]
+
+[resource]
+script = ExtResource("1_preset")
+id = &"sworn_knight"
+display_name = "Sworn Knight"
+tagline = "Balanced. The old kingdom's standard."
+description = "A knight of the old oath, cracked but not hollow. Sound armour, a plain straight sword, and no particular weakness."
+weapon = ExtResource("2_weapon")
+max_health = 100.0
+max_stamina = 100.0
+stamina_regen = 55.0
+flasks = 3
+flask_heal = 45.0
+damage_taken_mult = 1.0
+run_speed_mult = 1.0
+dodge_stamina = 22.0
+parry_window_frames = 8
+parry_stamina = 12.0
+armor_look = 2
+weapon_look = 0
+cloth_color = Color(0.133, 0.118, 0.157, 1)
+cloth_light_color = Color(0.227, 0.204, 0.259, 1)
+accent_color = Color(0.557, 0.106, 0.133, 1)
+perks = PackedStringArray("Three-hit sword combo with a heavy finisher", "No weak point to cover")
+drawbacks = PackedStringArray("Nothing exceptional either")

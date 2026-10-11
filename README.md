@@ -26,7 +26,7 @@ godot --headless --path . --export-release "Windows Desktop" build/windows/TheHo
 godot --headless --path . --fixed-fps 60 res://tests/run_tests.tscn
 ```
 
-31 automated tests drive the real scenes with simulated input: 18 gameplay tests (movement, combo, stamina, dodge i-frames, parry + riposte, healing, checkpoint, death/respawn, AI, spikes, hit-stop) and 13 save/menu tests (round trip, corruption, tampering, backup recovery, newer-version and malformed saves, write failure, autosave, the full menu → play → die → quit → continue flow, overwrite/delete confirmation, pause menu). Exit code 0 = all pass. Windows shortcut: `tools\run_tests.bat` (edit the Godot path inside first).
+37 automated tests drive the real scenes with simulated input: 18 gameplay tests (movement, combo, stamina, dodge i-frames, parry + riposte, healing, checkpoint, death/respawn, AI, spikes, hit-stop) 13 save/menu tests and 6 preset tests (round trip, corruption, tampering, backup recovery, newer-version and malformed saves, write failure, autosave, the full menu → play → die → quit → continue flow, overwrite/delete confirmation, pause menu). Exit code 0 = all pass. Windows shortcut: `tools\run_tests.bat` (edit the Godot path inside first).
 
 Cross-process save check (two separate game launches; the second must restore what the first saved):
 
@@ -58,6 +58,9 @@ tests/           Automated test suite + screenshot capture
 docs/            ARCHITECTURE, ART_BIBLE, ADDING_CONTENT, WORLD_BIBLE, TESTING_CHECKLIST
 build/           Export output (not committed)
 ```
+
+## Starting presets
+On New Game you choose one of four starting loadouts: **Sworn Knight** (balanced), **Twin-Blade Duelist** (fast, fragile), **Bulwark** (armoured, shield) or **The Unsworn** (no armour, fists only). The choice is saved with the slot. Add more in `data/presets/` (see `docs/ADDING_CONTENT.md`).
 
 ## Saves and settings
 Progress is saved automatically each time you rest at an Oath Candle and each time you respawn after dying (you will see "Progress saved"). Three slots; each slot keeps a backup of the previous save.

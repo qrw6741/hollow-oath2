@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"shield_air"
+display_name = "Bulwark — Anvil Drop"
+animation = &"air"
+startup_frames = 6
+active_frames = 8
+recovery_frames = 14
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 12.0
+poise_damage = 14.0
+stamina_cost = 13.0
+knockback = Vector2(40, 70)
+hitbox_size = Vector2(30, 30)
+hitbox_offset = Vector2(14, -10)
+gravity_scale = 0.6
+is_aerial = true
+hit_stop = 0.06
+shake = 2.0

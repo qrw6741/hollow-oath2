@@ -197,6 +197,8 @@ func _normalize(d: Dictionary) -> Dictionary:
 	out["saved_at"] = int(_num(d.get("saved_at"), 0.0))
 	out["play_time"] = maxf(0.0, _num(d.get("play_time"), 0.0))
 	out["deaths"] = maxi(0, int(_num(d.get("deaths"), 0.0)))
+	var pid := _str(d.get("preset_id"), "sworn_knight")
+	out["preset_id"] = pid if Presets.is_valid_id(pid) else "sworn_knight"
 	out["level_path"] = _str(d.get("level_path"), GameState.DEFAULT_LEVEL_PATH)
 	out["level_name"] = _str(d.get("level_name"), "")
 	out["checkpoint_id"] = _str(d.get("checkpoint_id"), "")

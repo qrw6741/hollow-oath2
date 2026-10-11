@@ -12,6 +12,8 @@ var in_game := false
 ## Active save slot (1-based). 0 = no slot: the session is never autosaved (tests, dev runs).
 var current_slot := 0
 
+## Chosen starting preset (see Presets). Fixed for the life of a save slot.
+var preset_id: StringName = &"sworn_knight"
 var level_path := DEFAULT_LEVEL_PATH
 var level_name := ""
 var has_checkpoint := false
@@ -74,6 +76,7 @@ func get_flag(flag: StringName, default: Variant = false) -> Variant:
 func reset() -> void:
 	in_game = false
 	current_slot = 0
+	preset_id = &"sworn_knight"
 	level_path = DEFAULT_LEVEL_PATH
 	level_name = ""
 	has_checkpoint = false
@@ -86,9 +89,10 @@ func reset() -> void:
 	_respawn_pending = false
 
 
-func new_game(slot: int) -> void:
+func new_game(slot: int, preset: StringName = &"sworn_knight") -> void:
 	reset()
 	current_slot = slot
+	preset_id = preset
 
 
 ## Serialisable snapshot of durable state. No transient combat state, ever.
@@ -96,6 +100,7 @@ func to_dict() -> Dictionary:
 	return {
 		"play_time": play_time,
 		"deaths": deaths,
+		"preset_id": String(preset_id),
 		"level_path": level_path,
 		"level_name": level_name,
 		"has_checkpoint": has_checkpoint,
@@ -111,6 +116,7 @@ func apply_dict(d: Dictionary, slot: int) -> void:
 	current_slot = slot
 	play_time = float(d.get("play_time", 0.0))
 	deaths = int(d.get("deaths", 0))
+	preset_id = StringName(d.get("preset_id", "sworn_knight"))
 	level_path = String(d.get("level_path", DEFAULT_LEVEL_PATH))
 	level_name = String(d.get("level_name", ""))
 	has_checkpoint = bool(d.get("has_checkpoint", false))

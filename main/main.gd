@@ -44,12 +44,12 @@ func _ready() -> void:
 
 # ------------------------------------------------------------------ session flow
 
-func start_new_game(slot: int) -> void:
+func start_new_game(slot: int, preset_id: StringName = &"sworn_knight") -> void:
 	if _busy:
 		return
 	_busy = true
 	await _fade_to(1.0)
-	GameState.new_game(slot)
+	GameState.new_game(slot, preset_id if Presets.is_valid_id(String(preset_id)) else &"sworn_knight")
 	if not SaveSystem.save_slot(slot):
 		# Never start a session that cannot be saved without telling the player.
 		GameState.reset()

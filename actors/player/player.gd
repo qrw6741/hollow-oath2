@@ -7,6 +7,9 @@ extends CharacterBody2D
 enum State { FREE, ATTACK, DODGE, PARRY, HEAL, HURT, REST, DEAD }
 
 @export var weapon: WeaponData
+## Starting preset (weapon, vitals, armour, handling). Assigned by Level before the
+## player enters the tree; when null the scene defaults (the Sworn Knight) apply.
+@export var preset: PresetData
 
 @export_group("Movement")
 @export var run_speed := 112.0
@@ -69,17 +72,36 @@ var _queued_attack: StringName = &""
 var _heal_applied := false
 var _parried := false
 var _last_hit_id := 0
+## Multiplies all damage taken (armour). Set from the preset.
+var damage_taken_mult := 1.0
 
 const BUFFERED: Array[StringName] = [&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal"]
 
 
 func _ready() -> void:
 	add_to_group(&"player")
+	if preset:
+		_apply_preset()
 	flasks = max_flasks
 	health.died.connect(_on_died)
 	attack_runner.hit_confirmed.connect(_on_attack_hit)
 	_add_lantern()
 	_emit_spawned.call_deferred()
+
+
+func _apply_preset() -> void:
+	weapon = preset.weapon
+	health.set_max(preset.max_health)
+	stamina.max_stamina = preset.max_stamina
+	stamina.regen_per_second = preset.stamina_regen
+	stamina.restore_full()
+	max_flasks = preset.flasks
+	flask_heal = preset.flask_heal
+	damage_taken_mult = preset.damage_taken_mult
+	run_speed *= preset.run_speed_mult
+	dodge_stamina = preset.dodge_stamina
+	parry_window_frames = preset.parry_window_frames
+	parry_stamina = preset.parry_stamina
 
 
 ## Faint personal light so the player reads clearly in dark rooms.
@@ -391,7 +413,7 @@ func receive_hit(hit: HitData) -> int:
 		return HitData.Result.PARRIED
 	if is_invulnerable(hit.environmental):
 		return HitData.Result.IGNORED
-	health.take_damage(hit.damage)
+	health.take_damage(hit.damage * damage_taken_mult)
 	GameFeel.spark(global_position + Vector2(0, -14), Palette.CRIMSON_BRIGHT, 12)
 	GameFeel.shake(4.0, 0.22)
 	GameFeel.hit_stop(0.08)

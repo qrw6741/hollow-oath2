@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"fist_uppercut"
+display_name = "Fists — Rising Fist"
+animation = &"uppercut"
+startup_frames = 8
+active_frames = 4
+recovery_frames = 20
+chain_open_frame = -1
+dodge_cancel_frame = 7
+damage = 15.0
+poise_damage = 26.0
+stamina_cost = 11.0
+knockback = Vector2(80, -130)
+hitbox_size = Vector2(24, 30)
+hitbox_offset = Vector2(13, -18)
+lunge_speed = 70.0
+lunge_start_frame = 5
+lunge_frames = 4
+hit_stop = 0.08
+shake = 2.5

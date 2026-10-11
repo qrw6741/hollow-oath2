@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+[ext_resource type="Resource" path="res://data/attacks/twin_light_4.tres" id="2_next"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"twin_light_3"
+display_name = "Twin Blades — Cross"
+animation = &"twin_x"
+startup_frames = 6
+active_frames = 3
+recovery_frames = 12
+chain_open_frame = 3
+dodge_cancel_frame = 4
+damage = 8.0
+lunge_speed = 70.0
+lunge_start_frame = 4
+lunge_frames = 4
+poise_damage = 7.0
+stamina_cost = 8.0
+knockback = Vector2(35, -8)
+hitbox_size = Vector2(30, 22)
+hitbox_offset = Vector2(17, -14)
+hit_stop = 0.04
+shake = 1.0
+next_in_combo = ExtResource("2_next")

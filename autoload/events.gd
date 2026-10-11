@@ -10,7 +10,7 @@ signal player_respawned(player: Node2D)
 signal flasks_changed(current: int, maximum: int)
 
 # --- Session / menus ---
-signal new_game_requested(slot: int)
+signal new_game_requested(slot: int, preset_id: StringName)
 signal load_game_requested(slot: int)
 signal quit_to_menu_requested
 signal session_started

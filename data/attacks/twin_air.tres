@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"twin_air"
+display_name = "Twin Blades — Drop Rake"
+animation = &"air"
+startup_frames = 3
+active_frames = 8
+recovery_frames = 10
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 9.0
+poise_damage = 6.0
+stamina_cost = 9.0
+knockback = Vector2(35, 55)
+hitbox_size = Vector2(30, 30)
+hitbox_offset = Vector2(12, -10)
+gravity_scale = 0.5
+is_aerial = true
+hit_stop = 0.04
+shake = 1.0

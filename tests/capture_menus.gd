@@ -66,7 +66,7 @@ func _run() -> void:
 	await frames(10)
 	await shot("m5_load_slots")
 
-	main.menu._show_screen(2)
+	main.menu._show_screen(3)
 	await frames(10)
 	await shot("m6_settings")
 

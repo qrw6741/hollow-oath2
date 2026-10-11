@@ -17,6 +17,7 @@
 Arrow keys / D-pad / stick move the selection, **Enter** or **A** selects, **Esc** or **B** goes back; the mouse works too. Overwriting or deleting a save, and quitting to the main menu from the pause menu, ask you to press the button a second time ("Sure?") within 3 seconds.
 
 ## Combat notes
+- Your preset changes what the attack buttons do: sword combo, twin-blade flurry, shield bash chain, or the Unsworn's fist combo (light = jab/cross/hook/uppercut, heavy = haymaker). Timings differ per preset; the parry button raises the shield for the Bulwark.
 - **Stamina** is spent by attacks, dodges and parries. You can act while any stamina remains; emptying the bar delays regeneration.
 - **Combos**: press light attack again any time during a swing — the next hit comes out when the current swing allows it. Light → heavy also chains.
 - **Dodge cancel**: the end of most attacks can be cancelled into a roll; the start cannot.

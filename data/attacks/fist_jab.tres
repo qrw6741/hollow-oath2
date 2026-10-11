@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+[ext_resource type="Resource" path="res://data/attacks/fist_cross.tres" id="2_next"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"fist_jab"
+display_name = "Fists — Jab"
+animation = &"jab"
+startup_frames = 4
+active_frames = 3
+recovery_frames = 9
+chain_open_frame = 2
+dodge_cancel_frame = 3
+damage = 6.0
+poise_damage = 6.0
+knockback = Vector2(30, -5)
+lunge_speed = 50.0
+lunge_start_frame = 2
+lunge_frames = 4
+stamina_cost = 7.0
+hitbox_size = Vector2(24, 20)
+hitbox_offset = Vector2(15, -15)
+hit_stop = 0.04
+shake = 1.0
+next_in_combo = ExtResource("2_next")

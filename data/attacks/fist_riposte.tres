@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"fist_riposte"
+display_name = "Fists — Hollow Palm"
+animation = &"palm"
+startup_frames = 6
+active_frames = 4
+recovery_frames = 26
+chain_open_frame = -1
+dodge_cancel_frame = 14
+damage = 84.0
+poise_damage = 999.0
+stamina_cost = 0.0
+knockback = Vector2(170, -100)
+critical = true
+hitbox_size = Vector2(36, 28)
+hitbox_offset = Vector2(15, -15)
+lunge_speed = 110.0
+lunge_start_frame = 3
+lunge_frames = 5
+hit_stop = 0.22
+shake = 7.0

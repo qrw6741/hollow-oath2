@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"twin_heavy"
+display_name = "Twin Blades — Whirl"
+animation = &"twin_x"
+startup_frames = 14
+active_frames = 6
+recovery_frames = 20
+chain_open_frame = 10
+dodge_cancel_frame = 8
+damage = 24.0
+poise_damage = 35.0
+stamina_cost = 20.0
+knockback = Vector2(150, -60)
+hitbox_size = Vector2(44, 28)
+hitbox_offset = Vector2(4, -15)
+lunge_speed = 120.0
+lunge_start_frame = 10
+lunge_frames = 6
+hit_stop = 0.09
+shake = 3.5

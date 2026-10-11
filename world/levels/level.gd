@@ -23,6 +23,7 @@ func _ready() -> void:
 	if player_scene == null:
 		player_scene = load(PLAYER_SCENE_PATH)
 	player = player_scene.instantiate() as Player
+	player.preset = Presets.get_preset(GameState.preset_id)
 	player.position = GameState.respawn_position if GameState.has_checkpoint else default_spawn
 	add_child(player)
 	Events.respawn_requested.connect(_on_respawn_requested)

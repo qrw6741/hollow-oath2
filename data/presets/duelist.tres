@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="PresetData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/preset_data.gd" id="1_preset"]
+[ext_resource type="Resource" path="res://data/weapons/twin_blades.tres" id="2_weapon"]
+
+[resource]
+script = ExtResource("1_preset")
+id = &"duelist"
+display_name = "Twin-Blade Duelist"
+tagline = "Fast, light and fragile."
+description = "A Candlewright duellist in a leather cuirass. Four-hit flurries and quick feet, but little margin for error."
+weapon = ExtResource("2_weapon")
+max_health = 80.0
+max_stamina = 110.0
+stamina_regen = 62.0
+flasks = 3
+flask_heal = 40.0
+damage_taken_mult = 1.12
+run_speed_mult = 1.12
+dodge_stamina = 18.0
+parry_window_frames = 8
+parry_stamina = 10.0
+armor_look = 1
+weapon_look = 1
+cloth_color = Color(0.231, 0.165, 0.165, 1)
+cloth_light_color = Color(0.353, 0.251, 0.251, 1)
+accent_color = Color(0.788, 0.635, 0.290, 1)
+perks = PackedStringArray("Fastest sword attacks, four-hit chain", "Cheap stamina costs, quick dodge", "Run speed +12%")
+drawbacks = PackedStringArray("Low health (80)", "Takes 12% more damage", "Weak poise damage")

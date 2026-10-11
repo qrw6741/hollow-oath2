@@ -6,7 +6,7 @@ extends CanvasLayer
 ## Destructive actions (overwrite, delete) need a second press within 3 seconds.
 ## Everything is operable with keyboard or gamepad (ui_* actions) and the mouse.
 
-enum Screen { TITLE, SLOTS, SETTINGS }
+enum Screen { TITLE, SLOTS, PRESET, SETTINGS }
 enum SlotMode { NEW, LOAD }
 
 const CONFIRM_MS := 3000
@@ -25,6 +25,15 @@ var _continue_info: Label
 var _slots_title: Label
 var _rows: Array[Dictionary] = []
 var _slots_back: Button
+var _preset_btns: Array[Button] = []
+var _preset_sel := 0
+var _pending_slot := 0
+var _pv_visual: Node2D
+var _pv_name: Label
+var _pv_tag: Label
+var _pv_desc: Label
+var _pv_stats: Label
+var _pv_perks: Label
 var _settings: SettingsPanel
 var _status: Label
 var _armed := ""
@@ -45,6 +54,7 @@ func _ready() -> void:
 
 	_screens[Screen.TITLE] = _build_title(root)
 	_screens[Screen.SLOTS] = _build_slots(root)
+	_screens[Screen.PRESET] = _build_preset(root)
 	_screens[Screen.SETTINGS] = _build_settings(root)
 
 	_status = Label.new()
@@ -84,7 +94,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
 	if event.is_action_pressed(&"ui_cancel") and screen != Screen.TITLE:
-		_show_screen(Screen.TITLE)
+		if screen == Screen.PRESET:
+			_open_slots(SlotMode.NEW)
+		else:
+			_show_screen(Screen.TITLE)
 		get_viewport().set_input_as_handled()
 
 
@@ -257,6 +270,112 @@ func _build_slots(root: Control) -> Control:
 	return v.get_parent()
 
 
+func _build_preset(root: Control) -> Control:
+	var c := CenterContainer.new()
+	c.name = &"PresetScreen"
+	c.set_anchors_preset(Control.PRESET_FULL_RECT)
+	c.offset_bottom = -24
+	root.add_child(c)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 4)
+	c.add_child(v)
+	var title := Label.new()
+	title.text = "CHOOSE YOUR OATH"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override(&"font_size", 12)
+	v.add_child(title)
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override(&"separation", 8)
+	v.add_child(h)
+
+	var left := VBoxContainer.new()
+	left.add_theme_constant_override(&"separation", 3)
+	h.add_child(left)
+	for i in Presets.IDS.size():
+		var pr := Presets.get_preset(Presets.IDS[i])
+		var b := Button.new()
+		b.name = "Preset_%s" % pr.id
+		b.text = pr.display_name
+		b.custom_minimum_size = Vector2(112, 22)
+		b.focus_entered.connect(_select_preset.bind(i))
+		b.mouse_entered.connect(b.grab_focus)
+		b.pressed.connect(_on_preset_pressed.bind(i))
+		left.add_child(b)
+		_preset_btns.append(b)
+	var back := _menu_button(left, "Back", func(): _open_slots(SlotMode.NEW), 112.0)
+	back.name = &"PresetBack"
+
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(332, 198)
+	h.add_child(panel)
+	var pv := HBoxContainer.new()
+	pv.add_theme_constant_override(&"separation", 6)
+	panel.add_child(pv)
+	var prev := Control.new()
+	prev.custom_minimum_size = Vector2(76, 120)
+	prev.clip_contents = true
+	pv.add_child(prev)
+	_pv_visual = Node2D.new()
+	_pv_visual.set_script(load("res://actors/player/player_visual.gd"))
+	_pv_visual.set("preview", true)
+	_pv_visual.position = Vector2(38, 104)
+	_pv_visual.scale = Vector2(3, 3)
+	prev.add_child(_pv_visual)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.add_theme_constant_override(&"separation", 3)
+	pv.add_child(info)
+	_pv_name = Label.new()
+	_pv_name.add_theme_font_size_override(&"font_size", 12)
+	_pv_name.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
+	info.add_child(_pv_name)
+	_pv_tag = Label.new()
+	_pv_tag.add_theme_color_override(&"font_color", Palette.BONE_DIM)
+	_pv_tag.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	info.add_child(_pv_tag)
+	_pv_desc = Label.new()
+	_pv_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_pv_desc.add_theme_constant_override(&"line_spacing", -3)
+	_pv_desc.custom_minimum_size.x = 226
+	info.add_child(_pv_desc)
+	_pv_stats = Label.new()
+	_pv_stats.add_theme_color_override(&"font_color", Palette.BONE)
+	info.add_child(_pv_stats)
+	_pv_perks = Label.new()
+	_pv_perks.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_pv_perks.add_theme_constant_override(&"line_spacing", -3)
+	_pv_perks.custom_minimum_size.x = 226
+	info.add_child(_pv_perks)
+	return c
+
+
+func _select_preset(i: int) -> void:
+	_preset_sel = i
+	var pr := Presets.get_preset(Presets.IDS[i])
+	_pv_visual.set("preset", pr)
+	_pv_name.text = pr.display_name
+	_pv_tag.text = pr.tagline
+	_pv_desc.text = pr.description
+	_pv_stats.text = "HP %d   Stamina %d   Flasks %d" % [int(pr.max_health), int(pr.max_stamina), pr.flasks]
+	var perks := ""
+	for t in pr.perks:
+		perks += "+ %s\n" % t
+	for t in pr.drawbacks:
+		perks += "- %s\n" % t
+	_pv_perks.text = perks.strip_edges()
+
+
+func _on_preset_pressed(i: int) -> void:
+	_select_preset(i)
+	if _pending_slot > 0:
+		Events.new_game_requested.emit(_pending_slot, Presets.IDS[i])
+
+
+func _open_presets(slot: int) -> void:
+	_pending_slot = slot
+	_show_screen(Screen.PRESET)
+
+
 func _build_settings(root: Control) -> Control:
 	var c := CenterContainer.new()
 	c.name = &"SettingsScreen"
@@ -280,6 +399,9 @@ func _show_screen(s: Screen) -> void:
 			_refresh_title()
 		Screen.SLOTS:
 			_refresh_slots()
+		Screen.PRESET:
+			_preset_btns[0].grab_focus()
+			_select_preset(0)
 		Screen.SETTINGS:
 			_settings.focus_first()
 
@@ -375,7 +497,7 @@ func _on_slot_action(slot: int) -> void:
 	if slot_mode == SlotMode.NEW:
 		if r.status != SaveSystem.Status.EMPTY and not _arm("act%d" % slot, _rows[slot - 1].act):
 			return
-		Events.new_game_requested.emit(slot)
+		_open_presets(slot)
 	else:
 		Events.load_game_requested.emit(slot)
 

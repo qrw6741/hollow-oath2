@@ -20,6 +20,12 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Presets
+- Preset balance is untested by a human; stat numbers live in `data/presets/*.tres` and `data/attacks/`.
+- Perk/drawback text on the selection screen is hand-written in each preset file, not generated, so it must be updated by hand when numbers change.
+- Preset is fixed per save slot; there is no in-game respec or armour/weapon swapping yet (equipment system planned).
+- All preset art is temporary procedural placeholder art.
+
 ## Save system notes
 - Verified: unit tests for corruption/tampering/backup recovery/newer versions/write failure, an in-process menu flow test, and a two-process write-then-read check on Linux. **Not yet tried on Windows** (Windows cannot rename over an existing file, so the code has a remove-then-rename fallback; the backup file covers that moment, but it has only been exercised on Linux).
 - Hand-editing a save file makes it fail its checksum and count as damaged (it falls back to the backup). This is intentional integrity protection, not a bug.

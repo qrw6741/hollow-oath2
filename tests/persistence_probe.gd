@@ -30,7 +30,7 @@ func _run() -> void:
 	if mode == "write":
 		for s in range(1, 4):
 			SaveSystem.delete_slot(s)
-		Events.new_game_requested.emit(3)
+		Events.new_game_requested.emit(3, &"unsworn")
 		await frames(100)
 		var lvl: Level = main.current_level()
 		if lvl == null:

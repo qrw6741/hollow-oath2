@@ -23,6 +23,13 @@
 2. Duplicate `hollow_penitent.tscn`, swap the root script and the `Visual` node.
 3. Keep the child names `Health`, `Hurtbox`, `Hitbox`, `AttackRunner` — EnemyBase looks them up.
 
+## A new preset (starting loadout)
+1. Create attack `.tres` files in `data/attacks/` and a weapon in `data/weapons/` (or reuse an existing weapon).
+2. Duplicate a file in `data/presets/`, set id, text, stats, `weapon`, colours, `armor_look` and `weapon_look`. Use `PackedStringArray("a", "b")` (no brackets) for `perks`/`drawbacks`.
+3. Add the id to `Presets.IDS` in `systems/presets.gd` (order = order on the selection screen).
+4. If you need a new attack animation key, add its pose to `player_visual.gd` (`SWINGS`, `TWIN` or `FISTS`).
+5. Run the tests: `test_presets_valid` and `test_each_preset_combo_lands` cover every registered preset automatically.
+
 ## A new level
 1. New scene, root `Node2D` with `world/levels/level.gd`. Set `level_id`, `display_name`, `bounds`, `default_spawn`.
 2. Build terrain with `StoneBlock` nodes (set `size`; tick `one_way` for platforms).

@@ -47,6 +47,9 @@ func _run() -> void:
 		test_menu_flow_end_to_end, test_death_then_quit_is_clean,
 		test_menu_overwrite_confirmation, test_menu_delete, test_menu_corrupt_slot,
 		test_pause_menu,
+		# --- presets ---
+		test_presets_valid, test_preset_stats_applied, test_unsworn_is_bare_fists,
+		test_each_preset_combo_lands, test_preset_save_and_fallback, test_preset_screen_menu,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -95,9 +98,10 @@ func _teardown() -> void:
 		await frames(2)
 
 
-func fresh_game() -> void:
+func fresh_game(preset: StringName = &"sworn_knight") -> void:
 	await _teardown()
 	game_state.reset()
+	game_state.preset_id = preset
 	main = load("res://main/main.tscn").instantiate()
 	main.show_menu_on_start = false
 	get_tree().root.add_child(main)
@@ -644,7 +648,7 @@ func test_menu_flow_end_to_end() -> void:
 	check(not menu_button("NewGame").disabled, "New Game available")
 
 	# New game in slot 2.
-	events.new_game_requested.emit(2)
+	events.new_game_requested.emit(2, &"sworn_knight")
 	await frames(100)
 	level = main.current_level()
 	check(level != null, "level loaded")
@@ -700,7 +704,7 @@ func test_death_then_quit_is_clean() -> void:
 	main.return_to_menu()
 	await frames(60)
 	check(not game_state.in_game and main.menu.visible, "in menu during pending respawn")
-	events.new_game_requested.emit(1)
+	events.new_game_requested.emit(1, &"sworn_knight")
 	await frames(130)   # well past the old session's respawn timer
 	check(not respawned[0], "stale respawn from the old session never fires")
 	level = main.current_level()
@@ -727,8 +731,12 @@ func test_menu_overwrite_confirmation() -> void:
 	check(rows[0].act.text == "Sure?", "first press asks for confirmation")
 	check(main.current_level() == null and read_raw(1) == before, "nothing happened yet")
 	rows[0].act.pressed.emit()
+	await frames(10)
+	check(main.menu.screen == main.menu.Screen.PRESET and main.current_level() == null, "slot choice opens the preset screen")
+	main.menu._preset_btns[1].pressed.emit()
 	await frames(100)
-	check(main.current_level() != null, "second press starts the new game")
+	check(main.current_level() != null, "choosing a preset starts the new game")
+	check(game_state.preset_id == &"duelist" and saves.load_slot(1).data.preset_id == "duelist", "chosen preset stored and saved")
 	check(saves.load_slot(1).data.deaths == 0, "slot was overwritten")
 	wipe_saves()
 
@@ -809,3 +817,119 @@ func test_pause_menu() -> void:
 	settings.master_volume = v
 	settings.apply_audio()
 	panel.queue_free()
+
+
+# ------------------------------------------------------------------ preset tests
+
+func test_presets_valid() -> void:
+	check(Presets.IDS.size() == 4, "four presets registered")
+	var seen := {}
+	for id in Presets.IDS:
+		var pr := Presets.get_preset(id)
+		check(pr != null and pr.id == id, "%s loads with matching id" % id)
+		if pr == null:
+			continue
+		check(pr.validate().is_empty(), "%s validates (%s)" % [id, pr.validate()])
+		check(pr.weapon != null and pr.weapon.light_combo_start != null, "%s has a weapon with a light combo" % id)
+		check(pr.perks.size() > 0 and pr.drawbacks.size() > 0, "%s lists perks and drawbacks" % id)
+		seen[pr.display_name] = true
+	check(seen.size() == 4, "display names are unique")
+	check(Presets.get_preset(&"nope").id == Presets.DEFAULT_ID, "unknown id falls back to default")
+
+
+func test_preset_stats_applied() -> void:
+	for id in Presets.IDS:
+		await fresh_game(id)
+		var pr := Presets.get_preset(id)
+		check(player.preset == pr, "%s: player holds its preset" % id)
+		check(player.health.max_health == pr.max_health and player.health.current == pr.max_health, "%s: health %.0f" % [id, player.health.current])
+		check(player.stamina.max_stamina == pr.max_stamina, "%s: stamina" % id)
+		check(player.flasks == pr.flasks and player.max_flasks == pr.flasks, "%s: flasks" % id)
+		check(player.weapon == pr.weapon, "%s: weapon" % id)
+	# Damage multiplier really changes damage taken.
+	await fresh_game(&"unsworn")
+	var before := player.health.current
+	player.receive_hit(damage(10.0))
+	check(is_equal_approx(before - player.health.current, 10.0 * Presets.get_preset(&"unsworn").damage_taken_mult), "unsworn takes multiplied damage (%.1f)" % (before - player.health.current))
+
+
+func test_unsworn_is_bare_fists() -> void:
+	var pr := Presets.get_preset(&"unsworn")
+	check(pr.armor_look == PresetData.ArmorLook.BARE, "unsworn wears no armour")
+	check(pr.weapon_look == PresetData.WeaponLook.FISTS, "unsworn fights with fists")
+	check(pr.weapon.id == &"fists", "unsworn weapon is fists")
+	check(pr.damage_taken_mult > 1.0, "unsworn takes extra damage (trade-off)")
+	for id in Presets.IDS:
+		if id != &"unsworn":
+			check(Presets.get_preset(id).armor_look != PresetData.ArmorLook.BARE, "%s is armoured" % id)
+
+
+func test_each_preset_combo_lands() -> void:
+	for id in Presets.IDS:
+		await fresh_game(id)
+		await place_player(300.0, 480.0, 1)
+		var dummy := level.get_node("TrainingDummy")
+		var started := [0]
+		player.attack_runner.started.connect(func(_a): started[0] += 1)
+		for i in 3:
+			await press(&"attack_light")
+			await frames(9)
+		await frames(60)
+		check(started[0] >= 2, "%s: light chain started (%d attacks)" % [id, started[0]])
+		check(dummy._combo_total > 5.0, "%s: light combo damaged the dummy (%.0f)" % [id, dummy._combo_total])
+		check(player.state == Player.State.FREE, "%s: returns to FREE" % id)
+
+
+func test_preset_save_and_fallback() -> void:
+	wipe_saves()
+	game_state.new_game(2, &"bulwark")
+	game_state.in_game = true
+	check(saves.save_slot(2), "save written")
+	check(saves.load_slot(2).data.preset_id == "bulwark", "preset_id round-trips")
+	game_state.reset()
+	game_state.apply_dict(saves.load_slot(2).data, 2)
+	check(game_state.preset_id == &"bulwark", "preset_id restored into GameState")
+	# Hand-edited / unknown preset id and a legacy save without the field.
+	var data: Dictionary = game_state.to_dict()
+	data["preset_id"] = "ghost"
+	data["version"] = 1
+	var txt: String = saves._encode(data)
+	var f := FileAccess.open(saves.slot_path(3), FileAccess.WRITE)
+	f.store_string(txt)
+	f.close()
+	check(saves.load_slot(3).data.preset_id == "sworn_knight", "unknown preset id falls back")
+	data.erase("preset_id")
+	f = FileAccess.open(saves.slot_path(3), FileAccess.WRITE)
+	f.store_string(saves._encode(data))
+	f.close()
+	check(saves.load_slot(3).data.preset_id == "sworn_knight", "legacy save without preset gets default")
+	game_state.reset()
+	wipe_saves()
+
+
+func test_preset_screen_menu() -> void:
+	wipe_saves()
+	await menu_game()
+	menu_button("NewGame").pressed.emit()
+	await frames(2)
+	main.menu._rows[0].act.pressed.emit()
+	await frames(2)
+	var m = main.menu
+	check(m.screen == m.Screen.PRESET, "preset screen shown after slot")
+	check(m._preset_btns.size() == 4, "four preset buttons")
+	m._select_preset(3)
+	check(m._pv_name.text == "The Unsworn" or m._pv_name.text == Presets.get_preset(&"unsworn").display_name, "detail panel shows selection")
+	check(m._pv_visual.get("preset") == Presets.get_preset(&"unsworn"), "preview follows selection")
+	# Esc goes back to the slot list, not the title.
+	var ev := InputEventAction.new()
+	ev.action = &"ui_cancel"
+	ev.pressed = true
+	Input.parse_input_event(ev)
+	await frames(3)
+	check(m.screen == m.Screen.SLOTS, "cancel returns to slots")
+	m._open_presets(1)
+	m._preset_btns[3].pressed.emit()
+	await frames(100)
+	check(main.current_level() != null and main.current_level().player.preset.id == &"unsworn", "unsworn game starts")
+	check(saves.load_slot(1).data.preset_id == "unsworn", "saved with preset")
+	wipe_saves()

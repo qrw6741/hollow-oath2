@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"shield_heavy"
+display_name = "Bulwark — Bastion Slam"
+animation = &"heavy"
+startup_frames = 24
+active_frames = 6
+recovery_frames = 30
+chain_open_frame = -1
+dodge_cancel_frame = 16
+damage = 30.0
+poise_damage = 70.0
+stamina_cost = 26.0
+knockback = Vector2(190, -90)
+hitbox_size = Vector2(42, 32)
+hitbox_offset = Vector2(22, -16)
+lunge_speed = 110.0
+lunge_start_frame = 18
+lunge_frames = 7
+hit_stop = 0.12
+shake = 5.0

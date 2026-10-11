@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="PresetData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/preset_data.gd" id="1_preset"]
+[ext_resource type="Resource" path="res://data/weapons/sword_and_shield.tres" id="2_weapon"]
+
+[resource]
+script = ExtResource("1_preset")
+id = &"bulwark"
+display_name = "Bulwark"
+tagline = "Slow, sturdy, patient."
+description = "Plate and a kite shield. You win by letting the enemy swing first and answering with the shield."
+weapon = ExtResource("2_weapon")
+max_health = 130.0
+max_stamina = 90.0
+stamina_regen = 50.0
+flasks = 4
+flask_heal = 45.0
+damage_taken_mult = 0.78
+run_speed_mult = 0.88
+dodge_stamina = 26.0
+parry_window_frames = 12
+parry_stamina = 8.0
+armor_look = 3
+weapon_look = 2
+cloth_color = Color(0.290, 0.322, 0.345, 1)
+cloth_light_color = Color(0.420, 0.455, 0.471, 1)
+accent_color = Color(0.369, 0.435, 0.412, 1)
+perks = PackedStringArray("Takes 22% less damage", "Longest parry window (12 frames)", "Shield bash staggers enemies", "4 healing vials")
+drawbacks = PackedStringArray("Run speed -12%", "Slow, committal attacks", "Dodge costs more stamina")
