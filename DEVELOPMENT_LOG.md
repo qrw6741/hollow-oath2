@@ -28,6 +28,13 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — Video options (resolution / fps)
+
+- The game was rendered into a fixed 480x270 buffer and integer-scaled (chunky "480p" look). It now defaults to **High-res (smooth)**: the same 480x270 world rendered natively at the window size (canvas_items stretch, fractional scaling), so text and shapes are sharp at 1080p and above.
+- Settings (main menu and pause): Display (Windowed/Fullscreen), Window size (720p, 900p, 1080p, 1440p, 4K; default 1920x1080, shrunk to fit the desktop), Graphics (High-res / Pixel 480x270), Frame rate limit (30/60/120/144/240/Unlimited), VSync. Saved in `settings.cfg` under `[video]`. Default: windowed 1080p, VSync on, unlimited cap.
+- Gameplay still simulates at a fixed 60 Hz; physics interpolation is enabled so motion renders smoothly above 60 fps.
+- Verified: suite 37/37, rendered 1920x1080 captures of arena and settings screen. **Not verified:** high-refresh behaviour, fullscreen switching and interpolation artefacts on a real monitor (headless/xvfb only); Windows build not launched.
+
 ## 2026-10-11 — Visual and main-menu polish pass
 
 - Sky: seeded stars and a smooth ember glow on the horizon. Parallax ruins: aerial haze that fades each layer toward fog near its feet (depth). New `Vignette` layer (dark corners, below the HUD).

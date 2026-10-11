@@ -9,6 +9,11 @@ signal back_requested
 var _shake: Button
 var _flashes: Button
 var _hitstop: Button
+var _display: Button
+var _res: Button
+var _render: Button
+var _fps: Button
+var _vsync: Button
 var _volume_label: Label
 var _back: Button
 
@@ -23,6 +28,11 @@ func _ready() -> void:
 	title.add_theme_font_size_override(&"font_size", 12)
 	add_child(title)
 
+	_display = _button(func(): Settings.fullscreen = not Settings.fullscreen; _video_changed())
+	_res = _button(func(): Settings.resolution_index = (Settings.resolution_index + 1) % Settings.RESOLUTIONS.size(); _video_changed())
+	_render = _button(func(): Settings.hires = not Settings.hires; _video_changed())
+	_fps = _button(func(): Settings.fps_cap = Settings.FPS_CAPS[(Settings.FPS_CAPS.find(Settings.fps_cap) + 1) % Settings.FPS_CAPS.size()]; _video_changed())
+	_vsync = _button(func(): Settings.vsync = not Settings.vsync; _video_changed())
 	_shake = _button(_toggle_shake)
 	_flashes = _button(_toggle_flashes)
 	_hitstop = _button(_toggle_hitstop)
@@ -59,7 +69,7 @@ func _ready() -> void:
 
 func _button(cb: Callable) -> Button:
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(150, 16)
+	b.custom_minimum_size = Vector2(170, 15)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(cb)
 	add_child(b)
@@ -67,10 +77,22 @@ func _button(cb: Callable) -> Button:
 
 
 func focus_first() -> void:
-	_shake.grab_focus()
+	_display.grab_focus()
+
+
+func _video_changed() -> void:
+	Settings.apply_video()
+	_refresh()
 
 
 func _refresh() -> void:
+	_display.text = "Display: %s" % ("Fullscreen" if Settings.fullscreen else "Windowed")
+	var r := Settings.RESOLUTIONS[Settings.resolution_index]
+	_res.text = "Window size: %dx%d" % [r.x, r.y]
+	_res.disabled = Settings.fullscreen
+	_render.text = "Graphics: %s" % ("High-res (smooth)" if Settings.hires else "Pixel (480x270)")
+	_fps.text = "Frame rate limit: %s" % ("Unlimited" if Settings.fps_cap == 0 else str(Settings.fps_cap))
+	_vsync.text = "VSync: %s" % ("On" if Settings.vsync else "Off")
 	_shake.text = "Screen shake: %s" % ("On" if Settings.screen_shake > 0.0 else "Off")
 	_flashes.text = "Hit flashes: %s" % ("On" if Settings.flashes else "Off")
 	_hitstop.text = "Hit-stop: %s" % ("On" if Settings.hit_stop else "Off")

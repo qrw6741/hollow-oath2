@@ -20,6 +20,10 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Video
+- Fps above 60 relies on Godot 2D physics interpolation; a one-frame smear may appear after teleports (respawn/rest). Untested on a real high-refresh monitor.
+- Art is still low-detail placeholder; High-res mode makes that more visible, not less.
+
 ## Presets
 - Preset balance is untested by a human; stat numbers live in `data/presets/*.tres` and `data/attacks/`.
 - Perk/drawback text on the selection screen is hand-written in each preset file, not generated, so it must be updated by hand when numbers change.

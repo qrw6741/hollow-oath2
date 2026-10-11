@@ -27,10 +27,11 @@ SaveSystem="*res://autoload/save_system.gd"
 
 window/size/viewport_width=480
 window/size/viewport_height=270
-window/size/window_width_override=1440
-window/size/window_height_override=810
-window/stretch/mode="viewport"
-window/stretch/scale_mode="integer"
+window/size/window_width_override=1920
+window/size/window_height_override=1080
+window/stretch/mode="canvas_items"
+window/stretch/scale_mode="fractional"
+window/vsync/vsync_mode=1
 
 [gui]
 
@@ -48,6 +49,7 @@ theme/default_font_size=8
 [physics]
 
 common/physics_ticks_per_second=60
+common/physics_interpolation=true
 2d/default_gravity=900.0
 
 [rendering]
