@@ -26,6 +26,10 @@ ext = [
     ("PackedScene", "res://actors/enemies/hollow_penitent.tscn", "penitent"),
     ("PackedScene", "res://actors/enemies/ember_acolyte.tscn", "acolyte"),
     ("PackedScene", "res://actors/enemies/bell_bearer.tscn", "bearer"),
+    ("PackedScene", "res://actors/enemies/gloam_moth.tscn", "moth"),
+    ("PackedScene", "res://actors/enemies/oathguard.tscn", "oathguard"),
+    ("PackedScene", "res://actors/enemies/mimic.tscn", "mimic"),
+    ("Script", "res://world/pickups/treasure_chest.gd", "chest"),
     ("Script", "res://world/background/ruins_silhouette.gd", "ruins"),
     ("Script", "res://world/pickups/item_pickup.gd", "pickup"),
     ("Script", "res://world/transitions/level_exit.gd", "exit"),
@@ -63,14 +67,24 @@ def plank(name, x, y, w):
     block(name, x, y, w, 6, style=2, one_way=True)
 
 
-def enemy(name, scene, x, y, patrol=40.0, facing=-1):
+def enemy(name, scene, x, y, patrol=40.0, facing=-1, spawn_id=""):
     node(f'''
 [node name="{name}" type="Marker2D" parent="."]
 position = Vector2({x}, {y})
 script = ExtResource("spawner")
 enemy_scene = ExtResource("{scene}")
 patrol_distance = {patrol}
-start_facing = {facing}''')
+start_facing = {facing}''' + (f'\nspawn_id = &"{spawn_id}"' if spawn_id else ""))
+
+
+def chest(name, x, y, cid, item=None, count=1, embers=0):
+    node(f'''
+[node name="{name}" type="Area2D" parent="."]
+position = Vector2({x}, {y})
+script = ExtResource("chest")
+chest_id = &"{cid}"
+count = {count}
+embers = {embers}''' + (f'\nitem = ExtResource("{item}")' if item else ""))
 
 
 def candle(name, x, y, cid, title):
@@ -240,6 +254,13 @@ initial_velocity_min = 0.0
 initial_velocity_max = 10.0
 color = Color(0.6, 0.8, 0.85, 0.5)
 z_index = 5''')
+
+# New enemy types
+enemy("OathguardStair", "oathguard", 380, 240, 40.0)
+enemy("MothNaveA", "moth", 1560, 570, 60.0)
+enemy("MothNaveB", "moth", 2060, 500, 50.0)
+chest("AlcoveChest", 2262, 660, "catacombs_alcove_chest", item="it_tonic", count=1, embers=300)
+enemy("MimicNave", "mimic", 1290, 660, 0.0, 1, spawn_id="catacombs_nave_mimic")
 
 header = f'[gd_scene load_steps={len(ext) + 1} format=3]\n\n'
 header += "\n".join(f'[ext_resource type="{t}" path="{p}" id="{i}"]' for t, p, i in ext)

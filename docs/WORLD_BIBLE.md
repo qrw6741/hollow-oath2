@@ -40,6 +40,9 @@ The test arena, **The Penitent's Yard [in game]**, is the churchyard at the edge
 ## Enemies
 - **Ember Acolyte [in game]** — Candlewright novices still tending censers of a liturgy no one hears; the burning wax they fling was meant to seal oaths.
 - **Bell-Bearer [in game]** — penitents who hauled the village bells to the chapel on the Night of Unbinding and never set them down.
+- **Gloam Moth [in game]** — moths that drank from the candles after the Unbinding; they circle anything that burns and dive at it.
+- **Oathguard [in game]** — sworn shields of the Vaelmoor road. Their oath was to hold the line; no one told them the line was gone.
+- **Mimic [in game]** — a strongbox that learned to wait. It breathes; real chests do not.
 
 ## Bosses
 - **The Bell-Warden [in game]** — the churchyard's bell-ringer, who swore first and loudest on the Night of Unbinding. He still keeps the yard and wears the cracked Yard Bell as a helm so that nothing else will ever ring it; he fights with its iron clapper. Intro boss at the end of the Penitent's Yard. Drops the **Warden's Bell Shard [in game]**.

@@ -74,6 +74,8 @@ func _run() -> void:
 		test_remapping,
 		test_difficulty_options,
 		test_settings_tabs,
+		# --- new enemies ---
+		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -2122,4 +2124,166 @@ func test_settings_tabs() -> void:
 	await tap_action(&"parry")
 	check(panel.page == 1, "L1 / Parry goes back")
 	panel.queue_free()
+	await frames(2)
+
+
+func spawn_scene(path: String, pos: Vector2, facing := -1, patrol := 0.0) -> EnemyBase:
+	var e: EnemyBase = load(path).instantiate()
+	e.position = pos
+	e.start_facing = facing
+	e.patrol_distance = patrol
+	level.add_child(e)
+	await frames(3)
+	return e
+
+
+func test_flying_enemy() -> void:
+	await fresh_game()
+	for x in enemies():
+		x.queue_free()
+	await place_player(300.0, 480.0, 1)
+	var m: FlyingEnemy = await spawn_scene("res://actors/enemies/gloam_moth.tscn", Vector2(700, 400))
+	await frames(60)
+	check(absf(m.global_position.y - 400.0) < 12.0, "hovers at its home without falling (y %.0f)" % m.global_position.y)
+	await place_player(640.0, 480.0, 1)
+	var dove := false
+	var lowest := 0.0
+	for i in 400:
+		await get_tree().physics_frame
+		if m.state == EnemyBase.State.ATTACK and m.attack_runner.phase == AttackRunner.Phase.ACTIVE:
+			dove = true
+		if dove:
+			lowest = maxf(lowest, m.global_position.y)
+		if dove and m.state == EnemyBase.State.RECOVER:
+			break
+	check(dove, "spots the player, hovers above and dives")
+	check(lowest > 455.0, "the dive comes down to the player (lowest y %.0f)" % lowest)
+	check(m.state == EnemyBase.State.RECOVER and m.global_position.y > 440.0, "hangs low and dazed after the dive (y %.0f)" % m.global_position.y)
+	check(player.health.current < player.health.max_health, "the dive hit a player who stood still")
+	# Parry the next dive: it drops to the ground and can be riposted.
+	player.health.restore_full()
+	m._cooldown = 0
+	var parried := false
+	for i in 500:
+		await get_tree().physics_frame
+		var r := m.attack_runner
+		if m.state == EnemyBase.State.ATTACK and r.phase == AttackRunner.Phase.ACTIVE and (m.global_position - player.global_position).length() < 44.0 and player.state == Player.State.FREE:
+			player.facing = 1 if m.global_position.x > player.global_position.x else -1
+			await press(&"parry", 1)
+		if m.state == EnemyBase.State.PARRIED:
+			parried = true
+			break
+	check(parried, "the dive can be parried")
+	await frames(30)
+	check(m.global_position.y > 470.0, "parried moth falls to the ground (y %.0f)" % m.global_position.y)
+	check(player.find_riposte_target() == m, "and is open to a riposte")
+	m.queue_free()
+	await frames(2)
+
+
+func test_shield_enemy() -> void:
+	await fresh_game()
+	for x in enemies():
+		x.queue_free()
+	await place_player(400.0, 480.0, 1)
+	var g: ShieldEnemy = await spawn_scene("res://actors/enemies/oathguard.tscn", Vector2(440, 480), -1)
+	g._set_state(EnemyBase.State.IDLE)   # cancel any opening swing (it would reset the cooldown)
+	g._cooldown = 100000
+	await frames(10)
+	var hp := g.health.current
+	var light := HitData.make(12.0, player, Vector2(60, 0))
+	light.poise_damage = 10.0
+	check(g.receive_hit(light) == HitData.Result.BLOCKED and g.health.current == hp, "a frontal hit is blocked, no damage")
+	check(g.guard < g.max_guard, "blocking drains guard (%.0f)" % g.guard)
+	# The player's real swing bounces off.
+	g.guard = g.max_guard
+	g.facing = -1
+	await press(&"attack_light")
+	await frames(20)
+	check(g.health.current == hp and g.guard < g.max_guard, "player's light attack is blocked (guard %.0f)" % g.guard)
+	# Heavy hits break the guard -> riposte window.
+	g.facing = -1
+	g.guard = g.max_guard
+	var heavy := HitData.make(32.0, player, Vector2(60, 0))
+	heavy.poise_damage = 45.0
+	check(g.receive_hit(heavy) == HitData.Result.BLOCKED, "one heavy is still blocked")
+	var r: int = g.receive_hit(heavy)
+	check(r == HitData.Result.HIT and g.state == EnemyBase.State.PARRIED and g.guard_breaks == 1, "two heavy hits break the guard")
+	await frames(6)
+	check(g.is_riposte_ready(), "guard break opens a riposte")
+	await frames(130)
+	# From behind it takes full damage.
+	g.facing = 1
+	g._set_state(EnemyBase.State.IDLE)
+	hp = g.health.current
+	check(g.receive_hit(light) == HitData.Result.HIT and g.health.current < hp, "hits from behind land")
+	# It turns slowly.
+	g._cooldown = 100000
+	g.target = player
+	g.facing = 1
+	g._set_state(EnemyBase.State.CHASE)
+	await frames(8)
+	check(g.facing == 1, "still facing away a few frames later")
+	await frames(30)
+	check(g.facing == -1, "then turns to face the player")
+	g.queue_free()
+	await frames(2)
+
+
+func test_mimic_and_chest() -> void:
+	await fresh_game()
+	for x in enemies():
+		x.queue_free()
+	# A real chest.
+	var chest := TreasureChest.new()
+	chest.item = load("res://data/items/ash_bandage.tres")
+	chest.count = 2
+	chest.embers = 50
+	chest.chest_id = &"test_chest"
+	chest.position = Vector2(500, 480)
+	level.add_child(chest)
+	var band: int = game_state.item_count(&"ash_bandage")
+	var emb: int = game_state.embers
+	await place_player(500.0)
+	await press(&"interact")
+	await frames(5)
+	check(chest.opened and game_state.item_count(&"ash_bandage") == band + 2 and game_state.embers == emb + 50, "opening a chest gives its contents")
+	check(game_state.get_flag(&"chest_open_test_chest"), "and it stays open (flag)")
+	chest.queue_free()
+	# A mimic: opening it springs an ambush.
+	var sp := EnemySpawner.new()
+	sp.enemy_scene = load("res://actors/enemies/mimic.tscn")
+	sp.spawn_id = &"test_mimic"
+	sp.patrol_distance = 0.0
+	sp.position = Vector2(700, 480)
+	level.add_child(sp)
+	await frames(4)
+	var m := sp.enemy as Mimic
+	check(m and m.dormant and m.spawn_id == &"test_mimic", "mimic waits, dormant")
+	await place_player(690.0, 480.0, 1)
+	player.health.restore_full()
+	await frames(60)
+	check(m.dormant, "it does not wake by itself")
+	await press(&"interact")
+	await frames(2)
+	check(not m.dormant and m.state == EnemyBase.State.ATTACK and m.attack_runner.attack.id == &"mimic_ambush", "trying to open it springs the ambush")
+	await frames(30)
+	check(player.health.current < player.health.max_health, "the ambush bites")
+	m.receive_hit(HitData.make(5000.0, player))
+	await frames(5)
+	check(m.is_dead() and game_state.get_flag(&"mimic_slain_test_mimic"), "slain mimic is remembered")
+	await frames(100)
+	sp.spawn()
+	await frames(4)
+	check(not is_instance_valid(sp.enemy) or sp.enemy.is_queued_for_deletion(), "a slain mimic does not come back")
+	# Striking a dormant mimic first: critical stagger.
+	sp.spawn_id = &"test_mimic_2"
+	sp.spawn()
+	await frames(4)
+	var m2 := sp.enemy as Mimic
+	var h := HitData.make(10.0, player)
+	m2.receive_hit(h)
+	check(not m2.dormant and m2.state == EnemyBase.State.STAGGER, "hitting it first wakes it staggered")
+	m2.queue_free()
+	sp.queue_free()
 	await frames(2)

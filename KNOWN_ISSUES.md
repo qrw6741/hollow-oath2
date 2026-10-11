@@ -19,6 +19,11 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## New enemies
+- Moth, Oathguard and Mimic balance is untested by a human. Moth dive parry timing is at contact (later than the glint), unlike ground enemies.
+- Flying enemies do not path around walls; they slide along them. A parried moth over water/the drowned shaft falls in (it does not drown; it lies on the bottom).
+- The mimic's tell (breath of ash) is small at 1080p in a dark area; may need to be stronger.
+
 ## Remapping / difficulty
 - L2 / R2 (analog triggers) cannot be bound yet; only digital buttons are accepted on the controller column.
 - Esc always cancels listening, so Esc cannot be assigned through the menu (it is Pause by default; *Reset controls* restores it).

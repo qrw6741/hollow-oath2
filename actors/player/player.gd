@@ -488,6 +488,11 @@ func _on_attack_hit(_target: Hurtbox, result: int, hit: HitData) -> void:
 	if result == HitData.Result.HIT:
 		GameFeel.hit_stop(hit.hit_stop)
 		GameFeel.shake(hit.shake)
+	elif result == HitData.Result.BLOCKED:
+		# Bounced off a shield: small recoil, the swing loses its forward lunge.
+		velocity.x = -facing * 110.0
+		GameFeel.shake(1.5, 0.1)
+		InputPrompts.rumble(0.3, 0.0, 0.08)
 
 
 ## Returns a parried enemy within riposte reach in front of the player, if any.

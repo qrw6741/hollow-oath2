@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
@@ -8,6 +8,10 @@
 [ext_resource type="PackedScene" path="res://actors/enemies/hollow_penitent.tscn" id="penitent"]
 [ext_resource type="PackedScene" path="res://actors/enemies/ember_acolyte.tscn" id="acolyte"]
 [ext_resource type="PackedScene" path="res://actors/enemies/bell_bearer.tscn" id="bearer"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gloam_moth.tscn" id="moth"]
+[ext_resource type="PackedScene" path="res://actors/enemies/oathguard.tscn" id="oathguard"]
+[ext_resource type="PackedScene" path="res://actors/enemies/mimic.tscn" id="mimic"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
 [ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
 [ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
 [ext_resource type="Script" path="res://world/pickups/item_pickup.gd" id="pickup"]
@@ -391,3 +395,40 @@ initial_velocity_min = 4.0
 initial_velocity_max = 12.0
 color = Color(0.62, 0.64, 0.7, 0.45)
 z_index = 5
+
+[node name="MothRoofs" type="Marker2D" parent="."]
+position = Vector2(1150, 262)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 60.0
+start_facing = -1
+
+[node name="MothSquare" type="Marker2D" parent="."]
+position = Vector2(1820, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 70.0
+start_facing = -1
+
+[node name="OathguardSquare" type="Marker2D" parent="."]
+position = Vector2(1680, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("oathguard")
+patrol_distance = 40.0
+start_facing = -1
+
+[node name="CorridorChest" type="Area2D" parent="."]
+position = Vector2(1360, 480)
+script = ExtResource("chest")
+chest_id = &"village_corridor_chest"
+count = 2
+embers = 120
+item = ExtResource("it_band")
+
+[node name="MimicLedge" type="Marker2D" parent="."]
+position = Vector2(1590, 420)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("mimic")
+patrol_distance = 0.0
+start_facing = 1
+spawn_id = &"village_ledge_mimic"

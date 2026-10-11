@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/mimic_bite.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/mimic_pounce.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/attacks/mimic_ambush.tres" id="a2"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="drop"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"mimic"
+display_name = "Mimic"
+lore = "A strongbox that learned to wait. Greed is the bait it never runs out of."
+max_health = 210.0
+max_poise = 70.0
+poise_regen_delay_frames = 90
+poise_regen_per_second = 30.0
+patrol_speed = 0.0
+chase_speed = 62.0
+detection_range = 200.0
+vertical_detection = 60.0
+leash_range = 320.0
+attacks = [ExtResource("a0"), ExtResource("a1"), ExtResource("a2")]
+attack_cooldown_min = 40
+attack_cooldown_max = 80
+recover_frames = 30
+backstep_speed = 40.0
+stagger_frames = 50
+parry_stagger_frames = 110
+ember_reward = 400
+drop_item = ExtResource("drop")
+drop_chance = 1.0
+drop_count = 3

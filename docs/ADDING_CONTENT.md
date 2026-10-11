@@ -23,6 +23,11 @@
 2. Duplicate `hollow_penitent.tscn`, swap the root script and the `Visual` node.
 3. Keep the child names `Health`, `Hurtbox`, `Hitbox`, `AttackRunner` — EnemyBase looks them up.
 
+## Flying, shielded and mimic enemies
+- **FlyingEnemy** (`actors/enemies/flying_enemy.gd`, e.g. `gloam_moth.tscn`): gravity is off except when staggered / parried / dead. Place its spawner in the air (that point is its home). Tune `hover_height`, `hover_side`, `dive_speed`; the dive attack's `active_frames` is the dive length.
+- **ShieldEnemy** (`oathguard.tscn`): frontal hits while not mid-swing are BLOCKED and drain `max_guard` (poise_damage x0.8 + damage x0.6). Guard 0 = guard break (riposte window). `turn_delay` sets how slowly it turns.
+- **Mimic** (`mimic.tscn`): give its spawner a unique `spawn_id` (saved "slain" flag). Real chests are `world/pickups/treasure_chest.gd` (`chest_id`, `item`, `count`, `embers`). Generators have `chest(...)` and `enemy(..., spawn_id=...)` helpers.
+
 ## A new preset (starting loadout)
 1. Create attack `.tres` files in `data/attacks/` and a weapon in `data/weapons/` (or reuse an existing weapon).
 2. Duplicate a file in `data/presets/`, set id, text, stats, `weapon`, colours, `armor_look` and `weapon_look`. Use `PackedStringArray("a", "b")` (no brackets) for `perks`/`drawbacks`.

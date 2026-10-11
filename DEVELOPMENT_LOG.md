@@ -28,6 +28,19 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-12 — New enemies: Gloam Moth, Oathguard, Mimic (+ treasure chests)
+
+- **Gloam Moth** (flying): hovers above and beside you, rears back with an eye glint, then dives in a straight line; after a dive it hangs dazed low — the time to hit it. Parried, it drops to the ground for a riposte. Village roofs / square, flooded nave.
+- **Oathguard** (shielded): its tower shield blocks frontal hits while it is not swinging (your blade bounces back). Each blocked hit cracks the shield; heavy attacks drain guard much faster. Guard break = riposte window. Turns slowly, so rolling behind it works. Village square, catacomb stair.
+- **Mimic**: looks exactly like a chest and offers "Open chest"; opening it springs an unparryable bite. The tell: it breathes ash every few seconds. Hit it first and it wakes staggered. Stays dead once killed; drops 3 ember shards and 400 embers. Village square ledge, start of the flooded nave.
+- **Treasure chests** (real ones, so the mimic is a real question): village corridor (2 bandages + 120 embers), catacomb alcove (tonic + 300 embers).
+- Engine: `HitData.Result.BLOCKED`; player recoils on a blocked swing. EnemySpawner `spawn_id`.
+
+### Verified
+- **Automated suite** — see the entry's final count in README; new tests: moth hover/dive/hit/daze/parry/fall/riposte, Oathguard block/drain/player-swing-blocked/guard-break/backstab/slow-turn, chest contents + flag, mimic dormant/ambush/bite/slain-flag/no-respawn/hit-first stagger.
+- Rendered captures (`tests/capture_enemies.tscn`) reviewed.
+- Not verified by a human: difficulty and fairness of the three enemies.
+
 ## 2026-10-12 — Fast travel, button remapping, difficulty & accessibility
 
 - **Fast travel**: resting at a candle offers *Travel*, listing every lit candle grouped by area (lit candles were already on the map). Travelling makes that candle your respawn point and moves you there through the usual fade.

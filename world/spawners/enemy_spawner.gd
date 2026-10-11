@@ -9,6 +9,8 @@ extends Marker2D
 @export var data_override: EnemyData
 @export var patrol_distance := 56.0
 @export_enum("Left:-1", "Right:1") var start_facing := -1
+## Passed to enemies that keep a saved per-instance flag (e.g. a slain Mimic).
+@export var spawn_id: StringName = &""
 
 var enemy: EnemyBase
 
@@ -31,6 +33,8 @@ func spawn() -> void:
 	enemy.patrol_distance = patrol_distance
 	enemy.start_facing = start_facing
 	enemy.position = position
+	if spawn_id != &"" and &"spawn_id" in enemy:
+		enemy.set(&"spawn_id", spawn_id)
 	get_parent().add_child(enemy)
 
 

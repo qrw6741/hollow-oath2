@@ -2,7 +2,8 @@ class_name HitData
 extends RefCounted
 ## One instance of damage being delivered to a Hurtbox.
 
-enum Result { HIT, IGNORED, PARRIED }
+## BLOCKED: stopped by a shield (no damage; the attacker recoils).
+enum Result { HIT, IGNORED, PARRIED, BLOCKED }
 
 var damage := 0.0
 var poise_damage := 0.0

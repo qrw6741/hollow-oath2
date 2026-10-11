@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/oathguard_bash.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/oathguard_thrust.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="drop"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"oathguard"
+display_name = "Oathguard"
+lore = "Sworn shields of the Vaelmoor road. Their oath was to hold the line; no one told them the line was gone."
+max_health = 130.0
+max_poise = 90.0
+poise_regen_delay_frames = 90
+poise_regen_per_second = 30.0
+patrol_speed = 24.0
+chase_speed = 52.0
+detection_range = 170.0
+vertical_detection = 60.0
+leash_range = 320.0
+attacks = [ExtResource("a0"), ExtResource("a1")]
+attack_cooldown_min = 40
+attack_cooldown_max = 80
+recover_frames = 26
+backstep_speed = 50.0
+stagger_frames = 50
+parry_stagger_frames = 110
+ember_reward = 140
+drop_item = ExtResource("drop")
+drop_chance = 0.2
+drop_count = 1

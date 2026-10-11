@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/moth_dive.tres" id="a0"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"gloam_moth"
+display_name = "Gloam Moth"
+lore = "Moths that drank from the candles after the Unbinding. They still circle anything that burns."
+max_health = 40.0
+max_poise = 20.0
+poise_regen_delay_frames = 90
+poise_regen_per_second = 30.0
+patrol_speed = 30.0
+chase_speed = 85.0
+detection_range = 170.0
+vertical_detection = 150.0
+leash_range = 320.0
+attacks = [ExtResource("a0")]
+attack_cooldown_min = 50
+attack_cooldown_max = 110
+recover_frames = 46
+backstep_speed = 0.0
+stagger_frames = 40
+parry_stagger_frames = 110
+ember_reward = 35
