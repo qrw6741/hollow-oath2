@@ -28,6 +28,23 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-12 — Gear: new weapons, armour you can take off, upgrade stations
+
+- **Equipment is now a saved layer** (`Loadout`, `GameState.weapons/armors/weapon_id/armor_id/flask_level`): you own weapons and armours, each with an upgrade level (+0..+5), and you equip one of each. The preset still decides vitals, handling and the starting gear; armour now decides damage taken, run speed and dodge cost. The four starting armours mirror their presets exactly (a test checks it), so nothing about existing characters changed.
+- **Take armour off and put it on** (Equipment tab -> select the Armour slot -> "Take off all armour" or pick a piece). Naked: take 135% damage, run 12% faster, drawn without armour. Same picker swaps weapons. Works anywhere you can open the pack.
+- **5 new weapons** (data in data/weapons + data/attacks, made by tools/gen_gear.py; each drawn on the character with its own thrust/swing poses): Wayfarer's Rapier (fast thrusts, long lunge, big riposte), Kingsfall Greatsword (slow, huge, heavy poise damage), Toll Hammer (poise breaker), Marshal's Lance (longest reach, thrusts), Tide-Sabre (4-hit wave combo).
+- **4 new armours**: Pilgrim's Coat, Penitent's Shroud (light), Drowned Canon's Mail (medium), Marshal's Plate (heavy, +4 dodge cost). Armour upgrades take 3% off the damage taken per level (-15% at +5).
+- **Blacksmith Hobb** (Vaelmoor, Awake and the Road's Pilgrim's Rest): upgrades weapons and armour (embers + Forge Scrap) and forges new gear. The great pieces need a relic you carry - Bell Warden's shard (hammer), Marshal's Crest (lance, plate), Canon's Seal (sabre, mail), Penitent's Tear (shroud) - shown to Hobb, never consumed. Greatsword, rapier, coat need only embers + scrap.
+- **Sister Ilse, the Vial-Keeper** (same two places): upgrades the Ember Vials (embers + Hollow Resin): +6 healing per level, one extra vial at +2 and another at +5.
+- **Materials**: Forge Scrap and Hollow Resin. Every enemy now has a second drop roll for them (scrap from armed/armoured foes, resin from the flying and the ember-touched; mimics and all bosses guarantee scrap). Wenna sells both as a fallback (110 / 170 embers).
+- **UI**: `ForgeMenu` (both stations, tabs WEAPONS / ARMOUR, shows the exact gain before you pay), Equipment tab pickers; the character preview and the in-game character draw whatever you wear and wield.
+- Save format: additive fields (version stays 1; old saves load with their preset's loadout). Hostile values in a save are clamped/dropped and a broken loadout repairs itself.
+
+### Verified
+- Automated suite, including 8 new tests (gear data and icons, equip/take-off numbers on the live player, forge rules and costs, save round-trip + legacy + hostile saves, both menus driven by presses, equip pickers, every new weapon landing hits and finishing its swing, the smiths' placement and talk -> station flow).
+- Rendered captures (tests/capture_gear.tscn): the smiths on the road, both station menus, equipment screen with pickers, every new weapon mid-swing - reviewed.
+- Not verified: balance (damage, costs and drop rates are my guesses; nobody has played the new weapons), feel of thrust weapons, whether the material economy is generous enough, Windows launch.
+
 ## 2026-10-12 — After the prologue: the Vaelmoor Road, NPCs, shop, Sir Orren
 
 - **The Vaelmoor Road** (new level, daylight, ~3600 px): Pilgrim's Rest (arrival, Wenna's stall, Wayside Candle), the Crow Fields (rise, chest, pikemen, crows), the Ford (wading, an Oathguard in the water, broken bridge planks), the Marshal's Camp (Camp Candle, a Mimic on the bank, pikemen, an Oathguard at the gate) and the Crossroads (boss). Reached from the east edge of Vaelmoor, Awake (the sealed gate is gone); the road's west edge leads back. On the world map; both candles are fast-travel destinations. The road to the Citadel is sealed ("next build").

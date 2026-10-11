@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
 [ext_resource type="Resource" path="res://data/attacks/acolyte_throw.tres" id="2_throw"]
 [ext_resource type="Resource" path="res://data/attacks/acolyte_swipe.tres" id="3_swipe"]
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="4_band"]
+[ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="bonus"]
 
 [resource]
 script = ExtResource("1_enemy")
@@ -28,3 +29,6 @@ ember_reward = 60
 drop_item = ExtResource("4_band")
 drop_chance = 0.15
 drop_count = 1
+bonus_drop_item = ExtResource("bonus")
+bonus_drop_chance = 0.25
+bonus_drop_count = 1

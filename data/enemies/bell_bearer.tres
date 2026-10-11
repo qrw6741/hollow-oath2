@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
 [ext_resource type="Resource" path="res://data/attacks/bearer_slam.tres" id="2_slam"]
 [ext_resource type="Resource" path="res://data/attacks/bearer_swing.tres" id="3_swing"]
 [ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="4_shard"]
+[ext_resource type="Resource" path="res://data/items/forge_scrap.tres" id="bonus"]
 
 [resource]
 script = ExtResource("1_enemy")
@@ -30,3 +31,6 @@ ember_reward = 220
 drop_item = ExtResource("4_shard")
 drop_chance = 0.25
 drop_count = 1
+bonus_drop_item = ExtResource("bonus")
+bonus_drop_chance = 0.3
+bonus_drop_count = 1

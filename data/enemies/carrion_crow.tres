@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
 [ext_resource type="Resource" path="res://data/attacks/crow_dive.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="bonus"]
 
 [resource]
 script = ExtResource("1_enemy")
@@ -25,3 +26,6 @@ backstep_speed = 0.0
 stagger_frames = 30
 parry_stagger_frames = 100
 ember_reward = 30
+bonus_drop_item = ExtResource("bonus")
+bonus_drop_chance = 0.25
+bonus_drop_count = 1

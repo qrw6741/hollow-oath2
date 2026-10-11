@@ -52,6 +52,27 @@ const WENNA_GREETINGS := [
 	"Business is slow. The dead are poor customers.",
 ]
 
+const HOBB_FIRST := [
+	"Mind the sparks. Hobb. I was a farrier, then a smith for the garrison, and now I'm a smith for whoever is still walking.",
+	"Bring me Forge Scrap - anything broken and iron, the hollow knights drop plenty - and embers for the coal, and I'll make your steel better. Blade, plate, anything.",
+	"Bring me a relic of something great that you've killed, and I'll make something new from it. I only need to see it. I'd never take a thing like that from you.",
+]
+const HOBB_GREETINGS := [
+	"Fire's hot. Make it count.",
+	"Steel remembers every hand that held it. Treat it kindly and it'll give you more.",
+	"A good edge won't save a bad swing. But it helps.",
+	"Armour doesn't make you brave. It makes you stay in the fight a little longer.",
+]
+const ILSE_FIRST := [
+	"Peace, traveller. I am Sister Ilse. I keep the vials.",
+	"The Ember Vials are older than the Night - the Candlewrights taught us to bottle the last warmth of a fire. They keep faith better than we did.",
+	"Bring me Hollow Resin and embers, and I will teach your vials to hold more, and to give more. Do not ask how the resin is gathered. It does not hurt anyone who is still alive.",
+]
+const ILSE_GREETINGS := [
+	"May your vials never run dry.",
+	"A little warmth is enough. It always was.",
+	"The Resin grows brighter when the candles are lit. I like to think they are talking.",
+]
 
 ## What the prompt calls them: the stranger gives his name on the third talk.
 static func display_name(npc: StringName, fallback: String) -> String:
@@ -82,6 +103,10 @@ static func conversation(npc: StringName) -> Dictionary:
 		&"wenna":
 			var lines2: Array = WENNA_FIRST if n == 0 else [WENNA_GREETINGS[(n - 1) % WENNA_GREETINGS.size()]]
 			return {"speaker": "Wenna", "lines": lines2}
+		&"hobb":
+			return {"speaker": "Hobb", "lines": HOBB_FIRST if n == 0 else [HOBB_GREETINGS[(n - 1) % HOBB_GREETINGS.size()]]}
+		&"ilse":
+			return {"speaker": "Sister Ilse", "lines": ILSE_FIRST if n == 0 else [ILSE_GREETINGS[(n - 1) % ILSE_GREETINGS.size()]]}
 	return {"speaker": "...", "lines": ["..."]}
 
 

@@ -60,3 +60,7 @@ The test arena, **The Penitent's Yard [in game]**, is the churchyard at the edge
 ## Items written so far
 - **Candlewright's Note [in game]** — 'On the night, the liturgy is to be read from its last line to its first. The sworn will not notice. The Crown must not.' (first hint at mystery 1)
 - **Oathblade [in game]** — "A plain straight sword issued to every sworn knight of the old kingdom. The engraving on its fuller has been scratched away by its last owner."
+
+## Hobb, the Blacksmith and Sister Ilse, the Vial-Keeper
+Two more of the road's survivors, each at both the edge of Vaelmoor and Pilgrim's Rest. **Hobb** was a farrier, then the garrison's smith; he works for whoever is still walking, asks only for scrap iron and coal-money, and will make something new from the relic of anything great you have killed - he only needs to *see* it. **Sister Ilse** keeps the Ember Vials, taught by the Candlewrights to bottle the last warmth of a fire; she strengthens them with Hollow Resin, the amber sap that weeps from things that should be dead.
+

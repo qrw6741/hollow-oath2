@@ -55,6 +55,11 @@ signal dialogue_requested(speaker: String, lines: Array)
 signal dialogue_closed
 signal shop_requested(shop_id: StringName)
 signal shop_closed
+## Equipment changed (equip, upgrade, forge, vial upgrade): the player recomputes its numbers.
+signal loadout_changed
+## A smithing station opens: &"forge" (Blacksmith) or &"vials" (Vial-Keeper).
+signal station_requested(kind: StringName)
+signal station_closed
 
 # --- Interaction / UI ---
 signal interact_prompt_shown(text: String)

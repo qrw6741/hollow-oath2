@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/weapon_data.gd" id="1_weapon"]
+[ext_resource type="Resource" path="res://data/attacks/sabre_1.tres" id="2_a"]
+[ext_resource type="Resource" path="res://data/attacks/sabre_heavy.tres" id="3_a"]
+[ext_resource type="Resource" path="res://data/attacks/sabre_air.tres" id="4_a"]
+[ext_resource type="Resource" path="res://data/attacks/sabre_riposte.tres" id="5_a"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = &"tide_sabre"
+display_name = "Tide-Sabre"
+description = "The Drowned Canon's curved blade, still wet. It strikes in long, quick waves, one after another, and each wave is a little harder than the last."
+light_combo_start = ExtResource("2_a")
+heavy = ExtResource("3_a")
+aerial = ExtResource("4_a")
+riposte = ExtResource("5_a")
+riposte_multiplier = 1.1
+look = 8
+two_handed = false

@@ -56,11 +56,17 @@ attack("mimic_bite","Mimic — Bite","bite",18,5,10,22,(100,-60),True,(30,24),(1
 attack("mimic_ambush","Mimic — Ambush","bite",12,6,34,30,(160,-120),False,(36,28),(16,-12),track=False,amin=0,amax=0,w=0.0,hs=0.1,shake=5.0)
 attack("mimic_pounce","Mimic — Pounce","pounce",30,10,36,30,(150,-90),False,(30,26),(14,-12),lunge=210,lstart=28,lframes=12,amin=50,amax=120,w=0.8,hs=0.1,shake=5.0)
 
+# Crafting materials (see systems/forge.gd): id -> (item, chance, count). Older enemies are patched in their .tres.
+BONUS={'gloam_moth':('hollow_resin',0.25,1),'oathguard':('forge_scrap',0.30,1),'mimic':('forge_scrap',1.0,3),
+ 'carrion_crow':('hollow_resin',0.25,1),'roadside_pikeman':('forge_scrap',0.30,1),'hollow_marshal':('forge_scrap',1.0,6)}
+
 def enemy(id_, name, lore, atks, hp, poise, patrol, chase, det, vdet, cdmin, cdmax, recover, backstep, stagger, pstag, embers, drop=None, dchance=0.0, dcount=1, leash=320):
     ext=['[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]']
     for i,a in enumerate(atks):
         ext.append(f'[ext_resource type="Resource" path="res://data/attacks/{a}.tres" id="a{i}"]')
     if drop: ext.append(f'[ext_resource type="Resource" path="res://data/items/{drop}.tres" id="drop"]')
+    bonus=BONUS.get(id_)
+    if bonus: ext.append(f'[ext_resource type="Resource" path="res://data/items/{bonus[0]}.tres" id="bonus"]')
     arr=", ".join(f'ExtResource("a{i}")' for i in range(len(atks)))
     s=f'''[gd_resource type="Resource" script_class="EnemyData" load_steps={len(ext)+1} format=3]
 
@@ -88,7 +94,7 @@ backstep_speed = {backstep:.1f}
 stagger_frames = {stagger}
 parry_stagger_frames = {pstag}
 ember_reward = {embers}
-''' + (f'drop_item = ExtResource("drop")\ndrop_chance = {dchance}\ndrop_count = {dcount}\n' if drop else "")
+''' + (f'drop_item = ExtResource("drop")\ndrop_chance = {dchance}\ndrop_count = {dcount}\n' if drop else "") + (f'bonus_drop_item = ExtResource("bonus")\nbonus_drop_chance = {bonus[1]}\nbonus_drop_count = {bonus[2]}\n' if bonus else "")
     open(f"{R}/data/enemies/{id_}.tres","w").write(s)
 
 enemy("gloam_moth","Gloam Moth","Moths that drank from the candles after the Unbinding. They still circle anything that burns.",["moth_dive"],40,20,30,85,170,150,50,110,46,0,40,110,35)

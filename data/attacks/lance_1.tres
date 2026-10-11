@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+[ext_resource type="Resource" path="res://data/attacks/lance_2.tres" id="2_next"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"lance_1"
+display_name = "Lance — Thrust"
+animation = &"thrust"
+startup_frames = 9
+active_frames = 4
+recovery_frames = 16
+chain_open_frame = 5
+dodge_cancel_frame = 5
+damage = 14.0
+poise_damage = 12.0
+stamina_cost = 12.0
+knockback = Vector2(50, -10)
+hitbox_size = Vector2(48, 14)
+hitbox_offset = Vector2(35, -14)
+lunge_speed = 60.0
+lunge_start_frame = 6
+lunge_frames = 4
+hit_stop = 0.05
+shake = 1.5
+next_in_combo = ExtResource("2_next")

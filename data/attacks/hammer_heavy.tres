@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"hammer_heavy"
+display_name = "Hammer — Knell"
+animation = &"heavy"
+startup_frames = 26
+active_frames = 6
+recovery_frames = 32
+chain_open_frame = -1
+dodge_cancel_frame = 17
+damage = 48.0
+poise_damage = 130.0
+stamina_cost = 30.0
+knockback = Vector2(200, -100)
+hitbox_size = Vector2(46, 38)
+hitbox_offset = Vector2(24, -16)
+lunge_speed = 100.0
+lunge_start_frame = 19
+lunge_frames = 6
+hit_stop = 0.15
+shake = 6.5

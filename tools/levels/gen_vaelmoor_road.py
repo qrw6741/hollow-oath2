@@ -104,7 +104,7 @@ count = {count}
 embers = {embers}''' + (f'\nitem = ExtResource("{item}")' if item else ""))
 
 
-def npc(name, x, y, nid, title, look, shop="", facing=-1):
+def npc(name, x, y, nid, title, look, shop="", facing=-1, station=""):
     node(f'''
 [node name="{name}" type="Area2D" parent="."]
 position = Vector2({x}, {y})
@@ -112,7 +112,7 @@ script = ExtResource("npc")
 npc_id = &"{nid}"
 display_name = "{title}"
 look = {look}
-start_facing = {facing}''' + (f'\nshop_id = &"{shop}"' if shop else ""))
+start_facing = {facing}''' + (f'\nshop_id = &"{shop}"' if shop else "") + (f'\nstation = &"{station}"' if station else ""))
 
 
 def water(name, x, y, w, h):
@@ -233,7 +233,9 @@ candle("WaysideCandle", 520, 480, "wayside_candle", "Wayside Candle")
 candle("CampCandle", 2090, 480, "marshals_camp_candle", "Marshal's Camp Candle")
 
 # NPCs
+npc("Hobb", 215, 480, "hobb", "Hobb", 2, station="forge", facing=1)
 npc("Wenna", 360, 480, "wenna", "Wenna", 0, shop="pedlar", facing=-1)
+npc("Ilse", 440, 480, "ilse", "Sister Ilse", 3, station="vials", facing=-1)
 npc("OmmenWayside", 600, 480, "ommen", "Hooded Figure", 1, facing=-1)
 npc("OmmenCamp", 2170, 480, "ommen", "Hooded Figure", 1, facing=-1)
 

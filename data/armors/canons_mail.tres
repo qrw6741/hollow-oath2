@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"canons_mail"
+display_name = "Drowned Canon's Mail"
+description = "Ring mail from the flooded cloister, rusted but whole. Water still runs from it when you stand still."
+look = 2
+damage_taken_mult = 0.86
+run_speed_mult = 0.95
+dodge_stamina_add = 1.0
+cloth_color = Color(0.180, 0.227, 0.235, 1)
+cloth_light_color = Color(0.278, 0.353, 0.361, 1)
+accent_color = Color(0.373, 0.639, 0.627, 1)

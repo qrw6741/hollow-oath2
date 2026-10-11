@@ -140,6 +140,24 @@ display_name = "Hooded Figure"
 look = 1
 start_facing = -1
 
+[node name="Hobb" type="Area2D" parent="."]
+position = Vector2(860, 480)
+script = ExtResource("npc")
+npc_id = &"hobb"
+display_name = "Hobb"
+look = 2
+station = &"forge"
+start_facing = -1
+
+[node name="Ilse" type="Area2D" parent="."]
+position = Vector2(1000, 480)
+script = ExtResource("npc")
+npc_id = &"ilse"
+display_name = "Sister Ilse"
+look = 3
+station = &"vials"
+start_facing = -1
+
 [node name="PrologueEnd" type="Node" parent="."]
 script = ExtResource("prologue")
 

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"greatsword_2"
+display_name = "Greatsword — Return Swing"
+animation = &"slash_rev"
+startup_frames = 11
+active_frames = 5
+recovery_frames = 24
+chain_open_frame = -1
+dodge_cancel_frame = 10
+damage = 28.0
+poise_damage = 36.0
+stamina_cost = 22.0
+knockback = Vector2(170, -60)
+hitbox_size = Vector2(56, 30)
+hitbox_offset = Vector2(30, -15)
+lunge_speed = 60.0
+lunge_start_frame = 8
+lunge_frames = 5
+hit_stop = 0.1
+shake = 4.0

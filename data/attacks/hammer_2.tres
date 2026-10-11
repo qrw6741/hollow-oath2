@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"hammer_2"
+display_name = "Hammer — Second Toll"
+animation = &"smash"
+startup_frames = 10
+active_frames = 4
+recovery_frames = 22
+chain_open_frame = -1
+dodge_cancel_frame = 9
+damage = 24.0
+poise_damage = 48.0
+stamina_cost = 19.0
+knockback = Vector2(150, -60)
+hitbox_size = Vector2(36, 32)
+hitbox_offset = Vector2(21, -14)
+lunge_speed = 70.0
+lunge_start_frame = 7
+lunge_frames = 4
+hit_stop = 0.09
+shake = 4.0

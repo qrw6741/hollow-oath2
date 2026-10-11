@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"sabre_heavy"
+display_name = "Sabre — Undertow"
+animation = &"heavy"
+startup_frames = 17
+active_frames = 5
+recovery_frames = 22
+chain_open_frame = -1
+dodge_cancel_frame = 12
+damage = 28.0
+poise_damage = 40.0
+stamina_cost = 22.0
+knockback = Vector2(160, -70)
+hitbox_size = Vector2(42, 28)
+hitbox_offset = Vector2(22, -15)
+lunge_speed = 130.0
+lunge_start_frame = 12
+lunge_frames = 6
+hit_stop = 0.1
+shake = 4.0

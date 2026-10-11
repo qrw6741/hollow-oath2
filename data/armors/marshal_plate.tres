@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"marshal_plate"
+display_name = "Marshal's Plate"
+description = "Sir Orren's own harness, hollow and ringing. It will stop almost anything, and it wants to stand still."
+look = 3
+damage_taken_mult = 0.7
+run_speed_mult = 0.84
+dodge_stamina_add = 4.0
+cloth_color = Color(0.235, 0.180, 0.165, 1)
+cloth_light_color = Color(0.361, 0.290, 0.259, 1)
+accent_color = Color(0.788, 0.635, 0.306, 1)

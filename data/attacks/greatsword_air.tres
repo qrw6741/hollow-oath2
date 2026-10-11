@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"greatsword_air"
+display_name = "Greatsword — Dive"
+animation = &"air"
+startup_frames = 8
+active_frames = 8
+recovery_frames = 16
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 22.0
+poise_damage = 24.0
+stamina_cost = 18.0
+knockback = Vector2(50, 80)
+hitbox_size = Vector2(44, 38)
+hitbox_offset = Vector2(16, -10)
+lunge_speed = 0.0
+lunge_start_frame = 0
+lunge_frames = 0
+hit_stop = 0.08
+shake = 3.0
+gravity_scale = 0.6
+is_aerial = true

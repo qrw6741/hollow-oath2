@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"lance_riposte"
+display_name = "Lance — Run Through"
+animation = &"riposte"
+startup_frames = 9
+active_frames = 4
+recovery_frames = 30
+chain_open_frame = -1
+dodge_cancel_frame = 18
+damage = 58.0
+poise_damage = 999.0
+stamina_cost = 0.0
+knockback = Vector2(150, -90)
+hitbox_size = Vector2(60, 20)
+hitbox_offset = Vector2(30, -14)
+lunge_speed = 120.0
+lunge_start_frame = 4
+lunge_frames = 5
+hit_stop = 0.2
+shake = 6.0
+critical = true

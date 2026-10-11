@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"bulwark"
+display_name = "Bulwark Plate"
+description = "Full plate over padded wool, dented by a decade of holding the line. Heavy enough to slow the stride; strong enough to make it worth it."
+look = 3
+damage_taken_mult = 0.78
+run_speed_mult = 0.88
+dodge_stamina_add = 0.0
+cloth_color = Color(0.290, 0.322, 0.345, 1)
+cloth_light_color = Color(0.420, 0.455, 0.471, 1)
+accent_color = Color(0.369, 0.435, 0.412, 1)

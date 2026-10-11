@@ -33,6 +33,9 @@ var _i_icon_id: StringName = &""
 var _d_sub: Label
 var _d_grid: GridContainer
 var _d_desc: Label
+var _picker: VBoxContainer
+var _picking := ""            # "" | "weapon" | "armour"
+var picker_buttons: Array = []   # [{"id": StringName, "button": Button}]
 # Items tab (names kept for tests and other menus)
 var _list: GridContainer
 var _name: Label
@@ -52,6 +55,7 @@ func _ready() -> void:
 	Events.inventory_menu_requested.connect(open)
 	Events.inventory_changed.connect(func(): if is_open: _rebuild(); _refresh_equipment())
 	Events.stats_changed.connect(func(): if is_open: _refresh_equipment())
+	Events.loadout_changed.connect(func(): if is_open and _picking == "": _refresh_equipment())
 
 
 # ------------------------------------------------------------------ building
@@ -162,6 +166,8 @@ func _build_equipment(stack: Control) -> Control:
 		s.custom_minimum_size = Vector2(48, 58)
 		s.caption = {"weapon": "Weapon", "armour": "Armour", "quick": "Item", "status": "Status"}[key]
 		s.focus_entered.connect(_select_slot.bind(key))
+		if key == "weapon" or key == "armour":
+			s.pressed.connect(open_picker.bind(key))
 		s.mouse_entered.connect(s.grab_focus)
 		grid.add_child(s)
 		_slots[key] = s
@@ -198,6 +204,10 @@ func _build_equipment(stack: Control) -> Control:
 	_d_desc.add_theme_font_size_override(&"font_size", 7)
 	_d_desc.add_theme_color_override(&"font_color", Palette.BONE_DIM)
 	cv.add_child(_d_desc)
+	_picker = VBoxContainer.new()
+	_picker.add_theme_constant_override(&"separation", 1)
+	_picker.visible = false
+	cv.add_child(_picker)
 	return h
 
 
@@ -262,7 +272,10 @@ func _btn(parent: Control, text: String, cb: Callable) -> Button:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_open:
-		if event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"inventory") or event.is_action_pressed(&"pause"):
+		if _picking != "" and (event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"pause")):
+			close_picker()
+			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"inventory") or event.is_action_pressed(&"pause"):
 			close()
 			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed(&"parry") or event.is_action_pressed(&"heal"):
@@ -292,6 +305,7 @@ func close() -> void:
 	if not is_open:
 		return
 	Audio.sfx(&"ui_back")
+	_picking = ""
 	is_open = false
 	_panel.visible = false
 	get_tree().paused = _was_paused
@@ -325,17 +339,27 @@ func _preset() -> PresetData:
 	return Presets.get_preset(GameState.preset_id)
 
 
+## Strength and the weapon's upgrade level together.
 func _strength_bonus() -> float:
-	return 1.0 + int(GameState.stats.get("strength", 0)) * GameState.STRENGTH_DAMAGE
+	return (1.0 + int(GameState.stats.get("strength", 0)) * GameState.STRENGTH_DAMAGE) * Loadout.weapon_mult()
+
+
+func _weapon_id() -> StringName:
+	var w := Loadout.weapon()
+	return w.id if w else &""
+
+
+func _armor_icon() -> StringName:
+	return &"" if GameState.armor_id == Armors.NONE or GameState.armor_id == &"" else StringName("armor_" + String(GameState.armor_id))
 
 
 func _refresh_equipment() -> void:
 	var pr := _preset()
-	_preview.set("preset", pr)
+	_preview.set("preset", Loadout.compose_look(pr))
 	_char_name.text = pr.display_name
 	_char_level.text = "Level %d      %d embers" % [GameState.level(), GameState.embers]
-	(_slots.weapon as IconSlot).icon_id = pr.weapon.id if pr.weapon else &""
-	(_slots.armour as IconSlot).icon_id = StringName("armor_" + String(pr.id))
+	(_slots.weapon as IconSlot).icon_id = _weapon_id()
+	(_slots.armour as IconSlot).icon_id = _armor_icon()
 	var qn := GameState.item_count(GameState.quick_item)
 	(_slots.quick as IconSlot).icon_id = GameState.quick_item if qn > 0 else &""
 	(_slots.quick as IconSlot).count = qn
@@ -350,14 +374,16 @@ func _select_slot(key: String) -> void:
 		c.queue_free()
 	var pr := _preset()
 	var p := _player()
-	_d_icon_id = {"weapon": pr.weapon.id if pr.weapon else &"", "armour": StringName("armor_" + String(pr.id)),
+	_d_icon_id = {"weapon": _weapon_id(), "armour": _armor_icon(),
 		"quick": GameState.quick_item if GameState.item_count(GameState.quick_item) > 0 else &"", "status": &"status"}[key]
 	_d_icon.queue_redraw()
 	match key:
 		"weapon":
-			var s := WeaponStats.summary(pr.weapon, _strength_bonus())
-			_d_title.text = s.name
-			_d_sub.text = "Weapon  -  %s, %s reach" % [s.speed, (s.reach as String).to_lower()]
+			var cur := Loadout.weapon()
+			var s := WeaponStats.summary(cur, _strength_bonus())
+			var wl := GameState.weapon_level(GameState.weapon_id)
+			_d_title.text = s.name + (" +%d" % wl if wl > 0 else "")
+			_d_sub.text = "Weapon  -  %s, %s reach  -  Select to change" % [s.speed, (s.reach as String).to_lower()]
 			var light: Array = s.light
 			_row("Light combo", " / ".join(light.map(func(x): return str(x))) + "  (%d total)" % s.light_total)
 			_row("Heavy", "%d" % s.heavy)
@@ -365,20 +391,25 @@ func _select_slot(key: String) -> void:
 			_row("Riposte", "%d" % s.riposte)
 			_row("Stamina per swing", "%d  (heavy %d)" % [s.stamina, s.heavy_stamina])
 			_row("Poise damage", "%d" % s.poise)
-			_row("Strength bonus", "+%d%%" % roundi((_strength_bonus() - 1.0) * 100.0))
-			_d_desc.text = pr.weapon.description if pr.weapon else ""
+			_row("Bonus (Strength, upgrade)", "+%d%%" % roundi((_strength_bonus() - 1.0) * 100.0))
+			_d_desc.text = cur.description if cur else ""
 		"armour":
-			_d_title.text = pr.armor_name
-			_d_sub.text = "Armour  -  " + ("none" if pr.armor_look == PresetData.ArmorLook.BARE else ["", "light", "medium", "heavy"][pr.armor_look])
-			var taken := roundi(pr.damage_taken_mult * 100.0)
+			var arm := Armors.get_armor(GameState.armor_id)
+			var alv := GameState.armor_level(GameState.armor_id)
+			_d_title.text = (arm.display_name + (" +%d" % alv if alv > 0 else "")) if arm else "No armour"
+			var look_kind: int = arm.look if arm else PresetData.ArmorLook.BARE
+			_d_sub.text = "Armour  -  " + ("none" if look_kind == PresetData.ArmorLook.BARE else ["", "light", "medium", "heavy"][look_kind]) + "  -  Select to change"
+			var taken := roundi(Armors.damage_mult(GameState.armor_id, alv) * 100.0)
 			_row("Damage taken", "%d%%  %s" % [taken, "(less)" if taken < 100 else ("(more)" if taken > 100 else "")])
+			_row("Run speed", "%d%%" % roundi(Armors.speed_mult(GameState.armor_id) * 100.0))
+			_row("Dodge cost", "%d stamina" % roundi(pr.dodge_stamina + Armors.dodge_add(GameState.armor_id)))
 			_row("Base health", "%d" % roundi(pr.max_health))
 			_row("Base stamina", "%d" % roundi(pr.max_stamina))
-			_row("Ember Vials", "%d  (heal %d each)" % [pr.flasks, roundi(pr.flask_heal)])
-			_row("Run speed", "%d%%" % roundi(pr.run_speed_mult * 100.0))
-			_row("Dodge cost", "%d stamina" % roundi(pr.dodge_stamina))
+			var fl: int = p.max_flasks if p else pr.flasks
+			var fh: float = p.flask_heal if p else pr.flask_heal
+			_row("Ember Vials", "%d  (heal %d each)" % [fl, roundi(fh)])
 			_row("Parry window", "%d frames" % pr.parry_window_frames)
-			_d_desc.text = pr.armor_description
+			_d_desc.text = arm.description if arm else "You wear nothing. Select to put something on."
 		"quick":
 			var it := Items.get_item(GameState.quick_item)
 			if it and GameState.item_count(GameState.quick_item) > 0:
@@ -410,6 +441,82 @@ func _select_slot(key: String) -> void:
 			var secs := int(GameState.play_time)
 			_row("Deaths  /  time", "%d   /   %02d:%02d" % [GameState.deaths, secs / 3600, (secs / 60) % 60])
 			_d_desc.text = "Raise Vigor, Endurance and Strength by resting at an Oath Candle."
+
+
+## Opens the weapon / armour chooser in the details pane (Select on the slot).
+func open_picker(key: String) -> void:
+	if key != "weapon" and key != "armour":
+		return
+	_picking = key
+	for c in _picker.get_children():
+		_picker.remove_child(c)
+		c.queue_free()
+	picker_buttons.clear()
+	_d_grid.visible = false
+	_d_desc.visible = false
+	_picker.visible = true
+	_d_icon_id = _weapon_id() if key == "weapon" else _armor_icon()
+	_d_icon.queue_redraw()
+	_d_title.text = "Choose a weapon" if key == "weapon" else "Choose armour"
+	_d_sub.text = "Confirm to equip   -   Cancel to go back"
+	var bonus := 1.0 + int(GameState.stats.get("strength", 0)) * GameState.STRENGTH_DAMAGE
+	if key == "weapon":
+		for id in Weapons.IDS:
+			if not GameState.owns_weapon(id):
+				continue
+			var w := Weapons.get_weapon(id)
+			var lv := GameState.weapon_level(id)
+			var total: int = WeaponStats.summary(w, bonus * Weapons.level_mult(lv)).light_total
+			var tag := "   (equipped)" if id == GameState.weapon_id else ""
+			_picker_row(id, "%s +%d    combo %d%s" % [w.display_name, lv, total, tag], id == GameState.weapon_id)
+	else:
+		var bare := GameState.armor_id == Armors.NONE
+		_picker_row(Armors.NONE, "Take off all armour" + ("   (nothing worn)" if bare else "") + "    taken %d%%" % roundi(Armors.NAKED_DAMAGE * 100.0), bare)
+		for id in Armors.IDS:
+			if not GameState.owns_armor(id):
+				continue
+			var ar := Armors.get_armor(id)
+			var lvl := GameState.armor_level(id)
+			var tag2 := "   (worn)" if id == GameState.armor_id else ""
+			_picker_row(id, "%s +%d    taken %d%%%s" % [ar.display_name, lvl, roundi(Armors.damage_mult(id, lvl) * 100.0), tag2], id == GameState.armor_id)
+	var focus: Button = picker_buttons[0].button
+	for r in picker_buttons:
+		if r.current:
+			focus = r.button
+	focus.grab_focus()
+
+
+func _picker_row(id: StringName, text: String, current: bool) -> void:
+	var b := FancyButton.new()
+	b.text = text
+	b.custom_minimum_size = Vector2(190, 14)
+	UITheme.compact(b)
+	b.pressed.connect(choose.bind(id))
+	_picker.add_child(b)
+	picker_buttons.append({"id": id, "button": b, "current": current})
+
+
+## Equips (or, for armour, takes off with Armors.NONE) while the chooser is open.
+func choose(id: StringName) -> void:
+	if _picking == "weapon":
+		Loadout.equip_weapon(id)
+	elif _picking == "armour":
+		Loadout.equip_armor(id)
+	Audio.sfx(&"ui_move", -2.0)
+	close_picker()
+
+
+func close_picker() -> void:
+	if _picking == "":
+		return
+	var slot := _picking
+	_picking = ""
+	_picker.visible = false
+	_d_grid.visible = true
+	_d_desc.visible = true
+	_slot_sel = slot
+	_refresh_equipment()
+	(_slots[slot] as Button).grab_focus()
 
 
 func _row(label: String, value: String) -> void:

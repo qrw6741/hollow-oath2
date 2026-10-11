@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"pilgrim_coat"
+display_name = "Pilgrim's Coat"
+description = "A road-worn coat of oiled wool with a few plates sewn in at the shoulders. Warmer than it looks."
+look = 1
+damage_taken_mult = 1.04
+run_speed_mult = 1.07
+dodge_stamina_add = -1.0
+cloth_color = Color(0.227, 0.227, 0.173, 1)
+cloth_light_color = Color(0.345, 0.337, 0.247, 1)
+accent_color = Color(0.690, 0.541, 0.235, 1)

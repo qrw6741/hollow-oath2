@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"hollow_resin"
+display_name = "Hollow Resin"
+description = "Amber sap that weeps from things that should be dead. The Vial-Keeper uses it to strengthen the Ember Vials."
+kind = 1
+max_stack = 20
+icon_color = Color(0.9, 0.65, 0.2, 1)

@@ -74,6 +74,9 @@ var _parried := false
 var _last_hit_id := 0
 ## Multiplies all damage taken (armour). Set from the preset.
 var damage_taken_mult := 1.0
+## What is drawn: the preset composed with the equipped weapon and armour (see Loadout).
+var look: PresetData
+var _base_run_speed := 112.0
 ## Number of water zones the player stands in (WaterZone). Water slows movement.
 var in_water := 0
 const WATER_MOVE := 0.6
@@ -86,8 +89,10 @@ const BUFFERED: Array[StringName] = [&"jump", &"attack_light", &"attack_heavy", 
 
 func _ready() -> void:
 	add_to_group(&"player")
+	_base_run_speed = run_speed
 	if preset:
 		_apply_preset()
+		Events.loadout_changed.connect(apply_loadout)
 	flasks = max_flasks
 	last_safe_position = global_position
 	health.died.connect(_on_died)
@@ -101,19 +106,43 @@ func _ready() -> void:
 
 
 func _apply_preset() -> void:
-	weapon = preset.weapon
+	Loadout.ensure(preset)
 	health.set_max(preset.max_health)
 	stamina.max_stamina = preset.max_stamina
 	stamina.regen_per_second = preset.stamina_regen
 	stamina.restore_full()
-	max_flasks = preset.flasks
-	flask_heal = preset.flask_heal
-	damage_taken_mult = preset.damage_taken_mult
-	run_speed *= preset.run_speed_mult
-	dodge_stamina = preset.dodge_stamina
 	parry_window_frames = preset.parry_window_frames
 	parry_stamina = preset.parry_stamina
+	apply_loadout()
+	flasks = max_flasks
 	apply_stats(false)
+
+
+## Recomputes everything the equipped weapon, armour and vial level decide: weapon,
+## damage multiplier, damage taken, run speed, dodge cost, vials and what is drawn.
+## Called at spawn and whenever Events.loadout_changed fires.
+func apply_loadout() -> void:
+	if preset == null:
+		return
+	var w := Loadout.weapon()
+	weapon = w if w else preset.weapon
+	damage_taken_mult = Loadout.damage_taken_mult()
+	run_speed = _base_run_speed * Armors.speed_mult(GameState.armor_id)
+	dodge_stamina = preset.dodge_stamina + Armors.dodge_add(GameState.armor_id)
+	var old_max := max_flasks
+	max_flasks = preset.flasks + Forge.vial_extra(GameState.flask_level)
+	flask_heal = preset.flask_heal + Forge.vial_heal_bonus(GameState.flask_level)
+	if max_flasks > old_max:
+		flasks += max_flasks - old_max
+	flasks = mini(flasks, max_flasks)
+	_refresh_damage_bonus()
+	look = Loadout.compose_look(preset)
+	Events.flasks_changed.emit(flasks, max_flasks)
+
+
+func _refresh_damage_bonus() -> void:
+	var stre := int(GameState.stats.get("strength", 0))
+	attack_runner.damage_bonus = (1.0 + stre * GameState.STRENGTH_DAMAGE) * Loadout.weapon_mult()
 
 
 ## Applies Vigor / Endurance / Strength on top of the preset. With [param heal_gain],
@@ -129,7 +158,7 @@ func apply_stats(heal_gain := true) -> void:
 	if heal_gain and health.max_health > old_max:
 		health.heal(health.max_health - old_max)
 	stamina.max_stamina = preset.max_stamina + end * GameState.ENDURANCE_STAMINA
-	attack_runner.damage_bonus = 1.0 + stre * GameState.STRENGTH_DAMAGE
+	_refresh_damage_bonus()
 	if not heal_gain:
 		health.current = health.max_health
 		stamina.restore_full()

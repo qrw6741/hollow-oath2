@@ -78,6 +78,8 @@ func _run() -> void:
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
 		test_dialogue_box, test_shop, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		# --- weapons, armour, upgrades ---
+		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -1974,7 +1976,8 @@ func test_equipment_screen() -> void:
 	check(im._d_title.text == "Bone-cloth Wraps", "selecting the armour slot names it")
 	for id in Items.IDS + [&"oathblade", &"twin_blades", &"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark", &"armor_unsworn", &"status"]:
 		check(IconArt.has_icon(id), "icon exists for %s" % id)
-	check(im._preview.get("preset") == Presets.get_preset(&"unsworn"), "character preview shows your preset")
+	var pv: PresetData = im._preview.get("preset")
+	check(pv.id == &"unsworn" and pv.weapon_look == PresetData.WeaponLook.FISTS and pv.armor_look == PresetData.ArmorLook.BARE, "character preview shows your preset, weapon and armour")
 	im._slots.armour.grab_focus()
 	await frames(2)
 	var texts := im._d_grid.get_children().map(func(n): return n.text)
@@ -2326,7 +2329,7 @@ func test_shop() -> void:
 	var shop: ShopMenu = main.get_node("ShopMenu")
 	events.shop_requested.emit(&"pedlar")
 	await frames(3)
-	check(shop.is_open and get_tree().paused and shop.rows.size() == 3, "the pedlar's shop opens with three wares")
+	check(shop.is_open and get_tree().paused and shop.rows.size() == 5, "the pedlar's shop opens with five wares")
 	var b0: int = game_state.item_count(&"ash_bandage")
 	var r := Shops.buy(&"pedlar", &"ash_bandage")
 	check(r.ok and game_state.embers == 60 and game_state.item_count(&"ash_bandage") == b0 + 1, "buying costs embers and gives the item")
@@ -2519,3 +2522,310 @@ func test_marshal_boss() -> void:
 	await frames(6)
 	check(boss.alive_crows() == 0, "the crows fall with him")
 	check(Dialogues.conversation(&"ommen").lines[0].contains("crossroads are quiet"), "Ommen has something to say")
+
+
+# ---------------------------------------------------------------- weapons, armour, upgrades
+
+func test_gear_data() -> void:
+	for id in Weapons.IDS:
+		var w := Weapons.get_weapon(id)
+		check(w != null and w.id == id and w.light_combo_start and w.heavy and w.aerial and w.riposte, "%s: weapon complete" % id)
+		if w == null:
+			continue
+		var bad := PackedStringArray()
+		for a in WeaponStats.light_chain(w) + [w.heavy, w.aerial, w.riposte]:
+			bad.append_array(a.validate())
+		check(bad.is_empty(), "%s: attacks valid %s" % [id, bad])
+		check(IconArt.has_icon(id), "%s: has an icon" % id)
+		check(WeaponStats.summary(w, 1.0).light_total > 0, "%s: summary works" % id)
+	for id in Armors.IDS:
+		var a := Armors.get_armor(id)
+		check(a != null and a.validate().is_empty(), "%s: armour valid" % id)
+		check(IconArt.has_icon(StringName("armor_" + String(id))), "%s: armour icon" % id)
+	# The four starting armours behave exactly like their presets always did.
+	for pid in Presets.IDS:
+		var pr := Presets.get_preset(pid)
+		var ar := Armors.get_armor(pid)
+		check(ar != null and is_equal_approx(ar.damage_taken_mult, pr.damage_taken_mult) and is_equal_approx(ar.run_speed_mult, pr.run_speed_mult) and ar.look == pr.armor_look, "%s: starter armour mirrors its preset" % pid)
+		check(pr.weapon.look == pr.weapon_look, "%s: weapon look matches" % pid)
+	for rid in Forge.RECIPES:
+		var rc: Dictionary = Forge.RECIPES[rid]
+		var known: bool = Weapons.is_valid_id(String(rid)) if rc.kind == "weapon" else Armors.is_valid_id(String(rid))
+		check(known, "%s: recipe points at real gear" % rid)
+		check(not rc.has("relic") or Items.get_item(rc.relic) != null, "%s: relic exists" % rid)
+	for it in [&"forge_scrap", &"hollow_resin"]:
+		check(Items.get_item(it).validate().is_empty() and IconArt.has_icon(it), "%s valid with an icon" % it)
+	# Every enemy that drops materials points at a real item.
+	var dropped := 0
+	for e in ["ember_acolyte", "hollow_penitent", "oathguard", "roadside_pikeman", "gloam_moth", "carrion_crow", "mimic", "bell_warden", "drowned_canon", "hollow_marshal", "bell_bearer"]:
+		var ed := load("res://data/enemies/%s.tres" % e) as EnemyData
+		if ed.bonus_drop_item != null and ed.bonus_drop_chance > 0.0:
+			dropped += 1
+	check(dropped == 11, "all eleven enemies drop crafting materials (%d)" % dropped)
+
+
+func test_loadout_equip() -> void:
+	await fresh_game()
+	check(game_state.owns_weapon(&"oathblade") and game_state.owns_armor(&"sworn_knight") and game_state.armor_id == &"sworn_knight", "starting loadout is the preset's")
+	check(is_equal_approx(player.damage_taken_mult, 1.0) and player.weapon.id == &"oathblade", "player starts as before")
+	var speed0 := player.run_speed
+	# Take the armour off.
+	check(Loadout.equip_armor(Armors.NONE), "taking armour off works")
+	check(is_equal_approx(player.damage_taken_mult, Armors.NAKED_DAMAGE) and player.run_speed > speed0, "naked: takes more damage, runs faster")
+	check(player.look.armor_look == PresetData.ArmorLook.BARE, "naked: drawn without armour")
+	var hp0 := player.health.current
+	player.receive_hit(damage(10.0))
+	check(is_equal_approx(hp0 - player.health.current, 10.0 * Armors.NAKED_DAMAGE), "naked: the hit really is bigger")
+	check(not Loadout.equip_armor(Armors.NONE), "taking it off twice does nothing")
+	# Put it back on.
+	check(Loadout.equip_armor(&"sworn_knight") and is_equal_approx(player.damage_taken_mult, 1.0) and is_equal_approx(player.run_speed, speed0), "wearing it again restores the numbers")
+	check(player.look.armor_look == PresetData.ArmorLook.KNIGHT, "drawn in armour again")
+	check(not Loadout.equip_armor(&"marshal_plate"), "cannot wear what you do not own")
+	# Heavy armour: slower, tougher, costlier dodge.
+	game_state.grant_gear("armor", &"marshal_plate")
+	Loadout.equip_armor(&"marshal_plate")
+	check(player.damage_taken_mult < 0.75 and player.run_speed < speed0 * 0.9 and player.dodge_stamina > 22.0, "marshal plate: tough, slow, heavy dodge")
+	check(player.look.armor_look == PresetData.ArmorLook.HEAVY, "marshal plate drawn heavy")
+	# Weapons.
+	check(not Loadout.equip_weapon(&"toll_hammer"), "cannot wield what you do not own")
+	game_state.grant_gear("weapon", &"wayfarers_rapier")
+	check(Loadout.equip_weapon(&"wayfarers_rapier") and player.weapon.id == &"wayfarers_rapier" and player.look.weapon_look == PresetData.WeaponLook.RAPIER, "rapier equipped and drawn")
+	check(not Loadout.equip_weapon(&"wayfarers_rapier"), "equipping the same weapon does nothing")
+	# Weapon level feeds damage.
+	var b0 := player.attack_runner.damage_bonus
+	game_state.set_gear_level("weapon", &"wayfarers_rapier", 3)
+	events.loadout_changed.emit()
+	check(is_equal_approx(player.attack_runner.damage_bonus / b0, 1.3), "+3 weapon deals 30%% more (%.3f)" % (player.attack_runner.damage_bonus / b0))
+	# Armour level feeds protection.
+	game_state.set_gear_level("armor", &"marshal_plate", 5)
+	events.loadout_changed.emit()
+	check(is_equal_approx(player.damage_taken_mult, Armors.get_armor(&"marshal_plate").damage_taken_mult * 0.85), "+5 armour takes 15%% less")
+	# An unsworn who takes the wraps off.
+	await fresh_game(&"unsworn")
+	check(game_state.armor_id == &"unsworn" and player.look.armor_look == PresetData.ArmorLook.BARE, "unsworn begins in wraps")
+	Loadout.equip_armor(Armors.NONE)
+	check(player.damage_taken_mult > 1.3, "unsworn can go fully naked and takes even more")
+
+
+func test_forge_rules() -> void:
+	await fresh_game()
+	game_state.embers = 10000
+	# Upgrading a weapon.
+	check(Forge.upgrade_cost("weapon", &"oathblade").embers == 150, "first weapon upgrade costs 150 embers")
+	var r := Forge.upgrade("weapon", &"oathblade")
+	check(not r.ok and game_state.embers == 10000 and game_state.weapon_level(&"oathblade") == 0, "no scrap: nothing happens, nothing is taken")
+	game_state.add_item(&"forge_scrap", 30)
+	r = Forge.upgrade("weapon", &"oathblade")
+	check(r.ok and game_state.weapon_level(&"oathblade") == 1 and game_state.embers == 9850 and game_state.item_count(&"forge_scrap") == 29, "upgrade spends embers + 1 scrap")
+	check(is_equal_approx(player.attack_runner.damage_bonus, 1.1), "the player gets the stronger blade at once (%.2f)" % player.attack_runner.damage_bonus)
+	for i in 6:
+		Forge.upgrade("weapon", &"oathblade")
+	check(game_state.weapon_level(&"oathblade") == 5 and Forge.upgrade_cost("weapon", &"oathblade").is_empty(), "stops at +5")
+	var e: int = game_state.embers
+	check(not Forge.upgrade("weapon", &"oathblade").ok and game_state.embers == e, "no charge at the maximum")
+	check(not Forge.upgrade("weapon", &"toll_hammer").ok, "cannot upgrade what you do not own")
+	# Armour.
+	r = Forge.upgrade("armor", &"sworn_knight")
+	check(r.ok and game_state.armor_level(&"sworn_knight") == 1 and is_equal_approx(player.damage_taken_mult, 0.97), "armour +1 takes 3%% less (%.3f)" % player.damage_taken_mult)
+	# Forging.
+	game_state.embers = 5000
+	r = Forge.make(&"toll_hammer")
+	check(not r.ok and not game_state.owns_weapon(&"toll_hammer") and game_state.embers == 5000, "the hammer needs the Bell Warden's shard")
+	game_state.add_item(&"warden_bell_shard", 1)
+	var scrap: int = game_state.item_count(&"forge_scrap")
+	r = Forge.make(&"toll_hammer")
+	check(r.ok and game_state.owns_weapon(&"toll_hammer") and game_state.embers == 4400 and game_state.item_count(&"forge_scrap") == scrap - 3, "forged: 600 embers + 3 scrap")
+	check(game_state.item_count(&"warden_bell_shard") == 1, "the relic is shown, not taken")
+	check(not Forge.make(&"toll_hammer").ok, "cannot forge it twice")
+	r = Forge.make(&"pilgrim_coat")
+	check(r.ok and game_state.owns_armor(&"pilgrim_coat"), "a plain armour needs no relic")
+	check(not Forge.make(&"oathblade").ok, "no recipe for starter gear")
+	game_state.embers = 0
+	check(not Forge.make(&"kingsfall_greatsword").ok and not game_state.owns_weapon(&"kingsfall_greatsword"), "broke: nothing forged")
+	# Vials.
+	game_state.embers = 10000
+	var hp := player.flask_heal
+	var fl0 := player.max_flasks
+	check(not Forge.upgrade_vials().ok, "vials need Hollow Resin")
+	game_state.add_item(&"hollow_resin", 20)
+	check(Forge.upgrade_vials().ok and game_state.flask_level == 1 and is_equal_approx(player.flask_heal, hp + 6.0) and player.max_flasks == fl0, "vials +1: heal +6, same count")
+	Forge.upgrade_vials()
+	check(game_state.flask_level == 2 and player.max_flasks == fl0 + 1 and player.flasks == fl0 + 1, "vials +2: one more vial, filled")
+	for i in 5:
+		Forge.upgrade_vials()
+	check(game_state.flask_level == 5 and player.max_flasks == fl0 + 2 and Forge.vial_cost().is_empty(), "vials stop at +5 with two extra vials")
+	# Rest refills the new count.
+	player.flasks = 0
+	player.rest()
+	check(player.flasks == player.max_flasks, "resting refills every vial")
+
+
+func test_gear_save() -> void:
+	wipe_saves()
+	game_state.reset()
+	game_state.preset_id = &"bulwark"
+	Loadout.ensure(Presets.get_preset(&"bulwark"))
+	game_state.grant_gear("weapon", &"marshals_lance")
+	game_state.set_gear_level("weapon", &"marshals_lance", 4)
+	game_state.weapon_id = &"marshals_lance"
+	game_state.grant_gear("armor", &"penitent_shroud")
+	game_state.set_gear_level("armor", &"bulwark", 2)
+	game_state.armor_id = Armors.NONE
+	game_state.flask_level = 3
+	game_state.in_game = true
+	game_state.current_slot = 1
+	check(saves.save_slot(1), "saved")
+	game_state.reset()
+	var res: Dictionary = saves.load_slot(1)
+	game_state.apply_dict(res.data, 1)
+	check(game_state.weapon_id == &"marshals_lance" and game_state.weapon_level(&"marshals_lance") == 4 and game_state.owns_weapon(&"sword_and_shield"), "weapons restored")
+	check(game_state.armor_id == Armors.NONE and game_state.owns_armor(&"penitent_shroud") and game_state.armor_level(&"bulwark") == 2, "armour restored, still taken off")
+	check(game_state.flask_level == 3, "vial level restored")
+	# A save from before gear existed gets the preset's loadout.
+	var old: Dictionary = saves._normalize({"version": 1, "saved_at": 1, "preset_id": "duelist"})
+	game_state.apply_dict(old, 1)
+	check(game_state.weapon_id == &"twin_blades" and game_state.armor_id == &"duelist" and game_state.flask_level == 0, "legacy save gets its starting loadout")
+	# Hostile values are cleaned.
+	var bad: Dictionary = saves._normalize({"version": 1, "saved_at": 1, "weapons": {"oathblade": 99, "ghost": 3, "fists": "x"}, "weapon_id": "ghost",
+		"armors": {"duelist": -4, "nope": 1}, "armor_id": "marshal_plate", "flask_level": 77})
+	check(bad.weapons.size() == 1 and bad.weapons.oathblade == 5 and bad.weapon_id == "", "bad weapons dropped / clamped")
+	check(bad.armors.size() == 1 and bad.armors.duelist == 0 and bad.armor_id == "" and bad.flask_level == 5, "bad armours dropped, bad worn armour reset, vials clamped")
+	game_state.apply_dict(bad, 1)
+	check(game_state.weapon_id == &"oathblade" and game_state.armor_id == &"duelist", "a broken loadout repairs itself")
+	game_state.reset()
+	wipe_saves()
+
+
+func test_forge_menu() -> void:
+	await fresh_game()
+	var menu: ForgeMenu = main.get_node("ForgeMenu")
+	game_state.embers = 5000
+	game_state.add_item(&"forge_scrap", 10)
+	events.station_requested.emit(&"forge")
+	await frames(3)
+	check(menu.is_open and get_tree().paused and game_state.ui_modal, "forge opens and pauses")
+	var weapon_ids: Array = menu.rows.map(func(r): return r.id)
+	check(weapon_ids.has(&"oathblade") and weapon_ids.has(&"toll_hammer") and not weapon_ids.has(&"twin_blades"), "weapons tab: owned + forgeable only (%s)" % [weapon_ids])
+	check("+0" in menu.row_text(&"oathblade") and "150" in menu.row_text(&"oathblade"), "row shows level and cost: %s" % menu.row_text(&"oathblade"))
+	var idx := weapon_ids.find(&"oathblade")
+	(menu.rows[idx].button as Button).pressed.emit()
+	await frames(2)
+	check(game_state.weapon_level(&"oathblade") == 1 and "+1" in menu.row_text(&"oathblade"), "pressing a row upgrades it")
+	check("Light combo" in menu.describe(&"oathblade") and "->" in menu.describe(&"oathblade"), "description previews the gain")
+	menu.show_tab("armor")
+	await frames(2)
+	var armor_ids: Array = menu.rows.map(func(r): return r.id)
+	check(armor_ids.has(&"sworn_knight") and armor_ids.has(&"marshal_plate"), "armour tab lists armour")
+	menu.act(&"sworn_knight")
+	check(game_state.armor_level(&"sworn_knight") == 1, "armour upgrades from the menu")
+	await tap_action(&"ui_cancel")
+	check(not menu.is_open and not get_tree().paused and not game_state.ui_modal, "Cancel leaves")
+	# Vials.
+	game_state.add_item(&"hollow_resin", 3)
+	events.station_requested.emit(&"vials")
+	await frames(3)
+	check(menu.is_open and menu.rows.size() == 1 and menu.rows[0].id == &"vials", "the vial station has one row")
+	menu.act(&"vials")
+	check(game_state.flask_level == 1 and "+1" in menu.row_text(&"vials"), "vials upgrade from the menu")
+	menu.close()
+	await frames(2)
+	check(not get_tree().paused, "closed")
+
+
+func test_equip_ui() -> void:
+	await fresh_game()
+	game_state.grant_gear("weapon", &"tide_sabre")
+	game_state.grant_gear("armor", &"pilgrim_coat")
+	var im: InventoryMenu = main.get_node("InventoryMenu")
+	im.open()
+	await frames(3)
+	check(im.is_open, "inventory opens")
+	im.open_picker("weapon")
+	await frames(2)
+	var ids: Array = im.picker_buttons.map(func(r): return r.id)
+	check(ids == [&"oathblade", &"tide_sabre"], "weapon picker lists exactly the owned weapons (%s)" % [ids])
+	(im.picker_buttons[1].button as Button).pressed.emit()
+	await frames(3)
+	check(player.weapon.id == &"tide_sabre" and game_state.weapon_id == &"tide_sabre", "choosing a weapon equips it")
+	im.open_picker("armour")
+	await frames(2)
+	var aids: Array = im.picker_buttons.map(func(r): return r.id)
+	check(aids == [Armors.NONE, &"sworn_knight", &"pilgrim_coat"], "armour picker: take off + owned (%s)" % [aids])
+	(im.picker_buttons[0].button as Button).pressed.emit()
+	await frames(3)
+	check(game_state.armor_id == Armors.NONE and player.look.armor_look == PresetData.ArmorLook.BARE, "'Take off' removes the armour")
+	check(im._d_title.text == "No armour", "the slot reflects it (%s)" % im._d_title.text)
+	im.open_picker("armour")
+	await frames(2)
+	await tap_action(&"ui_cancel")
+	check(im.is_open and im._picking == "", "Cancel closes only the picker")
+	im.open_picker("armour")
+	await frames(2)
+	(im.picker_buttons[2].button as Button).pressed.emit()
+	await frames(3)
+	check(game_state.armor_id == &"pilgrim_coat", "put another armour on")
+	im.close()
+	await frames(2)
+	check(not get_tree().paused, "menu closed")
+
+
+func test_new_weapons_land() -> void:
+	for id in [&"wayfarers_rapier", &"kingsfall_greatsword", &"toll_hammer", &"marshals_lance", &"tide_sabre"]:
+		await fresh_game()
+		game_state.grant_gear("weapon", id)
+		Loadout.equip_weapon(id)
+		await place_player(300.0, 480.0, 1)
+		await frames(4)
+		var dummy := level.get_node("TrainingDummy")
+		var best := 0.0
+		for i in 3:
+			await press(&"attack_light")
+			for f in 14:
+				await get_tree().physics_frame
+				best = maxf(best, dummy._combo_total)
+		await frames(70)
+		check(best > 5.0, "%s: light attacks damage the dummy (%.0f)" % [id, best])
+		check(player.state == Player.State.FREE, "%s: returns to FREE" % id)
+		# The heavy and the pose code run without errors for every attack.
+		await press(&"attack_heavy")
+		await frames(80)
+		check(player.state == Player.State.FREE, "%s: heavy finishes" % id)
+		var w := Weapons.get_weapon(id)
+		check(w.heavy.total_frames() > w.light_combo_start.total_frames(), "%s: heavy is slower than a light" % id)
+
+
+func test_gear_npcs() -> void:
+	await fresh_game()
+	await go_to_level(AWAKE, &"arrival")
+	for n in ["Hobb", "Ilse"]:
+		check(level.get_node_or_null(n) != null, "%s stands in Vaelmoor, Awake" % n)
+	await go_to_level(ROAD, &"from_awake")
+	var hobb: Npc = level.get_node("Hobb")
+	var ilse: Npc = level.get_node("Ilse")
+	check(hobb.station == &"forge" and ilse.station == &"vials", "stations are wired")
+	var box: DialogueBox = main.get_node("DialogueBox")
+	var menu: ForgeMenu = main.get_node("ForgeMenu")
+	await place_player(hobb.global_position.x - 24.0, 480.0, 1)
+	await frames(8)
+	await press(&"interact")
+	await frames(3)
+	check(box.is_open and box._name.text == "Hobb", "Hobb speaks first")
+	await frames(14)
+	await tap_action(&"ui_cancel")
+	await frames(6)
+	check(menu.is_open and menu.kind == &"forge", "after talking the forge opens")
+	menu.close()
+	await frames(25)
+	check(Dialogues.talks(&"hobb") >= 1, "the visit is remembered")
+	check(Dialogues.conversation(&"hobb").lines.size() == 1, "later visits are a single greeting")
+	# Spacing: no interaction zones overlapping.
+	var xs := []
+	for n in level.get_children():
+		if n is Npc or n is OathCandle:
+			xs.append(n.global_position.x)
+	xs.sort()
+	var tight := false
+	for i in range(1, xs.size()):
+		if xs[i] - xs[i - 1] < 60.0:
+			tight = true
+	check(not tight, "NPCs and candles are spaced out (%s)" % [xs])

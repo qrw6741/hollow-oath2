@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"greatsword_heavy"
+display_name = "Greatsword — Kingsfall"
+animation = &"heavy"
+startup_frames = 30
+active_frames = 7
+recovery_frames = 34
+chain_open_frame = -1
+dodge_cancel_frame = 20
+damage = 62.0
+poise_damage = 110.0
+stamina_cost = 36.0
+knockback = Vector2(240, -120)
+hitbox_size = Vector2(60, 38)
+hitbox_offset = Vector2(30, -17)
+lunge_speed = 130.0
+lunge_start_frame = 22
+lunge_frames = 8
+hit_stop = 0.16
+shake = 7.0

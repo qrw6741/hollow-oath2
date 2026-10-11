@@ -15,7 +15,8 @@ static func has_icon(id: StringName) -> bool:
 	return id in [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard",
 		&"penitents_tear", &"candlewright_note", &"canon_seal", &"pilgrims_draught", &"marshals_crest", &"oathblade", &"twin_blades",
 		&"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark",
-		&"armor_unsworn", &"status"]
+		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial"] \
+		or Weapons.IDS.has(id) or (String(id).begins_with("armor_") and Armors.is_valid_id(String(id).substr(6)))
 
 
 static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
@@ -41,6 +42,15 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"armor_bulwark": _plate(ci)
 		&"armor_unsworn": _wraps(ci)
 		&"status": _sigil(ci, t)
+		&"forge_scrap": _scrap(ci)
+		&"hollow_resin": _resin(ci)
+		&"vial": _vial(ci)
+		&"wayfarers_rapier": _rapier(ci)
+		&"kingsfall_greatsword": _greatsword(ci)
+		&"toll_hammer": _hammer(ci)
+		&"marshals_lance": _lance(ci)
+		&"tide_sabre": _sabre(ci)
+		&"armor_pilgrim_coat", &"armor_penitent_shroud", &"armor_canons_mail", &"armor_marshal_plate": _armor_generic(ci, id)
 		_: _unknown(ci)
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
@@ -183,7 +193,81 @@ static func _fist(ci: CanvasItem) -> void:
 	_poly(ci, [Vector2(3, 8), Vector2(6, 9), Vector2(5, 11.5), Vector2(2.5, 10.5)], skin)
 
 
+static func _rapier(ci: CanvasItem) -> void:
+	var d := Vector2(1, -1).normalized()
+	ci.draw_line(Vector2(5, 11), Vector2(14, 2), Color("d8dce4"), 1.0)
+	ci.draw_arc(Vector2(4.6, 11.4), 3.2, deg_to_rad(-135), deg_to_rad(45), 8, Color("c9a24e"), 1.2)
+	ci.draw_line(Vector2(4, 12), Vector2(2, 14), Color("4b3627"), 1.8)
+	ci.draw_circle(Vector2(1.8, 14.2), 1.0, Color("c9a24e"))
+
+
+static func _greatsword(ci: CanvasItem) -> void:
+	_poly(ci, [Vector2(4, 11), Vector2(12.8, 2), Vector2(14, 2), Vector2(14, 3.2), Vector2(5, 12)], Color("c3c7d0"))
+	ci.draw_line(Vector2(5.5, 10.5), Vector2(13, 3), Color(1, 1, 1, 0.5), 0.5)
+	ci.draw_line(Vector2(2.6, 9.4), Vector2(7.2, 13.8), OUTLINE, 2.2)
+	ci.draw_line(Vector2(2.8, 9.6), Vector2(7.0, 13.6), Color("c9a24e"), 1.4)
+	ci.draw_line(Vector2(4.5, 11.5), Vector2(2, 14), Color("4b3627"), 2.0)
+	ci.draw_circle(Vector2(1.8, 14.2), 1.1, Color("c9a24e"))
+
+
+static func _hammer(ci: CanvasItem) -> void:
+	ci.draw_line(Vector2(3, 14), Vector2(11, 6), Color("6a4a30"), 1.8)
+	_poly(ci, [Vector2(8, 3.5), Vector2(14, 3.5 + 3), Vector2(11.5, 9), Vector2(5.5, 6)], Color("8a8f98"))
+	ci.draw_line(Vector2(8.5, 4), Vector2(13.5, 7), Color("c9a24e"), 0.8)
+
+
+static func _lance(ci: CanvasItem) -> void:
+	ci.draw_line(Vector2(2, 14), Vector2(11, 5), Color("6a4a30"), 1.6)
+	_poly(ci, [Vector2(10, 3.5), Vector2(14.5, 1.5), Vector2(12.5, 6), Vector2(9.5, 6.5)], Color("c3c7d0"))
+	ci.draw_line(Vector2(9.2, 5.0), Vector2(11.8, 7.6), Color("8e1b22"), 1.4)
+
+
+static func _sabre(ci: CanvasItem) -> void:
+	var pts := PackedVector2Array()
+	for i in 8:
+		var f := float(i) / 7.0
+		pts.append(Vector2(4.5, 11.5).lerp(Vector2(13.5, 2.5), f) + Vector2(1, 1) * sin(f * PI) * 1.6)
+	ci.draw_polyline(pts, Color("9fb7bf"), 1.8)
+	ci.draw_line(Vector2(3, 9.5), Vector2(6.5, 13), OUTLINE, 2.0)
+	ci.draw_line(Vector2(3.2, 9.7), Vector2(6.3, 12.8), Color("c9a24e"), 1.2)
+	ci.draw_line(Vector2(4.8, 11.2), Vector2(2.5, 13.8), Color("4b3627"), 1.8)
+
+
+static func _scrap(ci: CanvasItem) -> void:
+	_poly(ci, [Vector2(2, 10), Vector2(6, 7), Vector2(9, 10), Vector2(8, 14), Vector2(3, 14)], Color("6f7480"))
+	_poly(ci, [Vector2(7, 5), Vector2(12, 3), Vector2(14, 7), Vector2(11, 10), Vector2(8, 8)], Color("8a8f98"))
+	ci.draw_line(Vector2(3, 12), Vector2(7, 9), Color("b0b4bc"), 0.6)
+	ci.draw_line(Vector2(9, 5.5), Vector2(12, 8.5), Color("5a5f68"), 0.6)
+
+
+static func _resin(ci: CanvasItem) -> void:
+	_poly(ci, [Vector2(8, 2), Vector2(12, 8), Vector2(12, 11.5), Vector2(8, 14.5), Vector2(4, 11.5), Vector2(4, 8)], Color("d89a2c"))
+	ci.draw_line(Vector2(6, 8), Vector2(7, 12), Color(1, 0.95, 0.7, 0.7), 1.0)
+	ci.draw_circle(Vector2(10, 10.5), 0.9, Color(1, 0.85, 0.4))
+
+
+static func _vial(ci: CanvasItem) -> void:
+	_poly(ci, [Vector2(6, 2), Vector2(10, 2), Vector2(10, 5), Vector2(12.5, 10), Vector2(11, 14), Vector2(5, 14), Vector2(3.5, 10), Vector2(6, 5)], Color("5b3b34"))
+	_poly(ci, [Vector2(4.6, 9), Vector2(11.4, 9), Vector2(11, 13), Vector2(5, 13)], Color("e0702a"), false)
+	ci.draw_rect(Rect2(6, 1, 4, 2), Color("b8a58a"))
+
+
 # ------------------------------------------------------------------ armour
+
+static func _armor_generic(ci: CanvasItem, id: StringName) -> void:
+	var a := Armors.get_armor(StringName(String(id).substr(6)))
+	if a == null:
+		_unknown(ci)
+		return
+	match a.look:
+		PresetData.ArmorLook.LIGHT: _leathers(ci)
+		PresetData.ArmorLook.HEAVY: _plate(ci)
+		PresetData.ArmorLook.BARE: _wraps(ci)
+		_: _mail(ci)
+	# Tint with the armour's own colours so each piece reads differently.
+	ci.draw_rect(Rect2(4.5, 3.2, 7, 2.2), Color(a.cloth_light_color, 0.9))
+	ci.draw_line(Vector2(5, 13), Vector2(11, 13), a.accent_color, 1.4)
+	ci.draw_circle(Vector2(8, 8.5), 1.1, a.accent_color)
 
 static func _torso(ci: CanvasItem, col: Color, shoulders := 0.0) -> void:
 	_poly(ci, [Vector2(3 - shoulders, 3), Vector2(6, 2), Vector2(8, 4), Vector2(10, 2), Vector2(13 + shoulders, 3),

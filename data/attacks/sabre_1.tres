@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+[ext_resource type="Resource" path="res://data/attacks/sabre_2.tres" id="2_next"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"sabre_1"
+display_name = "Sabre — First Wave"
+animation = &"slash"
+startup_frames = 6
+active_frames = 4
+recovery_frames = 14
+chain_open_frame = 4
+dodge_cancel_frame = 5
+damage = 9.0
+poise_damage = 8.0
+stamina_cost = 11.0
+knockback = Vector2(40, -10)
+hitbox_size = Vector2(36, 22)
+hitbox_offset = Vector2(21, -14)
+lunge_speed = 70.0
+lunge_start_frame = 4
+lunge_frames = 4
+hit_stop = 0.04
+shake = 1.2
+next_in_combo = ExtResource("2_next")

@@ -28,6 +28,13 @@
 - **ShieldEnemy** (`oathguard.tscn`): frontal hits while not mid-swing are BLOCKED and drain `max_guard` (poise_damage x0.8 + damage x0.6). Guard 0 = guard break (riposte window). `turn_delay` sets how slowly it turns.
 - **Mimic** (`mimic.tscn`): give its spawner a unique `spawn_id` (saved "slain" flag). Real chests are `world/pickups/treasure_chest.gd` (`chest_id`, `item`, `count`, `embers`). Generators have `chest(...)` and `enemy(..., spawn_id=...)` helpers.
 
+## Weapons, armour and the forge
+- Weapon: author the AttackData files (see tools/gen_gear.py for a compact generator), a WeaponData in data/weapons/ (set `look` = a PresetData.WeaponLook; add a new look by adding an enum value and a drawing in `player_visual.gd`), list its id in `Weapons.IDS`, give it an icon in `icon_art.gd`. Animation keys the visual knows: slash, slash_rev, heavy, air, riposte, smash, sweep, thrust.
+- Armour: an ArmorData in data/armors/ (`look`, damage_taken_mult, run_speed_mult, dodge_stamina_add, colours), id in `Armors.IDS`; its icon is automatic (`armor_<id>`).
+- Make it obtainable: add a recipe to `Forge.RECIPES` ({kind, embers, mat[, relic]}). Starter gear (a preset's own) must share the preset's id and values - `test_gear_data` enforces it.
+- New materials/drops: set `bonus_drop_item` / `bonus_drop_chance` / `bonus_drop_count` on an EnemyData.
+- New station: an Npc with `station` = &"forge" or &"vials" (or add a kind to `ForgeMenu`).
+
 ## NPCs, dialogue and shops
 - Place a `world/npcs/npc.gd` node (Area2D, origin = feet): `npc_id`, `display_name`, `look` (Pedlar / Figure; add a look by adding a `_draw_*` function), optional `shop_id`. Keep it ~80 px from any candle so the two interact zones do not overlap.
 - Lines live in `systems/dialogues.gd` (`conversation(npc_id)` returns `{speaker, lines}`; `finish()` records the talk in the flag `talks_<npc_id>`). Lines may be Strings or `{"who", "text"}`.

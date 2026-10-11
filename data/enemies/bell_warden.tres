@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
 [ext_resource type="Resource" path="res://data/attacks/warden_smash.tres" id="2_smash"]
 [ext_resource type="Resource" path="res://data/attacks/warden_sweep.tres" id="3_sweep"]
 [ext_resource type="Resource" path="res://data/attacks/warden_charge.tres" id="4_charge"]
 [ext_resource type="Resource" path="res://data/items/warden_bell_shard.tres" id="5_shard"]
+[ext_resource type="Resource" path="res://data/items/forge_scrap.tres" id="bonus"]
 
 [resource]
 script = ExtResource("1_enemy")
@@ -31,3 +32,6 @@ ember_reward = 1500
 drop_item = ExtResource("5_shard")
 drop_chance = 1.0
 drop_count = 1
+bonus_drop_item = ExtResource("bonus")
+bonus_drop_chance = 1.0
+bonus_drop_count = 5

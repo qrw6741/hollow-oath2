@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"duelist"
+display_name = "Candlewright Leathers"
+description = "Close-fitting leathers of the Candlewright duelists, cut for speed. They turn a glancing blow and nothing more."
+look = 1
+damage_taken_mult = 1.12
+run_speed_mult = 1.12
+dodge_stamina_add = 0.0
+cloth_color = Color(0.231, 0.165, 0.165, 1)
+cloth_light_color = Color(0.353, 0.251, 0.251, 1)
+accent_color = Color(0.788, 0.635, 0.290, 1)

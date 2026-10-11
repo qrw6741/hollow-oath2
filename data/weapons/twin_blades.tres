@@ -16,3 +16,4 @@ heavy = ExtResource("3_heavy")
 aerial = ExtResource("4_air")
 riposte = ExtResource("5_rip")
 riposte_multiplier = 1.0
+look = 1

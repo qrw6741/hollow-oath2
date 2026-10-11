@@ -6,7 +6,7 @@ extends Area2D
 ## Origin = feet. TEMPORARY ART (procedural): Pedlar = hunched trader with a towering pack
 ## and a lantern; Figure = tall hooded stranger holding a candle.
 
-enum Look { PEDLAR, FIGURE }
+enum Look { PEDLAR, FIGURE, SMITH, KEEPER }
 
 @export var npc_id: StringName = &"wenna"
 @export var display_name := "Wenna"
@@ -14,6 +14,8 @@ enum Look { PEDLAR, FIGURE }
 	set(v): look = v; queue_redraw()
 ## Shop opened after the conversation ("" = just talk).
 @export var shop_id: StringName = &""
+## Smithing station opened after the conversation: &"forge" or &"vials" ("" = none).
+@export var station: StringName = &""
 @export_enum("Left:-1", "Right:1") var start_facing := -1
 
 var facing := -1
@@ -85,6 +87,8 @@ func _on_dialogue_closed() -> void:
 	Dialogues.finish(npc_id)
 	if shop_id != &"":
 		Events.shop_requested.emit.call_deferred(shop_id)
+	elif station != &"":
+		Events.station_requested.emit.call_deferred(station)
 
 
 func _draw() -> void:
@@ -92,6 +96,8 @@ func _draw() -> void:
 	match look:
 		Look.PEDLAR: _draw_pedlar()
 		Look.FIGURE: _draw_figure()
+		Look.SMITH: _draw_smith()
+		Look.KEEPER: _draw_keeper()
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
@@ -150,3 +156,48 @@ func _draw_figure() -> void:
 	draw_line(Vector2(3, -22), Vector2(8, -19), robe_d, 2.0)
 	draw_rect(Rect2(7.5, -19, 2, 6), Palette.BONE)
 	draw_colored_polygon(PackedVector2Array([Vector2(8.5, -20), Vector2(7.4, -22.5 - fl), Vector2(8.5, -25 - fl * 2.0), Vector2(9.6, -22.5 - fl)]), Color(1.0, 0.8, 0.4, 0.95))
+
+
+func _draw_smith() -> void:
+	var bob := sin(_t * 1.3) * 0.4
+	var fl := 0.75 + 0.25 * sin(_t * 8.0) * sin(_t * 4.7)
+	# Anvil on a stump, hot iron on it
+	draw_rect(Rect2(-22, -6, 10, 6), Palette.WOOD)
+	draw_colored_polygon(PackedVector2Array([Vector2(-26, -10), Vector2(-9, -10), Vector2(-12, -7), Vector2(-23, -7)]), Color("5a5f68"))
+	draw_rect(Rect2(-22, -12, 8, 2), Color(1.0, 0.45 + 0.2 * fl, 0.15, 0.95))
+	draw_circle(Vector2(-18, -12), 7.0, Color(1.0, 0.5, 0.2, 0.10 * fl))
+	# Legs and broad body in a leather apron
+	draw_line(Vector2(-3, -10), Vector2(-4, 0), Color("3a2e26"), 3.4)
+	draw_line(Vector2(4, -10), Vector2(5, 0), Color("3a2e26"), 3.4)
+	draw_colored_polygon(PackedVector2Array([Vector2(-8, -11), Vector2(-7, -27 + bob), Vector2(9, -27 + bob), Vector2(10, -11)]), Color("6e5b4a"))
+	draw_colored_polygon(PackedVector2Array([Vector2(-5, -12), Vector2(-4, -24 + bob), Vector2(7, -24 + bob), Vector2(8, -12)]), Color("4a3626"))
+	# Bald head, heavy beard
+	draw_circle(Vector2(1, -31 + bob), 4.0, Color("c29a7c"))
+	draw_colored_polygon(PackedVector2Array([Vector2(-3, -30 + bob), Vector2(5, -30 + bob), Vector2(3, -24 + bob), Vector2(-1, -24 + bob)]), Color("5a4a3a"))
+	# Hammer arm raised a little, bobbing
+	draw_line(Vector2(7, -24 + bob), Vector2(14, -22 + bob), Color("c29a7c"), 3.0)
+	draw_line(Vector2(14, -22 + bob), Vector2(16, -33 + bob), Palette.WOOD_LIGHT, 1.6)
+	draw_rect(Rect2(13.5, -37 + bob, 6, 4), Color("7a808a"))
+
+
+func _draw_keeper() -> void:
+	var sway := sin(_t * 1.0) * 0.6
+	var fl := 0.8 + 0.2 * sin(_t * 6.0) * sin(_t * 3.7)
+	var robe := Color("6b5a78")
+	var robe_d := Color("4a3d58")
+	draw_circle(Vector2(10, -16), 14.0, Color(1.0, 0.55, 0.2, 0.07 * fl))
+	# Robe
+	draw_colored_polygon(PackedVector2Array([Vector2(-6, 0), Vector2(-4, -25), Vector2(3, -27), Vector2(6, -24), Vector2(7, 0)]), robe)
+	for i in 4:
+		var x := -6.0 + i * 3.4
+		draw_colored_polygon(PackedVector2Array([Vector2(x, 0), Vector2(x + 1.7, 2.0), Vector2(x + 3.4, 0)]), robe_d)
+	draw_line(Vector2(-2, -22), Vector2(-3, -2), robe_d, 1.0)
+	# Veiled head
+	draw_circle(Vector2(0.5 + sway * 0.3, -29), 3.6, Color("d9c5b0"))
+	draw_colored_polygon(PackedVector2Array([Vector2(-4, -29), Vector2(0, -35), Vector2(5, -29), Vector2(6, -22), Vector2(-5, -22)]), Color(robe_d, 0.95))
+	draw_circle(Vector2(1.5, -29), 2.4, Color("d9c5b0"))
+	# Arm holding a glass vial of ember-light
+	draw_line(Vector2(4, -22), Vector2(10, -19), robe_d, 2.0)
+	draw_rect(Rect2(8.5, -22, 3.4, 5.5), Color(0.15, 0.1, 0.1, 0.9))
+	draw_rect(Rect2(9.1, -21.4, 2.2, 4.3), Color(1.0, 0.5 + 0.2 * fl, 0.15, 0.95))
+	draw_rect(Rect2(8.8, -23.4, 2.8, 1.4), Palette.BONE)

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"lance_air"
+display_name = "Lance — Plunge"
+animation = &"air"
+startup_frames = 5
+active_frames = 9
+recovery_frames = 13
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 15.0
+poise_damage = 10.0
+stamina_cost = 13.0
+knockback = Vector2(30, 80)
+hitbox_size = Vector2(24, 38)
+hitbox_offset = Vector2(10, -4)
+lunge_speed = 0.0
+lunge_start_frame = 0
+lunge_frames = 0
+hit_stop = 0.05
+shake = 1.5
+gravity_scale = 0.5
+is_aerial = true

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"sworn_knight"
+display_name = "Oathsworn Mail"
+description = "Mail and a black cloak, the issue of every sworn knight. The crimson sash marks a vow that was never released."
+look = 2
+damage_taken_mult = 1.0
+run_speed_mult = 1.0
+dodge_stamina_add = 0.0
+cloth_color = Color(0.133, 0.118, 0.157, 1)
+cloth_light_color = Color(0.227, 0.204, 0.259, 1)
+accent_color = Color(0.557, 0.106, 0.133, 1)

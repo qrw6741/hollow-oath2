@@ -52,4 +52,6 @@ Arrow keys / D-pad / stick move the selection, **Enter** or **A** selects, **Esc
 ## Remapping
 **Talking and shopping:** stand next to a character and press Interact (E / Dpad-up) to talk; Interact / Confirm / Light attack moves the conversation on, Cancel skips it. In a shop, Confirm buys one of the selected item; Cancel leaves.
 
+**Equipment:** open the pack (Tab / Create), choose the Weapon or Armour slot and press Confirm to pick a different one. In the armour list, "Take off all armour" is the first entry. Blacksmith and Vial-Keeper: talk (Interact), then Confirm to upgrade the highlighted row; L1/R1 (Parry/Heal) switches the smith's tabs; Cancel leaves.
+
 Rebind any action in **Settings → Controls**: pick the keyboard or controller cell and press the new key/button (Esc cancels). Using a binding another action had swaps them. *Reset controls to defaults* restores everything. Bindings are saved to `user://input.cfg`; defaults live in `autoload/input_config.gd`.

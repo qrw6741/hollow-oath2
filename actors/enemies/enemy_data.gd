@@ -40,3 +40,7 @@ extends Resource
 @export var drop_item: ItemData
 @export_range(0.0, 1.0) var drop_chance := 0.0
 @export var drop_count := 1
+## A second, independent drop roll (crafting materials).
+@export var bonus_drop_item: ItemData
+@export_range(0.0, 1.0) var bonus_drop_chance := 0.0
+@export var bonus_drop_count := 1

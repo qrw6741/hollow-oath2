@@ -19,6 +19,13 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Gear
+- Balance is untested by a human: weapon damage/speed, upgrade and forge costs, material drop rates, naked/heavy armour trade-offs. The greatsword and hammer are deliberately slow; the rapier and sabre deliberately fragile in reach/poise.
+- Parry window and dodge base cost stay with the character (preset), not the weapon: a shield-less Bulwark keeps its 12-frame parry. Weapons do not yet have strength requirements.
+- Placeholder art: all weapon/armour visuals and icons are procedural; heavy armours differ mainly by silhouette and colour.
+- Relic-gated gear can be forged any time the relic is carried, but the relic items are one-off drops: if a boss is skipped the item cannot be forged.
+- No selling or dismantling of gear; unused weapons/armour stay in the pickers.
+
 ## After the prologue
 - The Marshal, the road and the new enemies are untested by a human: expect balance changes. The Marshal's banner window and the crows' damage are the most likely to need tuning.
 - The road ends at a sealed gate ("coming in the next build"); there is no area beyond the Crossroads yet.

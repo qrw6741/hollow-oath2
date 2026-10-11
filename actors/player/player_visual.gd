@@ -16,7 +16,14 @@ const SWINGS := {
 	&"heavy": [-170.0, 70.0],
 	&"air": [-110.0, 120.0],
 	&"riposte": [-20.0, -5.0],
+	&"smash": [-150.0, 70.0],
+	&"sweep": [-125.0, 55.0],
+	&"thrust": [62.0, 0.0],
 }
+## Weapon looks that use the one-weapon swing poses (sword, shield, and the later additions).
+const SINGLE_LOOKS := [0, 2, 4, 5, 6, 7, 8]
+## Looks whose thrust / riposte pushes the weapon forward instead of swinging it.
+const THRUSTERS := [5, 7]
 ## Twin blades: [windup, strike_end] for blade A (front) and B (rear).
 const TWIN := {
 	&"twin_a": {"a": [-100.0, 45.0]},
@@ -57,6 +64,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _look() -> PresetData:
+	if player and player.look:
+		return player.look
 	if player and player.preset:
 		return player.preset
 	if preset:
@@ -72,7 +81,7 @@ func _new_pose(wl: int) -> Dictionary:
 		"mode": "body", "lean": 0.0, "crouch": 0.0, "legs": 0.0, "arm_up": false,
 		"flash": 0.0, "alpha": 1.0,
 		"sa": 62.0, "sb": 100.0, "trail": Vector2.ZERO, "trail_b": Vector2.ZERO,
-		"sh_off": 0.0, "sh_up": 0.0,
+		"sh_off": 0.0, "sh_up": 0.0, "ext": 0.0,
 		"fa": FIST_GUARD_F, "fb": FIST_GUARD_R, "ftrail": [],
 	}
 	if wl == PresetData.WeaponLook.TWIN:
@@ -120,7 +129,8 @@ func _attack_pose(p: Dictionary, wl: int, r: AttackRunner) -> void:
 	var prog := r.phase_progress()
 	var phase := r.phase
 	match wl:
-		PresetData.WeaponLook.SWORD, PresetData.WeaponLook.SWORD_SHIELD:
+		PresetData.WeaponLook.SWORD, PresetData.WeaponLook.SWORD_SHIELD, PresetData.WeaponLook.GREATSWORD, \
+		PresetData.WeaponLook.RAPIER, PresetData.WeaponLook.HAMMER, PresetData.WeaponLook.SPEAR, PresetData.WeaponLook.SABRE:
 			var sw: Array = SWINGS.get(key, SWINGS[&"slash"])
 			if key == &"bash":
 				sw = [62.0, 62.0]
@@ -139,6 +149,15 @@ func _attack_pose(p: Dictionary, wl: int, r: AttackRunner) -> void:
 					p["sa"] = lerpf(sw[0], sw[1], ease(prog, 0.35)); p["trail"] = Vector2(sw[0], p["sa"]); p["lean"] = 3.0; p["crouch"] = 1.5
 				_:
 					p["sa"] = lerpf(sw[1], 62.0, prog * prog); p["lean"] = 2.0 * (1.0 - prog); p["crouch"] = 1.5 * (1.0 - prog)
+			if key == &"thrust" or (key == &"riposte" and wl in THRUSTERS):
+				match phase:
+					AttackRunner.Phase.STARTUP:
+						p["sa"] = lerpf(62.0, 14.0, ease(prog, 0.4)); p["ext"] = lerpf(0.0, -4.0, ease(prog, 0.4))
+					AttackRunner.Phase.ACTIVE:
+						p["sa"] = 2.0; p["ext"] = lerpf(-4.0, 11.0, ease(prog, 0.3))
+						p["trail"] = Vector2.ZERO
+					_:
+						p["sa"] = lerpf(2.0, 62.0, prog * prog); p["ext"] = lerpf(11.0, 0.0, prog)
 			if key == &"riposte":
 				p["lean"] = 4.0
 		PresetData.WeaponLook.TWIN:
@@ -418,6 +437,55 @@ func _draw_weapon(look: PresetData, p: Dictionary, shoulder: Vector2, flash: flo
 			_draw_shield(look, shoulder + Vector2(5.0 + p.sh_off, 5.0 - p.sh_up), p.sh_off > 2.0, flash, alpha)
 		PresetData.WeaponLook.FISTS:
 			_draw_fists(look, p, shoulder, flash, alpha)
+		PresetData.WeaponLook.GREATSWORD, PresetData.WeaponLook.RAPIER, PresetData.WeaponLook.HAMMER, \
+		PresetData.WeaponLook.SPEAR, PresetData.WeaponLook.SABRE:
+			_draw_long_weapon(look, p, shoulder, flash, alpha, arm_col)
+
+
+## Greatsword, rapier, hammer, spear and sabre: one hand position, a different thing in it.
+func _draw_long_weapon(look: PresetData, p: Dictionary, shoulder: Vector2, flash: float, alpha: float, arm_col: Color) -> void:
+	var wl: int = look.weapon_look
+	var hand := shoulder + Vector2(3.0 + float(p.get("ext", 0.0)), 3.0)
+	var deg: float = p.sa
+	var dir := Vector2.from_angle(deg_to_rad(deg))
+	var ortho := dir.orthogonal()
+	var length: float = {4: 26.0, 5: 22.0, 6: 15.0, 7: 30.0, 8: 18.0}[wl]
+	if p.trail != Vector2.ZERO:
+		_draw_trail(hand, p.trail.x, p.trail.y, alpha, length)
+	draw_line(shoulder + Vector2(2, 1), hand, _c(arm_col, flash, alpha), 2.0)
+	var steel := _c(Palette.STEEL, flash, alpha)
+	var gold := _c(Palette.GOLD, flash, alpha)
+	var wood := _c(Palette.WOOD_LIGHT, flash, alpha)
+	match wl:
+		PresetData.WeaponLook.GREATSWORD:
+			draw_line(shoulder + Vector2(1, 3), hand + dir * 2.0, _c(arm_col, flash, alpha), 1.6)
+			draw_line(hand - dir * 4.0, hand + dir * 3.0, wood, 2.0)
+			draw_line(hand + dir * 3.0 - ortho * 3.5, hand + dir * 3.0 + ortho * 3.5, gold, 1.6)
+			draw_line(hand + dir * 3.0, hand + dir * length, steel, 3.0)
+			draw_line(hand + dir * 5.0, hand + dir * (length - 2.0), _c(Palette.BONE, flash, alpha * 0.7), 0.8)
+		PresetData.WeaponLook.RAPIER:
+			draw_line(hand - dir * 2.0, hand + dir * 1.0, wood, 1.6)
+			draw_arc(hand + dir * 2.0, 3.0, deg_to_rad(deg) - 1.6, deg_to_rad(deg) + 1.6, 6, gold, 1.0)
+			draw_line(hand + dir * 2.0, hand + dir * length, steel, 1.0)
+		PresetData.WeaponLook.HAMMER:
+			draw_line(hand - dir * 3.0, hand + dir * length, wood, 2.0)
+			var head: Vector2 = hand + dir * length
+			draw_colored_polygon(PackedVector2Array([head + ortho * 4.0 - dir * 3.0, head + ortho * 4.0 + dir * 3.0,
+				head - ortho * 4.0 + dir * 3.0, head - ortho * 4.0 - dir * 3.0]), steel)
+			draw_line(head + ortho * 4.0, head - ortho * 4.0, gold, 0.8)
+		PresetData.WeaponLook.SPEAR:
+			draw_line(hand - dir * 7.0, hand + dir * (length - 6.0), wood, 1.8)
+			var tip: Vector2 = hand + dir * length
+			var base: Vector2 = hand + dir * (length - 7.0)
+			draw_colored_polygon(PackedVector2Array([base + ortho * 2.0, tip, base - ortho * 2.0]), steel)
+			draw_line(base + ortho * 1.6, base - ortho * 1.6, _c(look.accent_color, flash, alpha), 1.2)
+		PresetData.WeaponLook.SABRE:
+			var pts := PackedVector2Array()
+			for i in 7:
+				var f := float(i) / 6.0
+				pts.append(hand + dir * (f * length) + ortho * (sin(f * PI) * 2.2))
+			draw_polyline(pts, _c(Color("9fb7bf"), flash, alpha), 1.6)
+			draw_line(hand + dir * 1.5 - ortho * 2.0, hand + dir * 1.5 + ortho * 2.0, gold, 1.2)
 
 
 func _draw_blade(hand: Vector2, deg: float, length: float, trail: Vector2, arm_col: Color, shoulder: Vector2, flash: float, alpha: float, crossguard: bool) -> void:

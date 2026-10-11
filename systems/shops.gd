@@ -8,6 +8,8 @@ const STOCK := {
 		{"item": &"ash_bandage", "price": 40},
 		{"item": &"stamina_tonic", "price": 90},
 		{"item": &"pilgrims_draught", "price": 150},
+		{"item": &"forge_scrap", "price": 110},
+		{"item": &"hollow_resin", "price": 170},
 	],
 }
 const NAMES := {&"pedlar": "THE PEDLAR'S WARES"}

@@ -23,6 +23,13 @@ var stats := {"vigor": 0, "endurance": 0, "strength": 0}
 ## item id (String) -> count.
 var inventory := {}
 var quick_item: StringName = &""
+## Gear: owned id (String) -> upgrade level, and what is equipped. See Loadout / Forge.
+## armor_id == &"none" means no armour (taken off); &"" means "not set up yet".
+var weapons := {}
+var weapon_id: StringName = &""
+var armors := {}
+var armor_id: StringName = &""
+var flask_level := 0
 const STAT_NAMES := ["vigor", "endurance", "strength"]
 const VIGOR_HEALTH := 8.0
 const ENDURANCE_STAMINA := 6.0
@@ -101,6 +108,8 @@ func _on_enemy_killed(enemy: Node) -> void:
 		add_embers(d.ember_reward)
 	if d.drop_item != null and d.drop_chance > 0.0 and randf() < d.drop_chance:
 		add_item(d.drop_item.id, d.drop_count)
+	if d.bonus_drop_item != null and d.bonus_drop_chance > 0.0 and randf() < d.bonus_drop_chance:
+		add_item(d.bonus_drop_item.id, d.bonus_drop_count)
 
 
 func add_embers(amount: int) -> void:
@@ -227,6 +236,36 @@ func item_count(id: StringName) -> int:
 	return int(inventory.get(String(id), 0))
 
 
+func owns_weapon(id: StringName) -> bool:
+	return weapons.has(String(id))
+
+
+func owns_armor(id: StringName) -> bool:
+	return armors.has(String(id))
+
+
+func weapon_level(id: StringName) -> int:
+	return int(weapons.get(String(id), 0))
+
+
+func armor_level(id: StringName) -> int:
+	return int(armors.get(String(id), 0))
+
+
+func grant_gear(kind: String, id: StringName) -> void:
+	if kind == "weapon":
+		if not weapons.has(String(id)):
+			weapons[String(id)] = 0
+	elif not armors.has(String(id)):
+		armors[String(id)] = 0
+
+
+func set_gear_level(kind: String, id: StringName, level: int) -> void:
+	var d: Dictionary = weapons if kind == "weapon" else armors
+	if d.has(String(id)):
+		d[String(id)] = clampi(level, 0, Forge.MAX_LEVEL)
+
+
 # ------------------------------------------------------------------ flags
 
 func set_flag(flag: StringName, value: Variant = true) -> void:
@@ -249,6 +288,11 @@ func reset() -> void:
 	stats = {"vigor": 0, "endurance": 0, "strength": 0}
 	inventory = {}
 	quick_item = &""
+	weapons = {}
+	weapon_id = &""
+	armors = {}
+	armor_id = &""
+	flask_level = 0
 	ui_modal = false
 	explored = {}
 	level_path = DEFAULT_LEVEL_PATH
@@ -269,6 +313,7 @@ func new_game(slot: int, preset: StringName = &"sworn_knight") -> void:
 	reset()
 	current_slot = slot
 	preset_id = preset
+	Loadout.ensure(Presets.get_preset(preset))
 
 
 ## Serialisable snapshot of durable state. No transient combat state, ever.
@@ -282,6 +327,11 @@ func to_dict() -> Dictionary:
 		"stats": stats.duplicate(true),
 		"inventory": inventory.duplicate(true),
 		"quick_item": String(quick_item),
+		"weapons": weapons.duplicate(true),
+		"weapon_id": String(weapon_id),
+		"armors": armors.duplicate(true),
+		"armor_id": String(armor_id),
+		"flask_level": flask_level,
 		"explored": _explored_to_save(),
 		"level_path": level_path,
 		"level_name": level_name,
@@ -306,6 +356,11 @@ func apply_dict(d: Dictionary, slot: int) -> void:
 	stats = (d.get("stats", stats) as Dictionary).duplicate(true)
 	inventory = (d.get("inventory", {}) as Dictionary).duplicate(true)
 	quick_item = StringName(d.get("quick_item", ""))
+	weapons = (d.get("weapons", {}) as Dictionary).duplicate(true)
+	weapon_id = StringName(d.get("weapon_id", ""))
+	armors = (d.get("armors", {}) as Dictionary).duplicate(true)
+	armor_id = StringName(d.get("armor_id", ""))
+	flask_level = int(d.get("flask_level", 0))
 	explored = {}
 	var ex: Dictionary = d.get("explored", {})
 	for lv in ex:
@@ -322,3 +377,4 @@ func apply_dict(d: Dictionary, slot: int) -> void:
 	var p: Array = d.get("respawn_position", [0.0, 0.0])
 	respawn_position = Vector2(float(p[0]), float(p[1]))
 	flags = (d.get("flags", {}) as Dictionary).duplicate(true)
+	Loadout.ensure(Presets.get_preset(preset_id))

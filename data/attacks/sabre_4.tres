@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"sabre_4"
+display_name = "Sabre — Rising Tide"
+animation = &"slash_rev"
+startup_frames = 9
+active_frames = 5
+recovery_frames = 22
+chain_open_frame = -1
+dodge_cancel_frame = 8
+damage = 15.0
+poise_damage = 18.0
+stamina_cost = 14.0
+knockback = Vector2(120, -50)
+hitbox_size = Vector2(38, 24)
+hitbox_offset = Vector2(22, -14)
+lunge_speed = 90.0
+lunge_start_frame = 6
+lunge_frames = 5
+hit_stop = 0.07
+shake = 2.5

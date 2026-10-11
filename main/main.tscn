@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://main/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://world/camera_rig.gd" id="2_camera"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://ui/map/map_menu.gd" id="10_map"]
 [ext_resource type="Script" path="res://ui/dialogue/dialogue_box.gd" id="11_dlg"]
 [ext_resource type="Script" path="res://ui/shop/shop_menu.gd" id="12_shop"]
+[ext_resource type="Script" path="res://ui/forge/forge_menu.gd" id="13_forge"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_main")
@@ -52,3 +53,6 @@ script = ExtResource("11_dlg")
 
 [node name="ShopMenu" type="CanvasLayer" parent="."]
 script = ExtResource("12_shop")
+
+[node name="ForgeMenu" type="CanvasLayer" parent="."]
+script = ExtResource("13_forge")

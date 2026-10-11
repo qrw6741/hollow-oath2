@@ -113,3 +113,11 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Walk the whole road: pikemen (thrust parryable, low sweep not - jump it), crows, the Oathguard in the ford, the Mimic on the bank (does the breath of ash read as a tell?), chests, both candles.
 - [ ] Sir Orren: all five attacks readable? Is phase 2 fair? Do the banner crows feel like an opening or a nuisance? Crest + embers on victory; Ommen's new line afterwards.
 - [ ] Fast travel to the Wayside / Camp candle from another area; die on the road -> respawn at the last road candle.
+
+## Gear (new)
+- [ ] Find Hobb and Ilse (Vaelmoor, Awake and Pilgrim's Rest). Talk, then the station opens; Cancel leaves.
+- [ ] Buy Forge Scrap / Hollow Resin from Wenna; upgrade a weapon, an armour and the vials; check the numbers change on the Equipment tab and in play.
+- [ ] Take armour off (Equipment tab): you should look bare, run faster and take much more damage. Put it back on.
+- [ ] Forge each new weapon (carry the relic where one is required) and play with it: rapier, greatsword, hammer, lance, sabre. Do thrusts feel fair? Is the greatsword too slow, the lance too long?
+- [ ] Save, quit, load: weapons, armour, levels, worn/naked state and vial level all return.
+
