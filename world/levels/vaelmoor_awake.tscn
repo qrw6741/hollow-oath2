@@ -1,0 +1,157 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
+[ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/story/prologue_end.gd" id="prologue"]
+
+[node name="VaelmoorAwake" type="Node2D"]
+script = ExtResource("level")
+level_id = &"vaelmoor_awake"
+display_name = "Vaelmoor, Awake"
+bounds = Rect2(0, 0, 1920, 540)
+music = &"menu"
+music_pitch = 1.15
+map_origin = Vector2(0, -1400)
+default_spawn = Vector2(220, 480)
+
+[node name="Background" type="ParallaxBackground" parent="."]
+
+[node name="Sky" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0, 0)
+
+[node name="SkyDraw" type="Node2D" parent="Background/Sky"]
+script = ExtResource("sky")
+moon_pos = Vector2(120, 70)
+daylight = true
+
+[node name="Far" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.12, 0.1)
+
+[node name="Citadel" type="Node2D" parent="Background/Far"]
+script = ExtResource("ruins")
+base_y = 205.0
+max_height = 120.0
+color = Color(0.55, 0.6, 0.7, 1)
+seed_value = 61
+spacing = 70.0
+width = 1400.0
+haze = 0.5
+haze_color = Color(0.92, 0.88, 0.8, 1)
+
+[node name="Mid" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.35, 0.3)
+
+[node name="Hills" type="Node2D" parent="Background/Mid"]
+script = ExtResource("ruins")
+base_y = 250.0
+max_height = 70.0
+color = Color(0.36, 0.48, 0.36, 1)
+seed_value = 67
+spacing = 120.0
+width = 1800.0
+haze = 0.4
+haze_color = Color(0.9, 0.88, 0.78, 1)
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(1, 0.98, 0.94, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(24, 480)
+style = 1
+seed_value = 301
+
+[node name="HillA" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 480)
+script = ExtResource("block")
+size = Vector2(520, 60)
+style = 3
+seed_value = 302
+
+[node name="HillB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(520, 460)
+script = ExtResource("block")
+size = Vector2(300, 80)
+style = 3
+seed_value = 303
+
+[node name="HillC" type="StaticBody2D" parent="Geometry"]
+position = Vector2(820, 440)
+script = ExtResource("block")
+size = Vector2(360, 100)
+style = 3
+seed_value = 304
+
+[node name="HillD" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1180, 460)
+script = ExtResource("block")
+size = Vector2(380, 80)
+style = 3
+seed_value = 305
+
+[node name="HillE" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1560, 480)
+script = ExtResource("block")
+size = Vector2(360, 60)
+style = 3
+seed_value = 306
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1896, 0)
+script = ExtResource("block")
+size = Vector2(24, 480)
+style = 1
+seed_value = 307
+
+[node name="Arrival" type="Marker2D" parent="."]
+position = Vector2(220, 480)
+script = ExtResource("entry")
+entry_id = &"arrival"
+
+[node name="FirstLightCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(420, 480)
+checkpoint_id = &"first_light_candle"
+display_name = "First Light Candle"
+
+[node name="WakingStone" type="Area2D" parent="."]
+position = Vector2(700, 460)
+script = ExtResource("tablet")
+title = "The Waking Stone"
+text = "You have walked out of the Hollow: the dream the oath built around the sworn on the Night of Unbinding. The Yard, the village, the drowned choir - all of it was the oath remembering itself. This is Vaelmoor as it is now, under a real sun. The road below leads toward the Crownless Citadel.\n\n(End of the prologue. The real journey continues in the next build.)"
+
+[node name="RoadGate" type="Area2D" parent="."]
+position = Vector2(1860, 480)
+script = ExtResource("exit")
+mode = 1
+size = Vector2(30, 60)
+door_id = &"kingdom_road"
+display_name = "the road to the kingdom"
+locked_text = "THE ROAD AHEAD  -  coming in the next build"
+sealed = true
+
+[node name="PrologueEnd" type="Node" parent="."]
+script = ExtResource("prologue")
+
+[node name="Petals" type="CPUParticles2D" parent="."]
+position = Vector2(960, -10)
+amount = 40
+lifetime = 12.0
+preprocess = 12.0
+emission_shape = 3
+emission_rect_extents = Vector2(980, 4)
+direction = Vector2(0.6, 1)
+spread = 30.0
+gravity = Vector2(8, 12)
+initial_velocity_min = 6.0
+initial_velocity_max = 16.0
+color = Color(1, 0.9, 0.75, 0.6)
+z_index = 5

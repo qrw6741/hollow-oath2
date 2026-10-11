@@ -2,7 +2,7 @@
 
 A 2D dark-fantasy Soulslike action-platformer built in **Godot 4.3 (GDScript)**, targeting Windows 10/11 64-bit.
 
-**Current state: Milestone 1 vertical slice + save system and main menu (v0.1.0-m1).** Three areas — *The Penitent's Yard* (intro boss: the Bell-Warden), *The Forsaken Village* and *The Drowned Catacombs* (boss: the Drowned Canon) — three enemy types, six checkpoints, a shortcut, a secret wall, a world map, a hazard, the death/respawn loop, three save slots and a main menu. All art is **temporary procedural placeholder art** (see `docs/ART_BIBLE.md`); audio is synthesised placeholder (see `docs/AUDIO.md`).
+**Current state: Milestone 1 vertical slice + save system and main menu (v0.1.0-m1).** The full prologue: three Hollow areas — *The Penitent's Yard* (intro boss: the Bell-Warden), *The Forsaken Village* and *The Drowned Catacombs* (boss: the Drowned Canon) — ending in a light that carries you to *Vaelmoor, Awake*, the real world; three enemy types, six checkpoints, a shortcut, a secret wall, a world map, a hazard, the death/respawn loop, three save slots and a main menu. All art is **temporary procedural placeholder art** (see `docs/ART_BIBLE.md`); audio is synthesised placeholder (see `docs/AUDIO.md`).
 
 ## Run it
 
@@ -26,7 +26,7 @@ godot --headless --path . --export-release "Windows Desktop" build/windows/TheHo
 godot --headless --path . --fixed-fps 60 res://tests/run_tests.tscn
 ```
 
-68 automated tests drive the real scenes with simulated input: 18 gameplay tests (movement, combo, stamina, dodge i-frames, parry + riposte, healing, checkpoint, death/respawn, AI, spikes, hit-stop) 13 save/menu tests, 6 preset tests and 9 economy / controller tests and 8 boss tests (round trip, corruption, tampering, backup recovery, newer-version and malformed saves, write failure, autosave, the full menu → play → die → quit → continue flow, overwrite/delete confirmation, pause menu). Exit code 0 = all pass. Windows shortcut: `tools\run_tests.bat` (edit the Godot path inside first).
+69 automated tests drive the real scenes with simulated input: 18 gameplay tests (movement, combo, stamina, dodge i-frames, parry + riposte, healing, checkpoint, death/respawn, AI, spikes, hit-stop) 13 save/menu tests, 6 preset tests and 9 economy / controller tests and 8 boss tests (round trip, corruption, tampering, backup recovery, newer-version and malformed saves, write failure, autosave, the full menu → play → die → quit → continue flow, overwrite/delete confirmation, pause menu). Exit code 0 = all pass. Windows shortcut: `tools\run_tests.bat` (edit the Godot path inside first).
 
 Cross-process save check (two separate game launches; the second must restore what the first saved):
 

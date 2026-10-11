@@ -26,6 +26,9 @@ var _ember_shown := 0.0
 var _ember_tween: Tween
 var _quick_box: PanelContainer
 var _boss_box: Control
+var _msg_panel: PanelContainer
+var _msg_title: Label
+var _msg_text: Label
 var _boss_name: Label
 var _boss_bar: StatBar
 var _boss: BossBase
@@ -51,6 +54,8 @@ func _ready() -> void:
 	Events.item_picked.connect(func(id, n): _toast("%s  x%d" % [Items.get_item(id).display_name, n]))
 	Events.stats_changed.connect(_sync_economy)
 	Events.boss_fight_started.connect(_on_boss_fight_started)
+	Events.message_requested.connect(_on_message)
+	Events.message_closed.connect(func(): _msg_panel.visible = false)
 	Events.boss_fight_ended.connect(_on_boss_fight_ended)
 	Events.session_started.connect(_sync_economy)
 	Events.player_spawned.connect(func(_p): _sync_economy())
@@ -116,6 +121,26 @@ func _build() -> void:
 	qrow.add_child(qg)
 	_quick_label = _label(qrow, "", 8, HORIZONTAL_ALIGNMENT_LEFT)
 	root.add_child(_quick_box)
+
+	# Readable text (tablets, signs), lower middle.
+	_msg_panel = PanelContainer.new()
+	_msg_panel.position = Vector2(90, 150)
+	_msg_panel.custom_minimum_size = Vector2(300, 0)
+	_msg_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_msg_panel.visible = false
+	root.add_child(_msg_panel)
+	UITheme.frame(_msg_panel)
+	var mv := VBoxContainer.new()
+	mv.add_theme_constant_override(&"separation", 4)
+	_msg_panel.add_child(mv)
+	_msg_title = Label.new()
+	UITheme.title(_msg_title, 11, Palette.GOLD_BRIGHT)
+	mv.add_child(_msg_title)
+	_msg_text = Label.new()
+	_msg_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_msg_text.custom_minimum_size = Vector2(284, 0)
+	_msg_text.add_theme_constant_override(&"line_spacing", -1)
+	mv.add_child(_msg_text)
 
 	# Boss bar, bottom centre.
 	_boss_box = Control.new()
@@ -227,6 +252,14 @@ func _draw_vials() -> void:
 		_vials.draw_circle(Vector2(x + 3, 6), 2.5, body)
 		if full:
 			_vials.draw_circle(Vector2(x + 2.3, 5.2), 0.8, Palette.GOLD_BRIGHT)
+
+
+func _on_message(title: String, text: String) -> void:
+	_msg_title.text = title
+	_msg_text.text = text
+	_msg_panel.reset_size()
+	_msg_panel.position = Vector2(240 - _msg_panel.size.x / 2.0, 200 - _msg_panel.size.y)
+	_msg_panel.visible = true
 
 
 func _on_boss_fight_started(b: Node) -> void:
@@ -349,6 +382,7 @@ func _on_session_started() -> void:
 	_saved_label.modulate.a = 0.0
 	_prompt.visible = false
 	_boss_box.visible = false
+	_msg_panel.visible = false
 
 
 func _on_game_saved(_slot: int) -> void:

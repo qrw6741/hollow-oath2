@@ -66,7 +66,7 @@ func _run() -> void:
 		test_shortcut_gate, test_acolyte_projectile_parry_dodge, test_bell_bearer,
 		# --- catacombs, second boss, map ---
 		test_catacombs_travel_and_water, test_drown_shaft_kills, test_breakable_wall, test_canon_boss,
-		test_map_exploration_and_screen,
+		test_map_exploration_and_screen, test_prologue_ending,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -1890,3 +1890,44 @@ func test_map_exploration_and_screen() -> void:
 	await press(&"interact")
 	await frames(60)
 	check(game_state.get_flag(&"candle_lit_yard_candle", false), "resting marks the candle on the map")
+
+
+func test_prologue_ending() -> void:
+	await fresh_game()
+	await go_to_level(CATACOMBS, &"from_chapel")
+	var ar: BossArena = level.get_node("CanonArena")
+	check(get_tree().get_nodes_in_group(&"shining_light").is_empty(), "no light before the Canon falls")
+	await place_player(2600.0, 720.0, 1)
+	await frames(40)
+	ar.boss.receive_hit(damage(99999.0))
+	await frames(int(ar.light_delay * 60.0) + 20)
+	var lights := get_tree().get_nodes_in_group(&"shining_light")
+	check(lights.size() == 1, "a shining light appears after the victory")
+	if lights.is_empty():
+		return
+	# Walk into it.
+	await place_player(lights[0].global_position.x - 40.0, 720.0, 1)
+	Input.action_press(&"move_right")
+	await frames(50)
+	Input.action_release(&"move_right")
+	await frames(60 * 5)
+	level = main.current_level()
+	check(level.level_id == &"vaelmoor_awake", "the light carries you to the true Vaelmoor")
+	check(level.player.global_position.distance_to(Vector2(220, 480)) < 8.0, "arrive at the arrival point")
+	await frames(60 * 5)
+	check(game_state.get_flag(&"prologue_complete", false), "prologue marked complete")
+	check(main._fade.color.a < 0.05, "white fade cleared")
+	# The light stays for later visits.
+	await go_to_level(CATACOMBS, &"from_chapel")
+	await frames(4)
+	check(get_tree().get_nodes_in_group(&"shining_light").size() == 1, "the light is still there when you return")
+	# The stone can be read.
+	await go_to_level("res://world/levels/vaelmoor_awake.tscn", &"arrival")
+	await place_player(700.0, 460.0, 1)
+	await frames(6)
+	await press(&"interact")
+	await frames(4)
+	check(main.hud._msg_panel.visible and main.hud._msg_title.text == "The Waking Stone", "the Waking Stone can be read")
+	await place_player(1200.0, 460.0, 1)
+	await frames(6)
+	check(not main.hud._msg_panel.visible, "walking away closes the text")

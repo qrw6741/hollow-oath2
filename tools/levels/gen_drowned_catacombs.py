@@ -206,7 +206,10 @@ gate_height = 96.0
 trigger_offset = 40.0
 trigger_width = 640.0
 trigger_below = 160.0
-victory_text = "THE HYMN DROWNS"''')
+victory_text = "THE HYMN DROWNS"
+light_target_level = "res://world/levels/vaelmoor_awake.tscn"
+light_target_entry = &"arrival"
+light_offset = Vector2(420, 160)''')
 
 candle("OssuaryCandle", 220, 240, "ossuary_candle", "Ossuary Candle")
 candle("CanonCandle", 2320, 560, "canons_rest_candle", "Canon's Rest Candle")

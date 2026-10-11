@@ -9,6 +9,7 @@ const LEVELS := [
 	"res://world/levels/test_arena.tscn",
 	"res://world/levels/forsaken_village.tscn",
 	"res://world/levels/drowned_catacombs.tscn",
+	"res://world/levels/vaelmoor_awake.tscn",
 ]
 const CELL := 64.0
 const REVEAL_RADIUS := 3     # cells around the player revealed as you walk

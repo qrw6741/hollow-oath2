@@ -28,6 +28,15 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — The end of the prologue: the light, and Vaelmoor awake
+
+- After the Drowned Canon falls, a pillar of light rises in the Drowned Choir (`ShiningLight`, spawned by `BossArena` after `light_delay`; it stays on later visits). Walking into it lifts the player into the light, the music cuts to the victory sting, and the screen fades through warm white (`Main.teleport`) into a new area.
+- **Vaelmoor, Awake** (`tools/levels/gen_vaelmoor_awake.py`): the first daylight in the game (day sky with sun and clouds, grass ground style, drifting petals, brighter music: the menu theme at 1.15x pitch). Peaceful: the First Light Candle, the Waking Stone (readable; explains that the prologue was the Hollow, the oath's dream) and the sealed road to the kingdom (next build). On first arrival: banner "PROLOGUE COMPLETE", flag `prologue_complete`, autosave.
+- New pieces: `LoreTablet` + HUD reading panel (`Events.message_requested`), `PrologueEnd`, `Sky.daylight`, `StoneBlock.Style.GRASS`, `Level.music_pitch`, coloured / timed fades in `Main.change_level`.
+- On the map the true Vaelmoor sits apart from the Hollow areas (a different world).
+- Tests: 69 (new `test_prologue_ending`: no light before the boss falls, light after, walking in teleports to the arrival point, prologue flag set, fade cleared, light persists, stone readable and closes when you walk away).
+- Size: single-file zip still under the 30 MB limit (~54 KB to spare); no new audio files were needed.
+
 ## 2026-10-11 — The Drowned Catacombs, the Drowned Canon, and the map
 
 - **Area 3, the Drowned Catacombs** (`tools/levels/gen_drowned_catacombs.py`): through the village chapel door (now open). Two screens tall: Ossuary Stair (Ossuary Candle) -> eight-step descent -> the Flooded Nave (waist-deep water, a drowned shaft with a broken-pillar stepping stone, Acolytes on pillar ledges, a Bell-Bearer, Penitents) -> Canon's Ledge (Canon's Rest Candle; a cracked wall hides an alcove with two Ember Shards) -> the Drowned Choir, the boss arena (shallow water). Behind the boss, the flooded stair to the Ashen Cathedral is sealed (end of this build). Own ambience (`catacombs`: drips, low drone, distant bells).

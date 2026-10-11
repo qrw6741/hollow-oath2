@@ -7,6 +7,9 @@ The kingdom of **Vaelmoor** was held together by the **Hollow Oath** — a vow e
 
 The player is an **Oathbound** **[in game]** — a knight whose oath-mark is cracked rather than hollow, the only sworn soul still able to choose. They wake at the first **Oath Candle** **[in game]**.
 
+## The prologue (draft, in game)
+- The first three areas are **the Hollow [in game]**: the dream the oath built around the sworn on the Night of Unbinding — the oath remembering itself. Defeating the Drowned Canon breaks it: a light opens and the Oathbound wakes in **Vaelmoor, Awake [in game]**, the real kingdom under a real sun. The Waking Stone says so; the road onward leads toward the Crownless Citadel.
+
 ## Core mysteries (unresolved, revealed across regions)
 1. Who broke the oath — and was it broken, or *completed*?
 2. Why the player's oath cracked instead of hollowing.

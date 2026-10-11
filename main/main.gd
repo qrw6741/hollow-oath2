@@ -32,6 +32,7 @@ func _ready() -> void:
 	Events.load_game_requested.connect(continue_slot)
 	Events.quit_to_menu_requested.connect(return_to_menu)
 	Events.level_change_requested.connect(change_level)
+	Events.teleport_requested.connect(teleport)
 
 	if show_menu_on_start:
 		_enter_menu()
@@ -111,12 +112,13 @@ func _begin_game() -> void:
 
 ## Moves the session to another level (through an exit, or to respawn at a candle that
 ## is in a different level). Covered by the fade; autosaves on arrival through an exit.
-func change_level(path: String, entry_id: StringName, respawn := false) -> void:
+func change_level(path: String, entry_id: StringName, respawn := false, fade_color := Color.BLACK, fade_out := 0.45, fade_in := 0.45) -> void:
 	if _busy or not GameState.in_game:
 		return
 	_busy = true
 	get_tree().paused = false
-	await _fade_to(1.0, 0.45)
+	_fade.color = Color(fade_color, _fade.color.a)
+	await _fade_to(1.0, fade_out)
 	GameState.level_entry = entry_id
 	var scene := _level_scene(path)
 	var lvl := load_level(scene)
@@ -129,8 +131,14 @@ func change_level(path: String, entry_id: StringName, respawn := false) -> void:
 	else:
 		SaveSystem.autosave()
 	Events.level_entered.emit(GameState.level_path)
-	await _fade_to(0.0, 0.45)
+	await _fade_to(0.0, fade_in)
+	_fade.color = Color(0, 0, 0, 0)
 	_busy = false
+
+
+## The prologue's ending: a long fade through white into another world.
+func teleport(path: String, entry_id: StringName) -> void:
+	await change_level(path, entry_id, false, Color(1.0, 0.97, 0.88), 1.6, 2.2)
 
 
 ## Only levels inside LEVEL_DIR that exist are accepted; anything else (an edited or

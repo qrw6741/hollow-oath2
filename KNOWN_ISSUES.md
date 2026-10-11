@@ -20,6 +20,10 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Prologue ending
+- There is no way back from Vaelmoor, Awake to the Hollow areas except dying (which returns you to your last candle) — decide whether that is intended.
+- The daylight area reuses the menu music (pitched up) because the download is at its size limit.
+
 ## Drowned Catacombs / Drowned Canon / map
 - Untested by a person: the shaft crossing (20 px stepping stone while wading), wave-jump timing, Canon balance (820 HP).
 - The Canon's body is drawn over the floor while it sinks (it fades out instead of being clipped by the water).

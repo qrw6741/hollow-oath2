@@ -12,6 +12,7 @@ extends Node2D
 @export var bounds := Rect2(0, 0, 1920, 540)
 ## Looping music / ambience for this level (file in assets/audio/music/).
 @export var music: StringName = &"yard"
+@export var music_pitch := 1.0
 ## Where this level sits on the world map (map units = level pixels). Connected levels
 ## are placed so that their doors line up.
 @export var map_origin := Vector2.ZERO
@@ -33,7 +34,7 @@ func _ready() -> void:
 	player.position = spawn_position()
 	add_child(player)
 	_spawn_remnant()
-	Audio.music(music)
+	Audio.music(music, 1.2, music_pitch)
 	Events.respawn_requested.connect(_on_respawn_requested)
 	Events.checkpoint_rested.connect(_on_checkpoint_rested)
 	if display_name != "":

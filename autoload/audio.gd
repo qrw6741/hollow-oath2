@@ -62,7 +62,7 @@ func _connect_events() -> void:
 	Events.boss_fight_started.connect(_on_boss_fight_started)
 	Events.boss_fight_ended.connect(_on_boss_fight_ended)
 	Events.player_died.connect(func(): music(&"", 1.5))
-	Events.player_respawned.connect(func(_p): music(level_music(), 2.0))
+	Events.player_respawned.connect(func(_p): music(level_music(), 2.0, level_music_pitch()))
 
 
 func _on_boss_fight_started(b: Node) -> void:
@@ -70,6 +70,11 @@ func _on_boss_fight_started(b: Node) -> void:
 	var track: StringName = b.get("music_track") if b.get("music_track") != null else &"boss"
 	var pitch: float = b.get("music_pitch") if b.get("music_pitch") != null else 1.0
 	music(track, 0.8, pitch)
+
+
+func level_music_pitch() -> float:
+	var lv := get_tree().get_first_node_in_group(&"level")
+	return lv.get("music_pitch") if lv and lv.get("music_pitch") != null else 1.0
 
 
 func level_music() -> StringName:
@@ -83,7 +88,7 @@ func _on_boss_fight_ended(victory: bool) -> void:
 		sting(&"victory")
 		await get_tree().create_timer(6.0).timeout
 		if current_music == &"" and GameState.in_game:
-			music(level_music(), 3.0)
+			music(level_music(), 3.0, level_music_pitch())
 
 
 func _ensure_bus(bus_name: StringName) -> void:

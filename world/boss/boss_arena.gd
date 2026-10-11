@@ -23,6 +23,11 @@ extends Node2D
 ## Extra trigger height below the gate floor (arenas that drop down from their entrance).
 @export var trigger_below := 0.0
 @export var victory_text := "THE BELL FALLS SILENT"
+## Optional: a ShiningLight appears here after victory (and stays on later visits).
+@export_file("*.tscn") var light_target_level := ""
+@export var light_target_entry: StringName = &"arrival"
+@export var light_offset := Vector2(320, 0)
+@export var light_delay := 3.0
 
 var boss: BossBase
 var fight_active := false
@@ -95,6 +100,8 @@ func spawn() -> void:
 	_set_sealed(false)
 	_arm = 30
 	_defeated = is_defeated()
+	if _defeated:
+		_spawn_light()
 	if _defeated or boss_scene == null:
 		return
 	boss = boss_scene.instantiate() as BossBase
@@ -139,6 +146,10 @@ func _on_boss_died(_b: EnemyBase) -> void:
 	_end_fight(true)
 	Events.banner_requested.emit(victory_text)
 	SaveSystem.autosave()
+	if light_target_level != "":
+		await get_tree().create_timer(light_delay, false).timeout
+		if is_inside_tree():
+			_spawn_light()
 
 
 func _end_fight(victory: bool) -> void:
@@ -174,3 +185,16 @@ func _draw() -> void:
 	if Engine.is_editor_hint():
 		draw_circle(boss_offset + Vector2(0, -24), 8.0, Color(0.8, 0.2, 0.2, 0.5))
 		draw_rect(Rect2(trigger_offset, -gate_height, trigger_width, gate_height), Color(0.2, 0.8, 0.2, 0.3), false)
+
+
+func _spawn_light() -> void:
+	if light_target_level == "":
+		return
+	for l in get_tree().get_nodes_in_group(&"shining_light"):
+		if is_instance_valid(l) and not l.is_queued_for_deletion() and get_parent().is_ancestor_of(l):
+			return
+	var l := ShiningLight.new()
+	l.target_level = light_target_level
+	l.target_entry = light_target_entry
+	l.position = position + light_offset
+	get_parent().add_child.call_deferred(l)

@@ -91,6 +91,12 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Canon: lash glint parry -> riposte; three-shot fan; bubbles mark where it surfaces; phase 2 floor wave can be jumped.
 - [ ] Map (M / touchpad / L3, or pause menu): shows explored parts only, your position, candles (lit after resting), bosses (crossed after defeat); pan and zoom work; closing resumes the game.
 
+## Prologue ending
+- [ ] After the Drowned Canon dies, a pillar of light rises a few seconds later.
+- [ ] Walking into it lifts you, the screen fades to white, and you wake in daylight (Vaelmoor, Awake).
+- [ ] "PROLOGUE COMPLETE" appears; the Waking Stone can be read; the road gate says the next build continues.
+- [ ] Quit and Continue: you load in the daylight area. Going back to the catacombs, the light is still there.
+
 ## Build
 - [ ] Windows .exe launches from a folder with no Godot installed.
 - [ ] Holds ~60 FPS (F3) with all enemies active.

@@ -292,6 +292,9 @@ trigger_offset = 40.0
 trigger_width = 640.0
 trigger_below = 160.0
 victory_text = "THE HYMN DROWNS"
+light_target_level = "res://world/levels/vaelmoor_awake.tscn"
+light_target_entry = &"arrival"
+light_offset = Vector2(420, 160)
 
 [node name="OssuaryCandle" parent="." instance=ExtResource("candle")]
 position = Vector2(220, 240)

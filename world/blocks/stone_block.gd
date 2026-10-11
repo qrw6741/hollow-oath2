@@ -6,7 +6,7 @@ extends StaticBody2D
 ## Origin = top-left corner. Drop it into a level, set size, done.
 ## TEMPORARY ART: procedural masonry until the region tilesets exist (Milestone 5).
 
-enum Style { MASONRY, RUBBLE, PLANKS }
+enum Style { MASONRY, RUBBLE, PLANKS, GRASS }
 
 @export var size := Vector2(64, 32):
 	set(v):
@@ -68,6 +68,9 @@ func _draw() -> void:
 			draw_line(Vector2(sx, 6), Vector2(sx + 1, 14), Palette.WOOD, 2.0)
 		return
 
+	if style == Style.GRASS:
+		_draw_grass(rng)
+		return
 	draw_rect(Rect2(Vector2.ZERO, size), Palette.STONE_DARK)
 	var row_h := 8.0
 	var y := 0.0
@@ -93,3 +96,18 @@ func _draw() -> void:
 	for i in int(size.x / 10.0):
 		if rng.randf() < 0.4:
 			draw_rect(Rect2(rng.randf() * size.x, 0, rng.randi_range(1, 3), 1), Palette.DUST)
+
+
+## Daylight earth: soil with stones and a living green top (only in the true Vaelmoor).
+func _draw_grass(rng: RandomNumberGenerator) -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), Color("5a4532"))
+	for i in int(size.x * size.y / 260.0):
+		var p := Vector2(rng.randf() * size.x, 8.0 + rng.randf() * maxf(0.0, size.y - 8.0))
+		draw_rect(Rect2(p, Vector2(rng.randi_range(2, 5), rng.randi_range(1, 3))), Color("6e5640") if rng.randf() < 0.6 else Color("463526"))
+	draw_rect(Rect2(0, 0, size.x, 5), Color("5f8a3e"))
+	draw_rect(Rect2(0, 0, size.x, 2), Color("86b356"))
+	var x := 0.0
+	while x < size.x:
+		var h := rng.randf_range(2.0, 6.0)
+		draw_line(Vector2(x, 1), Vector2(x + rng.randf_range(-1.5, 1.5), -h), Color("7aa84c") if rng.randf() < 0.7 else Color("a7c96a"), 1.0)
+		x += rng.randf_range(2.0, 5.0)

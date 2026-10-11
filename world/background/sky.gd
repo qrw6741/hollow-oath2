@@ -4,9 +4,14 @@ extends Node2D
 
 @export var size := Vector2(480, 270)
 @export var moon_pos := Vector2(372, 58)
+## Daylight: a pale gold sky with a sun instead of the night sky and moon (the true Vaelmoor).
+@export var daylight := false
 
 
 func _draw() -> void:
+	if daylight:
+		_draw_day()
+		return
 	var bands := 18
 	for i in bands:
 		var t := float(i) / (bands - 1)
@@ -33,3 +38,24 @@ func _draw() -> void:
 	# Thin cloud streaks crossing the moon.
 	draw_rect(Rect2(moon_pos.x - 60, moon_pos.y + 6, 120, 2), Color(Palette.SKY_LOW, 0.85))
 	draw_rect(Rect2(moon_pos.x - 30, moon_pos.y - 9, 80, 1), Color(Palette.SKY_LOW, 0.7))
+
+
+func _draw_day() -> void:
+	var top := Color("6f8fb0")
+	var low := Color("f2d9a8")
+	var bands := 30
+	for i in bands:
+		var t := float(i) / (bands - 1)
+		draw_rect(Rect2(0, size.y * i / bands, size.x, size.y / bands + 1), top.lerp(low, pow(t, 1.3)))
+	# Sun with a broad halo.
+	for r in [70.0, 48.0, 32.0]:
+		draw_circle(moon_pos, r, Color(1.0, 0.95, 0.8, 0.08))
+	draw_circle(moon_pos, 17, Color("fff4d6"))
+	# Soft clouds.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 11
+	for i in 7:
+		var cy := rng.randf_range(30, 120)
+		var cx := rng.randf_range(0, size.x)
+		for k in 4:
+			draw_circle(Vector2(cx + k * 14, cy + sin(k) * 3), rng.randf_range(8, 14), Color(1, 1, 1, 0.18))
