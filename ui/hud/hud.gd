@@ -33,6 +33,7 @@ var _boss_name: Label
 var _boss_bar: StatBar
 var _boss: BossBase
 var _quick_label: Label
+var _quick_icon: Control
 var _saved_tween: Tween
 
 
@@ -119,6 +120,11 @@ func _build() -> void:
 	var qg := Glyph.new()
 	qg.action = &"use_item"
 	qrow.add_child(qg)
+	_quick_icon = Control.new()
+	_quick_icon.custom_minimum_size = Vector2(14, 14)
+	_quick_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_quick_icon.draw.connect(func(): IconArt.draw(_quick_icon, GameState.quick_item, Rect2(Vector2.ZERO, _quick_icon.size)))
+	qrow.add_child(_quick_icon)
 	_quick_label = _label(qrow, "", 8, HORIZONTAL_ALIGNMENT_LEFT)
 	root.add_child(_quick_box)
 
@@ -312,7 +318,8 @@ func _refresh_quick() -> void:
 	var item := Items.get_item(GameState.quick_item)
 	_quick_box.visible = item != null and GameState.item_count(GameState.quick_item) > 0
 	if _quick_box.visible:
-		_quick_label.text = "%s  x%d" % [item.display_name, GameState.item_count(GameState.quick_item)]
+		_quick_label.text = "x%d" % GameState.item_count(GameState.quick_item)
+		_quick_icon.queue_redraw()
 
 
 func _toast(text: String) -> void:

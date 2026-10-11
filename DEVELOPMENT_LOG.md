@@ -28,6 +28,13 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-12 — Icons instead of text
+
+- `IconArt` (ui/icons/icon_art.gd): 17 vector icons on a 16x16 grid: every item (bandage, ember shard, tonic, rusted key, bell shard, penitent's tear, Candlewright's note, Canon's seal), every weapon (Oathblade, twin blades, sword and shield, bare hands), every armour (mail with sash, leathers, plate, bone-cloth wraps) and a Status sigil. No image files: crisp at any resolution, no download cost.
+- `IconSlot`: a square, focusable slot (gold frame on focus, stack count, gold mark for the quick item, optional caption).
+- Equipment tab: Weapon / Armour / Item / Status are now four icon slots; the detail panel shows the big icon beside the name. Items tab: a 5 x 4 grid of slots (filled + empty) instead of a text list, big icon in the details. HUD quick item: icon + count instead of the name.
+- Tests: still 70; the equipment test now checks slot icons, that selecting a slot names it, and that every item/weapon/armour id has an icon. Rendered icon sheet (`tests/capture_icons.tscn`) reviewed; the bell shard was redrawn after it read as a boot.
+
 ## 2026-10-12 — Equipment & status screen
 
 - The pack became a two-tab character screen (`ui/inventory/inventory_menu.gd`). **Equipment**: your character drawn large on a pedestal (current preset look), name, level and embers; slots for Weapon, Armour, Quick item and Status. Weapon details: damage of every light-combo hit, heavy, aerial, riposte (Strength bonus included), stamina per swing, poise damage, speed and reach. Armour: damage taken, base health/stamina, vials and heal, run speed, dodge cost, parry window. Status: health, stamina, Vigor/Endurance/Strength and what they add, embers and next level cost, deaths and time. **Items**: the old pack. L1/R1 (Parry/Heal) or clicking switches tabs.

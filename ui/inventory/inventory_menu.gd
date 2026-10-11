@@ -26,11 +26,15 @@ var _char_level: Label
 var _slots := {}               # key -> Button
 var _slot_sel := "weapon"
 var _d_title: Label
+var _d_icon: Control
+var _d_icon_id: StringName = &""
+var _i_icon: Control
+var _i_icon_id: StringName = &""
 var _d_sub: Label
 var _d_grid: GridContainer
 var _d_desc: Label
 # Items tab (names kept for tests and other menus)
-var _list: VBoxContainer
+var _list: GridContainer
 var _name: Label
 var _kind: Label
 var _desc: Label
@@ -141,37 +145,47 @@ func _build_equipment(stack: Control) -> Control:
 	_char_level.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_char_level.add_theme_color_override(&"font_color", Palette.BONE)
 	av.add_child(_char_level)
-	# B — slots
+	# B — slots: icons, not text
 	var b := _framed(h, Vector2(124, 194))
 	var bv := VBoxContainer.new()
-	bv.add_theme_constant_override(&"separation", 3)
+	bv.alignment = BoxContainer.ALIGNMENT_CENTER
 	b.add_child(bv)
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override(&"h_separation", 8)
+	grid.add_theme_constant_override(&"v_separation", 8)
+	grid.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	bv.add_child(grid)
 	for key in ["weapon", "armour", "quick", "status"]:
-		var head := Label.new()
-		head.text = {"weapon": "WEAPON", "armour": "ARMOUR", "quick": "QUICK ITEM", "status": "STATUS"}[key]
-		UITheme.title(head, 8, Palette.BONE_DIM)
-		bv.add_child(head)
-		var s := FancyButton.new()
+		var s := IconSlot.new()
 		s.name = "Slot_" + key
-		s.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		s.custom_minimum_size = Vector2(112, 18)
-		s.clip_text = true
-		UITheme.compact(s)
+		s.custom_minimum_size = Vector2(48, 58)
+		s.caption = {"weapon": "Weapon", "armour": "Armour", "quick": "Item", "status": "Status"}[key]
 		s.focus_entered.connect(_select_slot.bind(key))
 		s.mouse_entered.connect(s.grab_focus)
-		bv.add_child(s)
+		grid.add_child(s)
 		_slots[key] = s
 	# C — details
 	var c := _framed(h, Vector2(206, 194))
 	var cv := VBoxContainer.new()
 	cv.add_theme_constant_override(&"separation", 2)
 	c.add_child(cv)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override(&"separation", 6)
+	cv.add_child(head)
+	_d_icon = Control.new()
+	_d_icon.custom_minimum_size = Vector2(26, 26)
+	_d_icon.draw.connect(func(): if _d_icon_id != &"": IconArt.draw(_d_icon, _d_icon_id, Rect2(Vector2.ZERO, _d_icon.size)))
+	head.add_child(_d_icon)
+	var hv := VBoxContainer.new()
+	hv.add_theme_constant_override(&"separation", 0)
+	head.add_child(hv)
 	_d_title = Label.new()
 	UITheme.title(_d_title, 12, Palette.GOLD_BRIGHT)
-	cv.add_child(_d_title)
+	hv.add_child(_d_title)
 	_d_sub = Label.new()
 	_d_sub.add_theme_color_override(&"font_color", Palette.BONE_DIM)
-	cv.add_child(_d_sub)
+	hv.add_child(_d_sub)
 	_d_grid = GridContainer.new()
 	_d_grid.columns = 2
 	_d_grid.add_theme_constant_override(&"h_separation", 10)
@@ -192,19 +206,31 @@ func _build_items(stack: Control) -> Control:
 	h.add_theme_constant_override(&"separation", 8)
 	stack.add_child(h)
 	var left := _framed(h, Vector2(170, 194))
-	_list = VBoxContainer.new()
-	_list.add_theme_constant_override(&"separation", 1)
+	_list = GridContainer.new()
+	_list.columns = 5
+	_list.add_theme_constant_override(&"h_separation", 3)
+	_list.add_theme_constant_override(&"v_separation", 3)
 	left.add_child(_list)
 	var right := _framed(h, Vector2(282, 194))
 	var rv := VBoxContainer.new()
 	rv.add_theme_constant_override(&"separation", 4)
 	right.add_child(rv)
+	var ih := HBoxContainer.new()
+	ih.add_theme_constant_override(&"separation", 8)
+	rv.add_child(ih)
+	_i_icon = Control.new()
+	_i_icon.custom_minimum_size = Vector2(36, 36)
+	_i_icon.draw.connect(func(): if _i_icon_id != &"": IconArt.draw(_i_icon, _i_icon_id, Rect2(Vector2.ZERO, _i_icon.size)))
+	ih.add_child(_i_icon)
+	var iv := VBoxContainer.new()
+	iv.add_theme_constant_override(&"separation", 0)
+	ih.add_child(iv)
 	_name = Label.new()
 	UITheme.title(_name, 13, Palette.GOLD_BRIGHT)
-	rv.add_child(_name)
+	iv.add_child(_name)
 	_kind = Label.new()
 	_kind.add_theme_color_override(&"font_color", Palette.BONE_DIM)
-	rv.add_child(_kind)
+	iv.add_child(_kind)
 	_desc = Label.new()
 	_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_desc.custom_minimum_size = Vector2(262, 60)
@@ -308,11 +334,12 @@ func _refresh_equipment() -> void:
 	_preview.set("preset", pr)
 	_char_name.text = pr.display_name
 	_char_level.text = "Level %d      %d embers" % [GameState.level(), GameState.embers]
-	(_slots.weapon as Button).text = pr.weapon.display_name if pr.weapon else "-"
-	(_slots.armour as Button).text = pr.armor_name if pr.armor_name != "" else "-"
-	var qi := Items.get_item(GameState.quick_item)
-	(_slots.quick as Button).text = ("%s  x%d" % [qi.display_name, GameState.item_count(GameState.quick_item)]) if qi and GameState.item_count(GameState.quick_item) > 0 else "(none)"
-	(_slots.status as Button).text = "Level %d" % GameState.level()
+	(_slots.weapon as IconSlot).icon_id = pr.weapon.id if pr.weapon else &""
+	(_slots.armour as IconSlot).icon_id = StringName("armor_" + String(pr.id))
+	var qn := GameState.item_count(GameState.quick_item)
+	(_slots.quick as IconSlot).icon_id = GameState.quick_item if qn > 0 else &""
+	(_slots.quick as IconSlot).count = qn
+	(_slots.status as IconSlot).icon_id = &"status"
 	_select_slot(_slot_sel)
 
 
@@ -323,6 +350,9 @@ func _select_slot(key: String) -> void:
 		c.queue_free()
 	var pr := _preset()
 	var p := _player()
+	_d_icon_id = {"weapon": pr.weapon.id if pr.weapon else &"", "armour": StringName("armor_" + String(pr.id)),
+		"quick": GameState.quick_item if GameState.item_count(GameState.quick_item) > 0 else &"", "status": &"status"}[key]
+	_d_icon.queue_redraw()
 	match key:
 		"weapon":
 			var s := WeaponStats.summary(pr.weapon, _strength_bonus())
@@ -395,38 +425,47 @@ func _row(label: String, value: String) -> void:
 
 # ------------------------------------------------------------------ items tab
 
+const ITEM_SLOTS := 20
+
+
 func _rebuild() -> void:
 	for c in _list.get_children():
 		_list.remove_child(c)
 		c.queue_free()
-	var first: Button
+	var first: IconSlot
 	var found := false
+	var used := 0
 	for id in Items.IDS:
 		var n := GameState.item_count(id)
 		if n <= 0:
 			continue
-		var item := Items.get_item(id)
-		var b := FancyButton.new()
-		b.text = "%s%s%s" % [item.display_name, "  x%d" % n if n > 1 else "", "   [quick]" if id == GameState.quick_item else ""]
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.custom_minimum_size = Vector2(160, 14)
-		UITheme.compact(b)
+		var b := IconSlot.new()
+		b.icon_id = id
+		b.count = n
+		b.marked = id == GameState.quick_item
+		b.custom_minimum_size = Vector2(29, 29)
 		b.focus_entered.connect(_select.bind(id))
 		b.mouse_entered.connect(b.grab_focus)
 		b.pressed.connect(_select.bind(id))
 		_list.add_child(b)
+		used += 1
 		if first == null:
 			first = b
 		if id == _selected:
 			first = b
 			found = true
-	if _list.get_child_count() == 0:
-		var l := Label.new()
-		l.text = "Your pack is empty."
-		l.add_theme_color_override(&"font_color", Palette.BONE_DIM)
-		_list.add_child(l)
+	# Empty slots fill out the grid.
+	for i in maxi(0, ITEM_SLOTS - used):
+		var e := IconSlot.new()
+		e.custom_minimum_size = Vector2(29, 29)
+		e.focus_mode = Control.FOCUS_NONE
+		e.disabled = true
+		e.modulate.a = 0.6
+		_list.add_child(e)
+	if used == 0:
 		_selected = &""
 		_show_detail()
+		_name.text = "Your pack is empty."
 		if tab == Tab.ITEMS:
 			_close_btn.grab_focus()
 		return
@@ -445,6 +484,8 @@ func _select(id: StringName) -> void:
 
 func _show_detail() -> void:
 	var item := Items.get_item(_selected)
+	_i_icon_id = _selected if item else &""
+	_i_icon.queue_redraw()
 	_use_btn.visible = item != null and item.is_usable()
 	_quick_btn.visible = _use_btn.visible
 	if item == null:
