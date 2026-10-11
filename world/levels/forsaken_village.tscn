@@ -25,6 +25,7 @@ level_id = &"forsaken_village"
 display_name = "The Forsaken Village"
 bounds = Rect2(0, 0, 3432, 540)
 music = &"village"
+map_origin = Vector2(2468, -32)
 default_spawn = Vector2(96, 480)
 
 [node name="Background" type="ParallaxBackground" parent="."]
@@ -249,12 +250,17 @@ lever_side = 1
 [node name="ChapelDoor" type="Area2D" parent="."]
 position = Vector2(3330, 400)
 script = ExtResource("exit")
+target_level = "res://world/levels/drowned_catacombs.tscn"
+target_entry = &"from_chapel"
 mode = 1
 size = Vector2(30, 60)
 door_id = &"chapel_door"
 display_name = "the chapel doors"
-locked_text = "BARRED FROM WITHIN  -  end of this build"
-sealed = true
+
+[node name="FromCatacombs" type="Marker2D" parent="."]
+position = Vector2(3372, 400)
+script = ExtResource("entry")
+entry_id = &"chapel_door"
 
 [node name="GateCandle" parent="." instance=ExtResource("candle")]
 position = Vector2(200, 480)
@@ -330,10 +336,10 @@ patrol_distance = 30.0
 start_facing = -1
 
 [node name="BearerSteps" type="Marker2D" parent="."]
-position = Vector2(3290, 400)
+position = Vector2(3230, 400)
 script = ExtResource("spawner")
 enemy_scene = ExtResource("bearer")
-patrol_distance = 30.0
+patrol_distance = 20.0
 start_facing = -1
 
 [node name="PickupBandage" type="Area2D" parent="."]

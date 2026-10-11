@@ -27,6 +27,8 @@ const STAT_NAMES := ["vigor", "endurance", "strength"]
 const VIGOR_HEALTH := 8.0
 const ENDURANCE_STAMINA := 6.0
 const STRENGTH_DAMAGE := 0.04
+## Map exploration: level_id (String) -> { cell_key (int): true }. See WorldMap.
+var explored := {}
 ## True while a modal menu (candle / inventory) owns input; the pause menu stays out of the way.
 var ui_modal := false
 var level_path := DEFAULT_LEVEL_PATH
@@ -65,6 +67,7 @@ func _on_checkpoint_rested(id: StringName, pos: Vector2) -> void:
 	has_checkpoint = true
 	checkpoint_id = id
 	respawn_position = pos
+	set_flag(StringName("candle_lit_" + String(id)), true)
 	checkpoint_level = level_path
 	level_entry = &""
 
@@ -141,6 +144,32 @@ func recover_drop() -> int:
 	add_embers(amount)
 	Events.ember_drop_changed.emit()
 	return amount
+
+
+## Marks map cells as seen. Returns how many were new.
+func explore(level_id: String, keys: Array) -> int:
+	if not explored.has(level_id):
+		explored[level_id] = {}
+	var cells: Dictionary = explored[level_id]
+	var added := 0
+	for k in keys:
+		if not cells.has(k):
+			cells[k] = true
+			added += 1
+	return added
+
+
+func is_explored(level_id: String, key: int) -> bool:
+	return explored.has(level_id) and (explored[level_id] as Dictionary).has(key)
+
+
+func _explored_to_save() -> Dictionary:
+	var out := {}
+	for lv in explored:
+		var arr: Array = (explored[lv] as Dictionary).keys()
+		arr.sort()
+		out[lv] = arr
+	return out
 
 
 func level() -> int:
@@ -221,6 +250,7 @@ func reset() -> void:
 	inventory = {}
 	quick_item = &""
 	ui_modal = false
+	explored = {}
 	level_path = DEFAULT_LEVEL_PATH
 	level_name = ""
 	checkpoint_level = ""
@@ -252,6 +282,7 @@ func to_dict() -> Dictionary:
 		"stats": stats.duplicate(true),
 		"inventory": inventory.duplicate(true),
 		"quick_item": String(quick_item),
+		"explored": _explored_to_save(),
 		"level_path": level_path,
 		"level_name": level_name,
 		"checkpoint_level": checkpoint_level,
@@ -275,6 +306,13 @@ func apply_dict(d: Dictionary, slot: int) -> void:
 	stats = (d.get("stats", stats) as Dictionary).duplicate(true)
 	inventory = (d.get("inventory", {}) as Dictionary).duplicate(true)
 	quick_item = StringName(d.get("quick_item", ""))
+	explored = {}
+	var ex: Dictionary = d.get("explored", {})
+	for lv in ex:
+		var cells := {}
+		for k in ex[lv]:
+			cells[int(k)] = true
+		explored[String(lv)] = cells
 	level_path = String(d.get("level_path", DEFAULT_LEVEL_PATH))
 	level_name = String(d.get("level_name", ""))
 	checkpoint_level = String(d.get("checkpoint_level", ""))

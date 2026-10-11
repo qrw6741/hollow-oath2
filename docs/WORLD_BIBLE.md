@@ -41,6 +41,8 @@ The test arena, **The Penitent's Yard [in game]**, is the churchyard at the edge
 ## Bosses
 - **The Bell-Warden [in game]** — the churchyard's bell-ringer, who swore first and loudest on the Night of Unbinding. He still keeps the yard and wears the cracked Yard Bell as a helm so that nothing else will ever ring it; he fights with its iron clapper. Intro boss at the end of the Penitent's Yard. Drops the **Warden's Bell Shard [in game]**.
 
+- **The Drowned Canon [in game]** — a Candlewright canon who read the liturgy backwards in the catacomb chapel on the Night of Unbinding; the crypt flooded while he was still reading, and he has not stopped. Boss of the **Drowned Catacombs [in game]**, under the village chapel. Drops the **Canon's Wax Seal [in game]** (the Candlewright mark pressed upside down), which answers to the stair to the Ashen Cathedral.
+
 ## Items written so far
 - **Candlewright's Note [in game]** — 'On the night, the liturgy is to be read from its last line to its first. The sworn will not notice. The Crown must not.' (first hint at mystery 1)
 - **Oathblade [in game]** — "A plain straight sword issued to every sworn knight of the old kingdom. The engraving on its fuller has been scratched away by its last owner."

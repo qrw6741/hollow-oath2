@@ -299,6 +299,22 @@ def make_sfx():
     gate = mix(thud(70, 35, 0.4, 0.9), lowpass(noise(int(d * SR)), 500) * env(int(d * SR), 0.3, 0.5) * 0.8)
     sfx("gate_open", reverb(gate, 0.3), 0.8)
 
+    # Catacombs / Drowned Canon additions
+    d = 0.7
+    spl = lowpass(noise(int(d * SR)), 2500) * env(int(d * SR), 0.005, 0.12)
+    spl += bandpass(noise(int(d * SR)), 1500, 6000) * env(int(d * SR), 0.03, 0.18) * 0.5 * (0.5 + 0.5 * np.sin(2 * np.pi * 23 * t_axis(d)))
+    sfx("splash", mix(spl, thud(90, 50, 0.15, 0.3) * 0.5), 0.6)
+    d = 1.4
+    gy = mix(lowpass(noise(int(d * SR)), 1200) * env(int(d * SR), 0.02, 0.45), thud(60, 30, 0.5, 1.0))
+    gy += bandpass(noise(int(d * SR)), 2000, 7000) * env(int(d * SR), 0.05, 0.4) * 0.5
+    sfx("geyser", reverb(gy, 0.25), 0.85)
+    d = 0.35
+    sp = bandpass(noise(int(d * SR)), 300, 1600) * env(int(d * SR), 0.01, 0.08) * (0.6 + 0.4 * np.sin(2 * np.pi * 60 * t_axis(d)))
+    sfx("spit", sp, 0.55)
+    d = 1.6
+    wv = lowpass(noise(int(d * SR)), 700) * env(int(d * SR), 0.15, 0.6) + bandpass(noise(int(d * SR)), 1200, 4000) * env(int(d * SR), 0.2, 0.4) * 0.4
+    sfx("wave", reverb(wv, 0.2), 0.75)
+
     t = t_axis(4.5)
     vic = np.zeros_like(t)
     for i, f in enumerate([146.8, 220, 293.7, 440, 587.3]):
@@ -410,6 +426,25 @@ def music_village():
     write(os.path.join(MUS_DIR, "village.wav"), out, sr, 0.55, do_fade=False)
 
 
+def music_catacombs():
+    sr, dur = MSR, 28.0
+    n = int(sr * dur)
+    out = np.zeros(n)
+    out += loop_tone(49.0, n) * 0.18 * (0.6 + 0.4 * slow_lfo(n, 2))
+    out += loop_tone(73.4, n) * 0.08 * slow_lfo(n, 3, 1.1)
+    out += loop_noise(n, sr, lo=60, hi=300, seed=41) * 0.10
+    r = np.random.default_rng(42)
+    for i in range(22):   # water drips
+        f = r.uniform(900, 1700)
+        tt = t_axis(0.25, sr)
+        drip = np.sin(2 * np.pi * np.cumsum(f * (1 + 0.6 * np.exp(-tt / 0.02))) / sr) * np.exp(-tt / 0.04) * r.uniform(0.05, 0.12)
+        place(out, drip, int(r.uniform(0, dur) * sr))
+    for i, (sec, f) in enumerate([(4, 146.8), (18, 130.8)]):
+        place(out, bell(f, 6.0, sr=sr, decay=3.5, cracked=0.5, seed=90 + i) * 0.08, int(sec * sr))
+    out = circular_reverb(out, 0.5, 4.5, 1.8, sr)
+    write(os.path.join(MUS_DIR, "catacombs.wav"), out, sr, 0.5, do_fade=False)
+
+
 def music_boss():
     sr = MSR
     bpm = 120.0
@@ -471,6 +506,7 @@ if __name__ == "__main__":
     music_menu()
     music_yard()
     music_village()
+    music_catacombs()
     music_boss()
     import subprocess
     open(os.path.join(BUILD, ".gdignore"), "w").close()

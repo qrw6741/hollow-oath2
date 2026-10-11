@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/canon_lash.tres" id="2_lash"]
+[ext_resource type="Resource" path="res://data/attacks/canon_spit.tres" id="3_spit"]
+[ext_resource type="Resource" path="res://data/attacks/canon_submerge.tres" id="4_sub"]
+[ext_resource type="Resource" path="res://data/items/canon_seal.tres" id="5_seal"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"drowned_canon"
+display_name = "The Drowned Canon"
+lore = "A Candlewright canon who read the liturgy backwards in the catacomb chapel on the Night of Unbinding. The crypt flooded while he was still reading. He has not stopped."
+max_health = 820.0
+max_poise = 110.0
+poise_regen_delay_frames = 120
+poise_regen_per_second = 25.0
+patrol_speed = 30.0
+chase_speed = 52.0
+detection_range = 800.0
+vertical_detection = 300.0
+leash_range = 99999.0
+attacks = [ExtResource("2_lash"), ExtResource("3_spit"), ExtResource("4_sub")]
+attack_cooldown_min = 40
+attack_cooldown_max = 80
+recover_frames = 26
+backstep_speed = 50.0
+stagger_frames = 55
+parry_stagger_frames = 120
+ember_reward = 2600
+drop_item = ExtResource("5_seal")
+drop_chance = 1.0
+drop_count = 1

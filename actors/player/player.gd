@@ -74,6 +74,10 @@ var _parried := false
 var _last_hit_id := 0
 ## Multiplies all damage taken (armour). Set from the preset.
 var damage_taken_mult := 1.0
+## Number of water zones the player stands in (WaterZone). Water slows movement.
+var in_water := 0
+const WATER_MOVE := 0.6
+const WATER_JUMP := 0.88
 ## Last standing spot that was not a hazard; lost embers fall here.
 var last_safe_position := Vector2.ZERO
 
@@ -211,7 +215,7 @@ func _axis() -> float:
 func _state_free(delta: float) -> void:
 	var dir := _axis()
 	var accel := (ground_accel if dir != 0.0 else ground_decel) if is_on_floor() else air_accel
-	velocity.x = move_toward(velocity.x, dir * run_speed, accel * delta)
+	velocity.x = move_toward(velocity.x, dir * run_speed * move_mult(), accel * delta)
 	if dir != 0.0:
 		facing = signi(int(signf(dir)))
 	_apply_gravity(delta)
@@ -272,7 +276,7 @@ func _try_actions() -> bool:
 
 
 func _jump() -> void:
-	velocity.y = jump_velocity
+	velocity.y = jump_velocity * (WATER_JUMP if in_water > 0 else 1.0)
 	_coyote = 0
 	_jumping = true
 
@@ -297,7 +301,7 @@ func _state_attack(delta: float) -> void:
 	elif is_on_floor():
 		velocity.x = move_toward(velocity.x, 0.0, ground_decel * delta)
 	else:
-		velocity.x = move_toward(velocity.x, _axis() * run_speed * 0.6, air_accel * 0.5 * delta)
+		velocity.x = move_toward(velocity.x, _axis() * run_speed * 0.6 * move_mult(), air_accel * 0.5 * delta)
 	_apply_gravity(delta, a.gravity_scale)
 
 	# Queue the next input any time after the startup has begun (Souls-style).
@@ -344,7 +348,7 @@ func _start_dodge() -> void:
 
 func _state_dodge(delta: float) -> void:
 	var t := float(state_frame) / dodge_frames
-	velocity.x = facing * dodge_speed * pow(1.0 - clampf(t, 0.0, 1.0), 1.4)
+	velocity.x = facing * dodge_speed * (0.75 if in_water > 0 else 1.0) * pow(1.0 - clampf(t, 0.0, 1.0), 1.4)
 	_apply_gravity(delta)
 	if state_frame >= dodge_act_frame and is_on_floor():
 		# Tail of the roll may be cancelled by attacks or jumps — but not by another dodge.
@@ -379,7 +383,7 @@ func _start_heal() -> void:
 
 func _state_heal(delta: float) -> void:
 	var dir := _axis()
-	velocity.x = move_toward(velocity.x, dir * run_speed * heal_move_mult, ground_accel * delta)
+	velocity.x = move_toward(velocity.x, dir * run_speed * heal_move_mult * move_mult(), ground_accel * delta)
 	_apply_gravity(delta)
 	if not _heal_applied and state_frame >= heal_apply_frame:
 		_heal_applied = true
@@ -495,6 +499,10 @@ func find_riposte_target() -> Node2D:
 		if absf(d.x) <= riposte_reach and absf(d.y) <= 24.0 and (absf(d.x) < 10.0 or signf(d.x) == float(facing)):
 			return e
 	return null
+
+
+func move_mult() -> float:
+	return WATER_MOVE if in_water > 0 else 1.0
 
 
 func _on_hazard() -> bool:

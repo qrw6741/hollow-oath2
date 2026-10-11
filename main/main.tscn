@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://main/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://world/camera_rig.gd" id="2_camera"]
@@ -11,6 +11,8 @@
 
 [ext_resource type="Script" path="res://ui/candle/candle_menu.gd" id="8_candle"]
 [ext_resource type="Script" path="res://ui/inventory/inventory_menu.gd" id="9_inv"]
+
+[ext_resource type="Script" path="res://ui/map/map_menu.gd" id="10_map"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_main")
@@ -39,3 +41,6 @@ script = ExtResource("8_candle")
 
 [node name="InventoryMenu" type="CanvasLayer" parent="."]
 script = ExtResource("9_inv")
+
+[node name="MapMenu" type="CanvasLayer" parent="."]
+script = ExtResource("10_map")

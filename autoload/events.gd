@@ -41,6 +41,8 @@ signal item_used(item_id: StringName)
 signal stats_changed
 signal inventory_menu_requested
 signal inventory_menu_closed
+signal map_requested
+signal map_closed
 
 # --- Interaction / UI ---
 signal interact_prompt_shown(text: String)

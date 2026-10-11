@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"canon_seal"
+display_name = "Canon's Wax Seal"
+description = "The Drowned Canon's seal, pressed in black wax that never set. It bears the Candlewright mark upside down. The stair to the Ashen Cathedral answers to it."
+kind = 1
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(0.25, 0.3, 0.3, 1)

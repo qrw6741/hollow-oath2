@@ -18,6 +18,7 @@ const VARY := [&"swing_light", &"swing_heavy", &"swing_fist", &"hit_flesh", &"hi
 	&"jump", &"land", &"dodge", &"enemy_windup", &"hurt", &"boss_stomp"]
 
 var current_music: StringName = &""
+var current_pitch := 1.0
 var _streams := {}
 var _players: Array[AudioStreamPlayer] = []
 var _players_2d: Array[AudioStreamPlayer2D] = []
@@ -58,10 +59,17 @@ func _connect_events() -> void:
 	Events.stats_changed.connect(func(): sfx(&"levelup"))
 	Events.game_saved.connect(func(_s): sfx(&"save", -10.0))
 	Events.checkpoint_rested.connect(func(_id, _p): sfx(&"rest"))
-	Events.boss_fight_started.connect(func(_b): sfx(&"gate_seal"); music(&"boss", 0.8))
+	Events.boss_fight_started.connect(_on_boss_fight_started)
 	Events.boss_fight_ended.connect(_on_boss_fight_ended)
 	Events.player_died.connect(func(): music(&"", 1.5))
 	Events.player_respawned.connect(func(_p): music(level_music(), 2.0))
+
+
+func _on_boss_fight_started(b: Node) -> void:
+	sfx(&"gate_seal")
+	var track: StringName = b.get("music_track") if b.get("music_track") != null else &"boss"
+	var pitch: float = b.get("music_pitch") if b.get("music_pitch") != null else 1.0
+	music(track, 0.8, pitch)
 
 
 func level_music() -> StringName:
@@ -169,10 +177,12 @@ func sfx_at(sname: StringName, where: Vector2, volume_db := 0.0, pitch := 1.0) -
 
 
 ## Crossfades to a looping music track. &"" fades to silence.
-func music(track: StringName, fade_time := 1.2) -> void:
-	if track == current_music:
+## pitch < 1 slows and darkens a track (one boss theme can serve two fights).
+func music(track: StringName, fade_time := 1.2, pitch := 1.0) -> void:
+	if track == current_music and is_equal_approx(pitch, current_pitch):
 		return
 	current_music = track
+	current_pitch = pitch
 	if _music_tween:
 		_music_tween.kill()
 	var old := _music_a
@@ -186,6 +196,7 @@ func music(track: StringName, fade_time := 1.2) -> void:
 		var s := _stream(MUSIC_DIR, track, true)
 		if s:
 			new.stream = s
+			new.pitch_scale = pitch
 			new.volume_db = -40.0
 			new.play()
 			_music_tween.tween_property(new, "volume_db", 0.0, fade_time)

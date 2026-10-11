@@ -22,6 +22,7 @@ const DEFAULTS := {
 	&"interact": ["k:%d" % KEY_E, "j:%d" % JOY_BUTTON_DPAD_UP],
 	&"use_item": ["k:%d" % KEY_F, "j:%d" % JOY_BUTTON_RIGHT_STICK],
 	&"inventory": ["k:%d" % KEY_TAB, "j:%d" % JOY_BUTTON_BACK],
+	&"map": ["k:%d" % KEY_M, "j:%d" % JOY_BUTTON_TOUCHPAD, "j:%d" % JOY_BUTTON_LEFT_STICK],
 	&"pause": ["k:%d" % KEY_ESCAPE, "j:%d" % JOY_BUTTON_START],
 	&"debug_toggle": ["k:%d" % KEY_F3],
 }

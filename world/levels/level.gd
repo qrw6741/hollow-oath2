@@ -12,12 +12,16 @@ extends Node2D
 @export var bounds := Rect2(0, 0, 1920, 540)
 ## Looping music / ambience for this level (file in assets/audio/music/).
 @export var music: StringName = &"yard"
+## Where this level sits on the world map (map units = level pixels). Connected levels
+## are placed so that their doors line up.
+@export var map_origin := Vector2.ZERO
 ## Fallback spawn if no checkpoint has been rested at.
 @export var default_spawn := Vector2(96, 470)
 
 const PLAYER_SCENE_PATH := "res://actors/player/player.tscn"
 
 var player: Player
+var _explore_tick := 0
 
 
 func _ready() -> void:
@@ -89,3 +93,11 @@ func _spawn_remnant() -> void:
 	rem.amount = int(d.get("amount", 0))
 	rem.position = Vector2(float(d.get("x", 0.0)), float(d.get("y", 0.0)))
 	add_child(rem)
+
+
+## Reveals the map around the player a few times a second.
+func _physics_process(_delta: float) -> void:
+	_explore_tick += 1
+	if _explore_tick % 8 != 0 or player == null or not is_instance_valid(player):
+		return
+	GameState.explore(String(level_id), WorldMap.cells_around(player.global_position, WorldMap.REVEAL_RADIUS))

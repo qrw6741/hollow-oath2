@@ -20,6 +20,8 @@ extends Node2D
 ## The trigger zone starts this far inside the gate and covers [member trigger_width].
 @export var trigger_offset := 36.0
 @export var trigger_width := 600.0
+## Extra trigger height below the gate floor (arenas that drop down from their entrance).
+@export var trigger_below := 0.0
 @export var victory_text := "THE BELL FALLS SILENT"
 
 var boss: BossBase
@@ -53,9 +55,9 @@ func _ready() -> void:
 	_trigger.collision_mask = 2
 	var ts := CollisionShape2D.new()
 	var tr := RectangleShape2D.new()
-	tr.size = Vector2(trigger_width, gate_height)
+	tr.size = Vector2(trigger_width, gate_height + trigger_below)
 	ts.shape = tr
-	ts.position = Vector2(trigger_offset + trigger_width / 2.0, -gate_height / 2.0)
+	ts.position = Vector2(trigger_offset + trigger_width / 2.0, (trigger_below - gate_height) / 2.0)
 	_trigger.add_child(ts)
 	add_child(_trigger)
 	Events.player_died.connect(_on_player_died)

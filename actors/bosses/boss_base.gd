@@ -23,6 +23,9 @@ signal phase_changed(phase: int)
 @export var leap_jump_frame := 12
 @export var leap_jump_speed := 330.0
 @export var leap_max_speed := 280.0
+## Music for this fight (assets/audio/music) and its playback pitch.
+@export var music_track: StringName = &"boss"
+@export var music_pitch := 1.0
 ## Frames the corpse lingers before fading out.
 @export var corpse_frames := 220
 

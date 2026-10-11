@@ -9,7 +9,7 @@ Layout (floor y = 480, x grows to the right):
                 The corridor below leads back to the shortcut gate (ember shard, Penitent).
   C  1540-2440  Village square: a Bell-Bearer, an Acolyte on a balcony, a Candlewright's note.
   D  2440-3400  Chapel road: Chapel Steps Candle, two Penitents, a spike pit, an Acolyte on a
-                ledge, steps up to the barred chapel door (end of this build).
+                ledge, steps up to the chapel door, which leads down into the Drowned Catacombs.
 Re-run after editing:  python3 tools/levels/gen_forsaken_village.py
 """
 import os
@@ -97,6 +97,7 @@ level_id = &"forsaken_village"
 display_name = "The Forsaken Village"
 bounds = Rect2(0, 0, 3432, 540)
 music = &"village"
+map_origin = Vector2(2468, -32)
 default_spawn = Vector2(96, 480)
 
 [node name="Background" type="ParallaxBackground" parent="."]
@@ -208,12 +209,17 @@ lever_side = 1
 [node name="ChapelDoor" type="Area2D" parent="."]
 position = Vector2(3330, 400)
 script = ExtResource("exit")
+target_level = "res://world/levels/drowned_catacombs.tscn"
+target_entry = &"from_chapel"
 mode = 1
 size = Vector2(30, 60)
 door_id = &"chapel_door"
 display_name = "the chapel doors"
-locked_text = "BARRED FROM WITHIN  -  end of this build"
-sealed = true''')
+
+[node name="FromCatacombs" type="Marker2D" parent="."]
+position = Vector2(3372, 400)
+script = ExtResource("entry")
+entry_id = &"chapel_door"''')
 
 # ------------------------------------------------------------------ candles, enemies, pickups
 candle("GateCandle", 200, 480, "village_gate_candle", "Village Gate Candle")
@@ -228,7 +234,7 @@ enemy("AcolyteBalcony", "acolyte", 2200, 390, 0.0)
 enemy("PenitentRoad1", "penitent", 2680, 480, 50.0)
 enemy("AcolyteLedge", "acolyte", 2745, 380, 0.0)
 enemy("PenitentRoad2", "penitent", 2990, 480, 30.0)
-enemy("BearerSteps", "bearer", 3290, 400, 30.0)
+enemy("BearerSteps", "bearer", 3230, 400, 20.0)
 
 pickup("PickupBandage", 330, 480, "it_band", 1, "village_bandage")
 pickup("PickupTonic", 960, 290, "it_tonic", 1, "village_tonic")

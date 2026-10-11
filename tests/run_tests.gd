@@ -64,6 +64,9 @@ func _run() -> void:
 		# --- village & transitions ---
 		test_levels_wired_correctly, test_bell_door_and_travel, test_respawn_across_levels, test_continue_in_village,
 		test_shortcut_gate, test_acolyte_projectile_parry_dodge, test_bell_bearer,
+		# --- catacombs, second boss, map ---
+		test_catacombs_travel_and_water, test_drown_shaft_kills, test_breakable_wall, test_canon_boss,
+		test_map_exploration_and_screen,
 	]
 	for t: Callable in tests:
 		_current = t.get_method()
@@ -1036,7 +1039,8 @@ func test_menu_works_with_controller() -> void:
 	await tap.call(JOY_BUTTON_START)
 	check(get_tree().paused, "Options opens the pause menu")
 	await tap.call(JOY_BUTTON_DPAD_DOWN)
-	await tap.call(JOY_BUTTON_DPAD_DOWN)   # Resume, Inventory, Settings
+	await tap.call(JOY_BUTTON_DPAD_DOWN)
+	await tap.call(JOY_BUTTON_DPAD_DOWN)   # Resume, Inventory, Map, Settings
 	await tap.call(JOY_BUTTON_A)
 	check(pm._settings.visible, "Cross on Settings opens it in the pause menu")
 	await tap.call(JOY_BUTTON_B)
@@ -1507,7 +1511,7 @@ func _scene_nodes(path: String) -> Array:
 ## door, gate and candle ids are unique across the game.
 func test_levels_wired_correctly() -> void:
 	var ids := {}
-	for path in [YARD, VILLAGE]:
+	for path in WorldMap.LEVELS:
 		var nodes := _scene_nodes(path)
 		var root: Node = nodes[0]
 		check(root is Level, "%s is a Level" % path)
@@ -1722,3 +1726,167 @@ func test_bell_bearer() -> void:
 	await frames(14)
 	check(player.health.current < hp, "parrying the chain swing does not help (hp %.0f)" % player.health.current)
 	b.queue_free()
+
+
+# ------------------------------------------------------------------ catacombs, Drowned Canon, map
+
+const CATACOMBS := "res://world/levels/drowned_catacombs.tscn"
+
+
+func test_catacombs_travel_and_water() -> void:
+	await fresh_game()
+	await go_to_level(VILLAGE, &"from_yard")
+	await place_player(3300.0, 400.0, 1)
+	var door: LevelExit = level.get_node("ChapelDoor")
+	check(door.try_open(), "the chapel door opens")
+	await frames(75)
+	level = main.current_level()
+	player = level.player
+	check(level.level_id == &"drowned_catacombs", "arrived in the Drowned Catacombs")
+	check(player.global_position.distance_to(Vector2(90, 240)) < 8.0, "at the chapel entry (%s)" % player.global_position)
+	# Water slows running (enemies removed so nothing interrupts the run).
+	for e in enemies():
+		e.queue_free()
+	await place_player(1300.0, 660.0, 1)
+	await frames(10)
+	check(player.in_water > 0, "standing in the flooded nave counts as water")
+	Input.action_press(&"move_right")
+	await frames(40)
+	var wet_speed := absf(player.velocity.x)
+	Input.action_release(&"move_right")
+	check(wet_speed < player.run_speed * 0.7 and wet_speed > 10.0, "wading is slower (%.0f vs %.0f)" % [wet_speed, player.run_speed])
+	await place_player(400.0, 240.0, 1)
+	await frames(6)
+	check(player.in_water == 0, "dry on the ossuary stair")
+	# Walking out the left edge returns to the village chapel.
+	await place_player(70.0, 240.0, -1)
+	Input.action_press(&"move_left")
+	await frames(30)
+	Input.action_release(&"move_left")
+	await frames(75)
+	level = main.current_level()
+	check(level.level_id == &"forsaken_village" and absf(level.player.global_position.x - 3372.0) < 8.0, "back at the chapel door")
+
+
+func test_drown_shaft_kills() -> void:
+	await fresh_game()
+	await go_to_level(CATACOMBS, &"from_chapel")
+	await place_player(1732.0, 600.0, 1)
+	player.global_position = Vector2(1732, 760)   # inside the shaft
+	await frames(6)
+	check(player.is_dead(), "falling into the drowned shaft is death")
+
+
+func test_breakable_wall() -> void:
+	await fresh_game()
+	await go_to_level(CATACOMBS, &"from_chapel")
+	var wall: BreakableWall = level.get_node("CrackedWall")
+	await place_player(2170.0, 660.0, 1)
+	for i in 3:
+		await press(&"attack_light")
+		await frames(30)
+	await frames(4)
+	check(not is_instance_valid(wall), "three hits break the cracked wall")
+	check(game_state.get_flag(&"wall_broken_canon_alcove", false), "broken wall remembered")
+	await go_to_level(CATACOMBS, &"from_chapel")
+	check(not level.has_node("CrackedWall") or level.get_node("CrackedWall").is_queued_for_deletion(), "stays broken after reloading")
+
+
+func test_canon_boss() -> void:
+	await fresh_game()
+	await go_to_level(CATACOMBS, &"from_chapel")
+	await place_player(2560.0, 720.0, 1)
+	await frames(40)
+	var ar: BossArena = level.get_node("CanonArena")
+	var boss := ar.boss as DrownedCanon
+	check(boss != null and ar.fight_active and boss.active, "dropping into the choir starts the Canon fight")
+	check(get_tree().root.get_node("Audio").current_music == &"boss" and is_equal_approx(get_tree().root.get_node("Audio").current_pitch, 0.82), "boss theme, slowed")
+	boss._cooldown = 99999
+	await frames(2)
+	# Undertow: invulnerable while under, surfaces under the player.
+	player.global_position = Vector2(2700, 720)
+	await frames(4)
+	var hp := player.health.current
+	boss._start_attack(load("res://data/attacks/canon_submerge.tres"))
+	await frames(boss.sink_frame + 4)
+	check(boss.submerged and not boss.hurtbox.enabled, "submerged boss cannot be hit")
+	await frames(20)
+	check(absf(boss.global_position.x - 2700.0) < 4.0, "it moves under the player (%.0f)" % boss.global_position.x)
+	await frames(50)
+	check(not boss.submerged and boss.hurtbox.enabled, "surfaces and can be hit again")
+	check(player.health.current < hp, "the geyser hurts a player who stayed on the bubbles")
+	# Spit fires a fan of three.
+	await frames(60)
+	for q in get_tree().get_nodes_in_group(&"projectiles"):
+		q.queue_free()
+	await frames(2)
+	boss.facing = -1
+	boss._start_attack(load("res://data/attacks/canon_spit.tres"))
+	await frames(34)
+	check(get_tree().get_nodes_in_group(&"projectiles").size() == 3, "Bile Hymn spits three")
+	# Phase 2 adds the floor wave; the wave is unparryable and rolls toward the player.
+	await frames(60)
+	var h := damage(boss.health.max_health * 0.55)
+	h.poise_damage = 0.0
+	boss.receive_hit(h)
+	await frames(boss.roar_frames + 6)
+	check(boss.phase == 2 and boss.data.attacks.any(func(a): return a.id == &"canon_wave"), "phase 2 adds Flood Psalm")
+	boss._cooldown = 99999   # the roar resets it; keep the boss to the scripted attack
+	for q in get_tree().get_nodes_in_group(&"projectiles"):
+		q.queue_free()
+	player.health.restore_full()
+	await place_player(boss.global_position.x - 160.0, 720.0, 1)
+	boss.facing = -1
+	boss._start_attack(load("res://data/attacks/canon_wave.tres"))
+	await frames(45)
+	var waves := get_tree().get_nodes_in_group(&"projectiles").filter(func(q): return q.kind == &"wave")
+	check(waves.size() == 1 and waves[0].velocity.x < 0.0, "a wave rolls toward the player")
+	if waves.size() == 1:
+		var w: Projectile = waves[0]
+		while is_instance_valid(w) and w.global_position.x - player.global_position.x > 56.0:
+			await get_tree().physics_frame
+		await press(&"jump", 24)   # hold for a full jump (a tap is a short hop)
+	await frames(60)
+	check(player.health.current == player.health.max_health, "jumping over the wave avoids it (hp %.0f)" % player.health.current)
+	# Victory.
+	var e0: int = game_state.embers
+	boss.receive_hit(damage(99999.0))
+	await frames(4)
+	check(game_state.get_flag(&"boss_defeated_drowned_canon", false) and game_state.item_count(&"canon_seal") == 1, "Canon defeated: flag + seal")
+	check(game_state.embers - e0 == 2600, "2600 embers")
+
+
+func test_map_exploration_and_screen() -> void:
+	await fresh_game()
+	await place_player(300.0, 480.0, 1)
+	await frames(20)
+	var seen: Dictionary = game_state.explored.get("test_arena", {})
+	check(seen.has(WorldMap.cell_key(4, 7)), "walking reveals map cells around the player")
+	check(not seen.has(WorldMap.cell_key(30, 7)), "far parts stay unexplored")
+	# Persistence.
+	var n: Dictionary = saves._normalize(game_state.to_dict())
+	check((n.explored.test_arena as Array).size() == seen.size(), "explored cells are saved")
+	var bad: Dictionary = saves._normalize({"version": 1, "saved_at": 1, "explored": {"x": [1, "a", -5, 3.0], "y": "nope"}})
+	check(bad.explored.x == [1, 3] and not bad.explored.has("y"), "bad exploration data is cleaned (%s)" % bad.explored)
+	# Map data for every level.
+	for d in WorldMap.all():
+		check(d.blocks.size() > 5 and d.candles.size() >= 1 and d.name != "", "%s map data read" % d.path)
+	# Doors line up across levels on the world map.
+	var yard := WorldMap.info(YARD)
+	var vil := WorldMap.info(VILLAGE)
+	var door_g: Vector2 = yard.origin + Vector2(2530, 448)
+	var entry_g: Vector2 = vil.origin + Vector2(92, 480)
+	check(door_g.distance_to(entry_g) < 64.0, "Yard and Village meet on the map (%s vs %s)" % [door_g, entry_g])
+	# The screen opens, pauses, closes.
+	var m: MapMenu = main.get_node("MapMenu")
+	await tap_action(&"map")
+	check(m.is_open and get_tree().paused, "Map button opens the map and pauses")
+	check(m.player_map_position().distance_to(Vector2(300, 480)) < 4.0, "player marker at the right place")
+	check((m._rects[YARD].blocks as Array).size() > 0, "explored geometry is drawn")
+	await tap_action(&"map")
+	check(not m.is_open and not get_tree().paused, "Map button closes it again")
+	# Candle rest lights its icon.
+	await place_player(170.0)
+	await press(&"interact")
+	await frames(60)
+	check(game_state.get_flag(&"candle_lit_yard_candle", false), "resting marks the candle on the map")

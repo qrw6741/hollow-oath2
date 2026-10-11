@@ -24,6 +24,7 @@ script = ExtResource("level")
 level_id = &"test_arena"
 display_name = "The Penitent's Yard"
 bounds = Rect2(0, 0, 2592, 540)
+map_origin = Vector2(0, 0)
 default_spawn = Vector2(96, 480)
 
 [node name="Background" type="ParallaxBackground" parent="."]

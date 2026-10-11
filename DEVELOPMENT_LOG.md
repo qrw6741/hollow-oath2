@@ -28,6 +28,18 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-11 — The Drowned Catacombs, the Drowned Canon, and the map
+
+- **Area 3, the Drowned Catacombs** (`tools/levels/gen_drowned_catacombs.py`): through the village chapel door (now open). Two screens tall: Ossuary Stair (Ossuary Candle) -> eight-step descent -> the Flooded Nave (waist-deep water, a drowned shaft with a broken-pillar stepping stone, Acolytes on pillar ledges, a Bell-Bearer, Penitents) -> Canon's Ledge (Canon's Rest Candle; a cracked wall hides an alcove with two Ember Shards) -> the Drowned Choir, the boss arena (shallow water). Behind the boss, the flooded stair to the Ashen Cathedral is sealed (end of this build). Own ambience (`catacombs`: drips, low drone, distant bells).
+- **New world pieces**: `WaterZone` (wading: 60% run speed, lower jump, shorter roll, splash), `DrownZone` (instant death, ignores i-frames), `BreakableWall` (three hits, remembered).
+- **Boss 2, the Drowned Canon** (`DrownedCanon` extends `BossBase`, 820 HP): Rosary Lash (long reach, parryable; phase 2 chains a returning lash), Bile Hymn (three parryable shots in a fan), Undertow (sinks, invulnerable, surfaces under you after a bubbling ring; unparryable), phase 2 Flood Psalm (a wave rolls along the floor; jump it). Boss music reuses the boss theme slowed to 0.82 (`BossBase.music_track/music_pitch`). Rewards: 2600 embers + Canon's Wax Seal (key item for the next region).
+- **Map** (`ui/map/map_menu.gd`, `systems/world_map.gd`): M / PS touchpad / L3, or Map in the pause menu. Every level is read from its scene and placed at its `Level.map_origin` so connected doors line up. Only explored 64 px cells are drawn (revealed in a radius as you walk; saved per level). Marks: you, Oath Candles (gold once rested at, with names), bosses (crossed out when defeated), doors and passages; area name and % explored. Pan, zoom (Parry / Heal or mouse wheel), drag.
+- **Projectiles** gained rectangle shapes, configurable drop and "pass through walls" (the floor wave).
+- Tests: 68 (5 new): chapel door -> catacombs and back, wading is slower, the drowned shaft kills, the cracked wall breaks and stays broken, the Canon (start, submerge invulnerability and surfacing under the player, three-shot fan, phase 2 wave toward the player that a full jump clears, defeat rewards), map (cells revealed, saved and sanitised, data for all levels, Yard/Village doors line up, open/close/pause, candles light up). Level-wiring test now covers every level in WorldMap.LEVELS.
+- Found by tests: the floor wave was too tall to jump while wading (lowered to 18 px); the boss's roar reset its attack cooldown during a scripted test.
+- **Size**: the single-file Windows zip is now ~65 KB under the 30 MB upload limit. The next sizeable addition will need audio trimmed or the build split again.
+- **Not verified**: nobody has played the catacombs or the Canon; the shaft jump and the wave timing need a real hands-on check.
+
 ## 2026-10-11 — Fix: split download did not launch; back to one file
 
 - Reported on Windows: "Couldn't load project data ... Is the .pck file missing?" The two-zip build extracted into two folders, separating the exe from its .pck. **First real launch report on Windows**: the error means the exe itself started.

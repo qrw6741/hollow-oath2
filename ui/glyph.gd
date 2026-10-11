@@ -55,6 +55,8 @@ func _wanted_size() -> Vector2:
 		return Vector2(maxf(SIZE, w + 6.0), SIZE)
 	if _id in ["l1", "r1"]:
 		return Vector2(17, SIZE)
+	if _id == "touchpad":
+		return Vector2(20, 10)
 	if _id in ["options", "create"]:
 		return Vector2(15, 9)
 	return Vector2(SIZE, SIZE)
@@ -87,6 +89,9 @@ func _draw() -> void:
 				_text("≡" if _id == "options" else "···", s)
 		"dpad_up", "dpad_down", "dpad_left", "dpad_right", "dpad":
 			_dpad(c, _id)
+		"touchpad":
+			_pill(s)
+			draw_rect(Rect2(4, 2.5, s.x - 8, s.y - 5), Color(0.62, 0.62, 0.68, 0.5))
 		"r3", "l3":
 			draw_circle(c, 5.6, C_FACE)
 			draw_arc(c, 5.6, 0, TAU, 20, C_RING, 0.8)

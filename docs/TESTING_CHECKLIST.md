@@ -84,6 +84,13 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Bell-Bearers ring before attacking; the slam can be parried, the red chain swing cannot.
 - [ ] The chapel door says the build ends here.
 
+## Drowned Catacombs, Drowned Canon, map
+- [ ] Chapel door leads down to the catacombs; the left edge leads back.
+- [ ] Wading is slower; the shaft is crossable on the broken pillar; falling in kills.
+- [ ] The cracked wall under Canon's Rest breaks after three hits and stays broken.
+- [ ] Canon: lash glint parry -> riposte; three-shot fan; bubbles mark where it surfaces; phase 2 floor wave can be jumped.
+- [ ] Map (M / touchpad / L3, or pause menu): shows explored parts only, your position, candles (lit after resting), bosses (crossed after defeat); pan and zoom work; closing resumes the game.
+
 ## Build
 - [ ] Windows .exe launches from a folder with no Godot installed.
 - [ ] Holds ~60 FPS (F3) with all enemies active.

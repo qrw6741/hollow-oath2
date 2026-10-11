@@ -20,11 +20,16 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Drowned Catacombs / Drowned Canon / map
+- Untested by a person: the shaft crossing (20 px stepping stone while wading), wave-jump timing, Canon balance (820 HP).
+- The Canon's body is drawn over the floor while it sinks (it fades out instead of being clipped by the water).
+- Enemies are not slowed by water; only the player is.
+- Map: no minimap, no markers you can place, no fast travel; the level layout on the map is schematic (door positions line up, nothing else is to scale between areas).
+- The Windows zip is only ~65 KB under the 30 MB chat upload limit.
+
 ## Forsaken Village / travel
 - Blockout quality: plain masonry blocks, no house details, no ladders; the rooftop climb uses three planks.
 - Not play-tested by a person: jump distances, enemy density (10 enemies) and the two candles' spacing are first guesses.
-- The chapel door is sealed: the village is the end of the current build.
-- No map, so the shortcut and routes are only signposted by the gate prompt.
 
 ## Audio
 - All audio is synthesised placeholder and has never been listened to by a person; volumes/mix are estimates.

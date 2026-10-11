@@ -12,6 +12,7 @@
 | Interact / Rest at candle | E | D-pad up |
 | Inventory (pack) | Tab | Create / Select |
 | Use quick item | F | R3 (press right stick) |
+| Map | M | Touchpad (PS) / L3 |
 | Pause | Esc | Start |
 | Debug overlay | F3 | — |
 
@@ -28,6 +29,7 @@ Plug in or pair the pad and press any button: on-screen prompts switch to contro
 | Parry | L1 | LB |
 | Heal | R1 | RB |
 | Interact / rest | D-pad up | D-pad up |
+| Map | Touchpad | L3 |
 | Pause | Options | Menu |
 | Pack | Create (Share) | View |
 | Quick item | R3 | RS click |

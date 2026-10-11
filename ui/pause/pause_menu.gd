@@ -20,6 +20,7 @@ func _ready() -> void:
 	_build()
 	_panel.visible = false
 	Events.inventory_menu_closed.connect(func(): if _panel.visible and _main_page.visible: _resume_btn.grab_focus())
+	Events.map_closed.connect(func(): if _panel.visible and _main_page.visible: _resume_btn.grab_focus())
 
 
 func _build() -> void:
@@ -52,6 +53,7 @@ func _build() -> void:
 
 	_resume_btn = _button("Resume", _resume)
 	_button("Inventory", func(): Events.inventory_menu_requested.emit())
+	_button("Map", func(): Events.map_requested.emit())
 	_button("Settings", _open_settings)
 	_menu_btn = _button("Quit to Main Menu", _on_quit_to_menu)
 	_button("Quit to Desktop", func(): get_tree().quit())

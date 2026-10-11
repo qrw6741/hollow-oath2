@@ -223,6 +223,20 @@ func _normalize(d: Dictionary) -> Dictionary:
 	out["inventory"] = inv
 	var q := _str(d.get("quick_item"), "")
 	out["quick_item"] = q if inv.has(q) else ""
+	var ex := {}
+	if typeof(d.get("explored")) == TYPE_DICTIONARY:
+		for lv in d["explored"]:
+			var cells: Variant = d["explored"][lv]
+			if typeof(cells) != TYPE_ARRAY:
+				continue
+			var clean: Array = []
+			for k in cells:
+				if typeof(k) in [TYPE_INT, TYPE_FLOAT] and int(k) >= 0 and int(k) < 4194304:
+					clean.append(int(k))
+			if clean.size() > 200000:
+				clean.resize(200000)
+			ex[String(lv)] = clean
+	out["explored"] = ex
 	out["level_path"] = _str(d.get("level_path"), GameState.DEFAULT_LEVEL_PATH)
 	out["level_name"] = _str(d.get("level_name"), "")
 	var cl := _str(d.get("checkpoint_level"), "")
