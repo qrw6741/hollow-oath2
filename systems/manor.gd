@@ -24,6 +24,15 @@ static func can_travel(player: Player, need_sigil := true) -> Dictionary:
 	for b in tree.get_nodes_in_group(&"bosses"):
 		if b.get("active") == true and not b.is_dead():
 			return {"ok": false, "msg": "The oath will not let you leave this fight."}
+	if player.combat_frames > 0:
+		return {"ok": false, "msg": "Not in the middle of a fight."}
+	for e in tree.get_nodes_in_group(&"enemies"):
+		if e.get("state") == null or e.is_dead():
+			continue
+		var st: int = e.state
+		if st in [EnemyBase.State.CHASE, EnemyBase.State.ATTACK, EnemyBase.State.STAGGER, EnemyBase.State.PARRIED] \
+				and e.global_position.distance_to(player.global_position) < 360.0:
+			return {"ok": false, "msg": "Something hunts you. Shake it first."}
 	return {"ok": true, "msg": ""}
 
 

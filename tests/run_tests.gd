@@ -81,7 +81,7 @@ func _run() -> void:
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
-		test_sigil_gift, test_sigil_travel, test_manor_level, test_npcs_stand_on_ground,
+		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_manor_level, test_npcs_stand_on_ground,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -3000,3 +3000,27 @@ func test_npcs_stand_on_ground() -> void:
 		await go_to_level(path, &"")
 		var bad := npc_grounding_problems()
 		check(bad.is_empty(), "%s: every NPC stands on the ground %s" % [path.get_file(), bad])
+
+
+func test_travel_key_combat_lock() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	check(InputMap.has_action(&"travel_manor") and InputMap.has_action(&"skill"), "new actions registered")
+	check(InputConfig.REMAPPABLE.has(&"travel_manor") and InputConfig.REMAPPABLE.has(&"skill"), "both remappable")
+	game_state.add_item(&"hollow_sigil", 1)
+	await place_player(500.0, 480.0, 1)
+	player.combat_frames = 100
+	check(not Manor.can_travel(player).ok, "recent combat blocks travel")
+	await press(&"travel_manor")
+	await frames(30)
+	check(game_state.level_path != Manor.PATH, "the key does nothing mid-combat")
+	player.combat_frames = 0
+	check(Manor.can_travel(player).ok, "calm: allowed")
+	await press(&"travel_manor")
+	await frames(300)
+	check(game_state.level_path == Manor.PATH, "the key carries you to Hollowmere")
+	level = main.current_level()
+	player = level.player
+	await press(&"travel_manor")
+	await frames(300)
+	check(game_state.level_path != Manor.PATH, "the key carries you back")

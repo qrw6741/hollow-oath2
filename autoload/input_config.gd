@@ -23,6 +23,8 @@ const DEFAULTS := {
 	&"use_item": ["k:%d" % KEY_F, "j:%d" % JOY_BUTTON_RIGHT_STICK],
 	&"inventory": ["k:%d" % KEY_TAB, "j:%d" % JOY_BUTTON_BACK],
 	&"map": ["k:%d" % KEY_M, "j:%d" % JOY_BUTTON_TOUCHPAD, "j:%d" % JOY_BUTTON_LEFT_STICK],
+	&"travel_manor": ["k:%d" % KEY_T, "j:%d" % JOY_BUTTON_MISC1],
+	&"skill": ["k:%d" % KEY_O, "a:%d:1" % JOY_AXIS_TRIGGER_RIGHT],
 	&"pause": ["k:%d" % KEY_ESCAPE, "j:%d" % JOY_BUTTON_START],
 	&"debug_toggle": ["k:%d" % KEY_F3],
 }
@@ -79,12 +81,13 @@ const MOVE_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up"
 ## Actions shown on the Controls page, in order (debug_toggle is not remappable).
 const REMAPPABLE: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down",
 	&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal", &"interact",
-	&"use_item", &"inventory", &"map", &"pause"]
+	&"use_item", &"skill", &"travel_manor", &"inventory", &"map", &"pause"]
 const ACTION_NAMES := {
 	&"move_left": "Move left", &"move_right": "Move right", &"move_up": "Look up / climb",
 	&"move_down": "Crouch / drop", &"jump": "Jump", &"attack_light": "Light attack",
 	&"attack_heavy": "Heavy attack", &"dodge": "Dodge", &"parry": "Parry",
 	&"heal": "Heal", &"interact": "Interact", &"use_item": "Use quick item",
+	&"skill": "Weapon skill", &"travel_manor": "Hollowmere travel",
 	&"inventory": "Inventory", &"map": "Map", &"pause": "Pause",
 }
 
@@ -161,7 +164,7 @@ func _load_custom() -> void:
 	if cfg.load(PATH) != OK:
 		return
 	for action: StringName in DEFAULTS:
-		var list = cfg.get_value("bindings", String(action), null)
+		var list = cfg.get_value("bindings", String(action)) if cfg.has_section_key("bindings", String(action)) else null
 		if typeof(list) != TYPE_ARRAY or (list as Array).is_empty():
 			continue
 		InputMap.action_erase_events(action)

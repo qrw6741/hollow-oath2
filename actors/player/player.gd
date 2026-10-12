@@ -189,6 +189,10 @@ func _physics_process(delta: float) -> void:
 		last_safe_position = global_position
 	if Input.is_action_just_pressed(&"use_item") and state == State.FREE and not GameState.ui_modal:
 		Items.use(GameState.quick_item, self)
+	if combat_frames > 0:
+		combat_frames -= 1
+	if Input.is_action_just_pressed(&"travel_manor") and state == State.FREE and not GameState.ui_modal:
+		_try_manor_travel()
 	state_frame += 1
 	if _iframes > 0:
 		_iframes -= 1
@@ -477,6 +481,7 @@ func receive_hit(hit: HitData) -> int:
 		return HitData.Result.PARRIED
 	if is_invulnerable(hit.environmental):
 		return HitData.Result.IGNORED
+	combat_frames = COMBAT_LOCK_FRAMES
 	health.take_damage(hit.damage * damage_taken_mult * Settings.damage_taken_pct / 100.0)
 	GameFeel.spark(global_position + Vector2(0, -14), Palette.CRIMSON_BRIGHT, 12)
 	GameFeel.shake(4.0, 0.22)
@@ -489,6 +494,17 @@ func receive_hit(hit: HitData) -> int:
 		facing = 1 if hit.source.global_position.x >= global_position.x else -1
 	_iframes = post_hit_iframes
 	return HitData.Result.HIT
+
+
+## Frames since the last blow dealt or taken; Manor.can_travel refuses while this runs.
+const COMBAT_LOCK_FRAMES := 300
+var combat_frames := 0
+
+
+func _try_manor_travel() -> void:
+	var r := Manor.travel(self)
+	if not r.ok:
+		Events.message_requested.emit("The oath holds", String(r.msg))
 
 
 func _faces(source: Node2D) -> bool:
@@ -514,6 +530,7 @@ func _on_parry_success(hit: HitData) -> void:
 
 
 func _on_attack_hit(_target: Hurtbox, result: int, hit: HitData) -> void:
+	combat_frames = COMBAT_LOCK_FRAMES
 	if result == HitData.Result.HIT:
 		GameFeel.hit_stop(hit.hit_stop)
 		GameFeel.shake(hit.shake)
