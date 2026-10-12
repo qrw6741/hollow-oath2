@@ -56,6 +56,7 @@ func _ready() -> void:
 	Events.inventory_changed.connect(_refresh_quick)
 	Events.item_picked.connect(func(id, n): _toast("%s  x%d" % [Items.get_item(id).display_name, n]))
 	Events.stats_changed.connect(_sync_economy)
+	Events.quest_changed.connect(_on_quest)
 	Events.boss_fight_started.connect(_on_boss_fight_started)
 	Events.message_requested.connect(_on_message)
 	Events.message_closed.connect(func(): _msg_panel.visible = false)
@@ -358,6 +359,19 @@ func _refresh_quick() -> void:
 	if _quick_box.visible:
 		_quick_label.text = "x%d" % GameState.item_count(GameState.quick_item)
 		_quick_icon.queue_redraw()
+
+
+func _on_quest(id: StringName, st: String) -> void:
+	var d := Quests.def(id)
+	match st:
+		"active":
+			_toast("Errand: %s" % d.title)
+		"done":
+			_toast("Errand done: %s" % d.title)
+		_:
+			var p := Quests.progress(id)
+			if p.have <= p.need:
+				_toast("%s  %d/%d" % [d.title, p.have, p.need])
 
 
 func _toast(text: String) -> void:

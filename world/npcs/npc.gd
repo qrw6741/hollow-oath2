@@ -6,7 +6,7 @@ extends Area2D
 ## Origin = feet. TEMPORARY ART (procedural): Pedlar = hunched trader with a towering pack
 ## and a lantern; Figure = tall hooded stranger holding a candle.
 
-enum Look { PEDLAR, FIGURE, SMITH, KEEPER, STEWARD }
+enum Look { PEDLAR, FIGURE, SMITH, KEEPER, STEWARD, ARCHIVIST }
 
 @export var npc_id: StringName = &"wenna"
 @export var display_name := "Wenna"
@@ -99,6 +99,7 @@ func _draw() -> void:
 		Look.SMITH: _draw_smith()
 		Look.KEEPER: _draw_keeper()
 		Look.STEWARD: _draw_steward()
+		Look.ARCHIVIST: _draw_archivist()
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
@@ -231,3 +232,29 @@ func _draw_steward() -> void:
 		var fl := 0.8 + 0.2 * sin(_t * 7.0 + dx)
 		draw_circle(Vector2(10 + dx, -27 + bob), 1.1 * fl, Color(0.7, 0.85, 1.0, 0.95))
 	draw_circle(Vector2(10, -25 + bob), 10.0, Color(0.6, 0.8, 1.0, 0.07))
+
+
+func _draw_archivist() -> void:
+	# A ghost in a long grey dress with spectacles and an open book, a quill behind one ear.
+	var bob := sin(_t * 1.0) * 1.0
+	var a := 0.8 + 0.1 * sin(_t * 2.0)
+	var dress := Color(0.5, 0.56, 0.62, a)
+	var dress_d := Color(0.3, 0.34, 0.42, a)
+	var skin := Color(0.84, 0.88, 0.92, a)
+	draw_circle(Vector2(0, -20 + bob), 17.0, Color(0.7, 0.8, 1.0, 0.05))
+	draw_colored_polygon(PackedVector2Array([Vector2(-7, 1 + bob), Vector2(-4, -25 + bob), Vector2(4, -25 + bob), Vector2(7, 1 + bob), Vector2(3, -3 + bob), Vector2(0, 2 + bob), Vector2(-3, -3 + bob)]), dress)
+	draw_line(Vector2(-4, -22 + bob), Vector2(-5, -4 + bob), dress_d, 1.0)
+	draw_circle(Vector2(0, -29 + bob), 3.6, skin)
+	draw_circle(Vector2(0, -30.2 + bob), 3.8, Color(0.74, 0.76, 0.84, a))   # hair bun base
+	draw_circle(Vector2(-2.4, -33.4 + bob), 2.0, Color(0.74, 0.76, 0.84, a))
+	draw_circle(Vector2(1.6, -29.3 + bob), 1.3, Color(0.85, 0.9, 1.0, 0.35))
+	draw_arc(Vector2(1.6, -29.3 + bob), 1.4, 0.0, TAU, 8, Color(0.9, 0.95, 1.0, a), 0.6)   # spectacles
+	draw_line(Vector2(-4, -31 + bob), Vector2(-7, -34 + bob), Color(0.9, 0.9, 0.85, a), 0.8)  # quill
+	# Book held open in front
+	draw_line(Vector2(3, -19 + bob), Vector2(9, -17 + bob), dress_d, 2.0)
+	draw_colored_polygon(PackedVector2Array([Vector2(7, -22 + bob), Vector2(12, -21 + bob), Vector2(12, -15 + bob), Vector2(7, -16 + bob)]), Color(0.8, 0.74, 0.55, a))
+	draw_line(Vector2(9.5, -21.5 + bob), Vector2(9.5, -15.5 + bob), Color(0.4, 0.33, 0.2, a), 0.7)
+	for i in 3:
+		draw_line(Vector2(7.8, -20 + i * 1.8 + bob), Vector2(9.0, -19.8 + i * 1.8 + bob), Color(0.4, 0.33, 0.2, a * 0.7), 0.5)
+		draw_line(Vector2(10.0, -20 + i * 1.8 + bob), Vector2(11.4, -19.8 + i * 1.8 + bob), Color(0.4, 0.33, 0.2, a * 0.7), 0.5)
+	draw_circle(Vector2(9.5, -18.5 + bob), 7.0, Color(1.0, 0.9, 0.6, 0.06))

@@ -15,7 +15,7 @@ static func has_icon(id: StringName) -> bool:
 	return id in [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard",
 		&"penitents_tear", &"candlewright_note", &"canon_seal", &"pilgrims_draught", &"marshals_crest", &"oathblade", &"twin_blades",
 		&"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark",
-		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil"] \
+		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil", &"gallery_key", &"sextons_lantern"] \
 		or Weapons.IDS.has(id) or (String(id).begins_with("armor_") and Armors.is_valid_id(String(id).substr(6)))
 
 
@@ -44,6 +44,8 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"status": _sigil(ci, t)
 		&"forge_scrap": _scrap(ci)
 		&"hollow_sigil": _sigil_seal(ci)
+		&"gallery_key": _gallery_key(ci)
+		&"sextons_lantern": _lantern(ci, t)
 		&"hollow_resin": _resin(ci)
 		&"vial": _vial(ci)
 		&"wayfarers_rapier": _rapier(ci)
@@ -120,6 +122,29 @@ static func _key(ci: CanvasItem) -> void:
 	ci.draw_line(Vector2(11, 11), Vector2(9.5, 12.5), rust, 1.6)
 	ci.draw_line(Vector2(13, 13), Vector2(11.5, 14.5), rust, 1.6)
 	ci.draw_circle(Vector2(9, 9), 0.6, Color("c47a45"))
+
+
+static func _gallery_key(ci: CanvasItem) -> void:
+	var brass := Color("d2a853")
+	ci.draw_rect(Rect2(3.5, 2.5, 5, 4), OUTLINE)
+	ci.draw_rect(Rect2(4, 3, 4, 3), brass)
+	ci.draw_line(Vector2(4.5, 3.6), Vector2(6, 4.8), Color("7a6130"), 0.7)
+	ci.draw_line(Vector2(7.5, 3.6), Vector2(6, 4.8), Color("7a6130"), 0.7)
+	ci.draw_line(Vector2(6, 6.5), Vector2(6, 14), OUTLINE, 2.6)
+	ci.draw_line(Vector2(6, 6.5), Vector2(6, 14), brass, 1.6)
+	ci.draw_line(Vector2(6, 11), Vector2(9.5, 11), brass, 1.4)
+	ci.draw_line(Vector2(6, 13.4), Vector2(8.6, 13.4), brass, 1.4)
+
+
+static func _lantern(ci: CanvasItem, t: float) -> void:
+	ci.draw_line(Vector2(8, 1.5), Vector2(8, 3.5), OUTLINE, 1.4)
+	ci.draw_rect(Rect2(4, 3.5, 8, 2), Color("2a2830"))
+	ci.draw_rect(Rect2(4.5, 5.5, 7, 7), Color("8fa6b8", 0.55))
+	ci.draw_rect(Rect2(4.5, 5.5, 7, 7), Color("2a2830"), false, 1.0)
+	var f := 0.8 + 0.2 * sin(t * 5.0)
+	ci.draw_circle(Vector2(8, 9.5), 2.2 * f, Color("bfe0ff", 0.55))
+	ci.draw_circle(Vector2(8, 9.5), 1.0, Color("eaf6ff"))
+	ci.draw_rect(Rect2(3.5, 12.5, 9, 1.8), Color("2a2830"))
 
 
 static func _bell_shard(ci: CanvasItem) -> void:

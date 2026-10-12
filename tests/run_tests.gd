@@ -81,7 +81,7 @@ func _run() -> void:
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
-		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_manor_level, test_npcs_stand_on_ground,
+		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_manor_level, test_npcs_stand_on_ground,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -3260,3 +3260,104 @@ func test_elite_enemy() -> void:
 	check(is_equal_approx(e.attack_runner.base_multiplier, 1.3), "elite hits harder")
 	check(e.status.resist_of(StatusFx.POISON) >= 1.0, "gilded penitent is poison-proof")
 	e.queue_free()
+
+
+func test_quests_collect_and_kill() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	# Hobb: introduced on the first talk, offers on the second.
+	var c := Dialogues.conversation(&"hobb")
+	check(not c.has("quest"), "first talk is the introduction")
+	Dialogues.finish(&"hobb")
+	c = Dialogues.conversation(&"hobb")
+	check(c.has("quest") and c.quest.mode == "offer", "second talk offers the errand")
+	Dialogues.finish(&"hobb")
+	check(Quests.is_active(&"hobb_scrap"), "the errand is open")
+	c = Dialogues.conversation(&"hobb")
+	check(c.quest.mode == "remind" and "0 / 3" in String(c.lines[0]), "while open, Hobb reminds you with progress")
+	game_state.add_item(&"forge_scrap", 2)
+	check(not Quests.is_ready(&"hobb_scrap"), "two scrap is not enough")
+	game_state.add_item(&"forge_scrap", 1)
+	check(Quests.is_ready(&"hobb_scrap"), "three scrap is")
+	var embers: int = game_state.embers
+	c = Dialogues.conversation(&"hobb")
+	check(c.quest.mode == "complete", "Hobb accepts the scrap")
+	Dialogues.finish(&"hobb")
+	check(Quests.is_done(&"hobb_scrap"), "errand done")
+	check(game_state.item_count(&"forge_scrap") == 0, "scrap handed over")
+	check(game_state.embers >= embers + 400 and game_state.item_count(&"ember_shard") >= 2, "reward paid")
+	c = Dialogues.conversation(&"hobb")
+	check(not c.has("quest"), "a finished errand is not offered again")
+	# Wenna: kill three crows.
+	Dialogues.finish(&"wenna")
+	Dialogues.finish(&"wenna")
+	check(Quests.is_active(&"wenna_crows"), "Wenna's errand opens")
+	var fake := Node.new()
+	var crow := load("res://data/enemies/carrion_crow.tres")
+	fake.set_meta(&"x", 1)
+	var gs := GDScript.new()
+	gs.source_code = "extends Node\nvar data\n"
+	gs.reload()
+	fake.set_script(gs)
+	fake.data = crow
+	add_child(fake)
+	for i in 3:
+		game_state._on_enemy_killed(fake)
+	check(Quests.kills(&"wenna_crows") == 3 and Quests.is_ready(&"wenna_crows"), "three crow kills count")
+	fake.queue_free()
+	# Saves keep it (flags only).
+	var d: Dictionary = game_state.to_dict()
+	check(d.is_empty() or String(d.get("flags", {}).get("quest_hobb_scrap", "")) == "done", "quest state is in the saved flags")
+
+
+func test_quest_gating_and_manor_lines() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	# Ommen's errand waits behind his story and the sigil.
+	for i in 4:
+		Dialogues.finish(&"ommen")
+	check(not Dialogues.conversation(&"ommen").has("quest"), "Ommen finishes his story first")
+	game_state.set_flag(Dialogues.SIGIL_FLAG, true)
+	for i in 2:
+		Dialogues.finish(&"ommen")
+	check(Dialogues.conversation(&"ommen").has("quest"), "then he asks his favour")
+	# Manor-only lines replace the road greetings.
+	game_state.set_flag(&"talks_wenna", 1)
+	var field: String = Dialogues.conversation(&"wenna").lines[0]
+	game_state.level_path = Manor.PATH
+	var inside := Dialogues.conversation(&"wenna")
+	if inside.has("quest"):
+		game_state.set_flag(&"quest_wenna_crows", "done")
+		inside = Dialogues.conversation(&"wenna")
+	check(inside.lines[0] in Dialogues.MANOR_GREETINGS[&"wenna"], "Wenna has manor lines")
+	check(not (field in Dialogues.MANOR_GREETINGS[&"wenna"]), "field lines are not manor lines")
+	# Vesper explains what you carry, once.
+	game_state.add_item(&"candlewright_note", 1)
+	var v := Dialogues.conversation(&"vesper")
+	check(v.speaker == "Vesper" and v.lines.size() == 2, "Vesper introduces herself")
+	Dialogues.finish(&"vesper")
+	v = Dialogues.conversation(&"vesper")
+	check("Note" in String(v.lines[0]), "she explains the note")
+	Dialogues.finish(&"vesper")
+	v = Dialogues.conversation(&"vesper")
+	check(not ("Note" in String(v.lines[0])), "only once")
+	for id in Quests.DEFS:
+		check(Quests.DEFS[id].giver != &"" and Items.get_item(Quests.DEFS[id].get("item", &"forge_scrap")) != null, "%s refers to real items" % id)
+	for id in Dialogues.ARCHIVE:
+		check(Items.get_item(id) != null, "archive entry %s is a real item" % id)
+
+
+func test_journal_tab() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	var inv: InventoryMenu = main.get_node("InventoryMenu") if main.has_node("InventoryMenu") else get_tree().get_first_node_in_group(&"inventory_menu")
+	check(inv != null, "inventory menu found")
+	if inv == null:
+		return
+	Quests.start(&"hobb_scrap")
+	var t := inv.journal_text()
+	check("Iron for the Forge" in t and "0 / 3" in t, "open errand listed with progress")
+	inv.open(InventoryMenu.Tab.JOURNAL)
+	await frames(3)
+	check(inv.tab == InventoryMenu.Tab.JOURNAL, "journal tab opens")
+	inv.close()

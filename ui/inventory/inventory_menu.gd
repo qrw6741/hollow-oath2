@@ -7,9 +7,10 @@ extends CanvasLayer
 ##               stamina; armour damage taken, health, stamina, vials, handling; full status.
 ##   ITEMS     — the pack: carried items, descriptions, Use and "Set as quick item".
 ## Opens with Inventory (Tab / Create) or from the pause and candle menus; pauses the game.
+## A JOURNAL tab lists open errands (see Quests).
 ## Switch tabs with Parry / Heal (L1 / R1) or by clicking. Keyboard, mouse and gamepad.
 
-enum Tab { EQUIPMENT, ITEMS }
+enum Tab { EQUIPMENT, ITEMS, JOURNAL }
 
 var is_open := false
 var tab := Tab.EQUIPMENT
@@ -78,9 +79,9 @@ func _build() -> void:
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
 	tabs.add_theme_constant_override(&"separation", 18)
 	v.add_child(tabs)
-	for i in 2:
+	for i in 3:
 		var b := FancyButton.new()
-		b.text = ["EQUIPMENT", "ITEMS"][i]
+		b.text = ["EQUIPMENT", "ITEMS", "JOURNAL"][i]
 		b.custom_minimum_size = Vector2(110, 18)
 		b.add_theme_font_override(&"font", UITheme.title_font())
 		b.add_theme_font_size_override(&"font_size", 12)
@@ -94,6 +95,7 @@ func _build() -> void:
 	v.add_child(stack)
 	_pages.append(_build_equipment(stack))
 	_pages.append(_build_items(stack))
+	_pages.append(_build_journal(stack))
 	_close_btn = FancyButton.new()
 	_close_btn.text = "Close"
 	_close_btn.custom_minimum_size = Vector2(110, 15)
@@ -258,6 +260,45 @@ func _build_items(stack: Control) -> Control:
 	return h
 
 
+var _journal_label: Label
+
+
+func _build_journal(stack: Control) -> Control:
+	var p := _framed(stack, Vector2(460, 194))
+	var sc := ScrollContainer.new()
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	p.add_child(sc)
+	_journal_label = Label.new()
+	_journal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_journal_label.custom_minimum_size = Vector2(440, 0)
+	_journal_label.add_theme_constant_override(&"line_spacing", -2)
+	sc.add_child(_journal_label)
+	return p
+
+
+## The journal text: open errands first, then finished ones.
+func journal_text() -> String:
+	var open_lines := PackedStringArray()
+	var done_lines := PackedStringArray()
+	for id in Quests.ORDER:
+		var d := Quests.def(id)
+		match Quests.state(id):
+			"active":
+				var tag := "READY - speak to them" if Quests.is_ready(id) else Quests.progress_text(id)
+				open_lines.append("%s  [%s]\n   %s\n   Reward: %s" % [d.title, tag, d.summary, Quests.reward_text(id)])
+			"done":
+				done_lines.append("%s" % d.title)
+	var t := "ERRANDS\n"
+	t += "\n".join(open_lines) if not open_lines.is_empty() else "None open. Talk to the people of the road and the manor."
+	if not done_lines.is_empty():
+		t += "\n\nDONE:  " + ",  ".join(done_lines)
+	return t
+
+
+func _refresh_journal() -> void:
+	_journal_label.text = journal_text()
+
+
 func _btn(parent: Control, text: String, cb: Callable) -> Button:
 	var b := FancyButton.new()
 	b.text = text
@@ -279,7 +320,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			close()
 			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed(&"parry") or event.is_action_pressed(&"heal"):
-			show_tab(Tab.ITEMS if tab == Tab.EQUIPMENT else Tab.EQUIPMENT)
+			var step := -1 if event.is_action_pressed(&"parry") else 1
+			show_tab((int(tab) + step + _pages.size()) % _pages.size())
 			get_viewport().set_input_as_handled()
 	elif event.is_action_pressed(&"inventory") and GameState.in_game and not GameState.ui_modal and not get_tree().paused:
 		open()
@@ -321,6 +363,9 @@ func show_tab(t: int) -> void:
 	if tab == Tab.EQUIPMENT:
 		_refresh_equipment()
 		(_slots[_slot_sel] as Button).grab_focus()
+	elif tab == Tab.JOURNAL:
+		_refresh_journal()
+		_close_btn.grab_focus()
 	else:
 		_rebuild()
 	Audio.sfx(&"ui_move", -4.0)

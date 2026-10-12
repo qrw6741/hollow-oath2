@@ -95,6 +95,87 @@ const ILSE_GREETINGS := [
 	"The Resin grows brighter when the candles are lit. I like to think they are talking.",
 ]
 
+## What these four say when you find them in Hollowmere Manor (instead of their road lines).
+const MANOR_GREETINGS := {
+	&"ommen": [
+		"It is strange to sit by a candle that nobody needs to guard. I keep forgetting that.",
+		"Aldous insists on formal dinners. There is nothing to eat. We sit anyway. It helps.",
+		"The house remembers every Candlewright who ever slept under this roof. Some nights I can hear them rehearsing.",
+		"You came back. That is all I ever hope for, when you leave.",
+	],
+	&"wenna": [
+		"Trade in a haunted manor! The ghosts are slow payers, but they never haggle.",
+		"I have hung my beads from the chandelier. Aldous pretends not to notice.",
+		"Wenna's Hall - I had a sign painted. The painter was already dead, so he did it for free.",
+		"The road is hungry. The house is full. I prefer the house.",
+	],
+	&"hobb": [
+		"Best forge I ever had. The chimney draws like a dream. Don't ask what feeds it.",
+		"The old Dowager's armour hangs in the hall. I've been itching to take it apart and see how it was made.",
+		"Quiet here. Too quiet. I keep tapping the anvil to hear something that answers.",
+		"Anything you break out there, bring it in. The house makes a good listener for hammering.",
+	],
+	&"ilse": [
+		"The conservatory still blooms. Nothing that grows here has ever seen sunlight. They are lovely anyway.",
+		"The ghosts come to warm their hands at the vials. I have not the heart to send them off.",
+		"Aldous says the house will let someone into the Gallery when it has decided. I think the house is waiting for a particular kind of courage.",
+		"Out there the oath hurts. In here, it only aches. That is a mercy, of a kind.",
+	],
+}
+
+## What the archivist says about things you carry. Each is explained once.
+const ARCHIVE := {
+	&"candlewright_note": "The Note. I filed the original, you know - or its twin. 'Read from the last line to the first.' They did not even disguise it. We were so sure no one would ever check.",
+	&"penitents_tear": "A penitent's tear: wax and salt. The sworn weep when the oath turns on them - the only sign left that someone is still inside. Do not be moved. Be quick.",
+	&"canon_seal": "The Canon's seal. Seals like this closed the Candlewright vaults. Whoever wore it was trusted with the final copy of the liturgy - the one that was never burned.",
+	&"warden_bell_shard": "A piece of the Warden's bell. It rang for every vow sworn in Vaelmoor, three hundred years running. It cracked on the Night, the way a throat cracks after a scream.",
+	&"marshals_crest": "Orren's crest. The Marshal is in the records as 'faithful beyond reason'. I never understood why that was a compliment.",
+	&"rusted_key": "An old cellar key, I think. Every manor has one nobody can match to a door. Keep it. Doors turn up.",
+	&"hollow_sigil": "The sigil! Candlewrights pressed these on letters they never meant the Crown to read. It was clever of Ommen to turn a seal into a road.",
+	&"gallery_key": "The Gallery key. You went down there and came back up. Few do. The cellarer was an excellent butler, you know, before the Night. He just never learned when to stop serving.",
+	&"sextons_lantern": "The Sexton's lantern. It lit every burial in the Pilgrim's Graveyard for a hundred years. It will light yours too, if you let it - and I would rather you did not.",
+}
+const VESPER_FIRST := [
+	"Oh! A visitor. A living one. Do forgive me - the Gallery has been shut for so long that I had begun to catalogue the dust.",
+	"I am Vesper, the archivist. Everything this house ever kept is kept here: letters, portraits, the Candlewrights' last drafts. Show me what you find, and I will tell you what it was.",
+]
+const VESPER_GREETINGS := [
+	"Do bring me anything curious. A catalogue with gaps in it is a wound.",
+	"I have read every letter in this room. The best of them were never sent.",
+	"The portraits do not mind being looked at. They have had a very long time to get used to it.",
+]
+
+static func _quest_for(npc: StringName) -> Dictionary:
+	var n := talks(npc)
+	if n < 1:
+		return {}
+	# Story pages come first for the two with a plot to tell.
+	if npc == &"ommen":
+		var marshal_down := bool(GameState.get_flag(MARSHAL_FLAG, false))
+		if n < OMMEN_STORY.size() or not bool(GameState.get_flag(SIGIL_FLAG, false)) \
+				or (marshal_down and not bool(GameState.get_flag(&"ommen_heard_after", false))):
+			return {}
+	if npc == &"aldous" and bool(GameState.get_flag(MARSHAL_FLAG, false)) and not bool(GameState.get_flag(&"aldous_heard_marshal", false)):
+		return {}
+	return Quests.for_npc(npc, n)
+
+
+static func _greeting(npc: StringName, field_pool: Array, n: int) -> Array:
+	var pool: Array = field_pool
+	if Manor.in_manor() and MANOR_GREETINGS.has(npc):
+		pool = MANOR_GREETINGS[npc]
+	return [pool[n % pool.size()]]
+
+
+## Items from the archive the player carries and has not yet heard about.
+static func archive_pending() -> Array:
+	var out := []
+	for id in ARCHIVE:
+		if GameState.item_count(id) > 0 and not bool(GameState.get_flag(StringName("arch_" + String(id)), false)):
+			out.append(id)
+	return out
+
+
 ## What the prompt calls them: the stranger gives his name on the third talk.
 static func display_name(npc: StringName, fallback: String) -> String:
 	if npc == &"ommen" and talks(npc) >= 2:
@@ -108,6 +189,25 @@ static func talks(npc: StringName) -> int:
 
 static func conversation(npc: StringName) -> Dictionary:
 	var n := talks(npc)
+	if npc == &"vesper":
+		var pend := archive_pending()
+		if n == 0:
+			return {"speaker": "Vesper", "lines": VESPER_FIRST}
+		if not pend.is_empty():
+			var lines4 := []
+			for id in pend.slice(0, 2):
+				lines4.append(ARCHIVE[id])
+			return {"speaker": "Vesper", "lines": lines4}
+		return {"speaker": "Vesper", "lines": [VESPER_GREETINGS[(n - 1) % VESPER_GREETINGS.size()]]}
+	var q := _quest_for(npc)
+	if not q.is_empty():
+		var qd := Quests.def(q.id)
+		var qlines: Array
+		match q.mode:
+			"offer": qlines = qd.offer
+			"complete": qlines = qd.complete
+			_: qlines = ["%s  (%s)" % [qd.remind, Quests.progress_text(q.id)]]
+		return {"speaker": _speaker_for(npc), "lines": qlines, "quest": q}
 	match npc:
 		&"ommen":
 			var marshal_down := bool(GameState.get_flag(MARSHAL_FLAG, false))
@@ -121,15 +221,15 @@ static func conversation(npc: StringName) -> Dictionary:
 			elif not bool(GameState.get_flag(SIGIL_FLAG, false)):
 				lines = OMMEN_SIGIL_LATE
 			else:
-				lines = [OMMEN_IDLE[(n - OMMEN_STORY.size()) % OMMEN_IDLE.size()]]
+				lines = _greeting(npc, OMMEN_IDLE, n - OMMEN_STORY.size())
 			return {"speaker": speaker, "lines": lines}
 		&"wenna":
-			var lines2: Array = WENNA_FIRST if n == 0 else [WENNA_GREETINGS[(n - 1) % WENNA_GREETINGS.size()]]
+			var lines2: Array = WENNA_FIRST if n == 0 else _greeting(npc, WENNA_GREETINGS, n - 1)
 			return {"speaker": "Wenna", "lines": lines2}
 		&"hobb":
-			return {"speaker": "Hobb", "lines": HOBB_FIRST if n == 0 else [HOBB_GREETINGS[(n - 1) % HOBB_GREETINGS.size()]]}
+			return {"speaker": "Hobb", "lines": HOBB_FIRST if n == 0 else _greeting(npc, HOBB_GREETINGS, n - 1)}
 		&"ilse":
-			return {"speaker": "Sister Ilse", "lines": ILSE_FIRST if n == 0 else [ILSE_GREETINGS[(n - 1) % ILSE_GREETINGS.size()]]}
+			return {"speaker": "Sister Ilse", "lines": ILSE_FIRST if n == 0 else _greeting(npc, ILSE_GREETINGS, n - 1)}
 		&"aldous":
 			var lines3: Array
 			if n == 0:
@@ -142,8 +242,26 @@ static func conversation(npc: StringName) -> Dictionary:
 	return {"speaker": "...", "lines": ["..."]}
 
 
+static func _speaker_for(npc: StringName) -> String:
+	return {&"ommen": "Ommen", &"wenna": "Wenna", &"hobb": "Hobb", &"ilse": "Sister Ilse", &"aldous": "Aldous Vane"}.get(npc, "...")
+
+
 ## Records that the conversation happened (advances the story).
 static func finish(npc: StringName) -> void:
+	if npc == &"vesper":
+		if talks(npc) > 0:
+			for id in archive_pending().slice(0, 2):
+				GameState.set_flag(StringName("arch_" + String(id)), true)
+		GameState.set_flag(&"talks_vesper", talks(npc) + 1)
+		return
+	var q := _quest_for(npc)
+	if not q.is_empty():
+		if q.mode == "offer":
+			Quests.start(q.id)
+		elif q.mode == "complete":
+			Quests.complete(q.id)
+		GameState.set_flag(StringName("talks_" + String(npc)), talks(npc) + 1)
+		return
 	if npc == &"ommen" and bool(GameState.get_flag(MARSHAL_FLAG, false)) and not bool(GameState.get_flag(&"ommen_heard_after", false)):
 		GameState.set_flag(&"ommen_heard_after", true)
 		return

@@ -106,6 +106,7 @@ func _on_player_died() -> void:
 # ------------------------------------------------------------------ economy
 
 func _on_enemy_killed(enemy: Node) -> void:
+	Quests.on_enemy_killed(enemy)
 	var d: EnemyData = enemy.get("data") as EnemyData
 	if d == null:
 		return
