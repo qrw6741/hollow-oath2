@@ -5,7 +5,7 @@ extends Resource
 ## is handled by whatever checks for the item.
 
 enum Kind { CONSUMABLE, KEY, LORE }
-enum Effect { NONE, HEAL, STAMINA, EMBERS }
+enum Effect { NONE, HEAL, STAMINA, EMBERS, TRAVEL }
 
 @export var id: StringName = &""
 @export var display_name := ""
@@ -19,7 +19,7 @@ enum Effect { NONE, HEAL, STAMINA, EMBERS }
 
 
 func is_usable() -> bool:
-	return kind == Kind.CONSUMABLE and effect != Effect.NONE
+	return (kind == Kind.CONSUMABLE and effect != Effect.NONE) or effect == Effect.TRAVEL
 
 
 func validate() -> PackedStringArray:
@@ -32,6 +32,6 @@ func validate() -> PackedStringArray:
 		errs.append("max_stack must be at least 1")
 	if kind == Kind.CONSUMABLE and effect == Effect.NONE:
 		errs.append("consumable has no effect")
-	if effect != Effect.NONE and effect_amount <= 0.0:
+	if effect != Effect.NONE and effect != Effect.TRAVEL and effect_amount <= 0.0:
 		errs.append("effect_amount must be positive")
 	return errs

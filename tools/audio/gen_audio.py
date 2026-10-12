@@ -529,9 +529,9 @@ if __name__ == "__main__":
     import subprocess
     open(os.path.join(BUILD, ".gdignore"), "w").close()
     total = 0
-    # SFX: 24 kHz, Vorbis q0. Music: 22.05 kHz, Vorbis q0. (q-1 is larger on noisy ambience.)
+    # SFX: 16 kHz, Vorbis q0. Music: 22.05 kHz, Vorbis q0. (q-1 is larger on noisy ambience.)
     # Sizes matter: the Windows build must stay under a 30 MB download. (ambient material hides artefacts).
-    for src, dst, extra in ((SFX_DIR, OUT_SFX, ["-ar", "24000", "-q:a", "0"]), (MUS_DIR, OUT_MUS, ["-q:a", "0"])):
+    for src, dst, extra in ((SFX_DIR, OUT_SFX, ["-ar", "16000", "-q:a", "0"]), (MUS_DIR, OUT_MUS, ["-q:a", "0"])):
         os.makedirs(dst, exist_ok=True)
         for f in sorted(os.listdir(src)):
             if not f.endswith(".wav"):

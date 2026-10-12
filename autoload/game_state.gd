@@ -38,6 +38,9 @@ const STRENGTH_DAMAGE := 0.04
 var explored := {}
 ## True while a modal menu (candle / inventory) owns input; the pause menu stays out of the way.
 var ui_modal := false
+## Set by the Hollowmere Sigil on the way back: the next load of this level puts the player here (not saved).
+var pending_spawn_level := ""
+var pending_spawn := Vector2.ZERO
 var level_path := DEFAULT_LEVEL_PATH
 ## Level holding the last rested candle ("" = same as level_path, for old saves).
 var checkpoint_level := ""
@@ -213,7 +216,7 @@ func add_item(id: StringName, count := 1) -> int:
 	if added <= 0:
 		return 0
 	inventory[String(id)] = have + added
-	if quick_item == &"" and item.is_usable():
+	if quick_item == &"" and item.is_usable() and item.effect != ItemData.Effect.TRAVEL:
 		quick_item = id
 	Events.item_picked.emit(id, added)
 	Events.inventory_changed.emit()
@@ -294,6 +297,7 @@ func reset() -> void:
 	armor_id = &""
 	flask_level = 0
 	ui_modal = false
+	pending_spawn_level = ""
 	explored = {}
 	level_path = DEFAULT_LEVEL_PATH
 	level_name = ""

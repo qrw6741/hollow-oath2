@@ -80,6 +80,8 @@ func _run() -> void:
 		test_dialogue_box, test_shop, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
+		# --- Hollowmere Manor and the sigil ---
+		test_sigil_gift, test_sigil_travel, test_manor_level, test_npcs_stand_on_ground,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -1887,7 +1889,7 @@ func test_map_exploration_and_screen() -> void:
 	check(bad.explored.x == [1, 3] and not bad.explored.has("y"), "bad exploration data is cleaned (%s)" % bad.explored)
 	# Map data for every level.
 	for d in WorldMap.all():
-		check(d.blocks.size() > 5 and d.candles.size() >= 1 and d.name != "", "%s map data read" % d.path)
+		check(d.blocks.size() > 3 and d.candles.size() >= 1 and d.name != "", "%s map data read" % d.path)
 	# Doors line up across levels on the world map.
 	var yard := WorldMap.info(YARD)
 	var vil := WorldMap.info(VILLAGE)
@@ -2829,3 +2831,172 @@ func test_gear_npcs() -> void:
 		if xs[i] - xs[i - 1] < 60.0:
 			tight = true
 	check(not tight, "NPCs and candles are spaced out (%s)" % [xs])
+
+
+# ---------------------------------------------------------------- Hollowmere Manor and the sigil
+
+func test_sigil_gift() -> void:
+	await fresh_game()
+	var it := Items.get_item(&"hollow_sigil")
+	check(it != null and it.validate().is_empty() and IconArt.has_icon(&"hollow_sigil") and it.is_usable() and it.max_stack == 1, "the sigil is a valid, usable key item with an icon")
+	game_state.add_item(&"hollow_sigil", 1)
+	check(game_state.quick_item == &"", "the sigil never becomes the quick item")
+	game_state.inventory.erase("hollow_sigil")
+	# Pages 1-3 give nothing.
+	for n in 3:
+		Dialogues.finish(&"ommen")
+	check(game_state.item_count(&"hollow_sigil") == 0, "the first three pages give nothing")
+	# Page 4 contains the gift and hands it over.
+	var c := Dialogues.conversation(&"ommen")
+	check(" ".join(c.lines.map(func(l): return str(l))).contains("sigil"), "page four talks about the sigil")
+	Dialogues.finish(&"ommen")
+	check(game_state.item_count(&"hollow_sigil") == 1 and game_state.get_flag(&"ommen_gave_sigil"), "he gives the sigil once")
+	Dialogues.finish(&"ommen")
+	check(game_state.item_count(&"hollow_sigil") == 1, "never a second one")
+	# Someone who already heard everything still gets it (a save from before this build).
+	await fresh_game()
+	game_state.set_flag(&"talks_ommen", 7)
+	var late := Dialogues.conversation(&"ommen")
+	check(" ".join(late.lines.map(func(l): return str(l))).contains("sigil"), "late visitors are offered the sigil")
+	Dialogues.finish(&"ommen")
+	check(game_state.item_count(&"hollow_sigil") == 1, "late visitors receive it")
+	check(Dialogues.conversation(&"ommen").lines.size() == 1, "afterwards he is back to idle lines")
+	# Aldous
+	var a0 := Dialogues.conversation(&"aldous")
+	check(a0.speaker == "Aldous Vane" and a0.lines.size() == 3, "Aldous introduces himself at length")
+	Dialogues.finish(&"aldous")
+	check(Dialogues.conversation(&"aldous").lines.size() == 1, "then greets briefly")
+	game_state.set_flag(&"boss_defeated_hollow_marshal", true)
+	var am := Dialogues.conversation(&"aldous")
+	check(" ".join(am.lines.map(func(l): return str(l))).contains("Orren"), "he reacts once to the Marshal's fall")
+	Dialogues.finish(&"aldous")
+	check(Dialogues.conversation(&"aldous").lines.size() == 1 and not " ".join(Dialogues.conversation(&"aldous").lines).contains("Orren"), "and only once")
+
+
+func test_sigil_travel() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	var start_path: String = game_state.level_path
+	check(not Items.use(&"hollow_sigil", player), "without the sigil nothing happens")
+	game_state.add_item(&"hollow_sigil", 1)
+	await place_player(500.0, 480.0, 1)
+	# A live boss blocks it.
+	var gs := GDScript.new()
+	gs.source_code = "extends Node\nvar active := true\nfunc is_dead() -> bool:\n\treturn false\n"
+	gs.reload()
+	var fake := Node.new()
+	fake.set_script(gs)
+	fake.add_to_group(&"bosses")
+	add_child(fake)
+	check(not Manor.can_travel(player).ok and "fight" in Manor.can_travel(player).msg, "the oath will not let you leave a boss fight")
+	check(not Items.use(&"hollow_sigil", player), "using it mid-fight does nothing")
+	fake.queue_free()
+	await frames(2)
+	# Go.
+	var x0 := player.global_position.x
+	check(Items.use(&"hollow_sigil", player), "using the sigil works")
+	check(game_state.item_count(&"hollow_sigil") == 1, "the sigil is not consumed")
+	await frames(300)
+	level = main.current_level()
+	player = level.player
+	check(level.level_id == &"hollowmere_manor" and game_state.level_path == Manor.PATH, "arrived in Hollowmere Manor")
+	check(player.global_position.x < 260.0, "in the front hall (%.0f)" % player.global_position.x)
+	check(game_state.get_flag(Manor.FROM_FLAG, {}).level == start_path, "where you came from is remembered")
+	# Back by the sigil.
+	check(Items.use(&"hollow_sigil", player), "using it in the manor goes back")
+	await frames(300)
+	level = main.current_level()
+	player = level.player
+	check(game_state.level_path == start_path and absf(player.global_position.x - x0) < 40.0, "back exactly where you stood (%.0f vs %.0f)" % [player.global_position.x, x0])
+	# And through the manor's own door (works even without the sigil).
+	Items.use(&"hollow_sigil", player)
+	await frames(300)
+	level = main.current_level()
+	player = level.player
+	game_state.inventory.erase("hollow_sigil")
+	var door: ManorDoor = level.get_node("ReturnDoor")
+	await place_player(door.global_position.x, 480.0, 1)
+	await frames(6)
+	await press(&"interact")
+	await frames(300)
+	level = main.current_level()
+	player = level.player
+	check(game_state.level_path == start_path and absf(player.global_position.x - x0) < 40.0, "the door returns you too")
+
+
+func test_manor_level() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(Manor.PATH, &"arrival")
+	check(level.level_id == &"hollowmere_manor", "the manor loads")
+	for n in ["Ommen", "Hobb", "Ilse", "Wenna", "Aldous", "ReturnDoor", "HollowmereCandle", "BalconyChest", "VisitorsLedger", "GalleryDoor", "Hall"]:
+		check(level.get_node_or_null(n) != null, "%s is in the manor" % n)
+	check((level.get_node("Hobb") as Npc).station == &"forge" and (level.get_node("Ilse") as Npc).station == &"vials" and (level.get_node("Wenna") as Npc).shop_id == &"pedlar", "the residents keep their trades")
+	check((level.get_node("GalleryDoor") as LevelExit).sealed, "the Gallery is sealed")
+	check(enemies().is_empty(), "no enemies: it is a safe house")
+	check(WorldMap.LEVELS.has(Manor.PATH), "it is on the world map")
+	check(WorldMap.info(Manor.PATH).candles.size() == 1, "its candle is known to fast travel")
+	# Spacing: no two interaction zones closer than 60 px.
+	var xs := []
+	for n in level.get_children():
+		if n is Npc or n is OathCandle or n is ManorDoor:
+			xs.append(n.global_position.x)
+	xs.sort()
+	var tight := false
+	for i in range(1, xs.size()):
+		if xs[i] - xs[i - 1] < 60.0:
+			tight = true
+	check(not tight, "residents, candle and door are spaced out (%s)" % [xs])
+	# The mezzanine can be climbed (steps no higher than a jump).
+	var planks: Array = []
+	for b in level.get_node("Geometry").get_children():
+		if b is StoneBlock and b.one_way:
+			planks.append(b.position.y)
+	planks.sort()
+	planks.reverse()
+	var prev := 480.0
+	var ok := true
+	for y in planks:
+		if prev - y > 50.0:
+			ok = false
+		prev = y
+	check(ok, "each step to the balcony is within jump height (%s)" % [planks])
+	# Resting at its candle makes it a respawn point and a travel destination.
+	await place_player(330.0 - 22.0, 480.0, 1)
+	await press(&"interact")
+	await frames(70)
+	check(game_state.checkpoint_id == &"hollowmere_candle" and game_state.checkpoint_level_path() == Manor.PATH, "the manor candle is a checkpoint")
+	check(CandleMenu.travel_destinations().any(func(d): return d.id == "hollowmere_candle"), "and a fast-travel destination")
+	# A save made in the manor loads back into it.
+	wipe_saves()
+	game_state.current_slot = 1
+	check(saves.save_slot(1), "saved in the manor")
+	var r: Dictionary = saves.load_slot(1)
+	check(r.status == saves.Status.OK and String(r.data.level_path) == Manor.PATH, "the save remembers the manor")
+	wipe_saves()
+
+
+## Every NPC must stand on a solid block's top surface (not sunk into a hill or floating).
+func npc_grounding_problems() -> Array:
+	var bad := []
+	for n in level.get_children():
+		if not (n is Npc):
+			continue
+		var found := false
+		for b in level.get_node("Geometry").get_children():
+			if b is StoneBlock and not b.one_way:
+				var r := Rect2(b.position, b.size)
+				if n.position.x >= r.position.x and n.position.x <= r.end.x and absf(n.position.y - r.position.y) <= 1.5:
+					found = true
+		if not found:
+			bad.append("%s (%.0f,%.0f)" % [n.name, n.position.x, n.position.y])
+	return bad
+
+
+func test_npcs_stand_on_ground() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	for path in [AWAKE, ROAD, Manor.PATH]:
+		await go_to_level(path, &"")
+		var bad := npc_grounding_problems()
+		check(bad.is_empty(), "%s: every NPC stands on the ground %s" % [path.get_file(), bad])

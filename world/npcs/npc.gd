@@ -6,7 +6,7 @@ extends Area2D
 ## Origin = feet. TEMPORARY ART (procedural): Pedlar = hunched trader with a towering pack
 ## and a lantern; Figure = tall hooded stranger holding a candle.
 
-enum Look { PEDLAR, FIGURE, SMITH, KEEPER }
+enum Look { PEDLAR, FIGURE, SMITH, KEEPER, STEWARD }
 
 @export var npc_id: StringName = &"wenna"
 @export var display_name := "Wenna"
@@ -98,6 +98,7 @@ func _draw() -> void:
 		Look.FIGURE: _draw_figure()
 		Look.SMITH: _draw_smith()
 		Look.KEEPER: _draw_keeper()
+		Look.STEWARD: _draw_steward()
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
@@ -201,3 +202,32 @@ func _draw_keeper() -> void:
 	draw_rect(Rect2(8.5, -22, 3.4, 5.5), Color(0.15, 0.1, 0.1, 0.9))
 	draw_rect(Rect2(9.1, -21.4, 2.2, 4.3), Color(1.0, 0.5 + 0.2 * fl, 0.15, 0.95))
 	draw_rect(Rect2(8.8, -23.4, 2.8, 1.4), Palette.BONE)
+
+
+func _draw_steward() -> void:
+	# A ghost in a tailcoat: pale, translucent, no legs, a candelabra in one hand.
+	var bob := sin(_t * 1.1) * 1.2
+	var a := 0.78 + 0.1 * sin(_t * 2.3)
+	var coat := Color(0.55, 0.58, 0.72, a)
+	var coat_d := Color(0.34, 0.36, 0.5, a)
+	var skin := Color(0.82, 0.86, 0.92, a)
+	draw_circle(Vector2(0, -20 + bob), 18.0, Color(0.6, 0.7, 1.0, 0.05))
+	# Tails of the coat fading to wisps instead of legs
+	draw_colored_polygon(PackedVector2Array([Vector2(-6, -4 + bob), Vector2(-5, -26 + bob), Vector2(5, -26 + bob), Vector2(6, -4 + bob), Vector2(2, 2 + bob), Vector2(-1, -3 + bob), Vector2(-4, 2 + bob)]), coat)
+	draw_colored_polygon(PackedVector2Array([Vector2(-6, -4 + bob), Vector2(-9, 3 + bob), Vector2(-4, -2 + bob)]), Color(coat, a * 0.6))
+	draw_colored_polygon(PackedVector2Array([Vector2(6, -4 + bob), Vector2(10, 4 + bob), Vector2(3, -2 + bob)]), Color(coat, a * 0.5))
+	draw_line(Vector2(0, -25 + bob), Vector2(0, -8 + bob), coat_d, 1.0)
+	draw_rect(Rect2(-2, -25 + bob, 4, 3), Color(0.9, 0.92, 1.0, a))   # cravat
+	# Head: long, solemn, with white hair
+	draw_circle(Vector2(0, -30 + bob), 3.8, skin)
+	draw_arc(Vector2(0, -31 + bob), 3.9, PI, TAU, 8, Color(0.9, 0.9, 0.95, a), 1.6)
+	draw_circle(Vector2(1.2, -30.4 + bob), 0.5, Color(0.1, 0.1, 0.2, a))
+	draw_circle(Vector2(-1.4, -30.4 + bob), 0.5, Color(0.1, 0.1, 0.2, a))
+	# Arm with a three-branch candelabra
+	draw_line(Vector2(4, -22 + bob), Vector2(10, -18 + bob), coat_d, 2.0)
+	draw_line(Vector2(10, -18 + bob), Vector2(10, -23 + bob), Color(0.75, 0.7, 0.5, a), 1.0)
+	for dx in [-3.0, 0.0, 3.0]:
+		draw_line(Vector2(10 + dx * 0.8, -22 + bob), Vector2(10 + dx, -25 + bob), Color(0.75, 0.7, 0.5, a), 0.8)
+		var fl := 0.8 + 0.2 * sin(_t * 7.0 + dx)
+		draw_circle(Vector2(10 + dx, -27 + bob), 1.1 * fl, Color(0.7, 0.85, 1.0, 0.95))
+	draw_circle(Vector2(10, -25 + bob), 10.0, Color(0.6, 0.8, 1.0, 0.07))

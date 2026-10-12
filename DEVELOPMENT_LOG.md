@@ -28,6 +28,17 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 - Area banner showed through the pause overlay; overlay made more opaque.
 - Two weak assertions in my own tests (always-true checks) tightened.
 
+## 2026-10-12 — Hollowmere Manor and the Hollowmere Sigil
+
+- **The sigil**: Ommen gives you the Hollowmere Sigil on his fourth talk (page four of his story; players who already heard everything are offered it on their next visit). Use it from the pack ("Travel to Hollowmere"): the oath folds the road and you arrive in the manor's front hall. Used in the manor ("Return") - or through the manor's own door - it puts you back at the exact spot you left (saved with the game). Reusable, never consumed, never the quick item, and refused during a live boss fight.
+- **Hollowmere Manor** (new peaceful hub, `tools/levels/gen_hollowmere_manor.py`, 2500 px): a haunted great hall - moonlit windows, portraits whose painted eyes glint, chandeliers (real light), a grandfather clock, armour with faint eyes, bookshelves, cobwebs, drifting ghosts and dust motes (`ManorHall`, procedural placeholder art). Residents: Ommen (the candle's keeper), Hobb's forge, Sister Ilse's vials, Wenna's trade hall, and the new **Steward Aldous Vane** (a ghost butler: introduces the house, reacts to the Marshal's fall). A mezzanine with a chest (4 Forge Scrap + 350 embers) and the Visitors' Ledger, the Hollowmere Candle (checkpoint + fast travel), and the sealed Gallery at the far end. On the world map.
+- **Bug fixed**: Hobb and Ilse in Vaelmoor, Awake were sunk 40 px into the hill (reported by the user). Now a test checks every NPC in Awake, the Road and the Manor stands on a block's top surface.
+
+### Verified
+- Automated suite, with new tests: sigil gift (pages, late offer, once only, never quick item), Aldous's lines, travel there and back to the exact spot, the boss-fight refusal, the manor door, manor wiring/spacing/climbable balcony/candle/saves, NPC grounding.
+- Rendered captures (tests/capture_manor.tscn) - reviewed; the hall was brightened after the first look (NPCs were hard to read).
+- Not verified: how the manor feels to play (nobody has), the Windows build launching, balance of the balcony chest.
+
 ## 2026-10-12 — Gear: new weapons, armour you can take off, upgrade stations
 
 - **Equipment is now a saved layer** (`Loadout`, `GameState.weapons/armors/weapon_id/armor_id/flask_level`): you own weapons and armours, each with an upgrade level (+0..+5), and you equip one of each. The preset still decides vitals, handling and the starting gear; armour now decides damage taken, run speed and dodge cost. The four starting armours mirror their presets exactly (a test checks it), so nothing about existing characters changed.
@@ -257,3 +268,5 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 
 ### Next (Milestone 2 polish → 3)
 Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining before Milestone 4: playtest feel on real hardware (your notes), tune timings, add placeholder SFX, aerial-attack bounce decision, first Windows launch report.
+
+- (Manor chunk) Download size: sound effects now 16 kHz (was 24 kHz) to keep the Windows zip under the 31,457,280-byte chat limit (31,426,254 now: ~31 KB spare). Further content needs GitHub Releases.

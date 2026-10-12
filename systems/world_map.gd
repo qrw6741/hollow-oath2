@@ -11,6 +11,7 @@ const LEVELS := [
 	"res://world/levels/drowned_catacombs.tscn",
 	"res://world/levels/vaelmoor_awake.tscn",
 	"res://world/levels/vaelmoor_road.tscn",
+	"res://world/levels/hollowmere_manor.tscn",
 ]
 const CELL := 64.0
 const REVEAL_RADIUS := 3     # cells around the player revealed as you walk

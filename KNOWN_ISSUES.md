@@ -19,6 +19,12 @@
 - Enemy AI does not path across platforms; enemies stay on their floor segment.
 - Boss state machine (Milestone 6).
 
+## Hollowmere Manor
+- Placeholder art throughout (procedural hall, ghosts, Aldous). The manor is dim by design; if NPCs are hard to read on your monitor, tell me and I will brighten it further.
+- Residents repeat their field dialogue (Ommen's idle lines etc.), with no manor-specific lines yet except Aldous. The Gallery is sealed; nothing lies beyond it yet.
+- The sigil is saved as a flag holding where you left from; a save edited by hand to a bad level falls back to the last candle.
+- Resting at the manor candle makes the manor your respawn point.
+
 ## Gear
 - Balance is untested by a human: weapon damage/speed, upgrade and forge costs, material drop rates, naked/heavy armour trade-offs. The greatsword and hammer are deliberately slow; the rapier and sabre deliberately fragile in reach/poise.
 - Parry window and dodge base cost stay with the character (preset), not the weapon: a shield-less Bulwark keeps its 12-frame parry. Weapons do not yet have strength requirements.

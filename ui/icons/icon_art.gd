@@ -15,7 +15,7 @@ static func has_icon(id: StringName) -> bool:
 	return id in [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard",
 		&"penitents_tear", &"candlewright_note", &"canon_seal", &"pilgrims_draught", &"marshals_crest", &"oathblade", &"twin_blades",
 		&"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark",
-		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial"] \
+		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil"] \
 		or Weapons.IDS.has(id) or (String(id).begins_with("armor_") and Armors.is_valid_id(String(id).substr(6)))
 
 
@@ -43,6 +43,7 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"armor_unsworn": _wraps(ci)
 		&"status": _sigil(ci, t)
 		&"forge_scrap": _scrap(ci)
+		&"hollow_sigil": _sigil_seal(ci)
 		&"hollow_resin": _resin(ci)
 		&"vial": _vial(ci)
 		&"wayfarers_rapier": _rapier(ci)
@@ -231,6 +232,19 @@ static func _sabre(ci: CanvasItem) -> void:
 	ci.draw_line(Vector2(3, 9.5), Vector2(6.5, 13), OUTLINE, 2.0)
 	ci.draw_line(Vector2(3.2, 9.7), Vector2(6.3, 12.8), Color("c9a24e"), 1.2)
 	ci.draw_line(Vector2(4.8, 11.2), Vector2(2.5, 13.8), Color("4b3627"), 1.8)
+
+
+static func _sigil_seal(ci: CanvasItem) -> void:
+	# A violet wax seal with a candle and a broken crown, on a ribbon.
+	ci.draw_line(Vector2(5, 1), Vector2(8, 8), Color("5a4a7a"), 2.0)
+	ci.draw_line(Vector2(11, 1), Vector2(8, 8), Color("5a4a7a"), 2.0)
+	ci.draw_circle(Vector2(8, 9.5), 5.6, OUTLINE)
+	ci.draw_circle(Vector2(8, 9.5), 5.0, Color("7a5aa8"))
+	ci.draw_arc(Vector2(8, 9.5), 3.8, 0, TAU, 12, Color("a98ad4"), 0.6)
+	ci.draw_rect(Rect2(7.2, 9, 1.6, 4), Color("e8dcc0"))
+	ci.draw_colored_polygon(PackedVector2Array([Vector2(7.3, 9), Vector2(8, 6.8), Vector2(8.7, 9)]), Color("ffd070"))
+	ci.draw_line(Vector2(5.2, 7), Vector2(6.4, 5.8), Color("e8dcc0"), 0.7)
+	ci.draw_line(Vector2(10.8, 7), Vector2(9.6, 5.8), Color("e8dcc0"), 0.7)
 
 
 static func _scrap(ci: CanvasItem) -> void:

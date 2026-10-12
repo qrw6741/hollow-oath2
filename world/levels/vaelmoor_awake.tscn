@@ -143,7 +143,7 @@ look = 1
 start_facing = -1
 
 [node name="Hobb" type="Area2D" parent="."]
-position = Vector2(860, 480)
+position = Vector2(860, 440)
 script = ExtResource("npc")
 npc_id = &"hobb"
 display_name = "Hobb"
@@ -152,7 +152,7 @@ station = &"forge"
 start_facing = -1
 
 [node name="Ilse" type="Area2D" parent="."]
-position = Vector2(1000, 480)
+position = Vector2(1000, 440)
 script = ExtResource("npc")
 npc_id = &"ilse"
 display_name = "Sister Ilse"

@@ -64,3 +64,6 @@ The test arena, **The Penitent's Yard [in game]**, is the churchyard at the edge
 ## Hobb, the Blacksmith and Sister Ilse, the Vial-Keeper
 Two more of the road's survivors, each at both the edge of Vaelmoor and Pilgrim's Rest. **Hobb** was a farrier, then the garrison's smith; he works for whoever is still walking, asks only for scrap iron and coal-money, and will make something new from the relic of anything great you have killed - he only needs to *see* it. **Sister Ilse** keeps the Ember Vials, taught by the Candlewrights to bottle the last warmth of a fire; she strengthens them with Hollow Resin, the amber sap that weeps from things that should be dead.
 
+## Hollowmere Manor
+The old house of the Dowager, later the Candlewrights', later nobody's. When the oath turned over, the halls emptied and then filled again with those who could not leave: ghosts of the household, and the road's few survivors who found the way in. **Aldous Vane**, the steward, is dead and keeping house regardless. Ommen's Hollowmere Sigil - a Candlewright's wax seal, a candle and a broken crown - opens the road to it. The Gallery at the far end is sealed; the house has not decided who is to be let in.
+

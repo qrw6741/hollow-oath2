@@ -594,7 +594,8 @@ func _show_detail() -> void:
 	_i_icon_id = _selected if item else &""
 	_i_icon.queue_redraw()
 	_use_btn.visible = item != null and item.is_usable()
-	_quick_btn.visible = _use_btn.visible
+	_use_btn.text = "Use" if item == null or item.effect != ItemData.Effect.TRAVEL else ("Return" if Manor.in_manor() else "Travel to Hollowmere")
+	_quick_btn.visible = _use_btn.visible and item.effect != ItemData.Effect.TRAVEL
 	if item == null:
 		_name.text = ""
 		_kind.text = ""
@@ -609,8 +610,13 @@ func _show_detail() -> void:
 
 func _on_use() -> void:
 	var p := _player()
-	if Items.use(_selected, p):
+	var travels := Items.get_item(_selected) != null and Items.get_item(_selected).effect == ItemData.Effect.TRAVEL
+	if travels and not Manor.can_travel(p).ok:
+		_msg.text = Manor.can_travel(p).msg
+	elif Items.use(_selected, p):
 		_msg.text = ""
+		if travels:
+			close()
 	else:
 		_msg.text = "That would have no effect right now."
 

@@ -121,3 +121,10 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Forge each new weapon (carry the relic where one is required) and play with it: rapier, greatsword, hammer, lance, sabre. Do thrusts feel fair? Is the greatsword too slow, the lance too long?
 - [ ] Save, quit, load: weapons, armour, levels, worn/naked state and vial level all return.
 
+## Hollowmere Manor (new)
+- [ ] Talk to Ommen four times (Awake / Wayside / Camp): he gives the Hollowmere Sigil on page four.
+- [ ] Pack -> Hollowmere Sigil -> "Travel to Hollowmere". Arrive in the front hall. Use it again (or the door by the start): you return to the exact spot.
+- [ ] Try it during a boss fight: it should refuse.
+- [ ] Walk the manor: Ommen, Hobb, Ilse, Wenna, Aldous; climb to the balcony (chest + ledger); rest at the candle; fast travel to and from it.
+- [ ] Save in the manor, quit, load: you are in the manor and the sigil still returns you to the field.
+

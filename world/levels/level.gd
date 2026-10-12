@@ -55,6 +55,9 @@ func _on_checkpoint_rested(_id: StringName, _pos: Vector2) -> void:
 ## GameState.level_entry (arriving through an exit), else the last candle if it is in
 ## this level, else default_spawn.
 func spawn_position() -> Vector2:
+	if GameState.pending_spawn_level != "" and GameState.pending_spawn_level == scene_file_path:
+		GameState.pending_spawn_level = ""
+		return GameState.pending_spawn
 	if GameState.level_entry != &"":
 		var e := find_entry(GameState.level_entry)
 		if e:

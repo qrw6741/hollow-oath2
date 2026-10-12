@@ -5,6 +5,7 @@ extends RefCounted
 ## Each result: {"speaker": String, "lines": Array}. Call [method finish] after it was shown.
 
 const MARSHAL_FLAG := &"boss_defeated_hollow_marshal"
+const SIGIL_FLAG := &"ommen_gave_sigil"
 
 ## The hooded figure's story, one page per visit. Page 4 only opens once the Marshal is down.
 const OMMEN_STORY := [
@@ -27,7 +28,13 @@ const OMMEN_STORY := [
 		"The road runs on to the Crownless Citadel. The chancellors sealed it behind them, and something sits on the Hollow Throne that is not a king.",
 		"A Marshal holds the crossroads ahead. Sir Orren swore to guard the Crown's road, and so he does, and so he will, long after there is any Crown to guard.",
 		"Break him if you can. Not out of cruelty. He has been standing there a very long time.",
+		"Take this. It is a Candlewright's sigil - the seal we pressed on letters we never meant the Crown to read.",
+		"Hold it up and the oath will fold the road. It will carry you to Hollowmere Manor, where the last of us have gathered - and, used there, back to the very spot you left. Use it from your pack.",
 	],
+]
+const OMMEN_SIGIL_LATE := [
+	"I nearly forgot. I meant to give you this, the last time.",
+	"A Candlewright's sigil. Hold it up and the oath folds the road: it carries you to Hollowmere Manor, where the last of us have gathered, and brings you back to the spot you left. Use it from your pack.",
 ]
 const OMMEN_AFTER_MARSHAL := [
 	"The crossroads are quiet. I heard the banner fall from here.",
@@ -63,6 +70,20 @@ const HOBB_GREETINGS := [
 	"A good edge won't save a bad swing. But it helps.",
 	"Armour doesn't make you brave. It makes you stay in the fight a little longer.",
 ]
+const ALDOUS_FIRST := [
+	"Good evening. Or morning; time keeps poor manners in this house. I am Aldous Vane, steward of Hollowmere - and, as you will have noticed, rather dead.",
+	"The house was the Dowager's, then the Candlewrights', then nobody's. The Night emptied the halls and the oath filled them again with those who could not leave. You will find them gentle. Mostly.",
+	"Mr. Hobb has taken the forge, Sister Ilse the conservatory, and Mistress Wenna insists on the hall, 'for trade'. Ser Ommen keeps the candle. The door by the stair returns you wherever you came from. The Gallery, at the far end, is sealed; the house has not yet decided who is to be let in.",
+]
+const ALDOUS_GREETINGS := [
+	"The house keeps itself, mostly. I merely supervise the dust.",
+	"You carry the road on your boots. Wipe them, or do not. I am past minding.",
+	"Should you tire of the house, the sigil will return you exactly where you left. Exactly. I checked.",
+	"The portraits have opinions of you. I would not ask what they are.",
+]
+const ALDOUS_AFTER_MARSHAL := [
+	"Sir Orren has fallen? How very sad. I served with his grandfather's steward. If you meet the Marshal's ghost, tell him the cellar key is under the third flagstone. He always forgot.",
+]
 const ILSE_FIRST := [
 	"Peace, traveller. I am Sister Ilse. I keep the vials.",
 	"The Ember Vials are older than the Night - the Candlewrights taught us to bottle the last warmth of a fire. They keep faith better than we did.",
@@ -97,6 +118,8 @@ static func conversation(npc: StringName) -> Dictionary:
 				speaker = "Ommen"
 			elif n < OMMEN_STORY.size():
 				lines = OMMEN_STORY[n]
+			elif not bool(GameState.get_flag(SIGIL_FLAG, false)):
+				lines = OMMEN_SIGIL_LATE
 			else:
 				lines = [OMMEN_IDLE[(n - OMMEN_STORY.size()) % OMMEN_IDLE.size()]]
 			return {"speaker": speaker, "lines": lines}
@@ -107,6 +130,15 @@ static func conversation(npc: StringName) -> Dictionary:
 			return {"speaker": "Hobb", "lines": HOBB_FIRST if n == 0 else [HOBB_GREETINGS[(n - 1) % HOBB_GREETINGS.size()]]}
 		&"ilse":
 			return {"speaker": "Sister Ilse", "lines": ILSE_FIRST if n == 0 else [ILSE_GREETINGS[(n - 1) % ILSE_GREETINGS.size()]]}
+		&"aldous":
+			var lines3: Array
+			if n == 0:
+				lines3 = ALDOUS_FIRST
+			elif bool(GameState.get_flag(MARSHAL_FLAG, false)) and not bool(GameState.get_flag(&"aldous_heard_marshal", false)):
+				lines3 = ALDOUS_AFTER_MARSHAL
+			else:
+				lines3 = [ALDOUS_GREETINGS[(n - 1) % ALDOUS_GREETINGS.size()]]
+			return {"speaker": "Aldous Vane", "lines": lines3}
 	return {"speaker": "...", "lines": ["..."]}
 
 
@@ -115,4 +147,10 @@ static func finish(npc: StringName) -> void:
 	if npc == &"ommen" and bool(GameState.get_flag(MARSHAL_FLAG, false)) and not bool(GameState.get_flag(&"ommen_heard_after", false)):
 		GameState.set_flag(&"ommen_heard_after", true)
 		return
+	if npc == &"aldous" and bool(GameState.get_flag(MARSHAL_FLAG, false)) and talks(npc) > 0 and not bool(GameState.get_flag(&"aldous_heard_marshal", false)):
+		GameState.set_flag(&"aldous_heard_marshal", true)
+		return
+	if npc == &"ommen" and talks(npc) >= 3 and not bool(GameState.get_flag(SIGIL_FLAG, false)):
+		GameState.set_flag(SIGIL_FLAG, true)
+		GameState.add_item(&"hollow_sigil", 1)
 	GameState.set_flag(StringName("talks_" + String(npc)), talks(npc) + 1)

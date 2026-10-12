@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"hollow_sigil"
+display_name = "Hollowmere Sigil"
+description = "A Candlewright's wax seal, pressed with a candle and a broken crown. Hold it up and the oath folds the road: it carries you to Hollowmere Manor, and, used there, back to the very spot you left. It cannot be used in the middle of a boss fight."
+kind = 1
+effect = 4
+max_stack = 1
+icon_color = Color(0.7, 0.55, 0.9, 1)
