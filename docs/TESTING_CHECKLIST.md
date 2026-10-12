@@ -128,3 +128,15 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Walk the manor: Ommen, Hobb, Ilse, Wenna, Aldous; climb to the balcony (chest + ledger); rest at the candle; fast travel to and from it.
 - [ ] Save in the manor, quit, load: you are in the manor and the sigil still returns you to the field.
 
+## Combat depth (new)
+- [ ] Press T anywhere with the sigil: you travel; press T again in the manor: you return. T just after a hit (or beside a chasing enemy, or during a boss) shows "The oath holds" and does nothing.
+- [ ] Remap Weapon skill and Hollowmere travel in Settings -> Controls; conflicts swap.
+- [ ] Land hits: the blue focus bar fills. Use each weapon's skill (O / RT): do they feel distinct (rapier lunge, hammer slam, shield rush)? Is 30 focus too cheap or too dear?
+- [ ] Status effects: let a Hollow Archer's arrows bleed you, a Cantor's frost slow you, an Acolyte burn you. Do the rings and icons read? Do armours resist as the Equipment tab says?
+- [ ] Parry windows by weapon; hold Parry with sword and shield and take a hit (blocked, stamina drains, guard breaks at zero stamina).
+- [ ] Archers (road at night, graveyard, cellar), Candle Cantor (two minions at most, they vanish with it), the three elites (gold mark; Gilded Penitent, Oathguard Captain, Pike Sergeant).
+- [ ] Quests: each of Hobb, Wenna, Ilse (second talk), Ommen (after his sigil), Aldous offers one; Journal lists progress; hand-in pays. Manor lines differ from field lines.
+- [ ] Cellar (door in the hall, near Ommen): Grume the Cellarer, drops the Gallery Key. Gallery door (far right of the hall) opens with it: Vesper comments on your lore items; the chest has the Ghostlight Raiment.
+- [ ] Graveyard (door on the road's east bank, past the ford): two cantors, an elite, Sexton Hale; drops the Sexton's Lantern.
+- [ ] Day and night: play ~8 minutes on the road; sky and tint shift, "Dusk falls" banner, night-only archers/penitents/sergeant appear. Rest at a candle: they re-roll with the time of day.
+

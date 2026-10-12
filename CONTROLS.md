@@ -10,6 +10,8 @@
 | Parry | I or Q | LB |
 | Heal (Ember Vial) | R | RB |
 | Interact / Rest at candle | E | D-pad up |
+| Weapon skill (costs focus) | O | Right trigger (RT) |
+| Travel to / from Hollowmere | T | Xbox: View-share button (Misc) |
 | Inventory (pack) | Tab | Create / Select |
 | Use quick item | F | R3 (press right stick) |
 | Map | M | Touchpad (PS) / L3 |
@@ -36,6 +38,13 @@ Plug in or pair the pad and press any button: on-screen prompts switch to contro
 | Menus: select / back | Cross / Circle | A / B |
 
 Settings has *Controller icons* (Auto / PlayStation / Xbox, in case Auto guesses wrong) and *Controller vibration* (short rumble on hits and parries).
+
+## Combat depth
+- **Focus** (blue bar under your vials): fills when you land hits (+6, +10 on a critical) and parry (+16); a rest at a candle refills it. Your weapon's **skill** (O / RT) spends focus: the rapier's Riposte Lunge, the hammer's Ground Slam, the greatsword's Kingsfall, and so on - see the Equipment tab for each weapon's skill and cost.
+- **Status effects**: hits fill a meter; at 100 it triggers. *Bleed* bursts for a share of health. *Poison* and *burning* tick for several seconds. *Frost* slows. Weapons inflict them (rapier and sabre bleed, lance and hammer frost, greatsword burning); armour resists them; some enemies are immune or weak. Bosses are immune. Rings over your head and under your vials show buildup and what is active.
+- **Weapon-specific parry**: the parry window differs by weapon (greatsword longer, rapier tighter - Equipment tab, "Parry window"). With **sword and shield**, hold Parry past the window to keep a guard up that blocks 75% of frontal damage for stamina.
+- **Hollowmere travel (T)**: with the Hollowmere Sigil, T takes you to the manor from anywhere and brings you back to the exact spot. It refuses for 5 seconds after any blow dealt or taken, while a hunting enemy is within 360 px, and during any boss fight.
+- **Errands and Journal**: the people of the road and manor now give small errands (Journal tab of the pack, switch tabs with LB / RB or Q / R). Time of day on the road turns from daylight to dusk to night over about 14 minutes of play; different enemies walk at night.
 
 ## Menus
 Arrow keys / D-pad / stick move the selection, **Enter** or **A** selects, **Esc** or **B** goes back; the mouse works too. Overwriting or deleting a save, and quitting to the main menu from the pause menu, ask you to press the button a second time ("Sure?") within 3 seconds.

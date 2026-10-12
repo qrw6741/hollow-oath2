@@ -38,3 +38,53 @@ static func buy(shop_id: StringName, item_id: StringName) -> Dictionary:
 		return {"ok": false, "msg": "Not enough embers."}
 	GameState.add_item(item_id, 1)
 	return {"ok": true, "msg": "Bought %s." % item.display_name}
+
+
+## What a merchant pays for things you carry. Bought stock fetches 40% of its price; a few drops
+## (not sold anywhere) have their own. Keys, notes and relics are never bought.
+const SELL_EXTRA := {&"ember_shard": 60, &"penitents_tear": 120}
+const SELL_RATE := 0.4
+
+
+static func buy_price_in(shop_id: StringName, item_id: StringName) -> int:
+	for e in stock(shop_id):
+		if e.item == item_id:
+			return int(e.price)
+	return 0
+
+
+static func buy_price(item_id: StringName) -> int:
+	for shop_id in STOCK:
+		for e in STOCK[shop_id]:
+			if e.item == item_id:
+				return int(e.price)
+	return 0
+
+
+static func sell_price(item_id: StringName) -> int:
+	if Items.get_item(item_id) == null:
+		return 0
+	if SELL_EXTRA.has(item_id):
+		return int(SELL_EXTRA[item_id])
+	return int(buy_price(item_id) * SELL_RATE)
+
+
+## Everything in the pack a merchant would take: [{"item": id, "price": int}].
+static func sellable() -> Array:
+	var out := []
+	for id in Items.IDS:
+		if GameState.item_count(id) > 0 and sell_price(id) > 0:
+			out.append({"item": id, "price": sell_price(id)})
+	return out
+
+
+static func sell(item_id: StringName) -> Dictionary:
+	var price := sell_price(item_id)
+	var item := Items.get_item(item_id)
+	if item == null or price <= 0:
+		return {"ok": false, "msg": "She will not take that."}
+	if GameState.item_count(item_id) <= 0:
+		return {"ok": false, "msg": "You have none."}
+	GameState.remove_item(item_id, 1)
+	GameState.add_embers(price)
+	return {"ok": true, "msg": "Sold %s for %d." % [item.display_name, price]}

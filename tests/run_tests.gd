@@ -77,7 +77,7 @@ func _run() -> void:
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
-		test_dialogue_box, test_shop, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		test_dialogue_box, test_shop, test_shop_selling, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
@@ -2029,7 +2029,7 @@ func test_remapping() -> void:
 	var cp := ControlsPanel.new()
 	get_tree().root.add_child(cp)
 	await frames(2)
-	check(cp._kb.size() == 15 and cp._pad[&"move_left"].disabled, "a row per action; pad movement is fixed")
+	check(cp._kb.size() == 17 and cp._pad[&"move_left"].disabled, "a row per action; pad movement is fixed")
 	check((cp._kb[&"jump"] as Button).text == "Space", "jump shows Space (%s)" % cp._kb[&"jump"].text)
 	# Rebind jump to G via the listening flow.
 	cp.start_listening(&"jump", false)
@@ -2323,6 +2323,33 @@ func test_dialogue_box() -> void:
 	await frames(14)
 	await tap_action(&"ui_cancel")
 	check(not box.is_open, "Cancel skips the conversation")
+
+
+func test_shop_selling() -> void:
+	await fresh_game()
+	game_state.embers = 0
+	game_state.add_item(&"ash_bandage", 2)
+	game_state.add_item(&"gallery_key", 1)
+	var ids: Array = Shops.sellable().map(func(e): return e.item)
+	check(&"ash_bandage" in ids and not (&"gallery_key" in ids), "consumables sell, keys never do")
+	check(Shops.sell_price(&"gallery_key") == 0, "a key has no sell price")
+	var price := Shops.sell_price(&"ash_bandage")
+	check(price > 0 and price < Shops.buy_price(&"ash_bandage"), "selling pays less than buying (%d)" % price)
+	var r := Shops.sell(&"ash_bandage")
+	check(r.ok and game_state.embers == price and game_state.item_count(&"ash_bandage") == 1, "selling gives embers and removes one")
+	check(not Shops.sell(&"gallery_key").ok and game_state.item_count(&"gallery_key") == 1, "a key cannot be sold")
+	var shop: ShopMenu = main.get_node("ShopMenu")
+	events.shop_requested.emit(&"pedlar")
+	await frames(3)
+	shop.show_tab(true)
+	await frames(2)
+	check(shop.selling and shop.rows.size() == Shops.sellable().size() and shop.rows.size() > 0, "the sell tab lists the pack")
+	var before: int = game_state.embers
+	(shop.rows[0].button as Button).pressed.emit()
+	await frames(2)
+	check(game_state.embers > before, "the sell tab's button sells")
+	shop.close()
+	await frames(2)
 
 
 func test_shop() -> void:
@@ -2860,11 +2887,13 @@ func test_sigil_gift() -> void:
 	check(" ".join(late.lines.map(func(l): return str(l))).contains("sigil"), "late visitors are offered the sigil")
 	Dialogues.finish(&"ommen")
 	check(game_state.item_count(&"hollow_sigil") == 1, "late visitors receive it")
+	game_state.set_flag(&"quest_ommen_cantors", "done")   # errands have their own tests
 	check(Dialogues.conversation(&"ommen").lines.size() == 1, "afterwards he is back to idle lines")
 	# Aldous
 	var a0 := Dialogues.conversation(&"aldous")
 	check(a0.speaker == "Aldous Vane" and a0.lines.size() == 3, "Aldous introduces himself at length")
 	Dialogues.finish(&"aldous")
+	game_state.set_flag(&"quest_aldous_gallery", "done")
 	check(Dialogues.conversation(&"aldous").lines.size() == 1, "then greets briefly")
 	game_state.set_flag(&"boss_defeated_hollow_marshal", true)
 	var am := Dialogues.conversation(&"aldous")

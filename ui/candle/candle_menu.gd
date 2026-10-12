@@ -6,6 +6,7 @@ extends CanvasLayer
 var is_open := false
 var _panel: ColorRect
 var _info: Label
+var _chip: EmberChip
 var _msg: Label
 var _rows := {}
 var _inv_btn: Button
@@ -55,40 +56,54 @@ func _build() -> void:
 	UITheme.title(title, 16)
 	v.add_child(title)
 	v.add_child(UITheme.rule(220))
+	var head := HBoxContainer.new()
+	head.custom_minimum_size.x = 330
+	v.add_child(head)
 	_info = Label.new()
-	_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_info.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
-	v.add_child(_info)
+	_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_info.add_theme_color_override(&"font_color", Palette.BONE)
+	head.add_child(_info)
+	_chip = EmberChip.new()
+	head.add_child(_chip)
+	var cards := HBoxContainer.new()
+	cards.add_theme_constant_override(&"separation", 9)
+	cards.alignment = BoxContainer.ALIGNMENT_CENTER
+	v.add_child(cards)
 	for stat in GameState.STAT_NAMES:
-		var b := FancyButton.new()
-		b.custom_minimum_size = Vector2(210, 17)
+		var b := StatCard.new()
+		b.stat = stat
+		b.title = LABELS[stat][0]
+		b.blurb = LABELS[stat][1]
 		b.pressed.connect(_on_buy.bind(stat))
-		UITheme.compact(b)
-		v.add_child(b)
+		cards.add_child(b)
 		_rows[stat] = b
 	_msg = Label.new()
 	_msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_msg.add_theme_color_override(&"font_color", Palette.BONE_DIM)
 	_msg.custom_minimum_size.y = 10
 	v.add_child(_msg)
+	var foot := HBoxContainer.new()
+	foot.add_theme_constant_override(&"separation", 6)
+	foot.alignment = BoxContainer.ALIGNMENT_CENTER
+	v.add_child(foot)
 	_inv_btn = FancyButton.new()
 	_inv_btn.text = "Pack"
-	_inv_btn.custom_minimum_size = Vector2(210, 17)
+	_inv_btn.custom_minimum_size = Vector2(104, 17)
 	_inv_btn.pressed.connect(func(): Events.inventory_menu_requested.emit())
 	UITheme.compact(_inv_btn)
-	v.add_child(_inv_btn)
+	foot.add_child(_inv_btn)
 	_travel_btn = FancyButton.new()
 	_travel_btn.text = "Travel"
-	_travel_btn.custom_minimum_size = Vector2(210, 17)
+	_travel_btn.custom_minimum_size = Vector2(104, 17)
 	_travel_btn.pressed.connect(_show_travel)
 	UITheme.compact(_travel_btn)
-	v.add_child(_travel_btn)
+	foot.add_child(_travel_btn)
 	_leave_btn = FancyButton.new()
 	_leave_btn.text = "Leave"
-	_leave_btn.custom_minimum_size = Vector2(210, 17)
+	_leave_btn.custom_minimum_size = Vector2(104, 17)
 	_leave_btn.pressed.connect(close)
 	UITheme.compact(_leave_btn)
-	v.add_child(_leave_btn)
+	foot.add_child(_leave_btn)
 
 
 func _build_travel() -> void:
@@ -210,6 +225,7 @@ func open() -> void:
 	_msg.text = ""
 	_panel.visible = true
 	_refresh()
+	_chip.set_value(GameState.embers, true)
 	_focus_best()
 
 
@@ -249,13 +265,34 @@ func _focus_best() -> void:
 	_inv_btn.grab_focus()
 
 
+func _stat_numbers(stat: String) -> Array:
+	var p := get_tree().get_first_node_in_group(&"player") as Player
+	match stat:
+		"vigor":
+			var now := roundi(p.health.max_health) if p else 100
+			return ["Health %d" % now, "%d" % (now + 8)]
+		"endurance":
+			var now2 := roundi(p.stamina.max_stamina) if p else 100
+			return ["Stamina %d" % now2, "%d" % (now2 + 6)]
+		_:
+			var pct := roundi(int(GameState.stats[stat]) * GameState.STRENGTH_DAMAGE * 100.0)
+			return ["Damage +%d%%" % pct, "+%d%%" % (pct + 4)]
+
+
 func _refresh() -> void:
 	var cost := GameState.level_cost()
-	_info.text = "Level %d      Embers %d      Next level: %d" % [GameState.level(), GameState.embers, cost]
+	_info.text = "LEVEL %d     next level costs %d" % [GameState.level(), cost]
+	_chip.set_value(GameState.embers)
 	for stat in GameState.STAT_NAMES:
-		var b: Button = _rows[stat]
-		b.text = "%s  %d  ->  %d     %s" % [LABELS[stat][0], GameState.stats[stat], GameState.stats[stat] + 1, LABELS[stat][1]]
-		b.disabled = GameState.embers < cost
+		var b := _rows[stat] as StatCard
+		var nums := _stat_numbers(stat)
+		b.value = int(GameState.stats[stat])
+		b.cost = cost
+		b.affordable = GameState.embers >= cost
+		b.line_now = nums[0]
+		b.line_next = nums[1]
+		b.disabled = not b.affordable
+		b.queue_redraw()
 	if GameState.embers < cost:
 		_msg.text = "Not enough embers to grow stronger."
 	else:
@@ -268,7 +305,10 @@ func _on_buy(stat: String) -> void:
 		if p:
 			p.apply_stats(true)
 		_msg.text = "%s raised." % LABELS[stat][0]
+		_chip.pulse(Palette.EMBER)
+		Audio.sfx(&"coin", -4.0)
 		_refresh()
 		_focus_best()
 	else:
+		_chip.pulse(Palette.CRIMSON_BRIGHT)
 		_msg.text = "Not enough embers."

@@ -103,3 +103,20 @@
 ## Minor
 - With hit-stop on, overlapping hits supersede rather than extend the freeze (intended, but very short freezes may feel clipped).
 - Far-layer lit windows can look like they float, because distant spires are close in colour to the sky.
+
+## Combat depth, quests, side areas, day and night (new)
+- **Nothing here has been played by a human.** Automated tests cover the rules (triggers, resists, skills spend focus and hit, parry windows, guard, quests, levels load and are grounded, mini-bosses attack and enter phase two, the cycle spawns and removes night enemies), not whether it feels good. Skill costs, focus gain, status numbers (bleed 16% burst, poison 2%/s, burn 4%/s, frost x0.62), elite stats and mini-boss health are first guesses.
+- **Temporary art**: the Archer, Cantor, both mini-bosses, Vesper, the cellar/gallery/graveyard backdrops and the focus bar are procedural placeholders.
+- Frost slows walking (and dodge/air control through the shared move multiplier) but not attack speed.
+- Focus is not saved: it resets to 30 on loading a game and to full when you rest.
+- Day/night follows play time, so a long menu session does not advance it; resting does not skip the night. Night enemies despawn at dawn only if they are not already hunting you.
+- The summoner's minions are Gloam Moths; they count for kill errands (a Wenna crow errand also counts crows summoned by the Marshal).
+- Weapon skills fire from the ground only; there is no aerial skill.
+- `gen_enemy_data.py` is older than the status system: re-running it rewrites the enemy/attack files without the `status` / `status_resist` lines added since. Re-apply them (or avoid re-running it) - see git history for the tables.
+- Download size: the build zip is expected to exceed the 30 MB chat limit with this content; use GitHub Releases (not connected yet).
+
+
+## UI polish (trading / upgrading)
+- The Forge menu (ui/forge/forge_menu.gd) has not been restyled to match the new shop and upgrade screens.
+- Sell prices are first-guess balance; there is no buy-back.
+- Layout verified only via headless/Xvfb screenshots, not on Windows or with a controller.

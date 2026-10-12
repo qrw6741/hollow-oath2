@@ -270,3 +270,23 @@ Status keys: **Tested** = verified by an automated test or a rendered capture ·
 Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining before Milestone 4: playtest feel on real hardware (your notes), tune timings, add placeholder SFX, aerial-attack bounce decision, first Windows launch report.
 
 - (Manor chunk) Download size: sound effects now 16 kHz (was 24 kHz) to keep the Windows zip under the 31,457,280-byte chat limit (31,426,254 now: ~31 KB spare). Further content needs GitHub Releases.
+
+## Combat depth, quests, side areas, day and night
+**Added**
+- **Hollowmere travel key (T)** with a combat lock (5 s after any blow dealt or taken, a hunting enemy within 360 px, any live boss fight). New remappable actions `travel_manor` and `skill`.
+- **Status effects**: `StatusFx` (kinds, numbers), `StatusComponent` (buildup, trigger, DoT, frost slow, pips overhead) on enemies and the player; fields on AttackData / WeaponData / ArmorData / EnemyData; projectiles carry them; bosses are immune. HUD ring row.
+- **Focus + weapon skills**: nine skills (data), focus from hits and parries, HUD bar, `skill` input. **Weapon parry/guard**: per-weapon window and recovery bonuses, hold-to-guard shield (block 75%, stamina cost, guard break).
+- **Enemies**: Hollow Archer, Candle Cantor (`SummonerEnemy`, <=2 minions), elites via `EnemyData.elite` + `damage_mult` + `EliteMark`: Gilded Penitent, Oathguard Captain, Pike Sergeant.
+- **Quests**: `Quests` (collect / kill / have / flag; flags only, no save change), offered / reminded / paid in dialogue; Journal tab in the pack; quest toasts. Manor-only lines for Ommen, Wenna, Hobb, Ilse. **Vesper**, ghost archivist, comments once on each lore item you carry.
+- **Side areas**: Hollowmere Cellar (Grume the Cellarer -> Gallery Key), Hollowmere Gallery (Vesper, Ghostlight Raiment, lore), Pilgrim's Graveyard (cantors, archers, Gilded Penitent, Hale the Gravewarden -> Sexton's Lantern). Two mini-bosses on `BossBase` with a shared `brute_visual`.
+- **Day/night**: `DayNight` (14-minute cycle from play time), `DayNightCycle` node (tint, sky, banners, `Events.daynight_changed`), EnemySpawner `when` (always / day / night); five night-only road spawners.
+- Tests: now 112 (all passing) (new: travel key + combat lock, status, data validity, skills, focus, weapon parry and guard, new enemy data, archer and cantor, elite, quests, gating + manor lines, journal, side levels, gallery gate, minibosses, day/night).
+
+**Verified**: see test run in the README. **Not verified**: feel and balance by a person; the Windows .exe on Windows.
+
+
+## Step: UI polish for upgrading and trading
+- Upgrade (candle) menu: three StatCards (Vigor/Endurance/Strength) with emblem, big value, 20 pips, "now -> next" numbers, ember price tag (red if unaffordable) and a pop animation on purchase; EmberChip counter in the header; Pack / Travel / Leave in a foot row.
+- Shop: now a counter with BUY and SELL tabs (Parry / Heal switch tabs), item rows with icon, owned count and price, and a detail pane (large icon, description, effect, "you carry", embers before -> after). Selling pays 40% of buy price (Shops.SELL_RATE); embers shard / penitent's tear have fixed prices; keys and lore are never sold.
+- Tests: new test_shop_selling; suite now 112, all passing (headless). Layout checked from screenshots (tests/capture_shop.gd) at 480x270 under Xvfb; not seen on a real Windows machine.
+- Not done: the Forge menu still has the older plain look.

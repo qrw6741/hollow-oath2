@@ -88,6 +88,15 @@
 5. Point `Main.start_level` at it (room transitions arrive in M8). Levels must live in `res://world/levels/` — saves only accept paths there.
 6. Anything that must persist (boss defeated, shortcut opened): `GameState.set_flag(&"name", true)` / `get_flag(&"name")`. Flags are saved automatically at the next autosave. See "Persistence" in `docs/ARCHITECTURE.md` before adding other kinds of saved data.
 
+## Status effects, skills, quests, elites, day and night
+- **Status on an attack**: set `status` (`bleed`/`poison`/`burn`/`frost`) and `status_amount` on its AttackData (100 = one hit triggers). **On a weapon**: same two fields on WeaponData (used when the attack has none). **Resistance**: `resist` on ArmorData, `status_resist` on EnemyData, e.g. `{"poison": 1.0}` immune, `{"frost": -0.3}` weak. Bosses (anything with `start_fight`) never take status.
+- **Weapon skill**: an AttackData in `data/attacks/skill_<weapon>.tres`, referenced by WeaponData `skill`, with `skill_cost` (max focus is 60). `invulnerable_frames` gives i-frames for lunges. **Parry**: `parry_window_bonus`, `parry_recovery_bonus`, and `block_reduction` > 0 for a hold-to-guard weapon.
+- **Elite**: copy an EnemyData, set `elite = true`, `damage_mult`, more health/poise/rewards. `tools/gen_combat_depth.py` shows the pattern (and generates the shipped ones).
+- **Quest**: add a dictionary to `Quests.DEFS` (kinds collect / kill / have / flag) and its id to `Quests.ORDER`; the giver's dialogue offers, reminds and pays by itself. State is in world flags.
+- **Manor-only lines**: `Dialogues.MANOR_GREETINGS[npc_id]`. **Lore commentary**: `Dialogues.ARCHIVE[item_id]` (Vesper).
+- **Night-only enemy**: set the EnemySpawner's `when` to Night only (or Day only); add a `DayNightCycle` node to the level so spawners hear about dusk. `DayNight.CYCLE` sets the length.
+- **Mini-boss**: `tools/gen_side_areas.py` (attacks, data, scene on BossBase with `brute_visual.gd`) and a BossArena in the level (`tools/levels/gen_side_levels.py`).
+
 ## Checklist after any content change
 - Run `res://tests/run_tests.tscn` (must end with 0 failed; currently 31 tests).
 - Do the relevant part of `docs/TESTING_CHECKLIST.md`.
