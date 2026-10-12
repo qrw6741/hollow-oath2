@@ -2,7 +2,7 @@
 """Generates world/levels/hollowmere_manor.tscn: the old haunted manor reached with the
 Hollowmere Sigil. A peaceful hub: front hall (the door back to the road, a candle), Ommen,
 Hobb's forge, Sister Ilse's conservatory, Wenna's trade hall, a mezzanine with a chest and a
-ledger, Steward Aldous Vane, and the sealed Gallery.
+ledger, Steward Aldous Vane, and the Gallery (locked until the cellar key is won) and the cellar door.
 Re-run after editing:  python3 tools/levels/gen_hollowmere_manor.py
 """
 import os
@@ -127,10 +127,34 @@ node(f'''
 [node name="GalleryDoor" type="Area2D" parent="."]
 position = Vector2({W - 90}, 480)
 script = ExtResource("exit")
+target_level = "res://world/levels/hollowmere_gallery.tscn"
+target_entry = &"from_manor"
 mode = 1
 size = Vector2(30, 80)
 display_name = "the Gallery"
-sealed = true
+required_item = &"gallery_key"
+door_id = &"hollowmere_gallery"
+locked_text = "The Gallery is locked. The key lies below the house."
+unlock_text = "The key turns."
+
+[node name="FromGallery" type="Marker2D" parent="."]
+position = Vector2({W - 150}, 480)
+script = ExtResource("entry")
+entry_id = &"from_gallery"
+
+[node name="CellarDoor" type="Area2D" parent="."]
+position = Vector2(640, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/hollowmere_cellar.tscn"
+target_entry = &"from_manor"
+mode = 1
+size = Vector2(30, 64)
+display_name = "the cellar"
+
+[node name="FromCellar" type="Marker2D" parent="."]
+position = Vector2(690, 480)
+script = ExtResource("entry")
+entry_id = &"from_cellar"
 
 [node name="Motes" type="CPUParticles2D" parent="."]
 position = Vector2({W // 2}, 120)

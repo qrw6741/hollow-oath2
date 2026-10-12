@@ -29,6 +29,10 @@ ext = [
     ("PackedScene", "res://actors/enemies/mimic.tscn", "mimic"),
     ("Script", "res://world/background/ruins_silhouette.gd", "ruins"),
     ("Script", "res://world/background/sky.gd", "sky"),
+    ("Script", "res://world/background/day_night_cycle.gd", "cycle"),
+    ("PackedScene", "res://actors/enemies/hollow_archer.tscn", "archer"),
+    ("PackedScene", "res://actors/enemies/hollow_penitent.tscn", "penitent"),
+    ("PackedScene", "res://actors/enemies/pike_sergeant.tscn", "sergeant"),
     ("Script", "res://world/pickups/item_pickup.gd", "pickup"),
     ("Script", "res://world/pickups/treasure_chest.gd", "chest"),
     ("Script", "res://world/transitions/level_exit.gd", "exit"),
@@ -66,14 +70,14 @@ def plank(name, x, y, w):
     block(name, x, y, w, 6, style=2, one_way=True)
 
 
-def enemy(name, scene, x, y, patrol=40.0, facing=-1, spawn_id=""):
+def enemy(name, scene, x, y, patrol=40.0, facing=-1, spawn_id="", when=0):
     node(f'''
 [node name="{name}" type="Marker2D" parent="."]
 position = Vector2({x}, {y})
 script = ExtResource("spawner")
 enemy_scene = ExtResource("{scene}")
 patrol_distance = {patrol}
-start_facing = {facing}''' + (f'\nspawn_id = &"{spawn_id}"' if spawn_id else ""))
+start_facing = {facing}''' + (f'\nspawn_id = &"{spawn_id}"' if spawn_id else "") + (f"\nwhen = {when}" if when else ""))
 
 
 def candle(name, x, y, cid, title):
@@ -175,6 +179,9 @@ haze_color = Color(0.9, 0.88, 0.78, 1)
 [node name="Light" type="CanvasModulate" parent="."]
 color = Color(1, 0.98, 0.94, 1)
 
+[node name="Cycle" type="Node" parent="."]
+script = ExtResource("cycle")
+
 [node name="Geometry" type="Node2D" parent="."]''')
 
 # Ground and walls
@@ -209,6 +216,20 @@ target_level = "res://world/levels/vaelmoor_awake.tscn"
 target_entry = &"from_road"
 size = Vector2(12, 80)
 
+[node name="GraveyardGate" type="Area2D" parent="."]
+position = Vector2(1830, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/pilgrims_graveyard.tscn"
+target_entry = &"from_road"
+mode = 1
+size = Vector2(30, 64)
+display_name = "the Pilgrim's Graveyard"
+
+[node name="FromGraveyard" type="Marker2D" parent="."]
+position = Vector2(1790, 480)
+script = ExtResource("entry")
+entry_id = &"from_graveyard"
+
 [node name="CitadelRoad" type="Area2D" parent="."]
 position = Vector2(3440, 480)
 script = ExtResource("exit")
@@ -240,6 +261,12 @@ npc("OmmenWayside", 600, 480, "ommen", "Hooded Figure", 1, facing=-1)
 npc("OmmenCamp", 2170, 480, "ommen", "Hooded Figure", 1, facing=-1)
 
 # Enemies
+# Night only: the road's dead walk when the light goes (see systems/day_night.gd).
+enemy("NightPenitentA", "penitent", 560, 480, 60.0, 1, when=2)
+enemy("NightArcherRise", "archer", 880, 460, 20.0, -1, when=2)
+enemy("NightPenitentB", "penitent", 1080, 480, 60.0, -1, when=2)
+enemy("NightArcherCamp", "archer", 2330, 400, 20.0, -1, when=2)
+enemy("NightSergeant", "sergeant", 2000, 480, 50.0, -1, when=2)
 enemy("PikemanRise", "pikeman", 820, 460, 40.0)
 enemy("CrowFieldA", "crow", 660, 385, 60.0)
 enemy("PikemanField", "pikeman", 1120, 480, 50.0)

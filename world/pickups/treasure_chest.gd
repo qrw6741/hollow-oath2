@@ -8,6 +8,9 @@ extends Area2D
 @export var item: ItemData
 @export var count := 1
 @export var embers := 0
+## Optional gear inside: "weapon" or "armor" and its id (see GameState.grant_gear).
+@export_enum("none", "weapon", "armor") var gear_kind := "none"
+@export var gear_id: StringName = &""
 ## Unique across the game; used for the saved "opened" flag.
 @export var chest_id: StringName = &""
 
@@ -64,6 +67,14 @@ func open() -> void:
 	var parts: Array[String] = []
 	if item and count > 0 and GameState.add_item(item.id, count) > 0:
 		parts.append("%s  x%d" % [item.display_name, count])
+	if gear_kind != "none" and gear_id != &"":
+		GameState.grant_gear(gear_kind, gear_id)
+		var nm := String(gear_id)
+		if gear_kind == "armor" and Armors.get_armor(gear_id):
+			nm = Armors.get_armor(gear_id).display_name
+		elif gear_kind == "weapon" and Weapons.get_weapon(gear_id):
+			nm = Weapons.get_weapon(gear_id).display_name
+		parts.append(nm)
 	if embers > 0:
 		GameState.add_embers(embers)
 		parts.append("%d embers" % embers)

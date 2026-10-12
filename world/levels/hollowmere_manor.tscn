@@ -177,10 +177,34 @@ item = ExtResource("it_scrap")
 [node name="GalleryDoor" type="Area2D" parent="."]
 position = Vector2(2410, 480)
 script = ExtResource("exit")
+target_level = "res://world/levels/hollowmere_gallery.tscn"
+target_entry = &"from_manor"
 mode = 1
 size = Vector2(30, 80)
 display_name = "the Gallery"
-sealed = true
+required_item = &"gallery_key"
+door_id = &"hollowmere_gallery"
+locked_text = "The Gallery is locked. The key lies below the house."
+unlock_text = "The key turns."
+
+[node name="FromGallery" type="Marker2D" parent="."]
+position = Vector2(2350, 480)
+script = ExtResource("entry")
+entry_id = &"from_gallery"
+
+[node name="CellarDoor" type="Area2D" parent="."]
+position = Vector2(640, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/hollowmere_cellar.tscn"
+target_entry = &"from_manor"
+mode = 1
+size = Vector2(30, 64)
+display_name = "the cellar"
+
+[node name="FromCellar" type="Marker2D" parent="."]
+position = Vector2(690, 480)
+script = ExtResource("entry")
+entry_id = &"from_cellar"
 
 [node name="Motes" type="CPUParticles2D" parent="."]
 position = Vector2(1250, 120)

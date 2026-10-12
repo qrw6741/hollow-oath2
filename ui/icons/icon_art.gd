@@ -53,7 +53,7 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"toll_hammer": _hammer(ci)
 		&"marshals_lance": _lance(ci)
 		&"tide_sabre": _sabre(ci)
-		&"armor_pilgrim_coat", &"armor_penitent_shroud", &"armor_canons_mail", &"armor_marshal_plate": _armor_generic(ci, id)
+		&"armor_pilgrim_coat", &"armor_penitent_shroud", &"armor_canons_mail", &"armor_marshal_plate", &"armor_ghostlight_raiment": _armor_generic(ci, id)
 		_: _unknown(ci)
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 

@@ -11,6 +11,8 @@ extends Marker2D
 @export_enum("Left:-1", "Right:1") var start_facing := -1
 ## Passed to enemies that keep a saved per-instance flag (e.g. a slain Mimic).
 @export var spawn_id: StringName = &""
+## When this enemy walks the world: always, only by day, or only at night (see DayNight).
+@export_enum("Always:0", "Day only:1", "Night only:2") var when := 0
 
 var enemy: EnemyBase
 
@@ -19,6 +21,21 @@ func _ready() -> void:
 	add_to_group(&"enemy_spawners")
 	if not Engine.is_editor_hint():
 		spawn.call_deferred()
+		if when != 0:
+			Events.daynight_changed.connect(_on_daynight)
+
+
+func _in_season() -> bool:
+	return when == 0 or (when == 2) == DayNight.is_night()
+
+
+func _on_daynight(_night: bool) -> void:
+	if _in_season():
+		if not is_instance_valid(enemy):
+			spawn()
+	elif is_instance_valid(enemy) and enemy.state in [EnemyBase.State.IDLE, EnemyBase.State.PATROL, EnemyBase.State.RETURN]:
+		GameFeel.spark(enemy.global_position + Vector2(0, -16), Palette.DUST, 10)
+		enemy.queue_free()
 
 
 func spawn() -> void:
@@ -27,6 +44,9 @@ func spawn() -> void:
 		return
 	if is_instance_valid(enemy):
 		enemy.queue_free()
+	enemy = null
+	if not _in_season():
+		return
 	enemy = enemy_scene.instantiate() as EnemyBase
 	if data_override:
 		enemy.data = data_override

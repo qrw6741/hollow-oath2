@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"ghostlight_raiment"
+display_name = "Ghostlight Raiment"
+description = "Grey-blue cloth that was never woven, only remembered. It sits on the shoulders like cold light and the cold things of the world slide off it."
+look = 1
+damage_taken_mult = 0.9
+run_speed_mult = 1.08
+dodge_stamina_add = -1.0
+cloth_color = Color(0.239, 0.298, 0.40, 1)
+cloth_light_color = Color(0.455, 0.545, 0.69, 1)
+accent_color = Color(0.72, 0.88, 1.0, 1)
+resist = {"frost": 0.4, "poison": 0.4, "burn": -0.2}

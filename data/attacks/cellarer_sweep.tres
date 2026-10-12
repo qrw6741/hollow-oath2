@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"cellarer_sweep"
+display_name = "Cellarer - Cask Sweep"
+animation = &"sweep"
+startup_frames = 28
+active_frames = 7
+recovery_frames = 32
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 24.0
+poise_damage = 0.0
+stamina_cost = 0.0
+knockback = Vector2(190, -60)
+parryable = false
+hitbox_size = Vector2(74, 30)
+hitbox_offset = Vector2(32, -20)
+lunge_speed = 0.0
+lunge_start_frame = 0
+lunge_frames = 0
+track_during_startup = true
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -34)
+hit_stop = 0.1
+shake = 5.0
+ai_min_range = 0
+ai_max_range = 70
+ai_weight = 0.8
+ai_chain_chance = 1.0

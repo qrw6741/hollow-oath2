@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/sexton_spade.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/sexton_sweep.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/attacks/sexton_wisp.tres" id="a2"]
+[ext_resource type="Resource" path="res://data/items/sextons_lantern.tres" id="drop"]
+[ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="bonus"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"sexton_hale"
+display_name = "Hale, the Gravewarden"
+lore = "Sexton of the Pilgrim's Graveyard. He dug every grave on this road and swore he would see each one filled. He has been very thorough."
+max_health = 540.0
+max_poise = 85.0
+poise_regen_delay_frames = 120
+poise_regen_per_second = 25.0
+patrol_speed = 28.0
+chase_speed = 58.0
+detection_range = 600.0
+vertical_detection = 200.0
+leash_range = 99999.0
+attacks = [ExtResource("a0"), ExtResource("a1"), ExtResource("a2")]
+attack_cooldown_min = 40
+attack_cooldown_max = 80
+recover_frames = 30
+backstep_speed = 50.0
+stagger_frames = 50
+parry_stagger_frames = 120
+ember_reward = 1400
+drop_item = ExtResource("drop")
+drop_chance = 1.0
+drop_count = 1
+bonus_drop_item = ExtResource("bonus")
+bonus_drop_chance = 1.0
+bonus_drop_count = 3

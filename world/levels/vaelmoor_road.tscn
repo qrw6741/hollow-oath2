@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=27 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
@@ -10,6 +10,10 @@
 [ext_resource type="PackedScene" path="res://actors/enemies/mimic.tscn" id="mimic"]
 [ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
 [ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
+[ext_resource type="Script" path="res://world/background/day_night_cycle.gd" id="cycle"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_penitent.tscn" id="penitent"]
+[ext_resource type="PackedScene" path="res://actors/enemies/pike_sergeant.tscn" id="sergeant"]
 [ext_resource type="Script" path="res://world/pickups/item_pickup.gd" id="pickup"]
 [ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
 [ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
@@ -73,6 +77,9 @@ haze_color = Color(0.9, 0.88, 0.78, 1)
 
 [node name="Light" type="CanvasModulate" parent="."]
 color = Color(1, 0.98, 0.94, 1)
+
+[node name="Cycle" type="Node" parent="."]
+script = ExtResource("cycle")
 
 [node name="Geometry" type="Node2D" parent="."]
 
@@ -188,6 +195,20 @@ target_level = "res://world/levels/vaelmoor_awake.tscn"
 target_entry = &"from_road"
 size = Vector2(12, 80)
 
+[node name="GraveyardGate" type="Area2D" parent="."]
+position = Vector2(1830, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/pilgrims_graveyard.tscn"
+target_entry = &"from_road"
+mode = 1
+size = Vector2(30, 64)
+display_name = "the Pilgrim's Graveyard"
+
+[node name="FromGraveyard" type="Marker2D" parent="."]
+position = Vector2(1790, 480)
+script = ExtResource("entry")
+entry_id = &"from_graveyard"
+
 [node name="CitadelRoad" type="Area2D" parent="."]
 position = Vector2(3440, 480)
 script = ExtResource("exit")
@@ -260,6 +281,46 @@ npc_id = &"ommen"
 display_name = "Hooded Figure"
 look = 1
 start_facing = -1
+
+[node name="NightPenitentA" type="Marker2D" parent="."]
+position = Vector2(560, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 60.0
+start_facing = 1
+when = 2
+
+[node name="NightArcherRise" type="Marker2D" parent="."]
+position = Vector2(880, 460)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20.0
+start_facing = -1
+when = 2
+
+[node name="NightPenitentB" type="Marker2D" parent="."]
+position = Vector2(1080, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 60.0
+start_facing = -1
+when = 2
+
+[node name="NightArcherCamp" type="Marker2D" parent="."]
+position = Vector2(2330, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20.0
+start_facing = -1
+when = 2
+
+[node name="NightSergeant" type="Marker2D" parent="."]
+position = Vector2(2000, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 50.0
+start_facing = -1
+when = 2
 
 [node name="PikemanRise" type="Marker2D" parent="."]
 position = Vector2(820, 460)

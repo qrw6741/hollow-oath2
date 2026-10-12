@@ -81,7 +81,7 @@ func _run() -> void:
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
-		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_manor_level, test_npcs_stand_on_ground,
+		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -2932,7 +2932,9 @@ func test_manor_level() -> void:
 	for n in ["Ommen", "Hobb", "Ilse", "Wenna", "Aldous", "ReturnDoor", "HollowmereCandle", "BalconyChest", "VisitorsLedger", "GalleryDoor", "Hall"]:
 		check(level.get_node_or_null(n) != null, "%s is in the manor" % n)
 	check((level.get_node("Hobb") as Npc).station == &"forge" and (level.get_node("Ilse") as Npc).station == &"vials" and (level.get_node("Wenna") as Npc).shop_id == &"pedlar", "the residents keep their trades")
-	check((level.get_node("GalleryDoor") as LevelExit).sealed, "the Gallery is sealed")
+	var gd := level.get_node("GalleryDoor") as LevelExit
+	check(not gd.sealed and gd.required_item == &"gallery_key", "the Gallery opens with the cellar key")
+	check(level.get_node_or_null("CellarDoor") != null, "the cellar door is in the hall")
 	check(enemies().is_empty(), "no enemies: it is a safe house")
 	check(WorldMap.LEVELS.has(Manor.PATH), "it is on the world map")
 	check(WorldMap.info(Manor.PATH).candles.size() == 1, "its candle is known to fast travel")
@@ -3361,3 +3363,163 @@ func test_journal_tab() -> void:
 	await frames(3)
 	check(inv.tab == InventoryMenu.Tab.JOURNAL, "journal tab opens")
 	inv.close()
+
+
+const CELLAR := "res://world/levels/hollowmere_cellar.tscn"
+const GALLERY := "res://world/levels/hollowmere_gallery.tscn"
+const GRAVEYARD := "res://world/levels/pilgrims_graveyard.tscn"
+
+
+## Anything placed in a level that should stand on a block top: [name (x,y)] for those that do not.
+func placement_problems() -> Array:
+	var bad := []
+	for n in level.get_children():
+		var needs := n is Npc or n is TreasureChest or n is OathCandle or n is LoreTablet or n is EnemySpawner
+		if not needs:
+			continue
+		var found := false
+		for b in level.get_node("Geometry").get_children():
+			if b is StoneBlock:
+				var r := Rect2(b.position, b.size)
+				if n.position.x >= r.position.x and n.position.x <= r.end.x and absf(n.position.y - r.position.y) <= 1.5:
+					found = true
+		if not found:
+			bad.append("%s (%.0f,%.0f)" % [n.name, n.position.x, n.position.y])
+	return bad
+
+
+func test_side_levels_load() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	var expect := {
+		CELLAR: ["Hall", "FromManor", "ToManor", "CellarCandle", "CellarerArena", "CellarChest"],
+		GALLERY: ["Hall", "FromManor", "ToManor", "Vesper", "GhostlightChest", "GalleryCandle"],
+		GRAVEYARD: ["Background", "FromRoad", "ToRoad", "GraveCandle", "SextonArena", "CantorA", "CantorB", "Cycle"],
+	}
+	for path in expect:
+		await go_to_level(path, &"")
+		check(level.scene_file_path == path, "%s loads" % path.get_file())
+		for n in expect[path]:
+			check(level.get_node_or_null(n) != null, "%s has %s" % [path.get_file(), n])
+		var bad := placement_problems()
+		check(bad.is_empty(), "%s: everything stands on something %s" % [path.get_file(), bad])
+		check(WorldMap.LEVELS.has(path), "%s is on the map" % path.get_file())
+		check(player != null and player.global_position.y > 300.0, "the player arrived")
+	# Cross-links resolve to real entries.
+	for pair in [[Manor.PATH, "from_cellar"], [Manor.PATH, "from_gallery"], [ROAD, "from_graveyard"], [CELLAR, "from_manor"], [GALLERY, "from_manor"], [GRAVEYARD, "from_road"]]:
+		await go_to_level(pair[0], StringName(pair[1]))
+		check(level.find_entry(StringName(pair[1])) != null, "%s has entry %s" % [pair[0].get_file(), pair[1]])
+	# The Ommen errand needs two cantors in the graveyard.
+	await go_to_level(GRAVEYARD, &"")
+	var cantors := 0
+	for sp in get_tree().get_nodes_in_group(&"enemy_spawners"):
+		if sp is EnemySpawner and sp.enemy_scene and "candle_cantor" in sp.enemy_scene.resource_path:
+			cantors += 1
+	check(cantors >= 2, "the graveyard holds the two cantors Ommen asks for (%d)" % cantors)
+
+
+func test_gallery_gate_and_key() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(Manor.PATH, &"arrival")
+	var gd := level.get_node("GalleryDoor") as LevelExit
+	check(not gd.try_open(), "locked without the key")
+	game_state.add_item(&"gallery_key", 1)
+	check(gd.try_open(), "opens with the key")
+	await frames(90)
+	level = main.current_level()
+	player = level.player
+	check(level.level_id == &"hollowmere_gallery", "arrived in the Gallery")
+	var chest := level.get_node("GhostlightChest") as TreasureChest
+	check(not game_state.owns_armor(&"ghostlight_raiment"), "the raiment is not owned yet")
+	chest.open()
+	check(game_state.owns_armor(&"ghostlight_raiment"), "the chest gives the Ghostlight Raiment")
+	check(Armors.get_armor(&"ghostlight_raiment") != null and Armors.is_valid_id("ghostlight_raiment"), "the armour is registered")
+	# Quest 'have' completes with the key.
+	game_state.set_flag(&"talks_aldous", 1)
+	Quests.start(&"aldous_gallery")
+	check(Quests.is_ready(&"aldous_gallery"), "holding the key completes Aldous' errand")
+	check(Quests.complete(&"aldous_gallery") and game_state.item_count(&"gallery_key") == 1, "the key is not consumed")
+
+
+func test_minibosses() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	for spec in [["res://actors/bosses/cellarer_grume.tscn", &"gallery_key", &"cellarer"], ["res://actors/bosses/sexton_hale.tscn", &"sextons_lantern", &"gravewarden"]]:
+		await fresh_game()
+		game_state.in_game = true
+		await place_player(300.0, 480.0, 1)
+		player.health.set_max(9999.0)
+		player.health.restore_full()
+		var b: BossBase = load(spec[0]).instantiate()
+		b.position = Vector2(420, 480)
+		level.add_child(b)
+		await frames(3)
+		check(b.boss_id == spec[2] and not b.phase2_attacks.is_empty(), "%s is a two-phase boss" % spec[2])
+		check(b.status == null, "bosses shrug off status effects")
+		b.start_fight()
+		var ids := {}
+		for i in 1500:
+			await get_tree().physics_frame
+			if b.attack_runner.attack:
+				ids[b.attack_runner.attack.id] = true
+			if i % 120 == 0:
+				player.global_position = b.global_position + Vector2(-70, 0)
+				player.velocity = Vector2.ZERO
+		check(ids.size() >= 2, "%s uses several attacks (%s)" % [spec[2], ids.keys()])
+		check(player.health.current < 9999.0, "%s can hurt the player" % spec[2])
+		b.receive_hit(damage(b.health.max_health * 0.6))
+		await frames(120)
+		check(b.phase == 2, "%s enters phase two" % spec[2])
+		var before: int = game_state.item_count(spec[1])
+		b.health.take_damage(99999.0)
+		await frames(5)
+		check(game_state.item_count(spec[1]) > before, "%s drops %s" % [spec[2], spec[1]])
+		check(Dialogues.ARCHIVE.has(spec[1]), "Vesper has something to say about %s" % spec[1])
+
+
+func test_day_night() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	DayNight.forced = 0.2
+	check(DayNight.phase() == DayNight.Phase.DAY and DayNight.darkness() == 0.0 and not DayNight.is_night(), "day")
+	DayNight.forced = 0.5
+	check(DayNight.phase() == DayNight.Phase.DUSK and DayNight.darkness() > 0.0 and DayNight.darkness() < 1.0, "dusk")
+	DayNight.forced = 0.7
+	check(DayNight.phase() == DayNight.Phase.NIGHT and DayNight.is_night() and DayNight.darkness() == 1.0, "night")
+	DayNight.forced = 0.97
+	check(DayNight.phase() == DayNight.Phase.DAWN and DayNight.darkness() < 1.0, "dawn")
+	DayNight.forced = -1.0
+	var d0 := DayNight.time()
+	game_state.play_time += DayNight.CYCLE * 0.5
+	check(absf(fposmod(DayNight.time() - d0 - 0.5, 1.0)) < 0.001 or absf(fposmod(DayNight.time() - d0 - 0.5, 1.0) - 1.0) < 0.001, "time follows play time")
+	game_state.play_time = 0.0
+	check(DayNight.tint(0.0).r > DayNight.tint(1.0).r and DayNight.tint(1.0).b > DayNight.tint(1.0).r, "night is dark and blue")
+	# The road: night-only spawners are absent by day, present at night, and follow the cycle.
+	DayNight.forced = 0.2
+	await go_to_level(ROAD, &"")
+	var night_sp := []
+	for sp in get_tree().get_nodes_in_group(&"enemy_spawners"):
+		if sp is EnemySpawner and sp.when == 2:
+			night_sp.append(sp)
+	check(night_sp.size() >= 4, "the road has night-only spawners (%d)" % night_sp.size())
+	for sp in night_sp:
+		check(not is_instance_valid(sp.enemy), "%s is not out by day" % sp.name)
+	check(level.get_node_or_null("Cycle") != null, "the road has a day/night cycle")
+	DayNight.forced = 0.7
+	Events.daynight_changed.emit(true)
+	await frames(5)
+	for sp in night_sp:
+		check(is_instance_valid(sp.enemy), "%s walks at night" % sp.name)
+	DayNight.forced = 0.2
+	Events.daynight_changed.emit(false)
+	await frames(5)
+	for sp in night_sp:
+		check(not is_instance_valid(sp.enemy) or sp.enemy.is_queued_for_deletion(), "%s fades at dawn" % sp.name)
+	# The cycle node tints the level.
+	DayNight.forced = 0.7
+	level.get_node("Cycle").apply()
+	check(level.get_node("Light").color.b > level.get_node("Light").color.r, "the level goes blue at night")
+	var sky = level.get_node("Background/Sky/SkyDraw")
+	check(sky.darkness > 0.9, "the sky darkens")
+	DayNight.forced = -1.0

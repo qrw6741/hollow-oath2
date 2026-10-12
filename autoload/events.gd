@@ -53,6 +53,8 @@ signal map_closed
 ## [param lines]: Strings, or {"who": speaker, "text": line} to switch speaker mid-conversation.
 ## state: "active" | "progress" | "done"
 signal quest_changed(quest_id: StringName, state: String)
+## Fired by a DayNightCycle when night begins (true) or ends (false).
+signal daynight_changed(night: bool)
 signal dialogue_requested(speaker: String, lines: Array)
 signal dialogue_closed
 signal shop_requested(shop_id: StringName)

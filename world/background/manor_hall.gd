@@ -16,6 +16,11 @@ extends Node2D
 @export var seed_value := 9:
 	set(v): seed_value = v; queue_redraw()
 @export var ghosts := 6
+## HALL: the great hall. CELLAR: brick vaults, casks and racks, hanging lanterns.
+## GALLERY: portraits and glass cases, no windows.
+enum Style { HALL, CELLAR, GALLERY }
+@export var style := Style.HALL:
+	set(v): style = v; queue_redraw()
 
 var _t := 0.0
 var _rng_ghost: Array = []
@@ -65,19 +70,27 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
+	if style == Style.CELLAR:
+		_draw_cellar(rng)
+		_draw_ghosts()
+		return
 	_draw_walls()
 	# Windows every 260 px, portraits between them.
 	var x := 130.0
 	var i := 0
 	while x < width:
-		if i % 2 == 0:
+		if i % 2 == 0 and style == Style.HALL:
 			_draw_window(x, rng)
+		elif i % 2 == 0:
+			_draw_case(x)
 		else:
 			_draw_portrait(x, rng)
 		x += 130.0
 		i += 1
 	_draw_furniture(rng)
 	for k in range(0, int(width / 520.0) + 1):
+		if style == Style.GALLERY and k % 2 == 1:
+			continue
 		_draw_chandelier(300.0 + k * 520.0 + 30.0 * sin(float(k)))
 	_draw_ghosts()
 	_draw_cobwebs()
@@ -256,3 +269,79 @@ func _draw_cobwebs() -> void:
 		for a in [0.2, 0.7, 1.2]:
 			var ang: float = a if dir > 0.0 else PI - a
 			draw_line(Vector2(cx, ceiling_y), Vector2(cx, ceiling_y) + Vector2.from_angle(ang) * 74.0, Color(0.8, 0.82, 0.9, 0.12), 0.8)
+
+
+func _draw_case(cx: float) -> void:
+	# A glass display case on a plinth holding a small, pale object.
+	var w := 44.0
+	var top := floor_y - 190.0
+	draw_rect(Rect2(cx - w / 2.0, top + 70, w, 120), Color("2a2030"))
+	draw_rect(Rect2(cx - w / 2.0 + 3, top + 6, w - 6, 70), Color(0.55, 0.65, 0.85, 0.12))
+	draw_rect(Rect2(cx - w / 2.0 + 3, top + 6, w - 6, 70), Color("55466a"), false, 1.5)
+	draw_rect(Rect2(cx - 7, top + 46, 14, 4), Color("7a6a4a"))
+	draw_circle(Vector2(cx, top + 40), 5.0, Color(0.85, 0.82, 0.7, 0.8))
+	draw_circle(Vector2(cx, top + 40), 14.0, Color(0.9, 0.9, 1.0, 0.05 + 0.02 * sin(_t * 1.2 + cx)))
+
+
+func _draw_cellar(rng: RandomNumberGenerator) -> void:
+	draw_rect(Rect2(-40, ceiling_y - 70, width + 80, floor_y - ceiling_y + 70), Color("1e1a1c"))
+	# Brick courses
+	var y := ceiling_y - 60.0
+	var row := 0
+	while y < floor_y:
+		var x := -40.0 + (row % 2) * 18.0
+		while x < width + 40.0:
+			var shade := 0.10 + rng.randf() * 0.05
+			draw_rect(Rect2(x, y, 34, 14), Color(shade + 0.07, shade + 0.03, shade + 0.03))
+			draw_rect(Rect2(x, y, 34, 14), Color(0.04, 0.03, 0.04, 0.7), false, 1.0)
+			x += 36.0
+		y += 16.0
+		row += 1
+	# Vault arches
+	var ax := 0.0
+	while ax < width:
+		draw_arc(Vector2(ax + 150, ceiling_y + 30), 140.0, PI, TAU, 18, Color("0d0b0e"), 6.0)
+		draw_rect(Rect2(ax + 4, ceiling_y + 30, 10, floor_y - ceiling_y - 30), Color("0d0b0e"))
+		ax += 300.0
+	# Casks, racks and crates
+	var cx := 120.0
+	while cx < width - 100.0:
+		var kind := rng.randi_range(0, 2)
+		if kind == 0:
+			_draw_cask(cx, rng)
+		elif kind == 1:
+			_draw_rack(cx)
+		else:
+			draw_rect(Rect2(cx - 14, floor_y - 28, 28, 28), Color("3b2d20"))
+			draw_rect(Rect2(cx - 14, floor_y - 28, 28, 28), Color("1a120c"), false, 1.5)
+			draw_line(Vector2(cx - 14, floor_y - 28), Vector2(cx + 14, floor_y), Color("1a120c"), 1.2)
+		cx += rng.randf_range(110.0, 230.0)
+	# Hanging lanterns
+	var lx := 220.0
+	while lx < width:
+		var sway := sin(_t * 1.1 + lx) * 1.5
+		draw_line(Vector2(lx, ceiling_y - 8), Vector2(lx + sway, ceiling_y + 40), Color("2a2430"), 1.0)
+		draw_rect(Rect2(lx + sway - 4, ceiling_y + 40, 8, 10), Color("6a5a3a"))
+		draw_circle(Vector2(lx + sway, ceiling_y + 45), 3.0 + 0.6 * sin(_t * 9.0 + lx), Color(1.0, 0.75, 0.4, 0.95))
+		draw_circle(Vector2(lx + sway, ceiling_y + 45), 18.0, Color(1.0, 0.7, 0.3, 0.05))
+		lx += 420.0
+	draw_rect(Rect2(-40, ceiling_y - 10, width + 80, 12), Color("0d0b0e"))
+
+
+func _draw_cask(x: float, rng: RandomNumberGenerator) -> void:
+	var h := rng.randf_range(34.0, 50.0)
+	draw_rect(Rect2(x - 20, floor_y - h, 40, h), Color("4a3524"))
+	draw_rect(Rect2(x - 20, floor_y - h, 40, h), Color("1a120c"), false, 1.5)
+	for yy in [floor_y - h * 0.8, floor_y - h * 0.2]:
+		draw_line(Vector2(x - 20, yy), Vector2(x + 20, yy), Color("6a6a70"), 2.0)
+	draw_circle(Vector2(x, floor_y - h * 0.5), 3.0, Color("1a120c"))
+
+
+func _draw_rack(x: float) -> void:
+	draw_rect(Rect2(x - 30, floor_y - 90, 60, 90), Color("2a1f17"))
+	draw_rect(Rect2(x - 30, floor_y - 90, 60, 90), Color("4a3524"), false, 2.0)
+	for r in 4:
+		for c in 4:
+			var bx := x - 24 + c * 14
+			var by := floor_y - 80 + r * 20
+			draw_circle(Vector2(bx + 4, by + 6), 5.0, Color("14221a") if (r + c) % 3 else Color("2a1a2a"))

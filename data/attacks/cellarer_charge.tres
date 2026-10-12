@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"cellarer_charge"
+display_name = "Cellarer - Barrel Charge"
+animation = &"charge"
+startup_frames = 36
+active_frames = 22
+recovery_frames = 36
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 30.0
+poise_damage = 0.0
+stamina_cost = 0.0
+knockback = Vector2(240, -100)
+parryable = false
+hitbox_size = Vector2(34, 46)
+hitbox_offset = Vector2(20, -24)
+lunge_speed = 270.0
+lunge_start_frame = 36
+lunge_frames = 22
+track_during_startup = true
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -34)
+hit_stop = 0.1
+shake = 7.0
+ai_min_range = 100
+ai_max_range = 280
+ai_weight = 1.0
+ai_chain_chance = 1.0

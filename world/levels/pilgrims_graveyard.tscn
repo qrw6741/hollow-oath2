@@ -1,0 +1,250 @@
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
+[ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
+[ext_resource type="Script" path="res://world/background/graveyard_props.gd" id="props"]
+[ext_resource type="Script" path="res://world/background/day_night_cycle.gd" id="cycle"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_penitent.tscn" id="penitent"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
+[ext_resource type="PackedScene" path="res://actors/enemies/candle_cantor.tscn" id="cantor"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gilded_penitent.tscn" id="gilded"]
+[ext_resource type="PackedScene" path="res://actors/enemies/roadside_pikeman.tscn" id="pikeman"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="it_resin"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
+[ext_resource type="PackedScene" path="res://actors/bosses/sexton_hale.tscn" id="gravewarden"]
+
+[node name="PilgrimsGraveyard" type="Node2D"]
+script = ExtResource("level")
+level_id = &"pilgrims_graveyard"
+display_name = "Pilgrim's Graveyard"
+bounds = Rect2(0, 0, 3500, 540)
+music = &"yard"
+music_pitch = 0.85
+map_origin = Vector2(1900, -1750)
+default_spawn = Vector2(120, 480)
+
+[node name="Background" type="ParallaxBackground" parent="."]
+
+[node name="Sky" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0, 0)
+
+[node name="SkyDraw" type="Node2D" parent="Background/Sky"]
+script = ExtResource("sky")
+moon_pos = Vector2(340, 56)
+daylight = true
+darkness = 0.78
+
+[node name="Far" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.1, 0.1)
+
+[node name="Hills" type="Node2D" parent="Background/Far"]
+script = ExtResource("ruins")
+base_y = 235.0
+max_height = 110.0
+color = Color(0.17, 0.17, 0.26, 1)
+seed_value = 81
+spacing = 100.0
+width = 3200.0
+haze = 0.5
+haze_color = Color(0.45, 0.35, 0.5, 1)
+
+[node name="Mid" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.35, 0.3)
+
+[node name="Graves" type="Node2D" parent="Background/Mid"]
+script = ExtResource("props")
+width = 3400.0
+base_y = 262.0
+seed_value = 5
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.56, 0.55, 0.78, 1)
+
+[node name="Cycle" type="Node" parent="."]
+script = ExtResource("cycle")
+light_path = NodePath("")
+sky_path = NodePath("")
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(3484, 60)
+style = 3
+seed_value = 902
+
+[node name="MoundA" type="StaticBody2D" parent="Geometry"]
+position = Vector2(780, 456)
+script = ExtResource("block")
+size = Vector2(220, 30)
+style = 3
+seed_value = 903
+
+[node name="MoundB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1500, 450)
+script = ExtResource("block")
+size = Vector2(260, 36)
+style = 3
+seed_value = 904
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3440, 0)
+script = ExtResource("block")
+size = Vector2(60, 540)
+style = 1
+seed_value = 905
+
+[node name="CryptRoof" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1180, 400)
+script = ExtResource("block")
+size = Vector2(110, 6)
+style = 2
+seed_value = 906
+one_way = true
+
+[node name="FenceTop" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2050, 405)
+script = ExtResource("block")
+size = Vector2(110, 6)
+style = 2
+seed_value = 907
+one_way = true
+
+[node name="FromRoad" type="Marker2D" parent="."]
+position = Vector2(130, 480)
+script = ExtResource("entry")
+entry_id = &"from_road"
+
+[node name="ToRoad" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/vaelmoor_road.tscn"
+target_entry = &"from_graveyard"
+size = Vector2(12, 80)
+
+[node name="GraveCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(380, 480)
+checkpoint_id = &"graveyard_candle"
+display_name = "Graveyard Candle"
+
+[node name="PenitentA" type="Marker2D" parent="."]
+position = Vector2(640, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 40
+start_facing = -1
+
+[node name="PenitentB" type="Marker2D" parent="."]
+position = Vector2(880, 456)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 30
+start_facing = -1
+
+[node name="ArcherA" type="Marker2D" parent="."]
+position = Vector2(1230, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="CantorA" type="Marker2D" parent="."]
+position = Vector2(1450, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 30
+start_facing = -1
+
+[node name="GildedPilgrim" type="Marker2D" parent="."]
+position = Vector2(1640, 450)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="ArcherB" type="Marker2D" parent="."]
+position = Vector2(2100, 405)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="CantorB" type="Marker2D" parent="."]
+position = Vector2(2300, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 30
+start_facing = -1
+
+[node name="NightPenitentA" type="Marker2D" parent="."]
+position = Vector2(520, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 60
+start_facing = 1
+when = 2
+
+[node name="NightPenitentB" type="Marker2D" parent="."]
+position = Vector2(1650, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 60
+start_facing = 1
+when = 2
+
+[node name="NightPikeman" type="Marker2D" parent="."]
+position = Vector2(2450, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 60
+start_facing = 1
+when = 2
+
+[node name="GraveChest" type="Area2D" parent="."]
+position = Vector2(1120, 480)
+script = ExtResource("chest")
+chest_id = &"graveyard_chest"
+count = 3
+embers = 400
+item = ExtResource("it_resin")
+
+[node name="SextonChest" type="Area2D" parent="."]
+position = Vector2(2560, 480)
+script = ExtResource("chest")
+chest_id = &"graveyard_chest_2"
+count = 3
+embers = 300
+item = ExtResource("it_shard")
+
+[node name="SextonStone" type="Area2D" parent="."]
+position = Vector2(700, 480)
+script = ExtResource("tablet")
+title = "A Sexton's Stone"
+text = "HALE. Sexton of this yard, forty-one years. 'He dug them all and saw them all filled.' Someone has scratched underneath, with a spade-edge: 'Not yet.'"
+
+[node name="SextonArena" type="Node2D" parent="."]
+position = Vector2(2740, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("gravewarden")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "THE YARD IS FILLED"
