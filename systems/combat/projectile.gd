@@ -84,6 +84,8 @@ func _on_area(a: Area2D) -> void:
 	hit.source = self
 	hit.attack_id = hit_template.attack_id
 	hit.hit_stop = hit_template.hit_stop
+	hit.status = hit_template.status
+	hit.status_amount = hit_template.status_amount
 	hit.shake = hit_template.shake
 	var result: int = (a as Hurtbox).receive_hit(hit)
 	match result:

@@ -12,6 +12,8 @@ extends Resource
 ## Multiplies all damage taken at level 0.
 @export var damage_taken_mult := 1.0
 @export var run_speed_mult := 1.0
+## Status resistance by kind, e.g. {"bleed": 0.4} (see Status).
+@export var resist := {}
 ## Added to the character's dodge stamina cost (negative = cheaper).
 @export var dodge_stamina_add := 0.0
 @export var cloth_color := Color("221e28")

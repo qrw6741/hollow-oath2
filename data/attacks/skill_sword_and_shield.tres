@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"skill_sword_and_shield"
+display_name = "Bulwark Rush"
+animation = &"heavy"
+startup_frames = 14
+active_frames = 8
+recovery_frames = 28
+chain_open_frame = -1
+dodge_cancel_frame = 14
+damage = 34.0
+poise_damage = 160.0
+stamina_cost = 14.0
+invulnerable_frames = 18
+knockback = Vector2(240, -60)
+hitbox_size = Vector2(44, 38)
+hitbox_offset = Vector2(24, -18)
+lunge_speed = 230.0
+lunge_start_frame = 11
+lunge_frames = 10
+hit_stop = 0.14
+shake = 6.0

@@ -17,3 +17,17 @@ extends Resource
 @export var look := PresetData.WeaponLook.SWORD
 ## Held in two hands (cosmetic; shown on the equipment screen).
 @export var two_handed := false
+## Status buildup every hit with this weapon adds (StatusFx.KINDS; empty = none).
+@export_group("Skill and guard")
+## The special move on the Skill button; costs [member skill_cost] focus.
+@export var skill: AttackData
+@export var skill_cost := 30.0
+## Frames added to the parry window (negative = tighter) and to the whole parry motion.
+@export var parry_window_bonus := 0
+@export var parry_recovery_bonus := 0
+## Above 0: holding Parry after the window keeps a guard up that cuts frontal damage by this
+## fraction (0.75 = takes a quarter), draining stamina per blocked hit.
+@export_range(0.0, 0.95) var block_reduction := 0.0
+@export_group("Status")
+@export var status: StringName = &""
+@export var status_amount := 0.0

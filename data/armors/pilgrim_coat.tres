@@ -14,3 +14,4 @@ dodge_stamina_add = -1.0
 cloth_color = Color(0.227, 0.227, 0.173, 1)
 cloth_light_color = Color(0.345, 0.337, 0.247, 1)
 accent_color = Color(0.690, 0.541, 0.235, 1)
+resist = {"poison": 0.15}

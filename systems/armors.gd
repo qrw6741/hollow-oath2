@@ -25,6 +25,18 @@ static func get_armor(id: StringName) -> ArmorData:
 	return _cache[id]
 
 
+## Status resistances worn: the armour's own plus 2% per upgrade level on each it resists.
+static func resist_of(id: StringName, level := 0) -> Dictionary:
+	var a := get_armor(id)
+	var out := {}
+	if a == null:
+		return out
+	for k in a.resist:
+		var v := float(a.resist[k])
+		out[String(k)] = minf(v + level * 0.02, 0.9) if v > 0.0 else v
+	return out
+
+
 static func is_valid_id(id: String) -> bool:
 	return IDS.has(StringName(id))
 

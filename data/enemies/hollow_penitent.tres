@@ -34,3 +34,4 @@ drop_count = 1
 bonus_drop_item = ExtResource("bonus")
 bonus_drop_chance = 0.3
 bonus_drop_count = 1
+status_resist = {"poison": 0.6, "bleed": 0.3}

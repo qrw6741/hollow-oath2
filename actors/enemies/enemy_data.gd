@@ -33,6 +33,10 @@ extends Resource
 ## Frames the enemy stays open to a riposte after being parried.
 @export var parry_stagger_frames := 100
 
+@export_group("Status")
+## Status resistance by kind, e.g. {"poison": 1.0} = immune (see Status).
+@export var status_resist := {}
+
 @export_group("Rewards")
 ## Embers (currency) awarded on death.
 @export var ember_reward := 0

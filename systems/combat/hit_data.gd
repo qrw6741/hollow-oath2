@@ -13,6 +13,8 @@ var attack_id: StringName = &""
 var parryable := true
 var critical := false                ## Ripostes / executions.
 var environmental := false           ## Hazards: not parryable, ignore dodge i-frames.
+var status: StringName = &""       ## Status kind applied as buildup (see Status).
+var status_amount := 0.0
 var hit_stop := 0.0
 var shake := 0.0
 

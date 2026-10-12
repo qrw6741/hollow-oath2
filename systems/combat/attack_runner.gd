@@ -22,6 +22,9 @@ var facing := 1
 var damage_multiplier := 1.0
 ## Permanent bonus from character stats (Strength), applied to every hit.
 var damage_bonus := 1.0
+## Weapon-borne status, used when the attack has none of its own.
+var weapon_status: StringName = &""
+var weapon_status_amount := 0.0
 var _hit_ids := {}
 
 
@@ -139,6 +142,12 @@ func _check_hits() -> void:
 		hit.critical = attack.critical
 		hit.hit_stop = attack.hit_stop
 		hit.shake = attack.shake
+		if attack.status != &"":
+			hit.status = attack.status
+			hit.status_amount = attack.status_amount
+		elif weapon_status != &"":
+			hit.status = weapon_status
+			hit.status_amount = weapon_status_amount
 		var result: int = hb.receive_hit(hit)
 		hit_confirmed.emit(hb, result, hit)
 		if attack == null:

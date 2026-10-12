@@ -27,9 +27,14 @@ extends Resource
 @export var damage := 10.0
 @export var poise_damage := 10.0
 @export var stamina_cost := 12.0
+## Player attacks: frames of invulnerability from the start (lunging weapon skills).
+@export var invulnerable_frames := 0
 ## Push applied to the target; x is multiplied by the attacker's facing.
 @export var knockback := Vector2(60, -20)
 @export var parryable := true
+## Optional status buildup this attack inflicts (StatusFx.KINDS) and how much per hit.
+@export var status: StringName = &""
+@export var status_amount := 0.0
 @export var critical := false
 
 @export_group("Hitbox")

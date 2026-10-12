@@ -34,3 +34,4 @@ drop_count = 1
 bonus_drop_item = ExtResource("bonus")
 bonus_drop_chance = 0.3
 bonus_drop_count = 1
+status_resist = {"frost": -0.2}

@@ -27,3 +27,5 @@ shake = 3.0
 ai_min_range = 0.0
 ai_max_range = 0.0
 ai_weight = 0.0
+status = &"bleed"
+status_amount = 22.0

@@ -35,6 +35,8 @@ var _boss: BossBase
 var _quick_label: Label
 var _quick_icon: Control
 var _saved_tween: Tween
+var _focus_bar: StatBar
+var _status_row: Control
 
 
 func _ready() -> void:
@@ -87,6 +89,20 @@ func _build() -> void:
 	_vials.size = Vector2(80, 12)
 	_vials.draw.connect(_draw_vials)
 	root.add_child(_vials)
+
+	# Focus (weapon skills) and status effects, under the vials.
+	_focus_bar = StatBar.new()
+	_focus_bar.position = Vector2(12, 43)
+	_focus_bar.size = Vector2(60, 3)
+	_focus_bar.fill_color = Color("6f7fd0")
+	_focus_bar.trail_color = Color("b9c3ff")
+	root.add_child(_focus_bar)
+	_status_row = Control.new()
+	_status_row.position = Vector2(12, 50)
+	_status_row.size = Vector2(80, 10)
+	_status_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_status_row.draw.connect(_draw_status)
+	root.add_child(_status_row)
 
 	# Embers (currency), top right.
 	var ember_icon := Control.new()
@@ -234,18 +250,40 @@ func _bind_player(p: Node2D) -> void:
 	if _player and is_instance_valid(_player):
 		_player.health.changed.disconnect(_health_bar.set_values)
 		_player.stamina.changed.disconnect(_stamina_bar.set_values)
+		_player.focus_changed.disconnect(_focus_bar.set_values)
+		_player.status.changed.disconnect(_status_row.queue_redraw)
 	_player = p
 	_player.health.changed.connect(_health_bar.set_values)
 	_player.stamina.changed.connect(_stamina_bar.set_values)
 	_health_bar.set_values(_player.health.current, _player.health.max_health)
 	_stamina_bar.set_values(_player.stamina.current, _player.stamina.max_stamina)
 	_on_flasks(_player.flasks, _player.max_flasks)
+	_player.focus_changed.connect(_focus_bar.set_values)
+	_focus_bar.set_values(_player.focus, Player.MAX_FOCUS)
+	_player.status.changed.connect(_status_row.queue_redraw)
 
 
 func _on_flasks(current: int, maximum: int) -> void:
 	_flasks = current
 	_flasks_max = maximum
 	_vials.queue_redraw()
+
+
+func _draw_status() -> void:
+	if _player == null or not is_instance_valid(_player) or _player.status == null:
+		return
+	var x := 0.0
+	for k in StatusFx.KINDS:
+		var on := _player.status.is_active(k)
+		var b := float(_player.status.buildup.get(k, 0.0))
+		if not on and b < 1.0:
+			continue
+		var c: Color = StatusFx.COLORS[k]
+		if on:
+			_status_row.draw_circle(Vector2(x + 4, 4), 3.6, c)
+		else:
+			_status_row.draw_arc(Vector2(x + 4, 4), 3.2, -PI / 2.0, -PI / 2.0 + TAU * b / StatusFx.THRESHOLD, 14, c, 1.6)
+		x += 10.0
 
 
 func _draw_vials() -> void:

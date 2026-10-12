@@ -14,3 +14,4 @@ dodge_stamina_add = 0.0
 cloth_color = Color(0.133, 0.118, 0.157, 1)
 cloth_light_color = Color(0.227, 0.204, 0.259, 1)
 accent_color = Color(0.557, 0.106, 0.133, 1)
+resist = {"bleed": 0.3, "burn": 0.2}

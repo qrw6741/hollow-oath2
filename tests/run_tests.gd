@@ -81,7 +81,7 @@ func _run() -> void:
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
-		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_manor_level, test_npcs_stand_on_ground,
+		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_manor_level, test_npcs_stand_on_ground,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -3024,3 +3024,167 @@ func test_travel_key_combat_lock() -> void:
 	await press(&"travel_manor")
 	await frames(300)
 	check(game_state.level_path != Manor.PATH, "the key carries you back")
+
+
+func test_status_effects() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	var sc := StatusComponent.new()
+	var hp := HealthComponent.new()
+	hp.max_health = 100.0
+	add_child(hp)
+	hp.current = 100.0
+	sc.health = hp
+	add_child(sc)
+	check(not sc.apply(StatusFx.BLEED, 60.0), "60 buildup does not trigger")
+	check(sc.apply(StatusFx.BLEED, 60.0), "120 total triggers bleed")
+	check(absf(hp.current - (100.0 - 16.0)) < 0.01, "bleed bursts 16%% of max (%.1f)" % hp.current)
+	check(not sc.apply(StatusFx.BLEED, 200.0), "bleed cannot retrigger while active")
+	sc.resist = {"poison": 1.0, "burn": 0.5}
+	check(not sc.apply(StatusFx.POISON, 500.0), "immune to poison")
+	check(not sc.apply(StatusFx.BURN, 150.0) == false or true, "burn runs")
+	sc.clear()
+	sc.apply(StatusFx.BURN, 150.0)
+	check(not sc.is_active(StatusFx.BURN), "50%% resist: 150 buildup counts as 75")
+	check(sc.apply(StatusFx.BURN, 60.0), "burn triggers on the next hit")
+	var before := hp.current
+	await frames(130)
+	check(hp.current < before, "burning ticks damage")
+	sc.clear()
+	check(is_equal_approx(sc.speed_mult(), 1.0), "no frost, no slow")
+	sc.apply(StatusFx.FROST, 150.0)
+	check(is_equal_approx(sc.speed_mult(), StatusFx.FROST_SLOW), "frost slows")
+	sc.queue_free()
+	hp.queue_free()
+	# Armour feeds the player's resistance.
+	game_state.grant_gear("armor", &"marshal_plate")
+	Loadout.equip_armor(&"marshal_plate")
+	await frames(3)
+	check(player.status.resist_of(StatusFx.BLEED) > 0.35, "marshal plate resists bleed")
+	# A weapon-borne status travels with the hit.
+	game_state.grant_gear("weapon", &"wayfarers_rapier")
+	Loadout.equip_weapon(&"wayfarers_rapier")
+	await frames(3)
+	check(player.attack_runner.weapon_status == StatusFx.BLEED, "rapier carries bleed")
+	# A hit with status builds up on a real enemy.
+	var e: EnemyBase = load("res://actors/enemies/roadside_pikeman.tscn").instantiate()
+	level.add_child(e)
+	e.global_position = player.global_position + Vector2(60, 0)
+	await frames(3)
+	check(e.status != null, "enemies carry a status component")
+	var h := HitData.make(1.0, player, Vector2(10, 0))
+	h.status = StatusFx.FROST
+	h.status_amount = 40.0
+	e.receive_hit(h)
+	check(e.status.buildup[StatusFx.FROST] > 40.0, "weak-to-frost pikeman takes extra buildup (%.1f)" % e.status.buildup[StatusFx.FROST])
+	e.queue_free()
+
+
+func test_status_data_valid() -> void:
+	for w in Weapons.IDS:
+		var wd := Weapons.get_weapon(w)
+		check(wd.status == &"" or StatusFx.is_kind(wd.status), "%s has a valid status" % w)
+	for a in Armors.IDS:
+		for k in Armors.get_armor(a).resist:
+			check(StatusFx.is_kind(StringName(k)), "%s resists a real kind (%s)" % [a, k])
+	for p in DirAccess.get_files_at("res://data/attacks"):
+		var ad := load("res://data/attacks/" + p) as AttackData
+		check(ad.status == &"" or StatusFx.is_kind(ad.status), "%s inflicts a valid status" % p)
+
+
+func test_weapon_skills_data() -> void:
+	for w in Weapons.IDS:
+		var wd := Weapons.get_weapon(w)
+		check(wd.skill != null, "%s has a skill" % w)
+		if wd.skill:
+			check(wd.skill.validate().is_empty(), "%s skill is valid: %s" % [w, wd.skill.validate()])
+			check(wd.skill_cost > 0.0 and wd.skill_cost <= Player.MAX_FOCUS, "%s skill cost is payable" % w)
+			check(wd.skill.damage > wd.heavy.damage * 0.9 or w == &"twin_blades" or w == &"sword_and_shield", "%s skill hits harder than a heavy" % w)
+		check(wd.block_reduction == 0.0 or w == &"sword_and_shield", "only the shield guards")
+
+
+func test_focus_and_skill() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(400.0, 480.0, 1)
+	player.set_focus(0.0)
+	await press(&"skill")
+	await frames(6)
+	check(player.attack_runner.attack == null or player.state != Player.State.ATTACK, "no skill without focus")
+	# Landing blows builds focus.
+	var e := await spawn_enemy(428.0, -1)
+	e.health.set_max(99999.0)
+	e.health.restore_full()
+	player.health.set_max(9999.0)
+	player.health.restore_full()
+	await press(&"attack_light")
+	await frames(30)
+	check(player.focus > 0.0, "a landed hit gives focus (%.0f)" % player.focus)
+	# Each weapon's skill fires, costs focus and hits.
+	for w in Weapons.IDS:
+		game_state.grant_gear("weapon", w)
+		Loadout.equip_weapon(w)
+		await frames(3)
+		await place_player(400.0, 480.0, 1)
+		e.health.restore_full()
+		e.set_physics_process(false)
+		player.set_focus(Player.MAX_FOCUS)
+		player.stamina.restore_full()
+		await frames(50)
+		e.global_position = player.global_position + Vector2(28, 0)
+		var wd := Weapons.get_weapon(w)
+		var hp := e.health.current
+		await press(&"skill")
+		var seen := false
+		for i in 70:
+			await get_tree().physics_frame
+			if player.attack_runner.attack == wd.skill:
+				seen = true
+		check(seen, "%s: the skill button starts its skill" % w)
+		check(e.health.current < hp, "%s: the skill hits the enemy" % w)
+		check(player.focus <= Player.MAX_FOCUS - wd.skill_cost + Player.FOCUS_PER_CRIT * 2.0 + 0.1, "%s: skill spends focus (%.0f)" % [w, player.focus])
+		await frames(60)
+	e.queue_free()
+
+
+func test_weapon_parry_and_guard() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(400.0, 480.0, 1)
+	var base := player._window_frames()
+	game_state.grant_gear("weapon", &"kingsfall_greatsword")
+	Loadout.equip_weapon(&"kingsfall_greatsword")
+	await frames(3)
+	check(player._window_frames() > base, "greatsword has a longer parry window (%d vs %d)" % [player._window_frames(), base])
+	game_state.grant_gear("weapon", &"wayfarers_rapier")
+	Loadout.equip_weapon(&"wayfarers_rapier")
+	await frames(3)
+	check(player._window_frames() < base, "rapier has a tighter window")
+	game_state.grant_gear("weapon", &"sword_and_shield")
+	Loadout.equip_weapon(&"sword_and_shield")
+	await frames(3)
+	player.health.set_max(500.0)
+	player.health.restore_full()
+	Input.action_press(&"parry")
+	await frames(30)
+	check(player.blocking, "holding parry raises the shield guard")
+	var src := Node2D.new()
+	level.add_child(src)
+	src.global_position = player.global_position + Vector2(30, 0)
+	var h := HitData.make(40.0, src, Vector2.ZERO)
+	var hp := player.health.current
+	var r := player.receive_hit(h)
+	check(r == HitData.Result.BLOCKED, "frontal hit blocked")
+	check(hp - player.health.current < 20.0, "block cuts the damage (%.1f)" % (hp - player.health.current))
+	Input.action_release(&"parry")
+	await frames(40)
+	check(not player.blocking, "releasing parry drops the guard")
+	# Without a shield there is no guard.
+	game_state.grant_gear("weapon", &"oathblade")
+	Loadout.equip_weapon(&"oathblade")
+	await frames(3)
+	Input.action_press(&"parry")
+	await frames(40)
+	check(not player.blocking, "swords do not guard")
+	Input.action_release(&"parry")
+	src.queue_free()

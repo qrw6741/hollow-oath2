@@ -29,3 +29,4 @@ ember_reward = 35
 bonus_drop_item = ExtResource("bonus")
 bonus_drop_chance = 0.25
 bonus_drop_count = 1
+status_resist = {"burn": -0.4, "frost": 0.3}

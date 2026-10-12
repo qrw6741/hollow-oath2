@@ -35,3 +35,4 @@ drop_count = 3
 bonus_drop_item = ExtResource("bonus")
 bonus_drop_chance = 1.0
 bonus_drop_count = 3
+status_resist = {"burn": 0.5}

@@ -31,3 +31,5 @@ ai_min_range = 0
 ai_max_range = 70
 ai_weight = 0.7
 ai_chain_chance = 1.0
+status = &"bleed"
+status_amount = 25.0

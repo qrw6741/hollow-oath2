@@ -222,6 +222,10 @@ func describe(id: StringName) -> String:
 			t += "Light combo %d -> %d   Heavy %d -> %d" % [now.light_total, nxt.light_total, now.heavy, nxt.heavy]
 		else:
 			t += "Light combo %d   Heavy %d" % [now.light_total, now.heavy]
+		if w.skill:
+			t += "\nSkill: %s (%d focus)" % [w.skill.display_name, roundi(w.skill_cost)]
+		if w.status != &"":
+			t += "   Inflicts %s" % StatusFx.name_of(w.status)
 		return t
 	var a := Armors.get_armor(id)
 	var lv3 := Forge.level_of("armor", id)
@@ -231,6 +235,9 @@ func describe(id: StringName) -> String:
 		t2 += "Damage taken %d%% -> %d%%   Speed %d%%" % [d_now, roundi(Armors.damage_mult(id, lv3 + 1) * 100.0), roundi(a.run_speed_mult * 100.0)]
 	else:
 		t2 += "Damage taken %d%%   Speed %d%%" % [d_now, roundi(a.run_speed_mult * 100.0)]
+	var rs := StatusFx.resist_text(a.resist)
+	if rs != "":
+		t2 += "\nResists: " + rs
 	return t2
 
 

@@ -392,6 +392,15 @@ func _select_slot(key: String) -> void:
 			_row("Stamina per swing", "%d  (heavy %d)" % [s.stamina, s.heavy_stamina])
 			_row("Poise damage", "%d" % s.poise)
 			_row("Bonus (Strength, upgrade)", "+%d%%" % roundi((_strength_bonus() - 1.0) * 100.0))
+			if cur and cur.skill:
+				_row("Skill", "%s  (%d focus)" % [cur.skill.display_name, roundi(cur.skill_cost)])
+			if cur:
+				var win := maxi(2, (pr.parry_window_frames if pr else 8) + cur.parry_window_bonus)
+				_row("Parry window", "%d frames" % win)
+				if cur.block_reduction > 0.0:
+					_row("Guard (hold Parry)", "blocks %d%% damage" % roundi(cur.block_reduction * 100.0))
+				if cur.status != &"":
+					_row("Inflicts", "%s  (+%d per hit)" % [StatusFx.name_of(cur.status), roundi(cur.status_amount)])
 			_d_desc.text = cur.description if cur else ""
 		"armour":
 			var arm := Armors.get_armor(GameState.armor_id)
@@ -408,7 +417,8 @@ func _select_slot(key: String) -> void:
 			var fl: int = p.max_flasks if p else pr.flasks
 			var fh: float = p.flask_heal if p else pr.flask_heal
 			_row("Ember Vials", "%d  (heal %d each)" % [fl, roundi(fh)])
-			_row("Parry window", "%d frames" % pr.parry_window_frames)
+			var rt := StatusFx.resist_text(Armors.resist_of(GameState.armor_id, alv))
+			_row("Resists", rt if rt != "" else "nothing")
 			_d_desc.text = arm.description if arm else "You wear nothing. Select to put something on."
 		"quick":
 			var it := Items.get_item(GameState.quick_item)

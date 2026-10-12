@@ -84,11 +84,16 @@ const WATER_JUMP := 0.88
 ## Last standing spot that was not a hazard; lost embers fall here.
 var last_safe_position := Vector2.ZERO
 
-const BUFFERED: Array[StringName] = [&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal"]
+const BUFFERED: Array[StringName] = [&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal", &"skill"]
 
 
 func _ready() -> void:
 	add_to_group(&"player")
+	status = StatusComponent.new()
+	status.name = &"Status"
+	status.health = health
+	status.position = Vector2(0, -46)
+	add_child(status)
 	_base_run_speed = run_speed
 	if preset:
 		_apply_preset()
@@ -127,6 +132,10 @@ func apply_loadout() -> void:
 	var w := Loadout.weapon()
 	weapon = w if w else preset.weapon
 	damage_taken_mult = Loadout.damage_taken_mult()
+	if status:
+		status.resist = Armors.resist_of(GameState.armor_id, GameState.armor_level(GameState.armor_id))
+	attack_runner.weapon_status = weapon.status if weapon else &""
+	attack_runner.weapon_status_amount = weapon.status_amount if weapon else 0.0
 	run_speed = _base_run_speed * Armors.speed_mult(GameState.armor_id)
 	dodge_stamina = preset.dodge_stamina + Armors.dodge_add(GameState.armor_id)
 	var old_max := max_flasks
@@ -177,6 +186,8 @@ func _add_lantern() -> void:
 
 
 func _emit_spawned() -> void:
+	focus = GameState.focus
+	focus_changed.emit(focus, MAX_FOCUS)
 	Events.player_spawned.emit(self)
 	Events.flasks_changed.emit(flasks, max_flasks)
 
@@ -191,6 +202,8 @@ func _physics_process(delta: float) -> void:
 		Items.use(GameState.quick_item, self)
 	if combat_frames > 0:
 		combat_frames -= 1
+	if state != State.PARRY:
+		blocking = false
 	if Input.is_action_just_pressed(&"travel_manor") and state == State.FREE and not GameState.ui_modal:
 		_try_manor_travel()
 	state_frame += 1
@@ -287,6 +300,13 @@ func _try_actions() -> bool:
 		_consume(&"jump")
 		_jump()
 		return true
+	if _buffered(&"skill"):
+		_consume(&"skill")
+		if can_use_skill():
+			set_focus(focus - weapon.skill_cost)
+			_start_attack(weapon.skill)
+			Audio.sfx_at(&"parry", global_position, -8.0, 0.7)
+			return true
 	if _buffered(&"attack_light") and stamina.can_spend() and weapon:
 		_consume(&"attack_light")
 		var target := find_riposte_target()
@@ -319,6 +339,8 @@ func _start_attack(a: AttackData, multiplier := 1.0) -> void:
 	if dir != 0.0:
 		facing = signi(int(signf(dir)))
 	stamina.spend(a.stamina_cost)
+	if a.invulnerable_frames > 0:
+		_iframes = maxi(_iframes, a.invulnerable_frames)
 	_queued_attack = &""
 	_set_state(State.ATTACK)
 	attack_runner.start(a, facing, multiplier)
@@ -400,13 +422,19 @@ func _start_parry() -> void:
 func _state_parry(delta: float) -> void:
 	velocity.x = move_toward(velocity.x, 0.0, ground_decel * delta)
 	_apply_gravity(delta)
-	var total := parry_success_recovery if _parried else parry_total_frames
+	var total := parry_success_recovery if _parried else _parry_total()
+	blocking = false
+	if not _parried and weapon and weapon.block_reduction > 0.0 and state_frame > _window_frames() \
+			and Input.is_action_pressed(&"parry") and stamina.current > 0.0:
+		blocking = true
+		state_frame = mini(state_frame, total - 1)  # hold the guard while the button is down
+		return
 	if state_frame >= total:
 		_set_state(State.FREE)
 
 
 func is_parry_active() -> bool:
-	return state == State.PARRY and not _parried and state_frame <= parry_window_frames + (Settings.PARRY_ASSIST_FRAMES if Settings.parry_assist else 0)
+	return state == State.PARRY and not _parried and state_frame <= _window_frames() + (Settings.PARRY_ASSIST_FRAMES if Settings.parry_assist else 0)
 
 
 func _start_heal() -> void:
@@ -481,7 +509,23 @@ func receive_hit(hit: HitData) -> int:
 		return HitData.Result.PARRIED
 	if is_invulnerable(hit.environmental):
 		return HitData.Result.IGNORED
+	if blocking and not hit.environmental and _faces(hit.source) and weapon and weapon.block_reduction > 0.0:
+		var cost := hit.damage * 0.45 + hit.poise_damage * 0.1
+		if stamina.current >= cost:
+			stamina.spend(cost)
+			combat_frames = COMBAT_LOCK_FRAMES
+			health.take_damage(hit.damage * (1.0 - weapon.block_reduction) * damage_taken_mult * Settings.damage_taken_pct / 100.0)
+			GameFeel.spark(global_position + Vector2(facing * 12, -16), Palette.BONE, 10, facing)
+			GameFeel.shake(2.0, 0.12)
+			velocity.x = -facing * 70.0
+			if health.is_dead:
+				return HitData.Result.HIT
+			return HitData.Result.BLOCKED
+		stamina.spend(stamina.current)  # guard broken: this one lands in full
+		blocking = false
 	combat_frames = COMBAT_LOCK_FRAMES
+	if hit.status != &"" and status:
+		status.apply(hit.status, hit.status_amount)
 	health.take_damage(hit.damage * damage_taken_mult * Settings.damage_taken_pct / 100.0)
 	GameFeel.spark(global_position + Vector2(0, -14), Palette.CRIMSON_BRIGHT, 12)
 	GameFeel.shake(4.0, 0.22)
@@ -500,6 +544,40 @@ func receive_hit(hit: HitData) -> int:
 const COMBAT_LOCK_FRAMES := 300
 var combat_frames := 0
 
+signal focus_changed(value: float, maximum: float)
+const MAX_FOCUS := 60.0
+const FOCUS_PER_HIT := 6.0
+const FOCUS_PER_CRIT := 10.0
+const FOCUS_PER_PARRY := 16.0
+var focus := 30.0
+## Frames the current guard has been held past the parry window (shield weapons).
+var blocking := false
+
+
+func add_focus(amount: float) -> void:
+	set_focus(focus + amount)
+
+
+func set_focus(v: float) -> void:
+	focus = clampf(v, 0.0, MAX_FOCUS)
+	GameState.focus = focus
+	focus_changed.emit(focus, MAX_FOCUS)
+
+
+func can_use_skill() -> bool:
+	return weapon != null and weapon.skill != null and focus >= weapon.skill_cost \
+		and stamina.can_spend() and is_on_floor()
+
+
+func _window_frames() -> int:
+	return maxi(2, parry_window_frames + (weapon.parry_window_bonus if weapon else 0))
+
+
+func _parry_total() -> int:
+	return maxi(10, parry_total_frames + (weapon.parry_recovery_bonus if weapon else 0))
+## Bleed / poison / burning / frost on the player; resistances come from armour.
+var status: StatusComponent
+
 
 func _try_manor_travel() -> void:
 	var r := Manor.travel(self)
@@ -516,6 +594,7 @@ func _faces(source: Node2D) -> bool:
 
 func _on_parry_success(hit: HitData) -> void:
 	_parried = true
+	add_focus(FOCUS_PER_PARRY)
 	state_frame = 0
 	parry_flash = 18
 	_iframes = maxi(_iframes, 20)
@@ -532,6 +611,7 @@ func _on_parry_success(hit: HitData) -> void:
 func _on_attack_hit(_target: Hurtbox, result: int, hit: HitData) -> void:
 	combat_frames = COMBAT_LOCK_FRAMES
 	if result == HitData.Result.HIT:
+		add_focus(FOCUS_PER_CRIT if hit.critical else FOCUS_PER_HIT)
 		GameFeel.hit_stop(hit.hit_stop)
 		GameFeel.shake(hit.shake)
 	elif result == HitData.Result.BLOCKED:
@@ -553,7 +633,7 @@ func find_riposte_target() -> Node2D:
 
 
 func move_mult() -> float:
-	return WATER_MOVE if in_water > 0 else 1.0
+	return (WATER_MOVE if in_water > 0 else 1.0) * (status.speed_mult() if status else 1.0)
 
 
 func _on_hazard() -> bool:
@@ -588,6 +668,7 @@ func rest() -> void:
 	health.restore_full()
 	stamina.restore_full()
 	flasks = max_flasks
+	set_focus(MAX_FOCUS)
 	Events.flasks_changed.emit(flasks, max_flasks)
 	velocity = Vector2.ZERO
 	_set_state(State.REST)
@@ -600,6 +681,7 @@ func respawn_at(pos: Vector2) -> void:
 	stamina.restore_full()
 	flasks = max_flasks
 	_iframes = 60
+	set_focus(0.0)
 	_buffer.clear()
 	_set_state(State.FREE)
 	Events.flasks_changed.emit(flasks, max_flasks)

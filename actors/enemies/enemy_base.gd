@@ -29,6 +29,10 @@ var _poise_regen_wait := 0
 var _cooldown := 0
 var _ledge_ray: RayCast2D
 var _rng := RandomNumberGenerator.new()
+## Bleed / poison / burning / frost (null for bosses and anything that opts out).
+var status: StatusComponent
+## Bosses are immune to status effects; mini-bosses opt back in with a high resistance.
+var takes_status := true
 
 
 func _ready() -> void:
@@ -40,12 +44,23 @@ func _ready() -> void:
 		health.set_max(data.max_health * Settings.enemy_health_pct / 100.0)
 		poise = data.max_poise
 	health.died.connect(_on_died)
+	if takes_status and not has_method(&"start_fight"):
+		_add_status()
 	attack_runner.hit_confirmed.connect(_on_attack_hit)
 	attack_runner.projectile_fired.connect(_fire_projectile)
 	_ledge_ray = RayCast2D.new()
 	_ledge_ray.collision_mask = 1
 	_ledge_ray.target_position = Vector2(0, 20)
 	add_child(_ledge_ray)
+
+
+func _add_status() -> void:
+	status = StatusComponent.new()
+	status.name = &"Status"
+	status.health = health
+	if data:
+		status.resist = data.status_resist
+	add_child(status)
 
 
 func _physics_process(delta: float) -> void:
@@ -69,6 +84,8 @@ func _physics_process(delta: float) -> void:
 		State.DEAD: _state_dead(delta)
 
 	velocity.y = minf(velocity.y + gravity * delta, 420.0)
+	if status and state in [State.PATROL, State.CHASE, State.RETURN, State.RECOVER]:
+		velocity.x *= status.speed_mult()
 	move_and_slide()
 
 
@@ -258,6 +275,8 @@ func receive_hit(hit: HitData) -> int:
 	var was_parried := state == State.PARRIED
 	var applied := health.take_damage(hit.damage)
 	hit_flash = 6
+	if status and hit.status != &"":
+		status.apply(hit.status, hit.status_amount)
 	GameFeel.damage_number(global_position + Vector2(0, -38), applied, hit.critical)
 	var push_dir := 1 if hit.knockback.x >= 0.0 else -1
 	GameFeel.spark(global_position + Vector2(-push_dir * 4, -16), Palette.BONE if not hit.critical else Palette.GOLD_BRIGHT, 14 if hit.critical else 9, push_dir)
@@ -310,6 +329,8 @@ func _fire_projectile(a: AttackData) -> void:
 	hit.attack_id = a.id
 	hit.hit_stop = a.hit_stop
 	hit.shake = a.shake
+	hit.status = a.status
+	hit.status_amount = a.status_amount
 	Projectile.spawn(get_parent(), from, dir * a.projectile_speed, hit, self)
 	Audio.sfx_at(&"throw", from)
 

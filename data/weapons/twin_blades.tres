@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://systems/combat/weapon_data.gd" id="1_weapon"]
 [ext_resource type="Resource" path="res://data/attacks/twin_light_1.tres" id="2_l1"]
 [ext_resource type="Resource" path="res://data/attacks/twin_heavy.tres" id="3_heavy"]
 [ext_resource type="Resource" path="res://data/attacks/twin_air.tres" id="4_air"]
 [ext_resource type="Resource" path="res://data/attacks/twin_riposte.tres" id="5_rip"]
+[ext_resource type="Resource" path="res://data/attacks/skill_twin_blades.tres" id="99_skill"]
 
 [resource]
 script = ExtResource("1_weapon")
@@ -17,3 +18,9 @@ aerial = ExtResource("4_air")
 riposte = ExtResource("5_rip")
 riposte_multiplier = 1.0
 look = 1
+status = &"bleed"
+status_amount = 14.0
+skill = ExtResource("99_skill")
+skill_cost = 30.0
+parry_window_bonus = 0
+parry_recovery_bonus = -4

@@ -8,6 +8,8 @@ const RESPAWN_DELAY := 2.6
 const DEFAULT_LEVEL_PATH := "res://world/levels/test_arena.tscn"
 
 ## True while a game session (not the main menu) is running.
+## Runtime only (not saved): focus carried between levels; see Player.
+var focus := 30.0
 var in_game := false
 ## Active save slot (1-based). 0 = no slot: the session is never autosaved (tests, dev runs).
 var current_slot := 0
