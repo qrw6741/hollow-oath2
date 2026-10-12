@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/cantor_summon.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/cantor_bolt.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="d0"]
+[ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="d1"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"candle_cantor"
+display_name = "Candle Cantor"
+lore = "The choir-master of a liturgy with no congregation. Every note it holds calls something small and burning out of the dark."
+max_health = 62.0
+max_poise = 22.0
+poise_regen_delay_frames = 90
+poise_regen_per_second = 30.0
+patrol_speed = 20.0
+chase_speed = 44.0
+detection_range = 280.0
+vertical_detection = 110.0
+leash_range = 380.0
+attacks = [ExtResource("a0"), ExtResource("a1")]
+attack_cooldown_min = 60
+attack_cooldown_max = 100
+recover_frames = 20
+backstep_speed = 60.0
+stagger_frames = 40
+parry_stagger_frames = 100
+ember_reward = 110
+drop_item = ExtResource("d0")
+drop_chance = 0.25
+drop_count = 1
+bonus_drop_item = ExtResource("d1")
+bonus_drop_chance = 0.4
+bonus_drop_count = 1
+status_resist = {"frost": 0.5, "burn": -0.3, "poison": 0.5}

@@ -43,6 +43,9 @@ func _ready() -> void:
 	if data:
 		health.set_max(data.max_health * Settings.enemy_health_pct / 100.0)
 		poise = data.max_poise
+		attack_runner.base_multiplier = data.damage_mult
+		if data.elite:
+			_make_elite()
 	health.died.connect(_on_died)
 	if takes_status and not has_method(&"start_fight"):
 		_add_status()
@@ -52,6 +55,16 @@ func _ready() -> void:
 	_ledge_ray.collision_mask = 1
 	_ledge_ray.target_position = Vector2(0, 20)
 	add_child(_ledge_ray)
+
+
+func _make_elite() -> void:
+	var mark := EliteMark.new()
+	mark.name = &"EliteMark"
+	add_child(mark)
+	var v := get_node_or_null(^"Visual")
+	if v is Node2D:
+		(v as Node2D).modulate = Color(1.18, 1.05, 0.78)
+		(v as Node2D).scale.y = 1.1
 
 
 func _add_status() -> void:

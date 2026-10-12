@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"cantor_bolt"
+display_name = "Candle Cantor - Cold Flame"
+animation = &"bolt"
+startup_frames = 30
+active_frames = 2
+recovery_frames = 30
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 16.0
+poise_damage = 0.0
+stamina_cost = 0.0
+knockback = Vector2(80, -40)
+parryable = true
+hitbox_size = Vector2(4, 4)
+hitbox_offset = Vector2(0, -30)
+lunge_speed = 0.0
+lunge_start_frame = 0
+lunge_frames = 0
+track_during_startup = true
+projectile_speed = 150.0
+projectile_offset = Vector2(12, -22)
+hit_stop = 0.07
+shake = 2.5
+ai_min_range = 50
+ai_max_range = 280
+ai_weight = 1.0
+ai_chain_chance = 1.0
+status = &"frost"
+status_amount = 28.0

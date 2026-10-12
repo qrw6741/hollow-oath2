@@ -1,0 +1,59 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/ranged_enemy.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/enemies/hollow_archer.tres" id="2_data"]
+[ext_resource type="Script" path="res://systems/combat/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://systems/combat/hurtbox.gd" id="4_hurtbox"]
+[ext_resource type="Script" path="res://systems/combat/hitbox.gd" id="5_hitbox"]
+[ext_resource type="Script" path="res://systems/combat/attack_runner.gd" id="6_runner"]
+[ext_resource type="Script" path="res://actors/enemies/archer_visual.gd" id="7_visual"]
+
+[sub_resource type="RectangleShape2D" id="body_shape"]
+size = Vector2(12, 28)
+
+[sub_resource type="RectangleShape2D" id="hurt_shape"]
+size = Vector2(14, 28)
+
+[sub_resource type="RectangleShape2D" id="hit_shape"]
+size = Vector2(36, 36)
+
+[node name="HollowArcher" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+floor_snap_length = 3.0
+script = ExtResource("1_enemy")
+data = ExtResource("2_data")
+keep_min = 110.0
+keep_max = 240.0
+
+[node name="Body" type="CollisionShape2D" parent="."]
+position = Vector2(0, -14)
+shape = SubResource("body_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("4_hurtbox")
+
+[node name="Shape" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -14)
+shape = SubResource("hurt_shape")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+script = ExtResource("5_hitbox")
+
+[node name="Shape" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(22, -18)
+shape = SubResource("hit_shape")
+
+[node name="AttackRunner" type="Node" parent="." node_paths=PackedStringArray("hitbox")]
+script = ExtResource("6_runner")
+hitbox = NodePath("../Hitbox")
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("7_visual")

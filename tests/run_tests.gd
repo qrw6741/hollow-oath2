@@ -81,7 +81,7 @@ func _run() -> void:
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
-		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_manor_level, test_npcs_stand_on_ground,
+		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_manor_level, test_npcs_stand_on_ground,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -3188,3 +3188,75 @@ func test_weapon_parry_and_guard() -> void:
 	check(not player.blocking, "swords do not guard")
 	Input.action_release(&"parry")
 	src.queue_free()
+
+
+func test_new_enemy_data_and_scenes() -> void:
+	for id in [&"hollow_archer", &"candle_cantor", &"gilded_penitent", &"oathguard_captain", &"pike_sergeant"]:
+		var d := load("res://data/enemies/%s.tres" % id) as EnemyData
+		check(d != null and d.max_health > 0.0 and not d.attacks.is_empty(), "%s data loads" % id)
+		var sc := load("res://actors/enemies/%s.tscn" % id) as PackedScene
+		check(sc != null, "%s scene loads" % id)
+		for a in d.attacks:
+			check((a as AttackData).validate().is_empty(), "%s attack %s valid" % [id, a.id])
+		for k in d.status_resist:
+			check(StatusFx.is_kind(StringName(k)), "%s resists real kinds" % id)
+	var base := load("res://data/enemies/hollow_penitent.tres") as EnemyData
+	var el := load("res://data/enemies/gilded_penitent.tres") as EnemyData
+	check(el.elite and el.max_health > base.max_health * 2.0 and el.damage_mult > 1.0 and el.ember_reward > base.ember_reward * 3, "elite is tougher and pays more")
+
+
+func test_archer_and_cantor() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(300.0, 480.0, 1)
+	player.health.set_max(5000.0)
+	player.health.restore_full()
+	var arc: EnemyBase = load("res://actors/enemies/hollow_archer.tscn").instantiate()
+	arc.position = Vector2(520, 480)
+	arc.start_facing = -1
+	level.add_child(arc)
+	var shots := 0
+	var seen_proj := false
+	for i in 400:
+		await get_tree().physics_frame
+		if level.get_tree().get_nodes_in_group(&"projectiles").size() > 0 or _find_projectile(level):
+			seen_proj = true
+			break
+	check(seen_proj, "the archer looses an arrow from range")
+	arc.queue_free()
+	# The cantor calls at most two minions, and they die with it.
+	var can: EnemyBase = load("res://actors/enemies/candle_cantor.tscn").instantiate()
+	can.position = Vector2(560, 480)
+	can.start_facing = -1
+	level.add_child(can)
+	await frames(500)
+	var minions: int = can.call("alive_minions")
+	check(minions >= 1 and minions <= 2, "the cantor has 1-2 minions (%d)" % minions)
+	for m in can._minions:
+		check(m is EnemyBase, "minions are enemies")
+	var held: Array = can._minions.duplicate()
+	can.health.take_damage(99999.0)
+	await frames(10)
+	for m in held:
+		check(not is_instance_valid(m) or m.is_dead(), "minions die with the cantor")
+
+
+func _find_projectile(n: Node) -> bool:
+	for c in n.get_children():
+		if c is Projectile:
+			return true
+	return false
+
+
+func test_elite_enemy() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(300.0, 480.0, 1)
+	var e: EnemyBase = load("res://actors/enemies/gilded_penitent.tscn").instantiate()
+	e.position = Vector2(600, 480)
+	level.add_child(e)
+	await frames(3)
+	check(e.get_node_or_null(^"EliteMark") != null, "elites wear the gold mark")
+	check(is_equal_approx(e.attack_runner.base_multiplier, 1.3), "elite hits harder")
+	check(e.status.resist_of(StatusFx.POISON) >= 1.0, "gilded penitent is poison-proof")
+	e.queue_free()

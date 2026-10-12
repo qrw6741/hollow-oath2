@@ -22,6 +22,8 @@ var facing := 1
 var damage_multiplier := 1.0
 ## Permanent bonus from character stats (Strength), applied to every hit.
 var damage_bonus := 1.0
+## Permanent multiplier on top of each attack's own (elite enemies).
+var base_multiplier := 1.0
 ## Weapon-borne status, used when the attack has none of its own.
 var weapon_status: StringName = &""
 var weapon_status_amount := 0.0
@@ -32,7 +34,7 @@ func start(a: AttackData, dir: int, multiplier := 1.0) -> void:
 	attack = a
 	facing = dir
 	frame = 0
-	damage_multiplier = multiplier
+	damage_multiplier = multiplier * base_multiplier
 	_hit_ids.clear()
 	_set_phase(Phase.STARTUP)
 	_place_hitbox()

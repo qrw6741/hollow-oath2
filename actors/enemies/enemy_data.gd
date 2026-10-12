@@ -33,6 +33,11 @@ extends Resource
 ## Frames the enemy stays open to a riposte after being parried.
 @export var parry_stagger_frames := 100
 
+@export_group("Elite")
+## Elites are tougher versions of ordinary enemies: gold mark, more damage, better drops.
+@export var elite := false
+@export var damage_mult := 1.0
+
 @export_group("Status")
 ## Status resistance by kind, e.g. {"poison": 1.0} = immune (see Status).
 @export var status_resist := {}
