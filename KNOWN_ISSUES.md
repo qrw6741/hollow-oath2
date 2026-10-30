@@ -141,3 +141,9 @@
 - No ShortcutGate in the Reliquary (the village still has the only one).
 - New weapon/art sounds reuse existing effects; the Art button on a pad shows a generic trigger glyph.
 - Download size: ~55 KB under the single-file cap. Any further content needs audio trimmed or the build published elsewhere.
+
+## The Hollow Keep (3 bosses)
+- Placeholder art: Gaoler Vess, Foundrymaster Brand and the Hollow Regent are recolours of the brute with small extra props (chains, embers, crown). The Keep reuses the cellar-style backdrop with a warm tint.
+- Boss balance (HP, damage, timings) is untested by a human. Only automated tests ran: they check the bosses attack, hurt, change phase and drop their relic, not that the fights are fun or fair.
+- The three relics reuse existing effects (status resist, flask heal, parry focus), so they stack in a similar way to the older relics.
+- Windows build still not launched on Windows.

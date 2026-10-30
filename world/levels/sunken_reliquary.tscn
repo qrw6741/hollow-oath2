@@ -397,6 +397,18 @@ size = Vector2(16, 200)
 wall_id = &"reliquary_vault"
 hits_needed = 3
 
+[node name="FromKeep" type="Marker2D" parent="."]
+position = Vector2(5200, 480)
+script = ExtResource("entry")
+entry_id = &"from_keep"
+
+[node name="ToKeep" type="Area2D" parent="."]
+position = Vector2(5330, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/hollow_keep.tscn"
+target_entry = &"from_reliquary"
+size = Vector2(12, 80)
+
 [node name="VaultCache" type="Area2D" parent="."]
 position = Vector2(5260, 480)
 script = ExtResource("chest")

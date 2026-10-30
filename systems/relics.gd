@@ -20,8 +20,11 @@ const DEFS := {
 	&"relic_coin": {"title": "Gravedigger's Coin", "desc": "Foes pay 20% more embers.", "effect": "ember_gain", "value": 1.2},
 	&"relic_candle": {"title": "Candle Stub", "desc": "Ember Vials heal 20% more.", "effect": "flask_heal", "value": 1.2},
 	&"relic_riposte": {"title": "Duellist's Glove", "desc": "A parry gives 10 extra focus.", "effect": "parry_focus", "value": 10.0},
+	&"relic_shackle": {"title": "Gaoler's Shackle", "desc": "Resist 30% of every status buildup.", "effect": "status_resist", "value": 0.3},
+	&"relic_slag": {"title": "Foundry Ladle", "desc": "Ember Vials heal 40% more.", "effect": "flask_heal", "value": 1.4},
+	&"relic_regent": {"title": "Hollow Crown", "desc": "A parry gives 20 extra focus.", "effect": "parry_focus", "value": 20.0},
 }
-const IDS: Array[StringName] = [&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte"]
+const IDS: Array[StringName] = [&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte", &"relic_shackle", &"relic_slag", &"relic_regent"]
 
 
 static func owned(id: StringName) -> bool:

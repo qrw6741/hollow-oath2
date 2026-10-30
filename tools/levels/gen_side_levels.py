@@ -51,6 +51,9 @@ EXT = {
     "pilgrim": ("PackedScene", "res://actors/enemies/drowned_pilgrim.tscn"),
     "lurker": ("PackedScene", "res://actors/enemies/reliquary_lurker.tscn"),
     "abbot": ("PackedScene", "res://actors/bosses/salt_abbot.tscn"),
+    "vess": ("PackedScene", "res://actors/bosses/gaoler_vess.tscn"),
+    "brand": ("PackedScene", "res://actors/bosses/foundrymaster_brand.tscn"),
+    "regent": ("PackedScene", "res://actors/bosses/hollow_regent.tscn"),
     "it_wick": ("Resource", "res://data/items/cantors_wick.tres"),
     "it_knot": ("Resource", "res://data/items/relic_knot.tres"),
     "it_draught": ("Resource", "res://data/items/pilgrims_draught.tres"),
@@ -242,6 +245,7 @@ GALLERY = "res://world/levels/hollowmere_gallery.tscn"
 GRAVE = "res://world/levels/pilgrims_graveyard.tscn"
 CHAPEL = "res://world/levels/ashen_chapel.tscn"
 RELIQUARY = "res://world/levels/sunken_reliquary.tscn"
+KEEP = "res://world/levels/hollow_keep.tscn"
 
 
 # ------------------------------------------------------------------ the cellar
@@ -694,6 +698,8 @@ color = Color(0.4, 0.62, 0.64, 1)
     L.arena("AbbotArena", 3560, 480, "abbot", "THE BOOK IS CLOSED", 420, 620)
     # Beyond the boss: the Salt Vault
     L.secret_wall("VaultWallBreak", 5150, 280, 16, 200, "reliquary_vault", 3)
+    L.entry("FromKeep", 5200, 480, "from_keep")
+    L.walk_exit("ToKeep", 5330, 480, KEEP, "from_reliquary")
     L.chest("VaultCache", 5260, 480, "reliquary_cache", count=2, embers=900, item="it_shard")
     L.illusion("VaultBlock", 4850, 420, 100, 60, "reliquary_vault_block")
     L.chest("WickChest", 4900, 480, "reliquary_wick", count=1, embers=300, item="it_wick")
@@ -702,9 +708,82 @@ color = Color(0.4, 0.62, 0.64, 1)
     L.write()
 
 
+def keep():
+    W = 6000
+    L = Level("hollow_keep.tscn")
+    L.use("hall")
+    L.node(f'''
+[node name="HollowKeep" type="Node2D"]
+script = ExtResource("level")
+level_id = &"hollow_keep"
+display_name = "The Hollow Keep"
+bounds = Rect2(0, 0, {W}, 540)
+music = &"catacombs"
+music_pitch = 0.72
+map_origin = Vector2(8800, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("hall")
+width = {W}.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 91
+ghosts = 4
+style = 1
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.7, 0.56, 0.5, 1)
+
+[node name="Geometry" type="Node2D" parent="."]''')
+    L.block("CliffLeft", 0, 0, 16, 480)
+    L.block("Ground", 16, 480, W - 16, 60, style=3)
+    L.block("CliffRight", W - 60, 0, 60, 540)
+    L.block("Ceiling", 0, 40, W, 56)
+    L.block("CellStep", 600, 456, 180, 24, style=1)
+    L.plank("CellLoft", 950, 400, 140)
+    L.block("FoundryStep", 2500, 452, 200, 28, style=1)
+    L.plank("FoundryGantry", 2800, 398, 150)
+    L.block("ThroneStep", 4350, 450, 200, 30, style=1)
+    L.entry("FromReliquary", 130, 480, "from_reliquary")
+    L.walk_exit("ToReliquary", 34, 480, RELIQUARY, "from_keep")
+    L.candle("KeepGateCandle", 300, 480, "keep_gate_candle", "Keep Gate Candle")
+    L.candle("FoundryCandle", 2130, 480, "foundry_candle", "Foundry Candle")
+    L.candle("ThroneCandle", 4120, 480, "throne_candle", "Throne Candle")
+    L.tablet("GaolerSlate", 400, 480, "Roll of the Kept",
+             "A slate of names, each struck through but one. Under it: 'No one is released. I am only keeping the count.'")
+    L.tablet("FoundryPlaque", 2200, 480, "Foundry Plaque",
+             "CAST HERE: ONE THOUSAND CHAINS, THIRTY BELLS, SEVEN CROWNS. The last line has been filed off.")
+    L.tablet("ThroneStone", 4200, 480, "The Court",
+             "The throne room is full. Nobody in it is breathing. They are all waiting to be told what to swear.")
+    L.enemy("KeepPilgrim", "pilgrim", 520, 480, 40)
+    L.enemy("KeepLurker", "lurker", 780, 480, 0)
+    L.enemy("KeepArcher", "archer", 1000, 400, 20, -1)
+    L.enemy("KeepGilded", "gilded", 1080, 480, 40)
+    L.enemy("KeepCaptain", "captain", 1180, 480, 40)
+    L.enemy("FoundryPilgrim", "pilgrim", 2350, 480, 40)
+    L.enemy("FoundryGuard", "gilded", 2540, 452, 40)
+    L.enemy("FoundrySergeant", "sergeant", 2700, 480, 40)
+    L.enemy("GantryArcher", "archer", 2850, 398, 20, -1)
+    L.enemy("FoundryCantor", "cantor", 3000, 480, 30)
+    L.enemy("CourtCaptain", "captain", 4400, 480, 40)
+    L.enemy("CourtGilded", "gilded", 4480, 450, 40)
+    L.enemy("CourtLurker", "lurker", 4720, 480, 0)
+    L.jet("KeepJetA", 1020, 480, 0.0)
+    L.jet("KeepJetB", 1050, 480, 1.5)
+    L.chest("KeepChest", 880, 480, "keep_chest", count=2, embers=700, item="it_draught")
+    L.chest("GantryChest", 2860, 398, "keep_chest_2", count=1, embers=800, item="it_shard")
+    L.arena("VessArena", 1300, 480, "vess", "THE CHAIN IS SLACK", 420, 620)
+    L.arena("BrandArena", 3250, 480, "brand", "THE FURNACE GOES COLD", 420, 620)
+    L.arena("RegentArena", 5000, 480, "regent", "THE COURT IS DISMISSED", 420, 560)
+    L.write()
+
+
 if __name__ == "__main__":
     trial()
     reliquary()
+    keep()
     cellar()
     gallery()
     graveyard()

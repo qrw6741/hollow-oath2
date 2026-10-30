@@ -160,6 +160,9 @@ const ARCHIVE := {
 	&"relic_coin": "A gravedigger's coin. He charged both the living and the dead, and the dead were better payers.",
 	&"relic_candle": "A Candle Stub. Tallow that refuses to finish. It reminds me of Ommen.",
 	&"relic_riposte": "A Duellist's Glove. Whoever left this in my Gallery taught fencing, I suspect, to people who would not use it politely.",
+	&"relic_shackle": "Vess's shackle. Every cell in the Keep had a ledger; hers had one entry, repeated. I would not wear it for comfort. It is, however, very good at not being moved.",
+	&"relic_slag": "A foundry ladle. Brand poured the Keep's chains, bells and crowns from it. It still holds the warmth of the last one.",
+	&"relic_regent": "The Hollow Crown. I had hoped it was a legend. Hold it carefully: it rewards those who strike the moment someone else strikes first.",
 	&"sextons_lantern": "The Sexton's lantern. It lit every burial in the Pilgrim's Graveyard for a hundred years. It will light yours too, if you let it - and I would rather you did not.",
 }
 const VESPER_FIRST := [

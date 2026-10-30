@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"vess_haul"
+display_name = "Vess - Hauling Blow"
+animation = &"smash"
+startup_frames = 32
+active_frames = 6
+recovery_frames = 34
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 34.0
+poise_damage = 0.0
+stamina_cost = 0.0
+knockback = Vector2(180, -120)
+parryable = true
+hitbox_size = Vector2(58, 44)
+hitbox_offset = Vector2(30, -24)
+lunge_speed = 50.0
+lunge_start_frame = 28
+lunge_frames = 6
+track_during_startup = true
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -34)
+hit_stop = 0.1
+shake = 5.0
+ai_min_range = 0
+ai_max_range = 64
+ai_weight = 1.0
+ai_chain_chance = 1.0

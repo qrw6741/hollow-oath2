@@ -1,0 +1,311 @@
+[gd_scene load_steps=24 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/drowned_pilgrim.tscn" id="pilgrim"]
+[ext_resource type="PackedScene" path="res://actors/enemies/reliquary_lurker.tscn" id="lurker"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gilded_penitent.tscn" id="gilded"]
+[ext_resource type="PackedScene" path="res://actors/enemies/oathguard_captain.tscn" id="captain"]
+[ext_resource type="PackedScene" path="res://actors/enemies/pike_sergeant.tscn" id="sergeant"]
+[ext_resource type="PackedScene" path="res://actors/enemies/candle_cantor.tscn" id="cantor"]
+[ext_resource type="Script" path="res://world/hazards/fire_jet.gd" id="jet"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
+[ext_resource type="PackedScene" path="res://actors/bosses/gaoler_vess.tscn" id="vess"]
+[ext_resource type="PackedScene" path="res://actors/bosses/foundrymaster_brand.tscn" id="brand"]
+[ext_resource type="PackedScene" path="res://actors/bosses/hollow_regent.tscn" id="regent"]
+
+[node name="HollowKeep" type="Node2D"]
+script = ExtResource("level")
+level_id = &"hollow_keep"
+display_name = "The Hollow Keep"
+bounds = Rect2(0, 0, 6000, 540)
+music = &"catacombs"
+music_pitch = 0.72
+map_origin = Vector2(8800, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("hall")
+width = 6000.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 91
+ghosts = 4
+style = 1
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.7, 0.56, 0.5, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(5984, 60)
+style = 3
+seed_value = 902
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(5940, 0)
+script = ExtResource("block")
+size = Vector2(60, 540)
+style = 1
+seed_value = 903
+
+[node name="Ceiling" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 40)
+script = ExtResource("block")
+size = Vector2(6000, 56)
+style = 1
+seed_value = 904
+
+[node name="CellStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(600, 456)
+script = ExtResource("block")
+size = Vector2(180, 24)
+style = 1
+seed_value = 905
+
+[node name="CellLoft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(950, 400)
+script = ExtResource("block")
+size = Vector2(140, 6)
+style = 2
+seed_value = 906
+one_way = true
+
+[node name="FoundryStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2500, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 907
+
+[node name="FoundryGantry" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2800, 398)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 908
+one_way = true
+
+[node name="ThroneStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(4350, 450)
+script = ExtResource("block")
+size = Vector2(200, 30)
+style = 1
+seed_value = 909
+
+[node name="FromReliquary" type="Marker2D" parent="."]
+position = Vector2(130, 480)
+script = ExtResource("entry")
+entry_id = &"from_reliquary"
+
+[node name="ToReliquary" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/sunken_reliquary.tscn"
+target_entry = &"from_keep"
+size = Vector2(12, 80)
+
+[node name="KeepGateCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(300, 480)
+checkpoint_id = &"keep_gate_candle"
+display_name = "Keep Gate Candle"
+
+[node name="FoundryCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(2130, 480)
+checkpoint_id = &"foundry_candle"
+display_name = "Foundry Candle"
+
+[node name="ThroneCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(4120, 480)
+checkpoint_id = &"throne_candle"
+display_name = "Throne Candle"
+
+[node name="GaolerSlate" type="Area2D" parent="."]
+position = Vector2(400, 480)
+script = ExtResource("tablet")
+title = "Roll of the Kept"
+text = "A slate of names, each struck through but one. Under it: 'No one is released. I am only keeping the count.'"
+
+[node name="FoundryPlaque" type="Area2D" parent="."]
+position = Vector2(2200, 480)
+script = ExtResource("tablet")
+title = "Foundry Plaque"
+text = "CAST HERE: ONE THOUSAND CHAINS, THIRTY BELLS, SEVEN CROWNS. The last line has been filed off."
+
+[node name="ThroneStone" type="Area2D" parent="."]
+position = Vector2(4200, 480)
+script = ExtResource("tablet")
+title = "The Court"
+text = "The throne room is full. Nobody in it is breathing. They are all waiting to be told what to swear."
+
+[node name="KeepPilgrim" type="Marker2D" parent="."]
+position = Vector2(520, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pilgrim")
+patrol_distance = 40
+start_facing = -1
+
+[node name="KeepLurker" type="Marker2D" parent="."]
+position = Vector2(780, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("lurker")
+patrol_distance = 0
+start_facing = -1
+
+[node name="KeepArcher" type="Marker2D" parent="."]
+position = Vector2(1000, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="KeepGilded" type="Marker2D" parent="."]
+position = Vector2(1080, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="KeepCaptain" type="Marker2D" parent="."]
+position = Vector2(1180, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="FoundryPilgrim" type="Marker2D" parent="."]
+position = Vector2(2350, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pilgrim")
+patrol_distance = 40
+start_facing = -1
+
+[node name="FoundryGuard" type="Marker2D" parent="."]
+position = Vector2(2540, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="FoundrySergeant" type="Marker2D" parent="."]
+position = Vector2(2700, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 40
+start_facing = -1
+
+[node name="GantryArcher" type="Marker2D" parent="."]
+position = Vector2(2850, 398)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="FoundryCantor" type="Marker2D" parent="."]
+position = Vector2(3000, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 30
+start_facing = -1
+
+[node name="CourtCaptain" type="Marker2D" parent="."]
+position = Vector2(4400, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="CourtGilded" type="Marker2D" parent="."]
+position = Vector2(4480, 450)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="CourtLurker" type="Marker2D" parent="."]
+position = Vector2(4720, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("lurker")
+patrol_distance = 0
+start_facing = -1
+
+[node name="KeepJetA" type="Area2D" parent="."]
+position = Vector2(1020, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="KeepJetB" type="Area2D" parent="."]
+position = Vector2(1050, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.5
+
+[node name="KeepChest" type="Area2D" parent="."]
+position = Vector2(880, 480)
+script = ExtResource("chest")
+chest_id = &"keep_chest"
+count = 2
+embers = 700
+item = ExtResource("it_draught")
+
+[node name="GantryChest" type="Area2D" parent="."]
+position = Vector2(2860, 398)
+script = ExtResource("chest")
+chest_id = &"keep_chest_2"
+count = 1
+embers = 800
+item = ExtResource("it_shard")
+
+[node name="VessArena" type="Node2D" parent="."]
+position = Vector2(1300, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("vess")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "THE CHAIN IS SLACK"
+
+[node name="BrandArena" type="Node2D" parent="."]
+position = Vector2(3250, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("brand")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "THE FURNACE GOES COLD"
+
+[node name="RegentArena" type="Node2D" parent="."]
+position = Vector2(5000, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("regent")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 560.0
+victory_text = "THE COURT IS DISMISSED"

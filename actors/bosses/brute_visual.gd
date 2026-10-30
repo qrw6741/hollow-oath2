@@ -4,7 +4,7 @@ extends Node2D
 ## style SEXTON: wide hat, long black coat, a grave-spade, a cold blue lantern on the belt.
 ## Telegraphs: overhead (smash) glints = parryable; sweep glows red where it can't be parried.
 
-enum Style { CELLARER, SEXTON, CINDER, ASHFALL, SALT }
+enum Style { CELLARER, SEXTON, CINDER, ASHFALL, SALT, GAOLER, FOUNDRY, REGENT }
 @export var style := Style.CELLARER
 
 var enemy: EnemyBase
@@ -106,7 +106,10 @@ func _draw() -> void:
 	var cinder := style == Style.CINDER
 	var ashfall := style == Style.ASHFALL
 	var salt := style == Style.SALT
-	var sexton := style == Style.SEXTON or ashfall or salt   # long-coat silhouette with a blade
+	var gaoler := style == Style.GAOLER
+	var foundry := style == Style.FOUNDRY
+	var regent := style == Style.REGENT
+	var sexton := style == Style.SEXTON or ashfall or salt or regent   # long-coat silhouette with a blade
 	var coat := Color("2a2530") if sexton else Color("5a4a3a")
 	var trim := Color("4a4258") if sexton else Color("8a7a60")
 	if cinder:
@@ -118,6 +121,15 @@ func _draw() -> void:
 	elif salt:
 		coat = Color("34505a")
 		trim = Color("b6dce6")
+	elif gaoler:
+		coat = Color("40362f")
+		trim = Color("8a8f98")
+	elif foundry:
+		coat = Color("4a2a1e")
+		trim = Color("ff9a3c")
+	elif regent:
+		coat = Color("24202e")
+		trim = Color("d8b44c")
 	var hip := Vector2(lean * 0.3, -18.0 + crouch * 0.6)
 	var shoulder := Vector2(2.0 + lean, -40.0 + crouch)
 	var head := shoulder + Vector2(2.0, -8.0)
@@ -141,11 +153,23 @@ func _draw() -> void:
 		draw_circle(head, 9.0 + sin(_t * 5.0), Color(1.0, 0.5, 0.15, 0.18 * alpha))
 		for i in 3:
 			draw_circle(hip + Vector2(-8 + i * 8, 12 - absf(sin(_t * 3.0 + i)) * 3.0), 1.3, Color(1.0, 0.6, 0.2, 0.8 * alpha))
+	if foundry:
+		for i in 4:
+			draw_circle(hip + Vector2(-9 + i * 6, 6 - absf(sin(_t * 4.0 + i)) * 4.0), 1.2, Color(1.0, 0.6, 0.2, 0.8 * alpha))
+	if gaoler:
+		for i in 5:
+			var cx := -10.0 + i * 5.0
+			draw_circle(shoulder + Vector2(cx, 10 + sin(_t * 3.0 + i) * 1.5), 1.6, _c(Palette.STEEL, flash, alpha))
 	# Head
 	draw_circle(head, 5.0, _c(Color("9a8f7c") if not sexton else Color("7a7468"), flash, alpha))
 	if sexton:
 		draw_rect(Rect2(head + Vector2(-8, -3), Vector2(16, 2)), _c(Palette.INK, flash, alpha))
 		draw_colored_polygon(PackedVector2Array([head + Vector2(-5, -2.5), head + Vector2(0, -10), head + Vector2(5, -2.5)]), _c(Palette.INK, flash, alpha))
+	if regent:
+		for k in 5:
+			var tx := -5.0 + k * 2.5
+			draw_colored_polygon(PackedVector2Array([head + Vector2(tx - 1.2, -4.5), head + Vector2(tx, -9.5 - (k % 2) * 3.0), head + Vector2(tx + 1.2, -4.5)]), _c(Color("d8b44c"), flash, alpha))
+		draw_circle(head, 11.0 + sin(_t * 3.0), Color(0.8, 0.7, 0.3, 0.1 * alpha))
 	draw_rect(Rect2(head + Vector2(1.0, -0.4), Vector2(3.4, 1.4)), Color(Palette.CRIMSON_BRIGHT, eye * alpha) if eye > 0.1 else _c(Palette.INK, flash, alpha))
 	# Weapon arm (both hands on the haft)
 	var hand := shoulder + Vector2(7, 8)

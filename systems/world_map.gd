@@ -17,6 +17,7 @@ const LEVELS := [
 	"res://world/levels/pilgrims_graveyard.tscn",
 	"res://world/levels/ashen_chapel.tscn",
 	"res://world/levels/sunken_reliquary.tscn",
+	"res://world/levels/hollow_keep.tscn",
 ]
 const CELL := 64.0
 const REVEAL_RADIUS := 3     # cells around the player revealed as you walk

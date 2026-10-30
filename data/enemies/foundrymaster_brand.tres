@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/brand_hammer.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/brand_sweep.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/attacks/brand_fling.tres" id="a2"]
+[ext_resource type="Resource" path="res://data/items/relic_slag.tres" id="drop"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="bonus"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"foundrymaster_brand"
+display_name = "Foundrymaster Brand"
+lore = "He cast the Keep's chains, then its bells, then its crowns. The furnace has not gone out. He has not left it to check."
+max_health = 1050.0
+max_poise = 130.0
+poise_regen_delay_frames = 120
+poise_regen_per_second = 25.0
+patrol_speed = 28.0
+chase_speed = 50.0
+detection_range = 600.0
+vertical_detection = 200.0
+leash_range = 99999.0
+attacks = [ExtResource("a0"), ExtResource("a1"), ExtResource("a2")]
+attack_cooldown_min = 40
+attack_cooldown_max = 80
+recover_frames = 30
+backstep_speed = 50.0
+stagger_frames = 50
+parry_stagger_frames = 120
+ember_reward = 3600
+drop_item = ExtResource("drop")
+drop_chance = 1.0
+drop_count = 1
+bonus_drop_item = ExtResource("bonus")
+bonus_drop_chance = 1.0
+bonus_drop_count = 3
