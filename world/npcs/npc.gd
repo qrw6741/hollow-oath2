@@ -17,6 +17,8 @@ enum Look { PEDLAR, FIGURE, SMITH, KEEPER, STEWARD, ARCHIVIST }
 ## Smithing station opened after the conversation: &"forge" or &"vials" ("" = none).
 @export var station: StringName = &""
 @export_enum("Left:-1", "Right:1") var start_facing := -1
+## When they are about: 0 always, 1 by day only, 2 by night only.
+@export_enum("Always:0", "Day only:1", "Night only:2") var when := 0
 
 var facing := -1
 var talking := false
@@ -42,6 +44,24 @@ func _ready() -> void:
 	body_entered.connect(_on_enter)
 	body_exited.connect(_on_exit)
 	Events.dialogue_closed.connect(_on_dialogue_closed)
+	Events.daynight_changed.connect(func(_n): _apply_time())
+	_apply_time()
+
+
+## Hides a day- or night-only person (and stops them being talked to) out of their hours.
+func _apply_time() -> void:
+	var here := when == 0 or (when == 2) == DayNight.is_night()
+	visible = here
+	if when == 2:
+		modulate = Color(0.78, 0.84, 1.0)
+	set_deferred(&"monitoring", here)
+	if not here and _player_inside:
+		_player_inside = null
+		Events.interact_prompt_hidden.emit()
+
+
+func is_about() -> bool:
+	return when == 0 or (when == 2) == DayNight.is_night()
 
 
 func _on_enter(b: Node) -> void:

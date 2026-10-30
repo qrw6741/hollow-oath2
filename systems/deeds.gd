@@ -17,11 +17,12 @@ const DEFS := {
 	&"level_10": {"title": "Kindled", "desc": "Reach level 10."},
 	&"all_status": {"title": "Every Affliction", "desc": "Trigger bleed, poison, burning and frost on foes."},
 	&"gallery": {"title": "Open Gallery", "desc": "Open the Gallery with its key."},
+	&"ending": {"title": "The Oath Decided", "desc": "Reach an ending at the Oath Gate."},
 	&"survive_night": {"title": "Night Walker", "desc": "Reach dawn after a night on the road."},
 }
 const ORDER: Array[StringName] = [
 	&"first_blood", &"hundred_dead", &"warden_down", &"marshal_down", &"cellarer_down", &"sexton_down",
-	&"errands", &"bestiary_half", &"bestiary_full", &"level_10", &"all_status", &"gallery", &"survive_night",
+	&"errands", &"bestiary_half", &"bestiary_full", &"level_10", &"all_status", &"gallery", &"survive_night", &"ending",
 ]
 
 
@@ -63,6 +64,7 @@ static func _met(id: StringName) -> bool:
 					return false
 			return true
 		&"gallery": return bool(GameState.get_flag(&"door_open_hollowmere_gallery", false)) or bool(GameState.get_flag(&"gallery_opened", false))
+		&"ending": return Endings.chosen() != &""
 		&"survive_night": return bool(GameState.get_flag(&"night_survived", false))
 	return false
 

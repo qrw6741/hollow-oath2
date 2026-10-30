@@ -310,3 +310,10 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Sexton's second graveyard chest no longer gives 3 Ember Shards (now the Thorn).
 - Inventory menu now has 6 tabs.
 - Tests: new test_relics_and_infusion; affected forge/quest/chest/level tests pass in a subset run. Balance numbers are guesses.
+
+## Step: Endings, quest chains, night merchant
+- Oath Gate (world/story/oath_gate.gd, systems/endings.gd, ui/ending/ending_menu.gd): replaces the sealed Citadel exit at the end of the Vaelmoor Road. After the Marshal falls you choose KEEP, BREAK, or MEND (MEND needs every errand done and the Gallery opened). Epilogue pages then play; the choice is permanent for the save (flags `ending_chosen`, `ending_<id>`). A deed records reaching an ending. Epilogue text is a first draft for the creative director to rewrite.
+- Quest chains: four follow-up errands (`needs` = the giver's first errand): Hobb (2 Pike Sergeants), Wenna (4 Gloam Moths), Ilse (show the Sexton's Lantern), Ommen (open the Gallery). Ommen's post-Marshal line updated.
+- Night merchant: the Lantern-Man (Npc `when` = night only) on the road sells cheaper goods and Ember Shards. Placeholder pedlar art with a blue tint.
+- Map screen already existed (ui/map), so nothing was added there.
+- Tests: new test_endings, test_night_merchant; quest/sigil tests updated for the chain (subset runs pass; full suite pending). Not seen in a screenshot yet: Oath Gate art, ending screen.

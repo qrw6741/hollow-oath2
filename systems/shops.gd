@@ -11,8 +11,16 @@ const STOCK := {
 		{"item": &"forge_scrap", "price": 110},
 		{"item": &"hollow_resin", "price": 170},
 	],
+	## Night-only wanderer on the road: cheaper, and the only place to buy Ember Shards.
+	&"lantern": [
+		{"item": &"stamina_tonic", "price": 70},
+		{"item": &"pilgrims_draught", "price": 120},
+		{"item": &"hollow_resin", "price": 140},
+		{"item": &"forge_scrap", "price": 90},
+		{"item": &"ember_shard", "price": 240},
+	],
 }
-const NAMES := {&"pedlar": "THE PEDLAR'S WARES"}
+const NAMES := {&"pedlar": "THE PEDLAR'S WARES", &"lantern": "THE LANTERN-MAN'S WARES"}
 
 
 static func stock(shop_id: StringName) -> Array:

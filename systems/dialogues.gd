@@ -39,7 +39,7 @@ const OMMEN_SIGIL_LATE := [
 const OMMEN_AFTER_MARSHAL := [
 	"The crossroads are quiet. I heard the banner fall from here.",
 	"Orren's oath is broken. That is all it takes, I think - one vow, set down by someone who still can. You did that.",
-	"The Citadel gate will not open yet. Not for you, and not for me. Go carefully when it does.",
+	"The gate at the end of the road has woken. It will ask you something, I think. Whatever you answer, answer it knowing what you are answering.",
 ]
 const OMMEN_IDLE := [
 	"The candles are still lit. That is something.",
@@ -47,6 +47,15 @@ const OMMEN_IDLE := [
 	"I have been counting the days since the Night. I lost the number somewhere in the second year.",
 ]
 
+const LANTERN_FIRST := [
+	"Evening. Or morning, if you are being generous. I walk the road when the sun is off it. Someone should.",
+	"I sell what the dark leaves lying about. The prices are lower at night. Nobody is looking, you see.",
+]
+const LANTERN_GREETINGS := [
+	"Mind the light. It likes you more than it likes me.",
+	"I was a lamplighter once. I still am, really. It is only that the lamps went out first.",
+	"Dawn comes and I go. You never see me in daylight. Do not take it personally.",
+]
 const WENNA_FIRST := [
 	"Ha! A customer! A living one, even, by the look of you - the hollow ones never haggle.",
 	"Wenna. Pedlar. I walk the road because someone has to, and because the road is the only thing in Vaelmoor that still pays.",
@@ -230,6 +239,8 @@ static func conversation(npc: StringName) -> Dictionary:
 			return {"speaker": "Hobb", "lines": HOBB_FIRST if n == 0 else _greeting(npc, HOBB_GREETINGS, n - 1)}
 		&"ilse":
 			return {"speaker": "Sister Ilse", "lines": ILSE_FIRST if n == 0 else _greeting(npc, ILSE_GREETINGS, n - 1)}
+		&"lantern_man":
+			return {"speaker": "The Lantern-Man", "lines": LANTERN_FIRST if n == 0 else [LANTERN_GREETINGS[(n - 1) % LANTERN_GREETINGS.size()]]}
 		&"aldous":
 			var lines3: Array
 			if n == 0:
@@ -243,7 +254,7 @@ static func conversation(npc: StringName) -> Dictionary:
 
 
 static func _speaker_for(npc: StringName) -> String:
-	return {&"ommen": "Ommen", &"wenna": "Wenna", &"hobb": "Hobb", &"ilse": "Sister Ilse", &"aldous": "Aldous Vane"}.get(npc, "...")
+	return {&"ommen": "Ommen", &"wenna": "Wenna", &"hobb": "Hobb", &"ilse": "Sister Ilse", &"aldous": "Aldous Vane", &"lantern_man": "The Lantern-Man"}.get(npc, "...")
 
 
 ## Records that the conversation happened (advances the story).

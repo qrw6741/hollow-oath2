@@ -54,8 +54,45 @@ const DEFS := {
 		"complete": ["The key! Splendid. The Gallery door will answer to it - go in, Archivist Vesper will be delighted. She has been waiting a very long time to be useful."],
 		"reward": {"embers": 500, "items": {&"relic_coin": 1}},
 	},
+	# ---- second errands: each opens once the giver's first errand is done ("needs")
+	&"hobb_sergeants": {
+		"giver": &"hobb", "needs": &"hobb_scrap", "after_talks": 2, "title": "A Better Edge", "kind": "kill",
+		"enemy": &"pike_sergeant", "count": 2,
+		"summary": "Hobb wants two Pike Sergeants brought down. Their halberd steel is the best on the road.",
+		"offer": ["That scrap was good, and it gave me an idea. The sergeants carry better steel than the pikemen - proper halberd-iron. Take two of them down and I'll have enough to try something clever."],
+		"remind": "Two sergeants. They are the ones with the plumes. Mind the reach on those halberds.",
+		"complete": ["Halberd-iron! Hear that ring? Here, I owe you more than coin for this."],
+		"reward": {"embers": 500, "items": {&"forge_scrap": 3}},
+	},
+	&"wenna_moths": {
+		"giver": &"wenna", "needs": &"wenna_crows", "after_talks": 2, "title": "Moth-Eaten Stock", "kind": "kill",
+		"enemy": &"gloam_moth", "count": 4,
+		"summary": "Gloam Moths are chewing through Wenna's wares. Swat four.",
+		"offer": ["Now it's moths. Moths! The ones that circle the candles. They've been at my linen all week. Swat four of them and I'll stop losing sleep over it."],
+		"remind": "Four moths, dear. Go where the candles are, and wait for the flutter.",
+		"complete": ["Quiet at last. Take these - Pilgrim's Draughts, my best, and I'm not telling the others."],
+		"reward": {"embers": 350, "items": {&"pilgrims_draught": 3}},
+	},
+	&"ilse_lantern": {
+		"giver": &"ilse", "needs": &"ilse_resin", "after_talks": 2, "title": "The Sexton's Light", "kind": "have",
+		"item": &"sextons_lantern", "count": 1,
+		"summary": "Ilse asks to see the Sexton's Lantern, from the graveyard behind the road.",
+		"offer": ["There is a lantern in the graveyard, they say. The Sexton's. It burns with the old flame, the kind we used to bottle. If you could show it to me, only show it, I would be very glad to have seen it once more."],
+		"remind": "The Sexton's Lantern. Only show it to me; I would not take it from you.",
+		"complete": ["Oh. It is exactly the colour I remembered. Thank you for letting an old woman look."],
+		"reward": {"embers": 500, "items": {&"stamina_tonic": 3}},
+	},
+	&"ommen_draft": {
+		"giver": &"ommen", "needs": &"ommen_cantors", "after_talks": 6, "title": "The Last Draft", "kind": "flag",
+		"flag": &"door_open_hollowmere_gallery",
+		"summary": "Ommen would like you to open the Manor's Gallery and read the page pinned in its glass case.",
+		"offer": ["One more thing, and then I will stop asking. In the Manor Gallery there is a page in a glass case. The last draft of the liturgy. I would like to know that someone has read it who can still choose.", "Open the Gallery and read it. Then come and tell me what you think the line should have said."],
+		"remind": "The Gallery, in the Manor. The page in the glass case. Read it, and come back.",
+		"complete": ["You read it. Then you know what I did, and what I should have done.", "Whatever you decide at the Gate, you will decide it knowing. That is all anyone is owed."],
+		"reward": {"embers": 800, "items": {&"ember_shard": 2}},
+	},
 }
-const ORDER: Array[StringName] = [&"hobb_scrap", &"wenna_crows", &"ilse_resin", &"ommen_cantors", &"aldous_gallery"]
+const ORDER: Array[StringName] = [&"hobb_scrap", &"wenna_crows", &"ilse_resin", &"ommen_cantors", &"aldous_gallery", &"hobb_sergeants", &"wenna_moths", &"ilse_lantern", &"ommen_draft"]
 
 
 static func def(id: StringName) -> Dictionary:
@@ -145,6 +182,8 @@ static func for_npc(npc: StringName, talks: int) -> Dictionary:
 			continue
 		match state(id):
 			"":
+				if d.has("needs") and state(d.needs) != "done":
+					continue
 				if talks >= int(d.after_talks):
 					return {"id": id, "mode": "offer"}
 			"active":

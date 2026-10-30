@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3]
+[gd_scene load_steps=28 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
@@ -24,6 +24,7 @@
 [ext_resource type="PackedScene" path="res://actors/bosses/hollow_marshal.tscn" id="marshal"]
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
 [ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Script" path="res://world/story/oath_gate.gd" id="oathgate"]
 [ext_resource type="Resource" path="res://data/items/stamina_tonic.tres" id="it_tonic"]
 [ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
 
@@ -209,15 +210,9 @@ position = Vector2(1790, 480)
 script = ExtResource("entry")
 entry_id = &"from_graveyard"
 
-[node name="CitadelRoad" type="Area2D" parent="."]
+[node name="OathGate" type="Area2D" parent="."]
 position = Vector2(3440, 480)
-script = ExtResource("exit")
-mode = 1
-size = Vector2(30, 60)
-door_id = &"citadel_road"
-display_name = "the road to the Crownless Citadel"
-locked_text = "THE ROAD TO THE CITADEL  -  coming in the next build"
-sealed = true
+script = ExtResource("oathgate")
 
 [node name="MarshalArena" type="Node2D" parent="."]
 position = Vector2(2764, 480)
@@ -247,6 +242,16 @@ display_name = "Hobb"
 look = 2
 start_facing = 1
 station = &"forge"
+
+[node name="LanternMan" type="Area2D" parent="."]
+position = Vector2(1500, 480)
+script = ExtResource("npc")
+npc_id = &"lantern_man"
+display_name = "The Lantern-Man"
+look = 0
+start_facing = -1
+shop_id = &"lantern"
+when = 2
 
 [node name="Wenna" type="Area2D" parent="."]
 position = Vector2(360, 480)

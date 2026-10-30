@@ -77,7 +77,7 @@ func _run() -> void:
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
-		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_endings, test_night_merchant, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
@@ -2325,6 +2325,61 @@ func test_dialogue_box() -> void:
 	check(not box.is_open, "Cancel skips the conversation")
 
 
+func test_night_merchant() -> void:
+	await fresh_game()
+	DayNight.forced = 0.2
+	await go_to_level(ROAD, &"")
+	var lm: Npc = main.current_level().get_node("LanternMan")
+	events.daynight_changed.emit(false)
+	await frames(3)
+	check(not lm.is_about() and not lm.visible, "the Lantern-Man is not about by day")
+	DayNight.forced = 0.7
+	events.daynight_changed.emit(true)
+	await frames(3)
+	check(lm.is_about() and lm.visible, "he walks the road at night")
+	check(Shops.stock(&"lantern").size() == 5 and Shops.shop_name(&"lantern") != "WARES", "he has his own stock and name")
+	var cheaper := true
+	for e in Shops.stock(&"lantern"):
+		if e.item != &"ember_shard" and e.price >= Shops.buy_price(e.item):
+			cheaper = false
+	check(cheaper, "his everyday wares are cheaper than the pedlar's")
+	check(Dialogues.conversation(&"lantern_man").speaker == "The Lantern-Man", "he has lines of his own")
+	DayNight.forced = -1.0
+
+
+func test_endings() -> void:
+	await fresh_game()
+	var em: EndingMenu = main.get_node("EndingMenu")
+	check(not Endings.gate_open() and not Endings.choose(&"keep"), "the gate is shut and nothing can be chosen before the Marshal falls")
+	events.ending_requested.emit()
+	await frames(2)
+	check(not em.is_open, "the ending menu will not open early")
+	game_state.set_flag(&"boss_defeated_hollow_marshal", true)
+	check(Endings.gate_open() and Endings.available(&"keep") and Endings.available(&"break") and not Endings.available(&"mend"), "after the Marshal, keep and break are open; mend is locked")
+	check(Endings.reason(&"mend") != "", "a locked ending says what it needs")
+	events.ending_requested.emit()
+	await frames(3)
+	check(em.is_open and get_tree().paused and em.phase == EndingMenu.Phase.CHOICE, "the choice opens")
+	em._pick(&"mend")
+	check(Endings.chosen() == &"", "picking a locked ending does nothing")
+	em._pick(&"break")
+	check(Endings.chosen() == &"break" and game_state.get_flag(&"ending_break", false) and em.phase == EndingMenu.Phase.EPILOGUE, "choosing starts the epilogue")
+	var n: int = em.pages.size()
+	for i in n:
+		em.advance()
+	check(not em.is_open and not get_tree().paused, "the last page returns to the road")
+	check(not Endings.gate_open() and not Endings.choose(&"keep"), "the choice cannot be taken back")
+	check(Deeds.has(&"ending"), "an ending unlocks its deed")
+	# Mend: all errands + Gallery opened.
+	await fresh_game()
+	game_state.set_flag(&"boss_defeated_hollow_marshal", true)
+	for q in Quests.ORDER:
+		game_state.set_flag(StringName("quest_" + String(q)), "done")
+	check(not Endings.available(&"mend"), "errands alone are not enough")
+	game_state.set_flag(&"door_open_hollowmere_gallery", true)
+	check(Endings.available(&"mend") and Endings.choose(&"mend") and Endings.chosen() == &"mend", "every errand plus the Gallery opens the third ending")
+
+
 func test_relics_and_infusion() -> void:
 	await fresh_game()
 	var pl: Player = main.current_level().player
@@ -2573,8 +2628,7 @@ func test_road_level() -> void:
 			ks[nm] = int(ks.get(nm, 0)) + 1
 	check(ks.get("roadside_pikeman.tscn", 0) == 4 and ks.get("carrion_crow.tscn", 0) == 4 and ks.get("oathguard.tscn", 0) == 2 and ks.get("mimic.tscn", 0) == 1, "the road is populated (%s)" % ks)
 	check(WorldMap.LEVELS.has(ROAD) and WorldMap.info(ROAD).candles.size() == 2, "the road is on the map with two candles")
-	var citadel: LevelExit = level.get_node("CitadelRoad")
-	check(citadel.sealed, "the Citadel road is sealed in this build")
+	check(level.get_node("OathGate") is OathGate and not Endings.gate_open(), "the Oath Gate is sealed until the Marshal falls")
 	# Resting at the wayside candle: a fast travel destination.
 	await place_player(500.0, 480.0, 1)
 	await press(&"interact")
@@ -2994,6 +3048,7 @@ func test_sigil_gift() -> void:
 	Dialogues.finish(&"ommen")
 	check(game_state.item_count(&"hollow_sigil") == 1, "late visitors receive it")
 	game_state.set_flag(&"quest_ommen_cantors", "done")   # errands have their own tests
+	game_state.set_flag(&"quest_ommen_draft", "done")
 	check(Dialogues.conversation(&"ommen").lines.size() == 1, "afterwards he is back to idle lines")
 	# Aldous
 	var a0 := Dialogues.conversation(&"aldous")
@@ -3424,7 +3479,9 @@ func test_quests_collect_and_kill() -> void:
 	check(game_state.item_count(&"forge_scrap") == 0, "scrap handed over")
 	check(game_state.embers >= embers + 400 and game_state.item_count(&"ember_shard") >= 2, "reward paid")
 	c = Dialogues.conversation(&"hobb")
-	check(not c.has("quest"), "a finished errand is not offered again")
+	check(not c.has("quest") or c.quest.id != &"hobb_scrap", "a finished errand is not offered again")
+	check(not c.has("quest") or c.quest.id == &"hobb_sergeants", "a follow-up errand may be offered once the first is done")
+	check(Dialogues.conversation(&"wenna").get("quest", {}).get("id", &"") != &"wenna_moths", "a second errand stays closed until the first is done")
 	# Wenna: kill three crows.
 	Dialogues.finish(&"wenna")
 	Dialogues.finish(&"wenna")
