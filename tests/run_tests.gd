@@ -77,7 +77,7 @@ func _run() -> void:
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
-		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_endings, test_night_merchant, test_new_game_plus, test_chapel_and_unique_weapons, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_endings, test_night_merchant, test_new_game_plus, test_chapel_and_unique_weapons, test_sound_extras, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
@@ -2323,6 +2323,33 @@ func test_dialogue_box() -> void:
 	await frames(14)
 	await tap_action(&"ui_cancel")
 	check(not box.is_open, "Cancel skips the conversation")
+
+
+func test_sound_extras() -> void:
+	await fresh_game()
+	for nm in Audio.STEPS:
+		check(ResourceLoader.exists("res://assets/audio/sfx/%s.ogg" % nm), "footstep %s exists" % nm)
+	for nm in [&"voice_growl", &"voice_hiss", &"voice_chant", &"archer_twang", &"fx_burn", &"fx_frost", &"fx_bleed", &"fx_poison", &"skill_cast", &"focus_ready", &"relic_equip"]:
+		check(ResourceLoader.exists("res://assets/audio/sfx/%s.ogg" % nm), "sound %s exists" % nm)
+	for nm in [&"night", &"chapel"]:
+		check(ResourceLoader.exists("res://assets/audio/music/%s.ogg" % nm), "music %s exists" % nm)
+	for id in Audio.VOICES:
+		check(Bestiary.data(id) != null, "voice entry %s names a real enemy" % id)
+	var seen := {}
+	for i in 60:
+		Audio.step()
+		seen[Audio._last_step] = true
+	check(seen.size() >= 4, "footsteps use several variants (%d)" % seen.size())
+	# Night music on a day/night level
+	game_state.in_game = true
+	DayNight.forced = 0.2
+	await go_to_level(ROAD, &"")
+	check(Audio.level_music() != &"night" and Audio.level_music() != &"", "by day the road plays its own music (%s)" % Audio.level_music())
+	DayNight.forced = 0.7
+	check(Audio.level_music() == &"night", "at night the road plays the night loop")
+	await go_to_level(Manor.PATH, &"")
+	check(Audio.level_music() != &"night", "indoor levels never switch to the night loop")
+	DayNight.forced = -1.0
 
 
 func test_chapel_and_unique_weapons() -> void:

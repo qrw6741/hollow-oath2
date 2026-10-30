@@ -101,3 +101,14 @@
 - Run `res://tests/run_tests.tscn` (must end with 0 failed; currently 31 tests).
 - Do the relevant part of `docs/TESTING_CHECKLIST.md`.
 - Log it in `DEVELOPMENT_LOG.md`; record placeholders in `KNOWN_ISSUES.md`.
+
+## Relics, infusions, deeds, bestiary, endings (added later)
+- **Relic**: add an ItemData (kind KEY, max_stack 1) named `relic_<x>`, add its id to `Items.IDS` and `Relics.IDS`, and a `Relics.DEFS` entry with `effect` and `value`. Effects are read with `Relics.mult("effect")`; a new effect name needs one call site. Hand it out through a quest reward, a drop or a chest. Icons draw from the item colour automatically.
+- **Infusion**: nothing to add; any owned weapon can take any status (Forge.infuse). Cost lives in `Forge.INFUSE_COST`.
+- **Deed**: add an entry to `Deeds.DEFS`/`ORDER` and a case in `Deeds._met`.
+- **Bestiary**: add the enemy id to `Bestiary.IDS` (its EnemyData needs `lore` and `status_resist`).
+- **Ending**: add an entry to `Endings.DEFS` and `Endings.ORDER`; the menu builds a button per entry, so add a matching word to the banner list in `EndingMenu.close`.
+- **Second errand**: a Quests.DEFS entry with `"needs": <first quest id>`.
+- **Night-only person**: an Npc with `when = 2`.
+- **Unique weapon**: copy a weapon .tres, set `damage_mult`, a skill, and a Forge.RECIPES entry that needs a boss relic.
+- **New Game+**: flags kept across a cycle are listed in `GameState.KEEP_FLAG_PREFIXES`.

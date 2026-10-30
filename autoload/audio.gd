@@ -15,7 +15,18 @@ const POOL := 14
 const POOL_2D := 10
 ## Sounds that get a small random pitch change so repeats do not sound mechanical.
 const VARY := [&"swing_light", &"swing_heavy", &"swing_fist", &"hit_flesh", &"hit_armor", &"step_1", &"step_2",
-	&"jump", &"land", &"dodge", &"enemy_windup", &"hurt", &"boss_stomp"]
+	&"jump", &"land", &"dodge", &"enemy_windup", &"hurt", &"boss_stomp",
+	&"step_3", &"step_4", &"step_5", &"voice_growl", &"voice_hiss", &"archer_twang", &"skill_cast"]
+## Footstep variants (picked so the same one never plays twice in a row).
+const STEPS: Array[StringName] = [&"step_1", &"step_2", &"step_3", &"step_4", &"step_5"]
+## Enemy voices by enemy id; anything not listed is silent beyond its wind-up sound.
+const VOICES := {
+	&"roadside_pikeman": &"voice_growl", &"hollow_penitent": &"voice_growl", &"oathguard": &"voice_growl",
+	&"oathguard_captain": &"voice_growl", &"pike_sergeant": &"voice_growl", &"gilded_penitent": &"voice_growl",
+	&"ember_acolyte": &"voice_hiss", &"candle_cantor": &"voice_chant", &"hollow_archer": &"archer_twang",
+	&"mother_cinder": &"voice_hiss", &"ser_ashfall": &"voice_growl",
+}
+var _last_step := -1
 
 var current_music: StringName = &""
 var current_pitch := 1.0
@@ -61,8 +72,16 @@ func _connect_events() -> void:
 	Events.checkpoint_rested.connect(func(_id, _p): sfx(&"rest"))
 	Events.boss_fight_started.connect(_on_boss_fight_started)
 	Events.boss_fight_ended.connect(_on_boss_fight_ended)
+	Events.daynight_changed.connect(func(_n): if GameState.in_game and current_music != &"" and not _boss_music(): music(level_music(), 4.0, level_music_pitch()))
 	Events.player_died.connect(func(): music(&"", 1.5))
 	Events.player_respawned.connect(func(_p): music(level_music(), 2.0, level_music_pitch()))
+
+
+## True while a boss track (anything but the level's own loop or the night loop) is playing.
+func _boss_music() -> bool:
+	var lv := get_tree().get_first_node_in_group(&"level")
+	var base: StringName = lv.get("music") if lv and lv.get("music") != null else &""
+	return current_music != &"" and current_music != base and current_music != &"night"
 
 
 func _on_boss_fight_started(b: Node) -> void:
@@ -79,6 +98,8 @@ func level_music_pitch() -> float:
 
 func level_music() -> StringName:
 	var lv := get_tree().get_first_node_in_group(&"level")
+	if lv and lv.get_node_or_null(^"Cycle") != null and DayNight.is_night() and lv.get("music") != null and lv.get("music") != &"":
+		return &"night"   # outdoor levels with a day/night cycle switch to the night loop
 	return lv.get("music") if lv and lv.get("music") != null else &""
 
 
@@ -148,6 +169,21 @@ func _recent(sname: StringName) -> bool:
 		return true
 	_last_played[sname] = now
 	return false
+
+
+## A footstep from the variants, never the same one twice in a row.
+func step(volume_db := -2.0) -> void:
+	var i := randi() % STEPS.size()
+	if i == _last_step:
+		i = (i + 1) % STEPS.size()
+	_last_step = i
+	sfx(STEPS[i], volume_db)
+
+
+## An enemy's own voice (if it has one) at its position, pitched a little per call.
+func voice_at(enemy_id: StringName, where: Vector2, volume_db := -5.0) -> void:
+	if VOICES.has(enemy_id):
+		sfx_at(VOICES[enemy_id], where, volume_db, randf_range(0.9, 1.1))
 
 
 ## Plays a sound effect without position. volume_db is relative.

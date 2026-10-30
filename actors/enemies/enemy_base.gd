@@ -380,6 +380,8 @@ func _on_died() -> void:
 
 func play_attack_sound(_a: AttackData) -> void:
 	Audio.sfx_at(&"enemy_windup", global_position)
+	if data:
+		Audio.voice_at(data.id, global_position)
 
 
 func play_death_sound() -> void:

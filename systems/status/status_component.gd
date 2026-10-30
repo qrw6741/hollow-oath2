@@ -76,6 +76,7 @@ func _trigger(kind: StringName) -> void:
 	GameFeel.spark(at, StatusFx.color_of(kind), 16)
 	if kind == StatusFx.BLEED:
 		_hurt(health.max_health * StatusFx.BLEED_BURST, true)
+	Audio.sfx_at(StringName("fx_" + String(kind)), at, -3.0)
 	triggered.emit(kind)
 	if not (get_parent() is Player):
 		Events.status_triggered.emit(kind)

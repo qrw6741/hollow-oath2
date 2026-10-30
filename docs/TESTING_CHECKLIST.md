@@ -140,3 +140,15 @@ Then play the test arena (F3 shows state, frame counter, i-frames). Tick each it
 - [ ] Graveyard (door on the road's east bank, past the ford): two cantors, an elite, Sexton Hale; drops the Sexton's Lantern.
 - [ ] Day and night: play ~8 minutes on the road; sky and tint shift, "Dusk falls" banner, night-only archers/penitents/sergeant appear. Rest at a candle: they re-roll with the time of day.
 
+
+## New since the combat-depth build (manual checks nobody has done yet)
+- [ ] Shop: switch BUY/SELL with Parry/Heal, sell an item, check ember counter animates and prices go red when you cannot afford.
+- [ ] Upgrade cards: layout at 1280x720 and fullscreen; price colour; pip bar.
+- [ ] Forge: infuse a weapon; hit an enemy and watch its status pips.
+- [ ] Relics: wear two, try a third; each effect is noticeable (focus, status, embers, vials, parry focus).
+- [ ] Tutorial tips appear once (focus, status, manor travel, night, errands) and can be disabled.
+- [ ] Bestiary entries fill in; Deeds toast on unlock.
+- [ ] Night: the Lantern-Man appears after dusk on the road and is gone by day; night music plays.
+- [ ] Oath Gate: sealed before the Marshal; choose each ending (Mend needs all errands + Gallery); epilogue pages; New Game+ restarts.
+- [ ] Ashen Chapel via the graveyard's east end; Mother Cinder and Ser Ashfall fights (balance!); forge Cinderbrand / Ashfall Pike.
+- [ ] Footsteps, enemy voices and status sounds: do any grate? Are levels right?

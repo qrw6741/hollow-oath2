@@ -64,3 +64,11 @@ Arrow keys / D-pad / stick move the selection, **Enter** or **A** selects, **Esc
 **Equipment:** open the pack (Tab / Create), choose the Weapon or Armour slot and press Confirm to pick a different one. In the armour list, "Take off all armour" is the first entry. Blacksmith and Vial-Keeper: talk (Interact), then Confirm to upgrade the highlighted row; L1/R1 (Parry/Heal) switches the smith's tabs; Cancel leaves.
 
 Rebind any action in **Settings → Controls**: pick the keyboard or controller cell and press the new key/button (Esc cancels). Using a binding another action had swaps them. *Reset controls to defaults* restores everything. Bindings are saved to `user://input.cfg`; defaults live in `autoload/input_config.gd`.
+
+
+## Menus added later
+- **Inventory (Tab)**: six tabs, switch with Parry / Heal: Equipment, Items, Journal, Bestiary, Deeds, Relics. In Relics, press a row to wear or remove (two slots).
+- **Shop**: BUY / SELL tabs, switch with Parry / Heal. Confirm trades one.
+- **Forge**: WEAPONS / ARMOUR tabs (Parry / Heal); the Infusion button under the description cycles the weapon's status.
+- **Oath Gate** (end of the Vaelmoor Road, after the Marshal): Interact to choose an ending. After an ending, Interact twice to begin New Game+.
+- **Settings > Game**: Colourblind status colours, Tutorial tips.

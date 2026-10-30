@@ -55,6 +55,7 @@ static func toggle(id: StringName) -> Dictionary:
 		return {"ok": false, "msg": "Both slots are full. Remove one first."}
 	cur.append(id)
 	_save(cur)
+	Audio.sfx(&"relic_equip", -4.0)
 	return {"ok": true, "msg": "Wearing %s." % DEFS[id].title}
 
 

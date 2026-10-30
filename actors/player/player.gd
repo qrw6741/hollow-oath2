@@ -306,6 +306,7 @@ func _try_actions() -> bool:
 		_consume(&"skill")
 		if can_use_skill():
 			set_focus(focus - weapon.skill_cost)
+			Audio.sfx(&"skill_cast", -2.0)
 			_start_attack(weapon.skill)
 			Audio.sfx_at(&"parry", global_position, -8.0, 0.7)
 			return true
@@ -561,7 +562,10 @@ func add_focus(amount: float) -> void:
 
 
 func set_focus(v: float) -> void:
+	var was_ready := can_use_skill() if weapon else false
 	focus = clampf(v, 0.0, MAX_FOCUS)
+	if weapon and not was_ready and can_use_skill():
+		Audio.sfx(&"focus_ready", -6.0)
 	GameState.focus = focus
 	focus_changed.emit(focus, MAX_FOCUS)
 

@@ -381,8 +381,8 @@ script = ExtResource("level")
 level_id = &"ashen_chapel"
 display_name = "The Ashen Chapel"
 bounds = Rect2(0, 0, {W}, 540)
-music = &"yard"
-music_pitch = 0.75
+music = &"chapel"
+music_pitch = 1.0
 map_origin = Vector2(5500, -1750)
 default_spawn = Vector2(130, 480)
 

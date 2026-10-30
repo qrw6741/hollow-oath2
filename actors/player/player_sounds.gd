@@ -49,7 +49,7 @@ func _physics_process(delta: float) -> void:
 		if _step_t <= 0.0:
 			_step_t = STEP_INTERVAL
 			_step_alt = not _step_alt
-			Audio.sfx(&"step_1" if _step_alt else &"step_2", -2.0)
+			Audio.step(-2.0)
 	else:
 		_step_t = 0.05
 
