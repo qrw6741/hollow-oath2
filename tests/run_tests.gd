@@ -77,7 +77,7 @@ func _run() -> void:
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
-		test_dialogue_box, test_shop, test_shop_selling, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
@@ -2323,6 +2323,26 @@ func test_dialogue_box() -> void:
 	await frames(14)
 	await tap_action(&"ui_cancel")
 	check(not box.is_open, "Cancel skips the conversation")
+
+
+func test_tips_and_access() -> void:
+	await fresh_game()
+	settings.tutorial_hints = true
+	check(Tutorial.take(&"focus") and not Tutorial.take(&"focus"), "a tip is given once")
+	check(game_state.get_flag(&"tip_focus", false), "the tip is remembered in the save flags")
+	settings.tutorial_hints = false
+	check(not Tutorial.take(&"night"), "tips can be turned off")
+	settings.tutorial_hints = true
+	var hud = main.hud
+	hud.show_tip(&"travel")
+	check(hud._tip.modulate.a > 0.9 and "Manor" in hud._tip.text and not ("{travel}" in hud._tip.text), "the HUD shows a tip with the key name filled in")
+	settings.colorblind = false
+	var normal: Color = StatusFx.color_of(&"poison")
+	settings.colorblind = true
+	check(StatusFx.color_of(&"poison") != normal and StatusFx.color_of(&"bleed") != StatusFx.COLORS[&"bleed"], "colourblind palette changes status colours")
+	settings.colorblind = false
+	for id in Tutorial.ids():
+		check(Tutorial.TIPS[id].has("title") and Tutorial.TIPS[id].has("text"), "tip %s has text" % id)
 
 
 func test_shop_selling() -> void:

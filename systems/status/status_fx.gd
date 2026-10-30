@@ -15,6 +15,10 @@ const NAMES := {BLEED: "Bleed", POISON: "Poison", BURN: "Burning", FROST: "Frost
 const COLORS := {
 	BLEED: Color("c0222e"), POISON: Color("7bb04a"), BURN: Color("f08a2a"), FROST: Color("8ed0ee"),
 }
+## Colourblind-safe set (Okabe-Ito): bleed vermillion, poison yellow, burn pink, frost sky blue.
+const COLORS_CB := {
+	BLEED: Color("d55e00"), POISON: Color("f0e442"), BURN: Color("cc79a7"), FROST: Color("56b4e9"),
+}
 const BLURBS := {
 	BLEED: "Bursts for a share of health once the wound opens.",
 	POISON: "Slow damage over ten seconds.",
@@ -28,6 +32,10 @@ const BURN_PER_SEC := 0.04
 const FROST_SLOW := 0.62
 const DURATIONS := {BLEED: 2.0, POISON: 10.0, BURN: 6.0, FROST: 5.0}
 const THRESHOLD := 100.0
+
+
+static func color_of(kind: StringName) -> Color:
+	return (COLORS_CB if Settings.colorblind else COLORS)[kind]
 const MIN_RESIST := -0.5
 const MAX_RESIST := 1.0
 

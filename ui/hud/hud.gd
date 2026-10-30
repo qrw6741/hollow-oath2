@@ -27,6 +27,8 @@ var _ember_tween: Tween
 var _quick_box: PanelContainer
 var _boss_box: Control
 var _msg_panel: PanelContainer
+var _tip: Label
+var _tip_tween: Tween
 var _msg_title: Label
 var _msg_text: Label
 var _boss_name: Label
@@ -59,6 +61,9 @@ func _ready() -> void:
 	Events.quest_changed.connect(_on_quest)
 	Events.boss_fight_started.connect(_on_boss_fight_started)
 	Events.message_requested.connect(_on_message)
+	Events.tip_requested.connect(show_tip)
+	Events.daynight_changed.connect(func(n): if n: show_tip(&"night"))
+	Events.level_entered.connect(func(path): if "manor" in String(path): show_tip(&"travel"))
 	Events.message_closed.connect(func(): _msg_panel.visible = false)
 	Events.boss_fight_ended.connect(_on_boss_fight_ended)
 	Events.session_started.connect(_sync_economy)
@@ -119,6 +124,12 @@ func _build() -> void:
 	_ember_label.position = Vector2(480 - 140, 9)
 	_ember_label.size = Vector2(108, 14)
 	_ember_label.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
+	_tip = _label(root, "", 8, HORIZONTAL_ALIGNMENT_CENTER)
+	_tip.position = Vector2(60, 226)
+	_tip.size = Vector2(360, 30)
+	_tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tip.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
+	_tip.modulate.a = 0.0
 	_ember_gain = _label(root, "", 8, HORIZONTAL_ALIGNMENT_RIGHT)
 	_ember_gain.position = Vector2(480 - 168, 24)
 	_ember_gain.size = Vector2(136, 12)
@@ -260,6 +271,7 @@ func _bind_player(p: Node2D) -> void:
 	_stamina_bar.set_values(_player.stamina.current, _player.stamina.max_stamina)
 	_on_flasks(_player.flasks, _player.max_flasks)
 	_player.focus_changed.connect(_focus_bar.set_values)
+	_player.focus_changed.connect(func(cur, _m): if cur >= 20.0: show_tip(&"focus"))
 	_focus_bar.set_values(_player.focus, Player.MAX_FOCUS)
 	_player.status.changed.connect(_status_row.queue_redraw)
 
@@ -279,7 +291,7 @@ func _draw_status() -> void:
 		var b := float(_player.status.buildup.get(k, 0.0))
 		if not on and b < 1.0:
 			continue
-		var c: Color = StatusFx.COLORS[k]
+		var c: Color = StatusFx.color_of(k)
 		if on:
 			_status_row.draw_circle(Vector2(x + 4, 4), 3.6, c)
 		else:
@@ -366,12 +378,29 @@ func _on_quest(id: StringName, st: String) -> void:
 	match st:
 		"active":
 			_toast("Errand: %s" % d.title)
+			show_tip(&"quest")
 		"done":
 			_toast("Errand done: %s" % d.title)
 		_:
 			var p := Quests.progress(id)
 			if p.have <= p.need:
 				_toast("%s  %d/%d" % [d.title, p.have, p.need])
+
+
+## Shows a one-time tutorial tip near the bottom of the screen for a few seconds.
+func show_tip(id: StringName) -> void:
+	if not Tutorial.take(id):
+		return
+	var t: Dictionary = Tutorial.TIPS[id]
+	var txt: String = t.text
+	txt = txt.replace("{skill}", _key_name(&"skill")).replace("{travel}", _key_name(&"travel_manor")).replace("{parry}", _key_name(&"parry"))
+	_tip.text = "%s: %s" % [t.title, txt]
+	_tip.modulate.a = 1.0
+	if _tip_tween:
+		_tip_tween.kill()
+	_tip_tween = create_tween()
+	_tip_tween.tween_property(_tip, "modulate:a", 0.0, 1.2).set_delay(7.0)
+	Events.tip_shown.emit(id)
 
 
 func _toast(text: String) -> void:

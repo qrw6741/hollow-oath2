@@ -12,7 +12,12 @@ var tab := "weapon"   ## "weapon" or "armor" (forge only)
 var rows: Array = []  ## [{"id": StringName, "kind": String, "button": Button, "slot": IconSlot}]
 var _panel: ColorRect
 var _title: Label
-var _funds: Label
+var _chip: EmberChip
+var _mat_lbl: Label
+var _big: IconSlot
+var _d_name: Label
+var _d_sub: Label
+var _d_cost: Label
 var _list: VBoxContainer
 var _desc: Label
 var _msg: Label
@@ -38,36 +43,80 @@ func _ready() -> void:
 	c.add_child(v)
 	v.draw.connect(func(): UITheme.draw_panel(v, Rect2(Vector2(-22, -12), v.size + Vector2(44, 24))))
 	v.resized.connect(v.queue_redraw)
+	var head := HBoxContainer.new()
+	head.custom_minimum_size.x = 380
+	v.add_child(head)
 	_title = Label.new()
-	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	UITheme.title(_title, 14)
-	v.add_child(_title)
-	v.add_child(UITheme.rule(280))
+	head.add_child(_title)
+	_mat_lbl = Label.new()
+	_mat_lbl.add_theme_color_override(&"font_color", Palette.STONE_LIGHT)
+	_mat_lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(_mat_lbl)
+	_chip = EmberChip.new()
+	head.add_child(_chip)
+	v.add_child(UITheme.rule(380))
 	_tabs = HBoxContainer.new()
-	_tabs.alignment = BoxContainer.ALIGNMENT_CENTER
-	_tabs.add_theme_constant_override(&"separation", 14)
+	_tabs.add_theme_constant_override(&"separation", 6)
 	v.add_child(_tabs)
 	for i in 2:
 		var b := FancyButton.new()
 		b.text = ["WEAPONS", "ARMOUR"][i]
-		b.custom_minimum_size = Vector2(90, 15)
+		b.custom_minimum_size = Vector2(80, 15)
+		b.add_theme_font_override(&"font", UITheme.title_font())
+		b.add_theme_font_size_override(&"font_size", 10)
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(show_tab.bind(["weapon", "armor"][i]))
 		UITheme.compact(b)
 		_tabs.add_child(b)
 		_tab_btns.append(b)
-	_funds = Label.new()
-	_funds.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_funds.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
-	v.add_child(_funds)
+	var hint := HintBar.new()
+	hint.spec = "parry:prev tab,heal:next tab"
+	_tabs.add_child(hint)
+	var body := HBoxContainer.new()
+	body.add_theme_constant_override(&"separation", 8)
+	v.add_child(body)
+	var left := PanelContainer.new()
+	left.custom_minimum_size = Vector2(176, 118)
+	body.add_child(left)
+	UITheme.frame(left)
 	_list = VBoxContainer.new()
 	_list.add_theme_constant_override(&"separation", 1)
-	v.add_child(_list)
+	left.add_child(_list)
+	var right := PanelContainer.new()
+	right.custom_minimum_size = Vector2(196, 118)
+	body.add_child(right)
+	UITheme.frame(right)
+	var rv := VBoxContainer.new()
+	rv.add_theme_constant_override(&"separation", 2)
+	right.add_child(rv)
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override(&"separation", 7)
+	rv.add_child(top)
+	_big = IconSlot.new()
+	_big.custom_minimum_size = Vector2(38, 38)
+	_big.focus_mode = Control.FOCUS_NONE
+	_big.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(_big)
+	var tv := VBoxContainer.new()
+	tv.add_theme_constant_override(&"separation", 0)
+	top.add_child(tv)
+	_d_name = Label.new()
+	UITheme.title(_d_name, 11, Palette.GOLD_BRIGHT)
+	tv.add_child(_d_name)
+	_d_sub = Label.new()
+	_d_sub.add_theme_color_override(&"font_color", Palette.STONE_LIGHT)
+	tv.add_child(_d_sub)
+	_d_cost = Label.new()
+	_d_cost.add_theme_color_override(&"font_color", Palette.GOLD)
+	tv.add_child(_d_cost)
 	_desc = Label.new()
 	_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_desc.custom_minimum_size = Vector2(280, 30)
-	_desc.add_theme_color_override(&"font_color", Palette.BONE_DIM)
-	v.add_child(_desc)
+	_desc.custom_minimum_size = Vector2(180, 60)
+	_desc.add_theme_color_override(&"font_color", Palette.BONE)
+	_desc.add_theme_constant_override(&"line_spacing", -2)
+	rv.add_child(_desc)
 	_msg = Label.new()
 	_msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_msg.custom_minimum_size.y = 10
@@ -75,7 +124,7 @@ func _ready() -> void:
 	v.add_child(_msg)
 	_leave = FancyButton.new()
 	_leave.text = "Leave"
-	_leave.custom_minimum_size = Vector2(280, 15)
+	_leave.custom_minimum_size = Vector2(380, 15)
 	_leave.pressed.connect(close)
 	UITheme.compact(_leave)
 	v.add_child(_leave)
@@ -93,7 +142,8 @@ func open(station: StringName) -> void:
 	get_tree().paused = true
 	GameFeel.reset()
 	GameState.ui_modal = true
-	_title.text = "THE BLACKSMITH'S FORGE" if kind == &"forge" else "THE VIAL-KEEPER"
+	_title.text = "THE BLACKSMITH'S FORGE"
+	_chip.set_value(GameState.embers, true) if kind == &"forge" else "THE VIAL-KEEPER"
 	_tabs.visible = kind == &"forge"
 	_panel.visible = true
 	_msg.text = ""
@@ -125,13 +175,21 @@ func _build_rows() -> void:
 		slot.icon_id = &"vial" if id == &"vials" else (id if tab == "weapon" else StringName("armor_" + String(id)))
 		row.add_child(slot)
 		var b := FancyButton.new()
-		b.custom_minimum_size = Vector2(261, 16)
+		b.custom_minimum_size = Vector2(98, 16)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		UITheme.compact(b)
 		b.pressed.connect(act.bind(id))
 		b.focus_entered.connect(_describe.bind(id))
+		b.mouse_entered.connect(_describe.bind(id))
 		row.add_child(b)
+		var pl := Label.new()
+		pl.custom_minimum_size = Vector2(52, 16)
+		pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		pl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		pl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(pl)
 		_list.add_child(row)
-		rows.append({"id": id, "kind": "vials" if id == &"vials" else tab, "button": b, "slot": slot, "row": row})
+		rows.append({"id": id, "kind": "vials" if id == &"vials" else tab, "button": b, "slot": slot, "row": row, "price": pl})
 	_tab_btns[0].add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT if tab == "weapon" else Palette.STONE_LIGHT)
 	_tab_btns[1].add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT if tab == "armor" else Palette.STONE_LIGHT)
 	_refresh()
@@ -186,19 +244,45 @@ func _affordable(id: StringName) -> bool:
 	return not c.is_empty() and GameState.embers >= int(c.embers) and GameState.item_count(material) >= int(c.mat)
 
 
+func _short_cost(id: StringName) -> String:
+	var c: Dictionary
+	if id == &"vials":
+		c = Forge.vial_cost()
+	elif Forge.owns(tab, id):
+		c = Forge.upgrade_cost(tab, id)
+	else:
+		c = Forge.recipe(id)
+	return "MAX" if c.is_empty() else "%d + %d" % [c.embers, c.mat]
+
+
 func _refresh() -> void:
 	if not is_open:
 		return
 	var m := Forge.RESIN if kind == &"vials" else Forge.SCRAP
-	_funds.text = "Embers: %d      %s: %d" % [GameState.embers, Items.get_item(m).display_name, GameState.item_count(m)]
+	_chip.set_value(GameState.embers)
+	_mat_lbl.text = "%s %d   " % [Items.get_item(m).display_name, GameState.item_count(m)]
 	for r in rows:
-		(r.button as Button).text = row_text(r.id)
-		(r.button as Button).modulate = Color.WHITE if _affordable(r.id) else Color(1, 1, 1, 0.55)
+		var ok := _affordable(r.id)
+		var lv := GameState.flask_level if r.id == &"vials" else (Forge.level_of(tab, r.id) if Forge.owns(tab, r.id) else -1)
+		var nm := "Ember Vials" if r.id == &"vials" else _name_of(r.id)
+		(r.button as Button).text = nm + ("  +%d" % lv if lv >= 0 else "  new")
+		(r.button as Button).tooltip_text = row_text(r.id)
+		var pl := r.price as Label
+		pl.text = _short_cost(r.id)
+		pl.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT if ok else Palette.CRIMSON_BRIGHT)
+		(r.button as Button).modulate = Color.WHITE if ok else Color(1, 1, 1, 0.6)
 
 
 ## What the focused row would give you.
 func _describe(id: StringName) -> void:
 	_desc.text = describe(id)
+	_big.icon_id = &"vial" if id == &"vials" else (id if tab == "weapon" else StringName("armor_" + String(id)))
+	_d_name.text = "Ember Vials" if id == &"vials" else _name_of(id)
+	var owned := id == &"vials" or Forge.owns(tab, id)
+	var lv := GameState.flask_level if id == &"vials" else (Forge.level_of(tab, id) if owned else 0)
+	_d_sub.text = ("Level +%d of +%d" % [lv, Forge.MAX_LEVEL]) if owned else "Not yet forged"
+	var sc := _short_cost(id)
+	_d_cost.text = "At its finest" if sc == "MAX" else ("Upgrade: " if owned else "Forge: ") + sc.replace(" + ", " embers + ") + (" resin" if id == &"vials" else " scrap")
 
 
 func describe(id: StringName) -> String:

@@ -26,6 +26,8 @@ var _back: Button
 var _dmg: Button
 var _ehp: Button
 var _assist: Button
+var _cb: Button
+var _tips: Button
 var _tab_btns: Array[Button] = []
 var _pages: Array[VBoxContainer] = []
 var _controls: ControlsPanel
@@ -72,6 +74,8 @@ func _ready() -> void:
 	_dmg = _button(func(): Settings.damage_taken_pct = _cycle(Settings.DAMAGE_STEPS, Settings.damage_taken_pct); _refresh(), p1)
 	_ehp = _button(func(): Settings.enemy_health_pct = _cycle(Settings.ENEMY_HP_STEPS, Settings.enemy_health_pct); _refresh(), p1)
 	_assist = _button(func(): Settings.parry_assist = not Settings.parry_assist; _refresh(), p1)
+	_cb = _button(func(): Settings.colorblind = not Settings.colorblind; _refresh(), p1)
+	_tips = _button(func(): Settings.tutorial_hints = not Settings.tutorial_hints; _refresh(), p1)
 	_shake = _button(_toggle_shake, p1)
 	_flashes = _button(_toggle_flashes, p1)
 	_hitstop = _button(_toggle_hitstop, p1)
@@ -143,6 +147,8 @@ func _refresh() -> void:
 	_dmg.text = "Damage you take: %d%%" % Settings.damage_taken_pct
 	_ehp.text = "Enemy health: %d%%" % Settings.enemy_health_pct
 	_assist.text = "Parry assist (wider window): %s" % ("On" if Settings.parry_assist else "Off")
+	_cb.text = "Colourblind status colours: %s" % ("On" if Settings.colorblind else "Off")
+	_tips.text = "Tutorial tips: %s" % ("On" if Settings.tutorial_hints else "Off")
 	_icons.text = "Controller icons: %s" % ["Auto", "PlayStation", "Xbox"][Settings.pad_style]
 	_vibe.text = "Controller vibration: %s" % ("On" if Settings.vibration else "Off")
 	_display.text = "Display: %s" % ("Fullscreen" if Settings.fullscreen else "Windowed")

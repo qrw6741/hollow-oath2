@@ -69,6 +69,9 @@ signal station_closed
 signal interact_prompt_shown(text: String)
 signal interact_prompt_hidden
 signal banner_requested(text: String)
+## Ask for a one-time tutorial tip (see Tutorial); the HUD decides whether to show it.
+signal tip_requested(id: StringName)
+signal tip_shown(id: StringName)
 
 # --- Combat feel ---
 signal screen_shake_requested(strength: float, duration: float)

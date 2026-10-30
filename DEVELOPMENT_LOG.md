@@ -290,3 +290,10 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Shop: now a counter with BUY and SELL tabs (Parry / Heal switch tabs), item rows with icon, owned count and price, and a detail pane (large icon, description, effect, "you carry", embers before -> after). Selling pays 40% of buy price (Shops.SELL_RATE); embers shard / penitent's tear have fixed prices; keys and lore are never sold.
 - Tests: new test_shop_selling; suite now 112, all passing (headless). Layout checked from screenshots (tests/capture_shop.gd) at 480x270 under Xvfb; not seen on a real Windows machine.
 - Not done: the Forge menu still has the older plain look.
+
+## Step: Forge restyle, tutorial tips, accessibility
+- Forge menu now matches the shop: header with EmberChip + material count, weapon/armour tabs, list with price column (red when unaffordable), detail pane with large icon, level and cost. Row/describe/act API unchanged.
+- Tutorial tips (systems/tutorial.gd): one-time hints for focus, status effects, manor travel, night, errands, weapon parry; shown by the HUD, remembered in save flags (`tip_<id>`), toggle in Settings > Game.
+- Accessibility: colourblind-safe status colours (Okabe-Ito) via StatusFx.color_of, setting saved in settings.cfg.
+- Tests: new test_tips_and_access (subset run passed; full suite run still pending at this step).
+- Not done: a separate hold-to-parry toggle (shield already blocks while parry is held).

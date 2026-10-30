@@ -48,6 +48,7 @@ func apply(kind: StringName, amount: float) -> bool:
 	if r >= 1.0 or active.has(kind):
 		return false
 	buildup[kind] = float(buildup.get(kind, 0.0)) + amount * (1.0 - r)
+	Events.tip_requested.emit(&"status")
 	_idle[kind] = 0.0
 	changed.emit()
 	if buildup[kind] >= StatusFx.THRESHOLD:
@@ -70,7 +71,7 @@ func clear() -> void:
 func _trigger(kind: StringName) -> void:
 	active[kind] = float(StatusFx.DURATIONS[kind])
 	var at := (get_parent() as Node2D).global_position + Vector2(0, -20) if get_parent() is Node2D else global_position
-	GameFeel.spark(at, StatusFx.COLORS[kind], 16)
+	GameFeel.spark(at, StatusFx.color_of(kind), 16)
 	if kind == StatusFx.BLEED:
 		_hurt(health.max_health * StatusFx.BLEED_BURST, true)
 	triggered.emit(kind)
@@ -125,7 +126,7 @@ func _draw() -> void:
 	var x0 := -(shown.size() - 1) * 4.0
 	for i in shown.size():
 		var k := shown[i]
-		var c: Color = StatusFx.COLORS[k]
+		var c: Color = StatusFx.color_of(k)
 		var at := Vector2(x0 + i * 8.0, 0)
 		if active.has(k):
 			draw_circle(at, 3.0, c)
