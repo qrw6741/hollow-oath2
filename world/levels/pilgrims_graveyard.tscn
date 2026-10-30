@@ -248,3 +248,15 @@ gate_height = 96.0
 trigger_offset = 36.0
 trigger_width = 620.0
 victory_text = "THE YARD IS FILLED"
+
+[node name="FromChapel" type="Marker2D" parent="."]
+position = Vector2(3350, 480)
+script = ExtResource("entry")
+entry_id = &"from_chapel"
+
+[node name="ToChapel" type="Area2D" parent="."]
+position = Vector2(3390, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/ashen_chapel.tscn"
+target_entry = &"from_graveyard"
+size = Vector2(12, 80)

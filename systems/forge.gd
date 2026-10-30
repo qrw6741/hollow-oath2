@@ -30,6 +30,8 @@ const RECIPES := {
 	&"toll_hammer": {"kind": "weapon", "embers": 600, "mat": 3, "relic": &"warden_bell_shard"},
 	&"marshals_lance": {"kind": "weapon", "embers": 800, "mat": 3, "relic": &"marshals_crest"},
 	&"tide_sabre": {"kind": "weapon", "embers": 700, "mat": 3, "relic": &"canon_seal"},
+	&"cinderbrand": {"kind": "weapon", "embers": 1500, "mat": 6, "relic": &"cinder_heart"},
+	&"ashfall_pike": {"kind": "weapon", "embers": 1800, "mat": 7, "relic": &"ashfall_seal"},
 	&"pilgrim_coat": {"kind": "armor", "embers": 350, "mat": 2},
 	&"penitent_shroud": {"kind": "armor", "embers": 600, "mat": 3, "relic": &"penitents_tear"},
 	&"canons_mail": {"kind": "armor", "embers": 750, "mat": 4, "relic": &"canon_seal"},

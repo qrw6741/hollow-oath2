@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/weapon_data.gd" id="1_weapon"]
+[ext_resource type="Resource" path="res://data/attacks/lance_1.tres" id="2_a"]
+[ext_resource type="Resource" path="res://data/attacks/lance_heavy.tres" id="3_a"]
+[ext_resource type="Resource" path="res://data/attacks/lance_air.tres" id="4_a"]
+[ext_resource type="Resource" path="res://data/attacks/lance_riposte.tres" id="5_a"]
+[ext_resource type="Resource" path="res://data/attacks/skill_ashfall_pike.tres" id="99_skill"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = &"ashfall_pike"
+display_name = "Ashfall Pike"
+description = "A knight's pike drawn from the unburied. It reaches far and opens wounds that do not close. The seal on the haft was never pressed by a king."
+light_combo_start = ExtResource("2_a")
+heavy = ExtResource("3_a")
+aerial = ExtResource("4_a")
+riposte = ExtResource("5_a")
+riposte_multiplier = 1.3
+look = 7
+two_handed = true
+damage_mult = 1.15
+status = &"bleed"
+status_amount = 24.0
+skill = ExtResource("99_skill")
+skill_cost = 28.0
+parry_window_bonus = 3
+parry_recovery_bonus = 3

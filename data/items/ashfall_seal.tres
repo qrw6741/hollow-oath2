@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"ashfall_seal"
+display_name = "Ashfall Seal"
+description = "The seal of a knight who would not swear. The wax is still soft. The smith will know what to do with it."
+kind = 1
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(0.608, 0.643, 0.753, 1)

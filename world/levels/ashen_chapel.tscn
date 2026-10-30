@@ -1,0 +1,288 @@
+[gd_scene load_steps=25 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
+[ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
+[ext_resource type="Script" path="res://world/background/graveyard_props.gd" id="props"]
+[ext_resource type="Script" path="res://world/background/day_night_cycle.gd" id="cycle"]
+[ext_resource type="Script" path="res://world/blocks/breakable_wall.gd" id="wall"]
+[ext_resource type="PackedScene" path="res://actors/enemies/pike_sergeant.tscn" id="sergeant"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_penitent.tscn" id="penitent"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gilded_penitent.tscn" id="gilded"]
+[ext_resource type="PackedScene" path="res://actors/enemies/candle_cantor.tscn" id="cantor"]
+[ext_resource type="PackedScene" path="res://actors/enemies/oathguard_captain.tscn" id="captain"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="it_resin"]
+[ext_resource type="Resource" path="res://data/items/forge_scrap.tres" id="it_scrap"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
+[ext_resource type="PackedScene" path="res://actors/bosses/mother_cinder.tscn" id="cinder"]
+[ext_resource type="PackedScene" path="res://actors/bosses/ser_ashfall.tscn" id="ashfall"]
+
+[node name="AshenChapel" type="Node2D"]
+script = ExtResource("level")
+level_id = &"ashen_chapel"
+display_name = "The Ashen Chapel"
+bounds = Rect2(0, 0, 4700, 540)
+music = &"yard"
+music_pitch = 0.75
+map_origin = Vector2(5500, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Background" type="ParallaxBackground" parent="."]
+
+[node name="Sky" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0, 0)
+
+[node name="SkyDraw" type="Node2D" parent="Background/Sky"]
+script = ExtResource("sky")
+moon_pos = Vector2(340, 56)
+daylight = true
+darkness = 0.7
+
+[node name="Far" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.1, 0.1)
+
+[node name="Hills" type="Node2D" parent="Background/Far"]
+script = ExtResource("ruins")
+base_y = 235.0
+max_height = 110.0
+color = Color(0.17, 0.17, 0.26, 1)
+seed_value = 81
+spacing = 100.0
+width = 4800.0
+haze = 0.5
+haze_color = Color(0.45, 0.35, 0.5, 1)
+
+[node name="Mid" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.35, 0.3)
+
+[node name="Graves" type="Node2D" parent="Background/Mid"]
+script = ExtResource("props")
+width = 4800.0
+base_y = 262.0
+seed_value = 5
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.78, 0.52, 0.42, 1)
+
+[node name="Cycle" type="Node" parent="."]
+script = ExtResource("cycle")
+light_path = NodePath("")
+sky_path = NodePath("")
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(4684, 60)
+style = 3
+seed_value = 902
+
+[node name="AshMound" type="StaticBody2D" parent="Geometry"]
+position = Vector2(900, 452)
+script = ExtResource("block")
+size = Vector2(240, 34)
+style = 3
+seed_value = 903
+
+[node name="NaveStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1800, 446)
+script = ExtResource("block")
+size = Vector2(300, 40)
+style = 3
+seed_value = 904
+
+[node name="AltarStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2260, 462)
+script = ExtResource("block")
+size = Vector2(180, 24)
+style = 3
+seed_value = 905
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(4640, 0)
+script = ExtResource("block")
+size = Vector2(60, 540)
+style = 1
+seed_value = 906
+
+[node name="ChoirLoft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1300, 400)
+script = ExtResource("block")
+size = Vector2(130, 6)
+style = 2
+seed_value = 907
+one_way = true
+
+[node name="BellLoft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2480, 400)
+script = ExtResource("block")
+size = Vector2(130, 6)
+style = 2
+seed_value = 908
+one_way = true
+
+[node name="VestryLoft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3520, 405)
+script = ExtResource("block")
+size = Vector2(120, 6)
+style = 2
+seed_value = 909
+one_way = true
+
+[node name="FromGraveyard" type="Marker2D" parent="."]
+position = Vector2(130, 480)
+script = ExtResource("entry")
+entry_id = &"from_graveyard"
+
+[node name="ToGraveyard" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/pilgrims_graveyard.tscn"
+target_entry = &"from_chapel"
+size = Vector2(12, 80)
+
+[node name="ChapelCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(360, 480)
+checkpoint_id = &"chapel_candle"
+display_name = "Chapel Candle"
+
+[node name="NaveCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(3180, 480)
+checkpoint_id = &"nave_candle"
+display_name = "Nave Candle"
+
+[node name="AcolyteA" type="Marker2D" parent="."]
+position = Vector2(620, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 40
+start_facing = -1
+
+[node name="ArcherChoirA" type="Marker2D" parent="."]
+position = Vector2(1340, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="GildedNave" type="Marker2D" parent="."]
+position = Vector2(1700, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="CantorNave" type="Marker2D" parent="."]
+position = Vector2(1950, 446)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 30
+start_facing = -1
+
+[node name="SergeantA" type="Marker2D" parent="."]
+position = Vector2(2150, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 40
+start_facing = -1
+
+[node name="ArcherBell" type="Marker2D" parent="."]
+position = Vector2(2520, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="CaptainA" type="Marker2D" parent="."]
+position = Vector2(2720, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="NightPenitentC" type="Marker2D" parent="."]
+position = Vector2(1000, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 60
+start_facing = 1
+when = 2
+
+[node name="NightCantor" type="Marker2D" parent="."]
+position = Vector2(2000, 446)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 40
+start_facing = 1
+when = 2
+
+[node name="PewChest" type="Area2D" parent="."]
+position = Vector2(1120, 452)
+script = ExtResource("chest")
+chest_id = &"chapel_chest"
+count = 3
+embers = 500
+item = ExtResource("it_resin")
+
+[node name="VestryChest" type="Area2D" parent="."]
+position = Vector2(3600, 405)
+script = ExtResource("chest")
+chest_id = &"chapel_chest_2"
+count = 2
+embers = 700
+item = ExtResource("it_scrap")
+
+[node name="AbbessStone" type="Area2D" parent="."]
+position = Vector2(760, 480)
+script = ExtResource("tablet")
+title = "The Abbess's Stone"
+text = "MOTHER CINDER. Abbess here eleven years. 'She kept the censer lit through the Night.' Below, in a rushed hand: 'It is still lit.'"
+
+[node name="CinderArena" type="Node2D" parent="."]
+position = Vector2(2980, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("cinder")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "THE CENSER GOES DARK"
+
+[node name="CrackedStone" type="Area2D" parent="."]
+position = Vector2(3800, 480)
+script = ExtResource("tablet")
+title = "A Cracked Stone"
+text = "The wall beyond the nave is thinner than it looks. Behind it: 'ASHFALL. Knight of the Crown's guard. He refused the oath, and the oath refused him a grave. Do not wake him. If you must, come ready.'"
+
+[node name="SecretWall" type="StaticBody2D" parent="."]
+position = Vector2(3900, 420)
+script = ExtResource("wall")
+size = Vector2(16, 60)
+wall_id = &"ashfall_crypt"
+hits_needed = 3
+
+[node name="AshfallArena" type="Node2D" parent="."]
+position = Vector2(4150, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("ashfall")
+boss_offset = Vector2(330, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 440.0
+victory_text = "THE UNBURIED REST"

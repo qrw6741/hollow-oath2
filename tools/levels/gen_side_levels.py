@@ -36,6 +36,11 @@ EXT = {
     "pikeman": ("PackedScene", "res://actors/enemies/roadside_pikeman.tscn"),
     "cellarer": ("PackedScene", "res://actors/bosses/cellarer_grume.tscn"),
     "gravewarden": ("PackedScene", "res://actors/bosses/sexton_hale.tscn"),
+    "cinder": ("PackedScene", "res://actors/bosses/mother_cinder.tscn"),
+    "ashfall": ("PackedScene", "res://actors/bosses/ser_ashfall.tscn"),
+    "sergeant": ("PackedScene", "res://actors/enemies/pike_sergeant.tscn"),
+    "captain": ("PackedScene", "res://actors/enemies/oathguard_captain.tscn"),
+    "wall": ("Script", "res://world/blocks/breakable_wall.gd"),
     "it_scrap": ("Resource", "res://data/items/forge_scrap.tres"),
     "it_shard": ("Resource", "res://data/items/ember_shard.tres"),
     "it_resin": ("Resource", "res://data/items/hollow_resin.tres"),
@@ -176,6 +181,7 @@ ROAD = "res://world/levels/vaelmoor_road.tscn"
 CELLAR = "res://world/levels/hollowmere_cellar.tscn"
 GALLERY = "res://world/levels/hollowmere_gallery.tscn"
 GRAVE = "res://world/levels/pilgrims_graveyard.tscn"
+CHAPEL = "res://world/levels/ashen_chapel.tscn"
 
 
 # ------------------------------------------------------------------ the cellar
@@ -360,6 +366,107 @@ sky_path = NodePath("")
     L.tablet("SextonStone", 700, 480, "A Sexton's Stone",
              "HALE. Sexton of this yard, forty-one years. 'He dug them all and saw them all filled.' Someone has scratched underneath, with a spade-edge: 'Not yet.'")
     L.arena("SextonArena", 2740, 480, "gravewarden", "THE YARD IS FILLED", 420, 620)
+    L.entry("FromChapel", 3350, 480, "from_chapel")
+    L.walk_exit("ToChapel", 3390, 480, CHAPEL, "from_graveyard")
+    L.write()
+
+
+def chapel():
+    W = 4700
+    L = Level("ashen_chapel.tscn")
+    L.use("sky"); L.use("ruins"); L.use("props"); L.use("cycle")
+    L.node(f'''
+[node name="AshenChapel" type="Node2D"]
+script = ExtResource("level")
+level_id = &"ashen_chapel"
+display_name = "The Ashen Chapel"
+bounds = Rect2(0, 0, {W}, 540)
+music = &"yard"
+music_pitch = 0.75
+map_origin = Vector2(5500, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Background" type="ParallaxBackground" parent="."]
+
+[node name="Sky" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0, 0)
+
+[node name="SkyDraw" type="Node2D" parent="Background/Sky"]
+script = ExtResource("sky")
+moon_pos = Vector2(340, 56)
+daylight = true
+darkness = 0.7
+
+[node name="Far" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.1, 0.1)
+
+[node name="Hills" type="Node2D" parent="Background/Far"]
+script = ExtResource("ruins")
+base_y = 235.0
+max_height = 110.0
+color = Color(0.17, 0.17, 0.26, 1)
+seed_value = 81
+spacing = 100.0
+width = 4800.0
+haze = 0.5
+haze_color = Color(0.45, 0.35, 0.5, 1)
+
+[node name="Mid" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.35, 0.3)
+
+[node name="Graves" type="Node2D" parent="Background/Mid"]
+script = ExtResource("props")
+width = 4800.0
+base_y = 262.0
+seed_value = 5
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.78, 0.52, 0.42, 1)
+
+[node name="Cycle" type="Node" parent="."]
+script = ExtResource("cycle")
+light_path = NodePath("")
+sky_path = NodePath("")
+
+[node name="Geometry" type="Node2D" parent="."]''')
+    L.use("wall"); L.use("sergeant")
+    L.block("CliffLeft", 0, 0, 16, 480)
+    L.block("Ground", 16, 480, W - 16, 60, style=3)
+    L.block("AshMound", 900, 452, 240, 34, style=3)
+    L.block("NaveStep", 1800, 446, 300, 40, style=3)
+    L.block("AltarStep", 2260, 462, 180, 24, style=3)
+    L.block("CliffRight", W - 60, 0, 60, 540)
+    L.plank("ChoirLoft", 1300, 400, 130)
+    L.plank("BellLoft", 2480, 400, 130)
+    L.plank("VestryLoft", 3520, 405, 120)
+    L.entry("FromGraveyard", 130, 480, "from_graveyard")
+    L.walk_exit("ToGraveyard", 34, 480, GRAVE, "from_chapel")
+    L.candle("ChapelCandle", 360, 480, "chapel_candle", "Chapel Candle")
+    L.candle("NaveCandle", 3180, 480, "nave_candle", "Nave Candle")
+    L.enemy("AcolyteA", "penitent", 620, 480, 40)
+    L.enemy("ArcherChoirA", "archer", 1340, 400, 20, -1)
+    L.enemy("GildedNave", "gilded", 1700, 480, 40)
+    L.enemy("CantorNave", "cantor", 1950, 446, 30)
+    L.enemy("SergeantA", "sergeant", 2150, 480, 40)
+    L.enemy("ArcherBell", "archer", 2520, 400, 20, -1)
+    L.enemy("CaptainA", "captain", 2720, 480, 40)
+    L.enemy("NightPenitentC", "penitent", 1000, 452, 60, 1, 2)
+    L.enemy("NightCantor", "cantor", 2000, 446, 40, 1, 2)
+    L.chest("PewChest", 1120, 452, "chapel_chest", count=3, embers=500, item="it_resin")
+    L.chest("VestryChest", 3600, 405, "chapel_chest_2", count=2, embers=700, item="it_scrap")
+    L.tablet("AbbessStone", 760, 480, "The Abbess's Stone",
+             "MOTHER CINDER. Abbess here eleven years. 'She kept the censer lit through the Night.' Below, in a rushed hand: 'It is still lit.'")
+    L.arena("CinderArena", 2980, 480, "cinder", "THE CENSER GOES DARK", 420, 620)
+    L.tablet("CrackedStone", 3800, 480, "A Cracked Stone",
+             "The wall beyond the nave is thinner than it looks. Behind it: 'ASHFALL. Knight of the Crown's guard. He refused the oath, and the oath refused him a grave. Do not wake him. If you must, come ready.'")
+    L.node('''
+[node name="SecretWall" type="StaticBody2D" parent="."]
+position = Vector2(3900, 420)
+script = ExtResource("wall")
+size = Vector2(16, 60)
+wall_id = &"ashfall_crypt"
+hits_needed = 3''')
+    L.arena("AshfallArena", 4150, 480, "ashfall", "THE UNBURIED REST", 330, 440)
     L.write()
 
 
@@ -367,3 +474,4 @@ if __name__ == "__main__":
     cellar()
     gallery()
     graveyard()
+    chapel()

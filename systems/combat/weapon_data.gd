@@ -18,6 +18,9 @@ extends Resource
 ## Held in two hands (cosmetic; shown on the equipment screen).
 @export var two_handed := false
 ## Status buildup every hit with this weapon adds (StatusFx.KINDS; empty = none).
+## Flat damage multiplier of this weapon (unique weapons hit harder than forged ones).
+@export var damage_mult := 1.0
+
 @export_group("Skill and guard")
 ## The special move on the Skill button; costs [member skill_cost] focus.
 @export var skill: AttackData

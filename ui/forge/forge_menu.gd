@@ -327,7 +327,7 @@ func describe(id: StringName) -> String:
 	if tab == "weapon":
 		var w := Weapons.get_weapon(id)
 		var lv2 := Forge.level_of("weapon", id)
-		var str_bonus := 1.0 + int(GameState.stats.get("strength", 0)) * GameState.STRENGTH_DAMAGE
+		var str_bonus := (1.0 + int(GameState.stats.get("strength", 0)) * GameState.STRENGTH_DAMAGE) * w.damage_mult
 		var now := WeaponStats.summary(w, str_bonus * Weapons.level_mult(lv2))
 		var t := w.description + "\n"
 		if Forge.owns("weapon", id) and lv2 < Forge.MAX_LEVEL:

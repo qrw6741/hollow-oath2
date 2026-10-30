@@ -120,3 +120,11 @@
 - The Forge menu (ui/forge/forge_menu.gd) has not been restyled to match the new shop and upgrade screens.
 - Sell prices are first-guess balance; there is no buy-back.
 - Layout verified only via headless/Xvfb screenshots, not on Windows or with a controller.
+
+## Endings, New Game+, Ashen Chapel
+- Epilogue texts are drafts; no music or art for the endings, just text pages.
+- New Game+ keeps all relics and weapons; the scaling (+60% HP, +35% damage per cycle) is a first guess and compounds linearly, not tuned.
+- Mother Cinder / Ser Ashfall reuse the brute silhouette with new colours; Cinderbrand and Ashfall Pike reuse existing attack sets and icons (placeholder).
+- The chapel sky is the graveyard's with a warmer tint.
+- Ser Ashfall's crypt is behind a breakable wall; there is no hint besides a tablet.
+- Quest chain `ilse_lantern` only needs you to carry the Sexton's Lantern.

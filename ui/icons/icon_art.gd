@@ -15,7 +15,7 @@ static func has_icon(id: StringName) -> bool:
 	return id in [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard",
 		&"penitents_tear", &"candlewright_note", &"canon_seal", &"pilgrims_draught", &"marshals_crest", &"oathblade", &"twin_blades",
 		&"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark",
-		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil", &"gallery_key", &"sextons_lantern"] \
+		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil", &"gallery_key", &"sextons_lantern", &"cinder_heart", &"ashfall_seal"] \
 		or String(id).begins_with("relic_") or Weapons.IDS.has(id) or (String(id).begins_with("armor_") and Armors.is_valid_id(String(id).substr(6)))
 
 
@@ -46,13 +46,15 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"hollow_sigil": _sigil_seal(ci)
 		&"gallery_key": _gallery_key(ci)
 		&"sextons_lantern": _lantern(ci, t)
+		&"cinder_heart": _relic(ci, id, t)
+		&"ashfall_seal": _relic(ci, id, t)
 		&"hollow_resin": _resin(ci)
 		&"vial": _vial(ci)
 		&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte": _relic(ci, id, t)
 		&"wayfarers_rapier": _rapier(ci)
-		&"kingsfall_greatsword": _greatsword(ci)
+		&"kingsfall_greatsword", &"cinderbrand": _greatsword(ci)
 		&"toll_hammer": _hammer(ci)
-		&"marshals_lance": _lance(ci)
+		&"marshals_lance", &"ashfall_pike": _lance(ci)
 		&"tide_sabre": _sabre(ci)
 		&"armor_pilgrim_coat", &"armor_penitent_shroud", &"armor_canons_mail", &"armor_marshal_plate", &"armor_ghostlight_raiment": _armor_generic(ci, id)
 		_: _unknown(ci)

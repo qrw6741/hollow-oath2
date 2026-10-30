@@ -142,6 +142,14 @@ const ARCHIVE := {
 	&"rusted_key": "An old cellar key, I think. Every manor has one nobody can match to a door. Keep it. Doors turn up.",
 	&"hollow_sigil": "The sigil! Candlewrights pressed these on letters they never meant the Crown to read. It was clever of Ommen to turn a seal into a road.",
 	&"gallery_key": "The Gallery key. You went down there and came back up. Few do. The cellarer was an excellent butler, you know, before the Night. He just never learned when to stop serving.",
+	&"cinder_heart": "Mother Cinder's heart. I confess I did not think it could be taken from her. Give it to Hobb. A coal like that should be a sword, not a vigil.",
+	&"ashfall_seal": "An Ashfall seal. He was the only guardsman who ever refused to swear in my hearing. I told him it would cost him everything. He said that was the point.",
+	&"relic_locket": "A Hollow Locket. They were handed out at funerals so the dead would not be forgotten. It remembers, if you hold it while you fight.",
+	&"relic_thorn": "The Widow's Thorn. It was worn by someone who held a grudge for forty years. It shows.",
+	&"relic_knot": "A Penitent's Knot. One knot per vow kept. This one has a great many.",
+	&"relic_coin": "A gravedigger's coin. He charged both the living and the dead, and the dead were better payers.",
+	&"relic_candle": "A Candle Stub. Tallow that refuses to finish. It reminds me of Ommen.",
+	&"relic_riposte": "A Duellist's Glove. Whoever left this in my Gallery taught fencing, I suspect, to people who would not use it politely.",
 	&"sextons_lantern": "The Sexton's lantern. It lit every burial in the Pilgrim's Graveyard for a hundred years. It will light yours too, if you let it - and I would rather you did not.",
 }
 const VESPER_FIRST := [

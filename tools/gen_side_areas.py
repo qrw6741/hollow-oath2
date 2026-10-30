@@ -57,6 +57,16 @@ attack("sexton_sweep", "Sexton - Cold Sweep", "sweep", 28, 7, 30, 26, (190, -60)
 attack("sexton_wisp", "Sexton - Grave Wisp", "throw", 32, 2, 32, 14, (80, -40), True, (4, 4), (0, -34), proj=140.0, amin=70, amax=320, w=1.1, status=("frost", 45), hs=0.06, shake=2.0)
 attack("sexton_leap", "Sexton - Burial Leap", "leap", 50, 6, 38, 34, (200, -150), False, (110, 30), (0, -14), track=False, amin=90, amax=300, w=1.1, shake=8.0)
 
+# --- Mother Cinder (Ashen Chapel boss) and Ser Ashfall (optional hard boss)
+attack("cinder_censer", "Cinder - Censer Smash", "smash", 34, 6, 34, 34, (170, -110), True, (56, 42), (30, -24), amin=0, amax=66, lunge=55, lstart=30, lframes=6, status=("burn", 40))
+attack("cinder_sweep", "Cinder - Ash Sweep", "sweep", 26, 7, 30, 28, (200, -60), False, (80, 30), (34, -20), amin=0, amax=72, w=0.8, status=("burn", 35))
+attack("cinder_embers", "Cinder - Rain of Embers", "throw", 30, 2, 32, 16, (80, -40), True, (4, 4), (0, -34), proj=170.0, amin=70, amax=320, w=1.1, status=("burn", 50), hs=0.06, shake=2.0)
+attack("cinder_pyre", "Cinder - Pyre Leap", "leap", 48, 6, 36, 36, (210, -150), False, (120, 30), (0, -14), track=False, amin=90, amax=300, w=1.0, shake=8.0, status=("burn", 60))
+attack("ashfall_cut", "Ashfall - Grave Cut", "smash", 22, 5, 26, 36, (170, -90), True, (60, 38), (32, -22), amin=0, amax=70, w=1.2, status=("bleed", 35), lunge=70, lstart=18, lframes=5)
+attack("ashfall_thrust", "Ashfall - Oath Thrust", "smash", 26, 4, 30, 40, (200, -70), True, (74, 24), (38, -20), amin=20, amax=120, w=1.0, lunge=160, lstart=22, lframes=6, status=("bleed", 40))
+attack("ashfall_sweep", "Ashfall - Hollow Sweep", "sweep", 30, 7, 32, 34, (220, -80), False, (90, 30), (36, -20), amin=0, amax=80, w=0.8, status=("frost", 35))
+attack("ashfall_rush", "Ashfall - Unburied Rush", "charge", 30, 20, 34, 38, (260, -100), False, (36, 46), (22, -24), amin=110, amax=300, w=1.0, lunge=300, lstart=30, lframes=20, shake=7.0)
+
 def enemy(id_, name, lore, atks, hp, poise, chase, embers, drop, bonus):
     ext = ['[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]']
     for i, a in enumerate(atks):
@@ -102,6 +112,11 @@ enemy("cellarer_grume", "Grume, the Cellarer", "He kept the manor's cellar for f
       ["cellarer_smash", "cellarer_sweep", "cellarer_bottle"], 430, 75, 56, 900, "gallery_key", "forge_scrap")
 enemy("sexton_hale", "Hale, the Gravewarden", "Sexton of the Pilgrim's Graveyard. He dug every grave on this road and swore he would see each one filled. He has been very thorough.",
       ["sexton_spade", "sexton_sweep", "sexton_wisp"], 540, 85, 58, 1400, "sextons_lantern", "hollow_resin")
+
+enemy("mother_cinder", "Mother Cinder", "Abbess of the chapel the oath burned. She kept the censer lit through the Night and has never let it go out, though nothing remains for it to bless.",
+      ["cinder_censer", "cinder_sweep", "cinder_embers"], 620, 90, 54, 1800, "cinder_heart", "hollow_resin")
+enemy("ser_ashfall", "Ser Ashfall", "A knight of the Crown's own guard, unburied by choice. He refused the oath and the oath refused him a grave. Few have reached his crypt. Fewer have left it.",
+      ["ashfall_cut", "ashfall_thrust", "ashfall_sweep"], 980, 130, 64, 3000, "ashfall_seal", "ember_shard")
 
 def boss(name, boss_id, data, p2, style, hurt=(26, 52), music_pitch=1.0):
     ext = [
@@ -177,4 +192,6 @@ style = {style}
 
 boss("Cellarer", "cellarer", "cellarer_grume", ["cellarer_smash", "cellarer_sweep", "cellarer_bottle", "cellarer_charge"], 0, music_pitch=1.1)
 boss("Gravewarden", "gravewarden", "sexton_hale", ["sexton_spade", "sexton_sweep", "sexton_wisp", "sexton_leap"], 1, music_pitch=0.9)
+boss("MotherCinder", "mother_cinder", "mother_cinder", ["cinder_censer", "cinder_sweep", "cinder_embers", "cinder_pyre"], 2, music_pitch=0.8)
+boss("SerAshfall", "ser_ashfall", "ser_ashfall", ["ashfall_cut", "ashfall_thrust", "ashfall_sweep", "ashfall_rush"], 3, hurt=(24, 52), music_pitch=0.95)
 print("ok")

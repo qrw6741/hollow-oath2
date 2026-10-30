@@ -4,7 +4,7 @@ extends Node2D
 ## style SEXTON: wide hat, long black coat, a grave-spade, a cold blue lantern on the belt.
 ## Telegraphs: overhead (smash) glints = parryable; sweep glows red where it can't be parried.
 
-enum Style { CELLARER, SEXTON }
+enum Style { CELLARER, SEXTON, CINDER, ASHFALL }
 @export var style := Style.CELLARER
 
 var enemy: EnemyBase
@@ -103,9 +103,17 @@ func _draw() -> void:
 			lean = -minf(f * 0.25, 8.0)
 			arm = 90.0
 			eye = 0.0
-	var sexton := style == Style.SEXTON
+	var cinder := style == Style.CINDER
+	var ashfall := style == Style.ASHFALL
+	var sexton := style == Style.SEXTON or ashfall   # long-coat silhouette with a blade
 	var coat := Color("2a2530") if sexton else Color("5a4a3a")
 	var trim := Color("4a4258") if sexton else Color("8a7a60")
+	if cinder:
+		coat = Color("5a2018")
+		trim = Color("e07a2c")
+	elif ashfall:
+		coat = Color("3a3a46")
+		trim = Color("b8b8c8")
 	var hip := Vector2(lean * 0.3, -18.0 + crouch * 0.6)
 	var shoulder := Vector2(2.0 + lean, -40.0 + crouch)
 	var head := shoulder + Vector2(2.0, -8.0)
@@ -124,6 +132,11 @@ func _draw() -> void:
 	else:
 		draw_colored_polygon(PackedVector2Array([shoulder + Vector2(-6, 8), shoulder + Vector2(6, 8), hip + Vector2(8, 11), hip + Vector2(-8, 11)]), _c(Color("c8bda0"), flash, alpha))
 		draw_line(shoulder + Vector2(-6, 4), shoulder + Vector2(-9, 0), _c(trim, flash, alpha), 1.4)
+	if cinder:
+		# A halo of embers around the head and a smouldering hem.
+		draw_circle(head, 9.0 + sin(_t * 5.0), Color(1.0, 0.5, 0.15, 0.18 * alpha))
+		for i in 3:
+			draw_circle(hip + Vector2(-8 + i * 8, 12 - absf(sin(_t * 3.0 + i)) * 3.0), 1.3, Color(1.0, 0.6, 0.2, 0.8 * alpha))
 	# Head
 	draw_circle(head, 5.0, _c(Color("9a8f7c") if not sexton else Color("7a7468"), flash, alpha))
 	if sexton:

@@ -3,7 +3,7 @@ extends RefCounted
 ## Registry and rules for weapons. Order of IDS = order in the equip list.
 
 const IDS: Array[StringName] = [&"oathblade", &"twin_blades", &"sword_and_shield", &"fists",
-	&"wayfarers_rapier", &"kingsfall_greatsword", &"toll_hammer", &"marshals_lance", &"tide_sabre"]
+	&"wayfarers_rapier", &"kingsfall_greatsword", &"toll_hammer", &"marshals_lance", &"tide_sabre", &"cinderbrand", &"ashfall_pike"]
 const DIR := "res://data/weapons/"
 ## Each upgrade level adds this fraction of the weapon's base damage.
 const LEVEL_BONUS := 0.10

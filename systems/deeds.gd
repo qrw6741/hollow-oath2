@@ -11,6 +11,8 @@ const DEFS := {
 	&"marshal_down": {"title": "The Oath Broken", "desc": "Defeat the Hollow Marshal."},
 	&"cellarer_down": {"title": "Below the House", "desc": "Defeat the Cellarer."},
 	&"sexton_down": {"title": "Grave Business", "desc": "Defeat the Sexton."},
+	&"cinder_down": {"title": "The Censer Goes Dark", "desc": "Defeat Mother Cinder."},
+	&"ashfall_down": {"title": "Rest at Last", "desc": "Defeat the optional Ser Ashfall."},
 	&"errands": {"title": "Good Neighbour", "desc": "Finish every errand."},
 	&"bestiary_half": {"title": "Student of the Dead", "desc": "Meet half the creatures in the Bestiary."},
 	&"bestiary_full": {"title": "Naturalist", "desc": "Meet every creature in the Bestiary."},
@@ -21,7 +23,7 @@ const DEFS := {
 	&"survive_night": {"title": "Night Walker", "desc": "Reach dawn after a night on the road."},
 }
 const ORDER: Array[StringName] = [
-	&"first_blood", &"hundred_dead", &"warden_down", &"marshal_down", &"cellarer_down", &"sexton_down",
+	&"first_blood", &"hundred_dead", &"warden_down", &"marshal_down", &"cellarer_down", &"sexton_down", &"cinder_down", &"ashfall_down",
 	&"errands", &"bestiary_half", &"bestiary_full", &"level_10", &"all_status", &"gallery", &"survive_night", &"ending",
 ]
 
@@ -50,6 +52,8 @@ static func _met(id: StringName) -> bool:
 		&"marshal_down": return _boss("hollow_marshal")
 		&"cellarer_down": return _boss("cellarer")
 		&"sexton_down": return _boss("gravewarden")
+		&"cinder_down": return _boss("mother_cinder")
+		&"ashfall_down": return _boss("ser_ashfall")
 		&"errands":
 			for q in Quests.ORDER:
 				if Quests.state(q) != "done":

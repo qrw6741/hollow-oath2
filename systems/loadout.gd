@@ -50,7 +50,8 @@ static func weapon() -> WeaponData:
 
 ## Damage multiplier from the weapon's upgrade level.
 static func weapon_mult() -> float:
-	return Weapons.level_mult(GameState.weapon_level(GameState.weapon_id))
+	var w := weapon()
+	return Weapons.level_mult(GameState.weapon_level(GameState.weapon_id)) * (w.damage_mult if w else 1.0)
 
 
 static func damage_taken_mult() -> float:

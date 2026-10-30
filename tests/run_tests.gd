@@ -77,7 +77,7 @@ func _run() -> void:
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
-		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_endings, test_night_merchant, test_new_game_plus, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_endings, test_night_merchant, test_new_game_plus, test_chapel_and_unique_weapons, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
@@ -2325,6 +2325,38 @@ func test_dialogue_box() -> void:
 	check(not box.is_open, "Cancel skips the conversation")
 
 
+func test_chapel_and_unique_weapons() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	const CHAPEL := "res://world/levels/ashen_chapel.tscn"
+	await go_to_level(CHAPEL, &"")
+	check(level.scene_file_path == CHAPEL and WorldMap.LEVELS.has(CHAPEL), "the Ashen Chapel loads and is on the map")
+	for n in ["FromGraveyard", "ToGraveyard", "ChapelCandle", "NaveCandle", "CinderArena", "AshfallArena", "SecretWall", "PewChest", "GildedNave", "CaptainA", "SergeantA"]:
+		check(level.get_node_or_null(n) != null, "the chapel has %s" % n)
+	var bad := placement_problems()
+	check(bad.is_empty(), "the chapel: everything stands on something %s" % [bad])
+	await go_to_level(GRAVEYARD, &"from_chapel")
+	check(level.find_entry(&"from_chapel") != null and level.get_node_or_null("ToChapel") != null, "the graveyard links to the chapel")
+	# Bosses and their data
+	for pair in [["mother_cinder", &"cinder_heart"], ["ser_ashfall", &"ashfall_seal"]]:
+		var d := Bestiary.data(StringName(pair[0]))
+		check(d != null and d.drop_item != null and d.drop_item.id == pair[1] and d.drop_chance == 1.0, "%s drops %s" % [pair[0], pair[1]])
+	# Unique weapons
+	for id in [&"cinderbrand", &"ashfall_pike"]:
+		var w := Weapons.get_weapon(id)
+		check(w != null and w.damage_mult > 1.0 and w.skill != null and w.light_combo_start != null and IconArt.has_icon(id), "%s is a complete weapon" % id)
+		check(Forge.recipe(id).has("relic") and Forge.recipe(id).kind == "weapon", "%s is forged from a boss relic" % id)
+	game_state.embers = 5000
+	game_state.add_item(&"forge_scrap", 10)
+	check(not Forge.make(&"cinderbrand").ok, "no relic, no Cinderbrand")
+	game_state.add_item(&"cinder_heart", 1)
+	check(Forge.make(&"cinderbrand").ok and game_state.owns_weapon(&"cinderbrand"), "the Heart lets Hobb forge it")
+	Loadout.equip_weapon(&"cinderbrand")
+	var base_mult := Weapons.level_mult(0)
+	check(is_equal_approx(Loadout.weapon_mult(), base_mult * 1.15), "a unique weapon hits harder (%.2f)" % Loadout.weapon_mult())
+	check(Deeds.DEFS.has(&"cinder_down") and Deeds.DEFS.has(&"ashfall_down"), "the new bosses have deeds")
+
+
 func test_new_game_plus() -> void:
 	await fresh_game()
 	check(game_state.ng_cycle() == 0 and is_equal_approx(game_state.ng_hp_mult(), 1.0), "a first run has no scaling")
@@ -3672,7 +3704,7 @@ func test_gallery_gate_and_key() -> void:
 func test_minibosses() -> void:
 	await fresh_game()
 	game_state.in_game = true
-	for spec in [["res://actors/bosses/cellarer_grume.tscn", &"gallery_key", &"cellarer"], ["res://actors/bosses/sexton_hale.tscn", &"sextons_lantern", &"gravewarden"]]:
+	for spec in [["res://actors/bosses/cellarer_grume.tscn", &"gallery_key", &"cellarer"], ["res://actors/bosses/sexton_hale.tscn", &"sextons_lantern", &"gravewarden"], ["res://actors/bosses/mother_cinder.tscn", &"cinder_heart", &"mother_cinder"], ["res://actors/bosses/ser_ashfall.tscn", &"ashfall_seal", &"ser_ashfall"]]:
 		await fresh_game()
 		game_state.in_game = true
 		await place_player(300.0, 480.0, 1)
