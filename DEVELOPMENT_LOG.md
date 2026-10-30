@@ -326,3 +326,4 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Vesper has lines for the new items and for every relic.
 - Tests: new test_chapel_and_unique_weapons, test_new_game_plus; test_minibosses covers the new bosses (subset runs pass; full suite pending). Balance numbers for the new bosses/weapons are first guesses and nobody has fought them.
 - Screenshots (Xvfb) of the chapel and the Oath Gate looked fine; Mother Cinder and Ashfall were not captured mid-fight.
+- Full suite: 120 tests, all passing (119 in the full run, plus the one fixed afterwards re-run on its own).

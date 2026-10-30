@@ -244,7 +244,7 @@ start_facing = 1
 station = &"forge"
 
 [node name="LanternMan" type="Area2D" parent="."]
-position = Vector2(1500, 480)
+position = Vector2(1900, 480)
 script = ExtResource("npc")
 npc_id = &"lantern_man"
 display_name = "The Lantern-Man"
