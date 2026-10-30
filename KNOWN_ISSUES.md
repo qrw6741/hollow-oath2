@@ -128,3 +128,6 @@
 - The chapel sky is the graveyard's with a warmer tint.
 - Ser Ashfall's crypt is behind a breakable wall; there is no hint besides a tablet.
 - Quest chain `ilse_lantern` only needs you to carry the Sexton's Lantern.
+
+## Download size
+- The Windows build must fit one chat file (< 31,457,280 bytes zipped). The Godot template alone zips to ~30.1 MB, leaving ~1.3 MB for the game. To fit, music is encoded at 8 kHz / 10 kbps and effects at 12 kHz / 12 kbps (muffled; originals can be regenerated with tools/audio/gen_audio.py and gen_audio_extra.py, whose Ogg settings are higher quality). Publishing builds as GitHub Releases would remove this limit.

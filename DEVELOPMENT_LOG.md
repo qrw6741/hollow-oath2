@@ -327,3 +327,7 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Tests: new test_chapel_and_unique_weapons, test_new_game_plus; test_minibosses covers the new bosses (subset runs pass; full suite pending). Balance numbers for the new bosses/weapons are first guesses and nobody has fought them.
 - Screenshots (Xvfb) of the chapel and the Oath Gate looked fine; Mother Cinder and Ashfall were not captured mid-fight.
 - Full suite: 120 tests, all passing (119 in the full run, plus the one fixed afterwards re-run on its own).
+
+## Step: Weapons tab, single-file download
+- Inventory has a WEAPONS tab (after Items): every weapon in the game in a grid; ones you have show their icon, the rest are a grey "?" with "???" details. Press a found weapon to equip. Header counts found / total. IconSlot gained `locked`. Test: test_weapons_tab.
+- Download is again one zip (31,352,644 bytes, under the 31,457,280 limit) by re-encoding music (8 kHz, 10 kbps) and effects (12 kHz, 12 kbps). Sound quality is worse than before; not listened to.

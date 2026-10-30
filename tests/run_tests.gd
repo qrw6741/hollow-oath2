@@ -77,7 +77,7 @@ func _run() -> void:
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
-		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_endings, test_night_merchant, test_new_game_plus, test_chapel_and_unique_weapons, test_sound_extras, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_weapons_tab, test_endings, test_night_merchant, test_new_game_plus, test_chapel_and_unique_weapons, test_sound_extras, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
@@ -2472,6 +2472,30 @@ func test_endings() -> void:
 	check(not Endings.available(&"mend"), "errands alone are not enough")
 	game_state.set_flag(&"door_open_hollowmere_gallery", true)
 	check(Endings.available(&"mend") and Endings.choose(&"mend") and Endings.chosen() == &"mend", "every errand plus the Gallery opens the third ending")
+
+
+func test_weapons_tab() -> void:
+	await fresh_game()
+	var inv: InventoryMenu = main.get_node("InventoryMenu")
+	inv.open(InventoryMenu.Tab.WEAPONS)
+	await frames(3)
+	check(inv.tab == InventoryMenu.Tab.WEAPONS and inv._w_slots.size() == Weapons.IDS.size(), "the weapons tab has a slot for every weapon in the game")
+	var owned := 0
+	for i in Weapons.IDS.size():
+		var has: bool = game_state.owns_weapon(Weapons.IDS[i])
+		owned += 1 if has else 0
+		check(inv._w_slots[i].locked == not has, "%s is %s" % [Weapons.IDS[i], "shown" if has else "a grey question mark"])
+	check("%d / %d" % [owned, Weapons.IDS.size()] in inv._w_head.text, "the header counts what you have found")
+	inv._show_weapon(&"cinderbrand")
+	check(inv._w_name.text == "???" and not ("Cinder" in inv._w_text.text), "an unfound weapon reveals nothing")
+	game_state.grant_gear("weapon", &"toll_hammer")
+	inv.show_tab(InventoryMenu.Tab.WEAPONS)
+	var idx := Weapons.IDS.find(&"toll_hammer")
+	check(not inv._w_slots[idx].locked, "a weapon you pick up appears at once")
+	inv._weapon_pressed(&"toll_hammer")
+	check(game_state.weapon_id == &"toll_hammer", "pressing a found weapon equips it")
+	inv.close()
+	await frames(2)
 
 
 func test_relics_and_infusion() -> void:

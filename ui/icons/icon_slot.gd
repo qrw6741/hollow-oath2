@@ -10,6 +10,9 @@ var count := 0:
 	set(v): count = v; queue_redraw()
 var marked := false:
 	set(v): marked = v; queue_redraw()
+## An undiscovered thing: drawn as a grey "?" instead of its icon.
+var locked := false:
+	set(v): locked = v; queue_redraw()
 var caption := "":
 	set(v): caption = v; queue_redraw()
 
@@ -46,7 +49,12 @@ func _draw() -> void:
 	if hot:
 		draw_rect(box, Color(Palette.GOLD, 0.10 + 0.05 * sin(_t * 5.0)))
 	draw_rect(box, Palette.GOLD if hot else Color(Palette.STONE, 0.9), false, 1.5 if hot else 1.0)
-	if icon_id != &"":
+	if locked:
+		var qf := UITheme.title_font()
+		var qs := int(box.size.y * 0.6)
+		var qw := qf.get_string_size("?", HORIZONTAL_ALIGNMENT_LEFT, -1, qs).x
+		draw_string(qf, Vector2((box.size.x - qw) / 2.0, box.size.y * 0.72), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, qs, Color(0.35, 0.34, 0.38))
+	elif icon_id != &"":
 		IconArt.draw(self, icon_id, box.grow(-box.size.x * 0.14), _t)
 	if count > 1:
 		var s := str(count)

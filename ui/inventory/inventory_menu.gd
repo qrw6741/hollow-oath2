@@ -10,7 +10,7 @@ extends CanvasLayer
 ## A JOURNAL tab lists open errands (see Quests).
 ## Switch tabs with Parry / Heal (L1 / R1) or by clicking. Keyboard, mouse and gamepad.
 
-enum Tab { EQUIPMENT, ITEMS, JOURNAL, BESTIARY, DEEDS, RELICS }
+enum Tab { EQUIPMENT, ITEMS, WEAPONS, JOURNAL, BESTIARY, DEEDS, RELICS }
 
 var is_open := false
 var tab := Tab.EQUIPMENT
@@ -18,6 +18,12 @@ var _was_paused := false
 var _prev_modal := false
 var _panel: ColorRect
 var _tab_btns: Array[Button] = []
+var _w_slots: Array[IconSlot] = []
+var _w_head: Label
+var _w_big: IconSlot
+var _w_name: Label
+var _w_state: Label
+var _w_text: Label
 var _relic_list: VBoxContainer
 var _relic_head: Label
 var _relic_btns: Array[Button] = []
@@ -84,12 +90,12 @@ func _build() -> void:
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
 	tabs.add_theme_constant_override(&"separation", 6)
 	v.add_child(tabs)
-	for i in 6:
+	for i in 7:
 		var b := FancyButton.new()
-		b.text = ["EQUIPMENT", "ITEMS", "JOURNAL", "BESTIARY", "DEEDS", "RELICS"][i]
-		b.custom_minimum_size = Vector2(70, 18)
+		b.text = ["EQUIPMENT", "ITEMS", "WEAPONS", "JOURNAL", "BESTIARY", "DEEDS", "RELICS"][i]
+		b.custom_minimum_size = Vector2(60, 18)
 		b.add_theme_font_override(&"font", UITheme.title_font())
-		b.add_theme_font_size_override(&"font_size", 9)
+		b.add_theme_font_size_override(&"font_size", 8)
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(show_tab.bind(i))
 		tabs.add_child(b)
@@ -100,6 +106,7 @@ func _build() -> void:
 	v.add_child(stack)
 	_pages.append(_build_equipment(stack))
 	_pages.append(_build_items(stack))
+	_pages.append(_build_weapons(stack))
 	_pages.append(_build_journal(stack))
 	_pages.append(_build_scroll_text(stack, "_bestiary_label"))
 	_pages.append(_build_scroll_text(stack, "_deeds_label"))
@@ -284,6 +291,106 @@ func _build_journal(stack: Control) -> Control:
 	return p
 
 
+func _build_weapons(stack: Control) -> Control:
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override(&"separation", 6)
+	stack.add_child(h)
+	var left := _framed(h, Vector2(230, 194))
+	var lv := VBoxContainer.new()
+	lv.add_theme_constant_override(&"separation", 4)
+	left.add_child(lv)
+	_w_head = Label.new()
+	UITheme.title(_w_head, 10, Palette.GOLD_BRIGHT)
+	lv.add_child(_w_head)
+	var grid := GridContainer.new()
+	grid.columns = 5
+	grid.add_theme_constant_override(&"h_separation", 4)
+	grid.add_theme_constant_override(&"v_separation", 4)
+	lv.add_child(grid)
+	for id in Weapons.IDS:
+		var s := IconSlot.new()
+		s.custom_minimum_size = Vector2(38, 38)
+		s.pressed.connect(_weapon_pressed.bind(id))
+		s.focus_entered.connect(_show_weapon.bind(id))
+		s.mouse_entered.connect(_show_weapon.bind(id))
+		grid.add_child(s)
+		_w_slots.append(s)
+	var right := _framed(h, Vector2(224, 194))
+	var rv := VBoxContainer.new()
+	rv.add_theme_constant_override(&"separation", 3)
+	right.add_child(rv)
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override(&"separation", 7)
+	rv.add_child(top)
+	_w_big = IconSlot.new()
+	_w_big.custom_minimum_size = Vector2(44, 44)
+	_w_big.focus_mode = Control.FOCUS_NONE
+	_w_big.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(_w_big)
+	var tv := VBoxContainer.new()
+	tv.add_theme_constant_override(&"separation", 0)
+	top.add_child(tv)
+	_w_name = Label.new()
+	UITheme.title(_w_name, 11, Palette.GOLD_BRIGHT)
+	tv.add_child(_w_name)
+	_w_state = Label.new()
+	_w_state.add_theme_color_override(&"font_color", Palette.STONE_LIGHT)
+	tv.add_child(_w_state)
+	_w_text = Label.new()
+	_w_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_w_text.custom_minimum_size = Vector2(206, 0)
+	_w_text.add_theme_color_override(&"font_color", Palette.BONE)
+	_w_text.add_theme_constant_override(&"line_spacing", -2)
+	rv.add_child(_w_text)
+	return h
+
+
+## Every weapon in the game: ones you have are drawn, the rest stay a grey "?".
+func _refresh_weapons() -> void:
+	var have := 0
+	for i in Weapons.IDS.size():
+		var id: StringName = Weapons.IDS[i]
+		var owned := GameState.owns_weapon(id)
+		have += 1 if owned else 0
+		_w_slots[i].icon_id = id if owned else &""
+		_w_slots[i].locked = not owned
+		_w_slots[i].marked = id == GameState.weapon_id
+	_w_head.text = "WEAPONS    found %d / %d" % [have, Weapons.IDS.size()]
+	_show_weapon(GameState.weapon_id if GameState.owns_weapon(GameState.weapon_id) else Weapons.IDS[0])
+	_w_slots[0].grab_focus.call_deferred()
+
+
+func _show_weapon(id: StringName) -> void:
+	var owned := GameState.owns_weapon(id)
+	_w_big.icon_id = id if owned else &""
+	_w_big.locked = not owned
+	if not owned:
+		_w_name.text = "???"
+		_w_state.text = "Not yet found"
+		_w_text.text = "Somewhere in Vaelmoor there is a weapon for this slot. Explore, defeat what guards it, or ask the smith."
+		return
+	var w := Weapons.get_weapon(id)
+	var lvl := GameState.weapon_level(id)
+	_w_name.text = w.display_name
+	_w_state.text = "Equipped" if id == GameState.weapon_id else "Found  (+%d)   press to equip" % lvl
+	var b := (1.0 + int(GameState.stats.get("strength", 0)) * GameState.STRENGTH_DAMAGE) * Weapons.level_mult(lvl) * w.damage_mult
+	var sm := WeaponStats.summary(w, b)
+	var t := w.description + "\n\nLight combo %d   Heavy %d" % [sm.light_total, sm.heavy]
+	if w.skill:
+		t += "\nSkill: %s (%d focus)" % [w.skill.display_name, roundi(w.skill_cost)]
+	var fx := Forge.effective_status(w)
+	if fx.kind != &"":
+		t += "\nInflicts %s" % StatusFx.name_of(fx.kind)
+	_w_text.text = t
+
+
+func _weapon_pressed(id: StringName) -> void:
+	if GameState.owns_weapon(id) and Loadout.equip_weapon(id):
+		_msg.text = "Equipped %s." % Weapons.get_weapon(id).display_name
+		_refresh_weapons()
+		_show_weapon(id)
+
+
 func _build_relics(stack: Control) -> Control:
 	var p := _framed(stack, Vector2(460, 194))
 	var v := VBoxContainer.new()
@@ -440,6 +547,8 @@ func show_tab(t: int) -> void:
 	if tab == Tab.EQUIPMENT:
 		_refresh_equipment()
 		(_slots[_slot_sel] as Button).grab_focus()
+	elif tab == Tab.WEAPONS:
+		_refresh_weapons()
 	elif tab == Tab.JOURNAL:
 		_refresh_journal()
 		_close_btn.grab_focus()
