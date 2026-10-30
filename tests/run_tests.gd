@@ -77,7 +77,7 @@ func _run() -> void:
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
-		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_endings, test_night_merchant, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_endings, test_night_merchant, test_new_game_plus, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
@@ -2323,6 +2323,41 @@ func test_dialogue_box() -> void:
 	await frames(14)
 	await tap_action(&"ui_cancel")
 	check(not box.is_open, "Cancel skips the conversation")
+
+
+func test_new_game_plus() -> void:
+	await fresh_game()
+	check(game_state.ng_cycle() == 0 and is_equal_approx(game_state.ng_hp_mult(), 1.0), "a first run has no scaling")
+	game_state.set_flag(&"boss_defeated_hollow_marshal", true)
+	game_state.set_flag(&"quest_hobb_scrap", "done")
+	game_state.set_flag(&"chest_open_cellar_chest", true)
+	game_state.set_flag(&"deed_first_blood", true)
+	game_state.set_flag(&"bk_carrion_crow", 4)
+	game_state.set_flag(&"infuse_oathblade", "burn")
+	game_state.set_flag(&"ending_chosen", "keep")
+	game_state.set_flag(&"ending_keep", true)
+	game_state.add_item(&"relic_coin", 1)
+	game_state.embers = 777
+	game_state.stats["vigor"] = 5
+	var wid: StringName = game_state.weapon_id
+	var n: int = game_state.begin_new_cycle()
+	check(n == 1 and game_state.ng_cycle() == 1, "the cycle counter rises")
+	check(not game_state.get_flag(&"boss_defeated_hollow_marshal", false) and not Quests.is_done(&"hobb_scrap") and not game_state.get_flag(&"chest_open_cellar_chest", false), "the story resets: bosses, errands, chests")
+	check(Endings.chosen() == &"" and game_state.get_flag(&"ending_keep", false), "the gate asks again, but past endings are remembered")
+	check(game_state.get_flag(&"deed_first_blood", false) and Bestiary.kills(&"carrion_crow") == 4 and Forge.infusion_of(&"oathblade") == &"burn", "deeds, bestiary and infusions are kept")
+	check(game_state.item_count(&"relic_coin") == 1 and game_state.embers == 777 and game_state.stats["vigor"] == 5 and game_state.weapon_id == wid, "gear, stats and embers are kept")
+	check(is_equal_approx(game_state.ng_hp_mult(), 1.6) and is_equal_approx(game_state.ng_damage_mult(), 1.35) and is_equal_approx(game_state.ng_ember_mult(), 1.5), "cycle 1 is harder and pays more")
+	check(game_state.level_path == GameState.DEFAULT_LEVEL_PATH and not game_state.has_checkpoint, "you start again at the beginning")
+	await go_to_level(ROAD, &"")
+	var base: float = 0.0
+	var found := false
+	for e in get_tree().get_nodes_in_group(&"enemies"):
+		if e is EnemyBase and e.data and e.data.id == &"roadside_pikeman":
+			base = e.data.max_health
+			check(is_equal_approx(e.health.max_health, base * 1.6 * settings.enemy_health_pct / 100.0), "enemies spawn with cycle health (%.0f vs %.0f)" % [e.health.max_health, base])
+			found = true
+			break
+	check(found, "found a pikeman to check")
 
 
 func test_night_merchant() -> void:

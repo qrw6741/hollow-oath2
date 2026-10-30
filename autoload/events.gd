@@ -76,6 +76,8 @@ signal bestiary_changed(enemy_id: StringName)
 ## The Oath Gate asks for the ending choice; the EndingMenu opens.
 signal ending_requested
 signal ending_chosen(id: StringName)
+## The player chose to begin a New Game+ cycle at the Oath Gate.
+signal new_cycle_requested
 signal deed_unlocked(id: StringName)
 ## A status effect triggered on a foe (not on the player).
 signal status_triggered(kind: StringName)

@@ -109,6 +109,53 @@ func _on_player_died() -> void:
 	Events.respawn_requested.emit()
 
 
+# ------------------------------------------------------------------ New Game+
+## A cycle restarts the story with everything you built kept. Enemies get tougher each time.
+## Flags kept across a cycle (prefixes): what the player has *learned or earned for good*.
+const KEEP_FLAG_PREFIXES := ["deed_", "bs_", "bk_", "tip_", "fx_", "infuse_", "relics_eq", "night_survived", "ng_cycle", "ending_", "candle_lit_"]
+
+
+func ng_cycle() -> int:
+	return int(get_flag(&"ng_cycle", 0))
+
+
+func ng_hp_mult() -> float:
+	return 1.0 + 0.6 * ng_cycle()
+
+
+func ng_damage_mult() -> float:
+	return 1.0 + 0.35 * ng_cycle()
+
+
+func ng_ember_mult() -> float:
+	return 1.0 + 0.5 * ng_cycle()
+
+
+## Clears the story (bosses, errands, chests, doors, conversations) but keeps gear, stats, items,
+## relics, deeds and the bestiary. Returns the new cycle number. The caller reloads the world.
+func begin_new_cycle() -> int:
+	var keep := {}
+	for k in flags:
+		for pre in KEEP_FLAG_PREFIXES:
+			if String(k).begins_with(pre):
+				keep[k] = flags[k]
+				break
+	keep.erase("ending_chosen")
+	keep["ng_cycle"] = ng_cycle() + 1
+	flags = keep
+	explored = {}
+	level_path = DEFAULT_LEVEL_PATH
+	level_name = ""
+	checkpoint_level = ""
+	level_entry = &""
+	has_checkpoint = false
+	checkpoint_id = &""
+	respawn_position = Vector2.ZERO
+	ember_drop = {}
+	pending_spawn_level = ""
+	return ng_cycle()
+
+
 # ------------------------------------------------------------------ economy
 
 func _on_enemy_killed(enemy: Node) -> void:
@@ -118,7 +165,7 @@ func _on_enemy_killed(enemy: Node) -> void:
 	if d == null:
 		return
 	if d.ember_reward > 0:
-		add_embers(roundi(d.ember_reward * Relics.mult("ember_gain")))
+		add_embers(roundi(d.ember_reward * Relics.mult("ember_gain") * ng_ember_mult()))
 	if d.drop_item != null and d.drop_chance > 0.0 and randf() < d.drop_chance:
 		add_item(d.drop_item.id, d.drop_count)
 	if d.bonus_drop_item != null and d.bonus_drop_chance > 0.0 and randf() < d.bonus_drop_chance:

@@ -6,6 +6,7 @@ extends Area2D
 
 var _player_inside: Player
 var _t := 0.0
+var _confirm := 0.0
 
 
 func _ready() -> void:
@@ -25,18 +26,24 @@ func _ready() -> void:
 
 func _prompt() -> String:
 	if Endings.chosen() != &"":
-		return "The gate is quiet"
+		return "Begin anew (New Game+)"
 	return "Face the gate" if Endings.gate_open() else "The gate is sealed"
 
 
 func _physics_process(delta: float) -> void:
 	_t += delta
+	_confirm = maxf(0.0, _confirm - delta)
 	queue_redraw()
 	if Engine.is_editor_hint() or _player_inside == null:
 		return
 	if Input.is_action_just_pressed(&"interact") and _player_inside.can_interact():
 		if Endings.chosen() != &"":
-			Events.banner_requested.emit("THE GATE IS QUIET")
+			if _confirm > 0.0:
+				_confirm = 0.0
+				Events.new_cycle_requested.emit()
+			else:
+				_confirm = 5.0
+				Events.banner_requested.emit("INTERACT AGAIN TO BEGIN ANEW  -  NEW GAME+ (CYCLE %d)" % (GameState.ng_cycle() + 1))
 		elif Endings.gate_open():
 			Events.ending_requested.emit()
 		else:

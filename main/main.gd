@@ -19,6 +19,7 @@ var _busy := false
 
 
 func _ready() -> void:
+	Events.new_cycle_requested.connect(begin_new_cycle)
 	var fade_layer := CanvasLayer.new()
 	fade_layer.layer = 50
 	add_child(fade_layer)
@@ -60,6 +61,21 @@ func start_new_game(slot: int, preset_id: StringName = &"sworn_knight") -> void:
 		return
 	_begin_game()
 	await _fade_to(0.0)
+	_busy = false
+
+
+## New Game+: keeps your build, restarts the story one cycle harder, saves, and reloads the world.
+func begin_new_cycle() -> void:
+	if _busy or not GameState.in_game:
+		return
+	_busy = true
+	get_tree().paused = false
+	await _fade_to(1.0, 1.0)
+	var n := GameState.begin_new_cycle()
+	SaveSystem.save_slot(GameState.current_slot)
+	_begin_game()
+	await _fade_to(0.0, 1.0)
+	Events.banner_requested.emit("NEW CYCLE %d" % n)
 	_busy = false
 
 

@@ -41,9 +41,9 @@ func _ready() -> void:
 	facing = start_facing
 	home = global_position
 	if data:
-		health.set_max(data.max_health * Settings.enemy_health_pct / 100.0)
+		health.set_max(data.max_health * Settings.enemy_health_pct / 100.0 * GameState.ng_hp_mult())
 		poise = data.max_poise
-		attack_runner.base_multiplier = data.damage_mult
+		attack_runner.base_multiplier = data.damage_mult * GameState.ng_damage_mult()
 		if data.elite:
 			_make_elite()
 	health.died.connect(_on_died)
