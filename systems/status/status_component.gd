@@ -75,6 +75,8 @@ func _trigger(kind: StringName) -> void:
 	if kind == StatusFx.BLEED:
 		_hurt(health.max_health * StatusFx.BLEED_BURST, true)
 	triggered.emit(kind)
+	if not (get_parent() is Player):
+		Events.status_triggered.emit(kind)
 	changed.emit()
 
 

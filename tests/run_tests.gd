@@ -77,7 +77,7 @@ func _run() -> void:
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
-		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
@@ -2323,6 +2323,42 @@ func test_dialogue_box() -> void:
 	await frames(14)
 	await tap_action(&"ui_cancel")
 	check(not box.is_open, "Cancel skips the conversation")
+
+
+func test_bestiary_and_deeds() -> void:
+	await fresh_game()
+	var d := Bestiary.data(&"candle_cantor")
+	check(d != null and Bestiary.entry_text(&"candle_cantor") == "???", "an unmet creature shows ???")
+	Bestiary.record_seen(d)
+	check(Bestiary.seen(&"candle_cantor") and not (d.lore in Bestiary.entry_text(&"candle_cantor")), "met but not slain: no lore yet")
+	Bestiary.record_kill(d)
+	check(d.lore in Bestiary.entry_text(&"candle_cantor") and Bestiary.kills(&"candle_cantor") == 1, "one kill reveals the lore")
+	check("more kills reveal" in Bestiary.entry_text(&"candle_cantor"), "weaknesses stay hidden until three kills")
+	Bestiary.record_kill(d)
+	Bestiary.record_kill(d)
+	check("Frost" in Bestiary.entry_text(&"candle_cantor") or "frost" in Bestiary.entry_text(&"candle_cantor").to_lower(), "three kills reveal resistances")
+	for id in Bestiary.IDS:
+		check(Bestiary.data(id) != null, "bestiary data exists for %s" % id)
+	check(Deeds.has(&"first_blood"), "the first kill unlocks First Blood")
+	check(not Deeds.has(&"warden_down"), "boss deeds start locked")
+	game_state.set_flag(&"boss_defeated_bell_warden", true)
+	var got := Deeds.check_all()
+	check(&"warden_down" in got and Deeds.has(&"warden_down"), "a boss flag unlocks its deed")
+	check(Deeds.check_all().is_empty(), "a deed unlocks only once")
+	game_state.set_flag(&"fx_bleed", true)
+	game_state.set_flag(&"fx_poison", true)
+	game_state.set_flag(&"fx_burn", true)
+	check(not Deeds.has(&"all_status"), "three of four afflictions is not enough")
+	events.status_triggered.emit(&"frost")
+	check(Deeds.has(&"all_status"), "all four afflictions unlock the deed")
+	var inv: InventoryMenu = main.get_node("InventoryMenu")
+	inv.open(InventoryMenu.Tab.BESTIARY)
+	await frames(3)
+	check(inv.tab == InventoryMenu.Tab.BESTIARY and "BESTIARY" in inv._bestiary_label.text, "the bestiary tab lists creatures")
+	inv.show_tab(InventoryMenu.Tab.DEEDS)
+	check("DEEDS" in inv._deeds_label.text and "[x]" in inv._deeds_label.text, "the deeds tab lists deeds")
+	inv.close()
+	await frames(2)
 
 
 func test_tips_and_access() -> void:

@@ -67,6 +67,12 @@ func _ready() -> void:
 	Events.player_died.connect(_on_player_died)
 	Events.checkpoint_rested.connect(_on_checkpoint_rested)
 	Events.enemy_killed.connect(_on_enemy_killed)
+	Events.boss_defeated.connect(func(_id): Deeds.check_all())
+	Events.quest_changed.connect(func(_i, _s): Deeds.check_all())
+	Events.stats_changed.connect(func(): Deeds.check_all())
+	Events.bestiary_changed.connect(func(_i): Deeds.check_all())
+	Events.level_entered.connect(func(_p): Deeds.check_all())
+	Events.status_triggered.connect(func(k): set_flag(StringName("fx_" + String(k)), true); Deeds.check_all())
 
 
 func _process(delta: float) -> void:
@@ -108,6 +114,7 @@ func _on_player_died() -> void:
 func _on_enemy_killed(enemy: Node) -> void:
 	Quests.on_enemy_killed(enemy)
 	var d: EnemyData = enemy.get("data") as EnemyData
+	Bestiary.record_kill(d)
 	if d == null:
 		return
 	if d.ember_reward > 0:

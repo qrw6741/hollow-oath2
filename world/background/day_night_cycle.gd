@@ -30,6 +30,9 @@ func _process(delta: float) -> void:
 	apply()
 	var night := DayNight.is_night()
 	if night != _was_night:
+		if _was_night and not night:
+			GameState.set_flag(&"night_survived", true)
+			Deeds.check_all()
 		_was_night = night
 		Events.daynight_changed.emit(night)
 	var p := DayNight.phase()

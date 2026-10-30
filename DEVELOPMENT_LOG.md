@@ -297,3 +297,9 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Accessibility: colourblind-safe status colours (Okabe-Ito) via StatusFx.color_of, setting saved in settings.cfg.
 - Tests: new test_tips_and_access (subset run passed; full suite run still pending at this step).
 - Not done: a separate hold-to-parry toggle (shield already blocks while parry is held).
+
+## Step: Bestiary and deeds
+- Bestiary (systems/bestiary.gd): creatures are met when they first chase you or die; entries unlock lore after 1 kill and weaknesses/resistances after 3. Flags `bs_<id>`, `bk_<id>` (no save-format change).
+- Deeds (systems/deeds.gd): 13 achievements (kills, bosses, errands, bestiary, level, all four statuses, gallery, surviving a night), flags `deed_<id>`, toast on unlock.
+- Inventory menu now has 5 tabs: Equipment, Items, Journal, Bestiary, Deeds.
+- Tests: new test_bestiary_and_deeds (subset passed). Not yet looked at in a screenshot.

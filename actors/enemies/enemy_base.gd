@@ -259,6 +259,8 @@ func _set_state(s: State) -> void:
 		attack_runner.cancel()
 	state = s
 	state_frame = 0
+	if s == State.CHASE:
+		Bestiary.record_seen(data)
 
 
 # ------------------------------------------------------------------ combat

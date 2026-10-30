@@ -10,7 +10,7 @@ extends CanvasLayer
 ## A JOURNAL tab lists open errands (see Quests).
 ## Switch tabs with Parry / Heal (L1 / R1) or by clicking. Keyboard, mouse and gamepad.
 
-enum Tab { EQUIPMENT, ITEMS, JOURNAL }
+enum Tab { EQUIPMENT, ITEMS, JOURNAL, BESTIARY, DEEDS }
 
 var is_open := false
 var tab := Tab.EQUIPMENT
@@ -18,6 +18,8 @@ var _was_paused := false
 var _prev_modal := false
 var _panel: ColorRect
 var _tab_btns: Array[Button] = []
+var _bestiary_label: Label
+var _deeds_label: Label
 var _pages: Array[Control] = []
 var _close_btn: Button
 # Equipment tab
@@ -77,14 +79,14 @@ func _build() -> void:
 	# Tabs
 	var tabs := HBoxContainer.new()
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
-	tabs.add_theme_constant_override(&"separation", 18)
+	tabs.add_theme_constant_override(&"separation", 6)
 	v.add_child(tabs)
-	for i in 3:
+	for i in 5:
 		var b := FancyButton.new()
-		b.text = ["EQUIPMENT", "ITEMS", "JOURNAL"][i]
-		b.custom_minimum_size = Vector2(110, 18)
+		b.text = ["EQUIPMENT", "ITEMS", "JOURNAL", "BESTIARY", "DEEDS"][i]
+		b.custom_minimum_size = Vector2(78, 18)
 		b.add_theme_font_override(&"font", UITheme.title_font())
-		b.add_theme_font_size_override(&"font_size", 12)
+		b.add_theme_font_size_override(&"font_size", 10)
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(show_tab.bind(i))
 		tabs.add_child(b)
@@ -96,6 +98,8 @@ func _build() -> void:
 	_pages.append(_build_equipment(stack))
 	_pages.append(_build_items(stack))
 	_pages.append(_build_journal(stack))
+	_pages.append(_build_scroll_text(stack, "_bestiary_label"))
+	_pages.append(_build_scroll_text(stack, "_deeds_label"))
 	_close_btn = FancyButton.new()
 	_close_btn.text = "Close"
 	_close_btn.custom_minimum_size = Vector2(110, 15)
@@ -276,6 +280,20 @@ func _build_journal(stack: Control) -> Control:
 	return p
 
 
+func _build_scroll_text(stack: Control, field: String) -> Control:
+	var p := _framed(stack, Vector2(460, 194))
+	var sc := ScrollContainer.new()
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	p.add_child(sc)
+	var l := Label.new()
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.custom_minimum_size = Vector2(440, 0)
+	l.add_theme_constant_override(&"line_spacing", -2)
+	sc.add_child(l)
+	set(field, l)
+	return p
+
+
 ## The journal text: open errands first, then finished ones.
 func journal_text() -> String:
 	var open_lines := PackedStringArray()
@@ -365,6 +383,12 @@ func show_tab(t: int) -> void:
 		(_slots[_slot_sel] as Button).grab_focus()
 	elif tab == Tab.JOURNAL:
 		_refresh_journal()
+		_close_btn.grab_focus()
+	elif tab == Tab.BESTIARY:
+		_bestiary_label.text = Bestiary.text()
+		_close_btn.grab_focus()
+	elif tab == Tab.DEEDS:
+		_deeds_label.text = Deeds.text()
 		_close_btn.grab_focus()
 	else:
 		_rebuild()

@@ -72,6 +72,10 @@ signal banner_requested(text: String)
 ## Ask for a one-time tutorial tip (see Tutorial); the HUD decides whether to show it.
 signal tip_requested(id: StringName)
 signal tip_shown(id: StringName)
+signal bestiary_changed(enemy_id: StringName)
+signal deed_unlocked(id: StringName)
+## A status effect triggered on a foe (not on the player).
+signal status_triggered(kind: StringName)
 
 # --- Combat feel ---
 signal screen_shake_requested(strength: float, duration: float)

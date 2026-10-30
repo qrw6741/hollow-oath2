@@ -62,6 +62,7 @@ func _ready() -> void:
 	Events.boss_fight_started.connect(_on_boss_fight_started)
 	Events.message_requested.connect(_on_message)
 	Events.tip_requested.connect(show_tip)
+	Events.deed_unlocked.connect(func(id): _toast("Deed: %s" % Deeds.DEFS[id].title); Audio.sfx(&"coin", -6.0))
 	Events.daynight_changed.connect(func(n): if n: show_tip(&"night"))
 	Events.level_entered.connect(func(path): if "manor" in String(path): show_tip(&"travel"))
 	Events.message_closed.connect(func(): _msg_panel.visible = false)
