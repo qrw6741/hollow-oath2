@@ -91,8 +91,26 @@ const DEFS := {
 		"complete": ["You read it. Then you know what I did, and what I should have done.", "Whatever you decide at the Gate, you will decide it knowing. That is all anyone is owed."],
 		"reward": {"embers": 800, "items": {&"ember_shard": 2}},
 	},
+	&"pell_lurkers": {
+		"giver": &"pell", "after_talks": 1, "title": "What Waits in the Shallows", "kind": "kill",
+		"enemy": &"reliquary_lurker", "count": 3,
+		"summary": "Pell wants three Reliquary Lurkers put down. They have been taking her divers.",
+		"offer": ["Something lives under the shallow water and it has been taking my divers one by one. Look for the ripple with no wind behind it. Put three of them down for me and I will make it worth your while."],
+		"remind": "Three lurkers. Watch the water, not the walls. A ripple with no wind.",
+		"complete": ["Three. And you walked back dry. Here - the divers would have wanted you to have their share."],
+		"reward": {"embers": 450, "items": {&"hollow_resin": 2, &"ember_shard": 1}},
+	},
+	&"pell_signet": {
+		"giver": &"pell", "needs": &"pell_lurkers", "after_talks": 2, "title": "The Abbot's Seal", "kind": "have",
+		"item": &"abbots_signet", "count": 1,
+		"summary": "Show Pell the Abbot's Signet, once the Salt Abbot is down.",
+		"offer": ["The Abbot signed every drowning with a seal. If it can be taken from him - and I would not say that it can - I would like to see that it ends. Only show it to me."],
+		"remind": "The Abbot's Signet. Show it to me, if you take it from him.",
+		"complete": ["So it has ended. He signed a great many of my friends. Thank you for closing the book."],
+		"reward": {"embers": 1000, "items": {&"ember_shard": 2, &"stamina_tonic": 3}},
+	},
 }
-const ORDER: Array[StringName] = [&"hobb_scrap", &"wenna_crows", &"ilse_resin", &"ommen_cantors", &"aldous_gallery", &"hobb_sergeants", &"wenna_moths", &"ilse_lantern", &"ommen_draft"]
+const ORDER: Array[StringName] = [&"hobb_scrap", &"wenna_crows", &"ilse_resin", &"ommen_cantors", &"aldous_gallery", &"hobb_sergeants", &"wenna_moths", &"ilse_lantern", &"ommen_draft", &"pell_lurkers", &"pell_signet"]
 
 
 static func def(id: StringName) -> Dictionary:

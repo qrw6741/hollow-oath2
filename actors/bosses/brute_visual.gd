@@ -4,7 +4,7 @@ extends Node2D
 ## style SEXTON: wide hat, long black coat, a grave-spade, a cold blue lantern on the belt.
 ## Telegraphs: overhead (smash) glints = parryable; sweep glows red where it can't be parried.
 
-enum Style { CELLARER, SEXTON, CINDER, ASHFALL }
+enum Style { CELLARER, SEXTON, CINDER, ASHFALL, SALT }
 @export var style := Style.CELLARER
 
 var enemy: EnemyBase
@@ -105,7 +105,8 @@ func _draw() -> void:
 			eye = 0.0
 	var cinder := style == Style.CINDER
 	var ashfall := style == Style.ASHFALL
-	var sexton := style == Style.SEXTON or ashfall   # long-coat silhouette with a blade
+	var salt := style == Style.SALT
+	var sexton := style == Style.SEXTON or ashfall or salt   # long-coat silhouette with a blade
 	var coat := Color("2a2530") if sexton else Color("5a4a3a")
 	var trim := Color("4a4258") if sexton else Color("8a7a60")
 	if cinder:
@@ -114,6 +115,9 @@ func _draw() -> void:
 	elif ashfall:
 		coat = Color("3a3a46")
 		trim = Color("b8b8c8")
+	elif salt:
+		coat = Color("34505a")
+		trim = Color("b6dce6")
 	var hip := Vector2(lean * 0.3, -18.0 + crouch * 0.6)
 	var shoulder := Vector2(2.0 + lean, -40.0 + crouch)
 	var head := shoulder + Vector2(2.0, -8.0)

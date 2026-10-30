@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"croz_3"
+display_name = "Crozier - Hook and Haul"
+animation = &"smash"
+startup_frames = 14
+active_frames = 5
+recovery_frames = 26
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 28.0
+poise_damage = 40.0
+stamina_cost = 20.0
+invulnerable_frames = 0
+knockback = Vector2(120, -50)
+hitbox_size = Vector2(50, 34)
+hitbox_offset = Vector2(28, -16)
+lunge_speed = 0.0
+lunge_start_frame = 0
+lunge_frames = 0
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -22)
+hit_stop = 0.06
+shake = 3.0

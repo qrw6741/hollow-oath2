@@ -37,6 +37,10 @@ extends Resource
 ## Elites are tougher versions of ordinary enemies: gold mark, more damage, better drops.
 @export var elite := false
 @export var damage_mult := 1.0
+## Forces an elite modifier (frenzied / stoneskin / venomous); empty = picked from where it stands.
+@export var modifier: StringName = &""
+## When this enemy spots you, unaware neighbours within earshot join the hunt.
+@export var pack_alert := false
 
 @export_group("Status")
 ## Status resistance by kind, e.g. {"poison": 1.0} = immune (see Status).

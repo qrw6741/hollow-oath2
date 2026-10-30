@@ -19,8 +19,17 @@ const STOCK := {
 		{"item": &"forge_scrap", "price": 90},
 		{"item": &"ember_shard", "price": 240},
 	],
+	## Pell the Salt-Diver, in the Sunken Reliquary.
+	&"salt_diver": [
+		{"item": &"ash_bandage", "price": 40},
+		{"item": &"stamina_tonic", "price": 80},
+		{"item": &"pilgrims_draught", "price": 140},
+		{"item": &"forge_scrap", "price": 100},
+		{"item": &"hollow_resin", "price": 150},
+		{"item": &"ember_shard", "price": 260},
+	],
 }
-const NAMES := {&"pedlar": "THE PEDLAR'S WARES", &"lantern": "THE LANTERN-MAN'S WARES"}
+const NAMES := {&"pedlar": "THE PEDLAR'S WARES", &"lantern": "THE LANTERN-MAN'S WARES", &"salt_diver": "PELL'S WARES"}
 
 
 static func stock(shop_id: StringName) -> Array:

@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"axe_heavy"
+display_name = "Greataxe - Grave Chop"
+animation = &"heavy"
+startup_frames = 34
+active_frames = 7
+recovery_frames = 36
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 70.0
+poise_damage = 140.0
+stamina_cost = 38.0
+invulnerable_frames = 0
+knockback = Vector2(180, -70)
+hitbox_size = Vector2(62, 40)
+hitbox_offset = Vector2(32, -18)
+lunge_speed = 110.0
+lunge_start_frame = 30
+lunge_frames = 4
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -22)
+hit_stop = 0.14
+shake = 7.0

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
 [ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
 [ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/trial_door.gd" id="trialdoor"]
 [ext_resource type="Script" path="res://world/transitions/manor_door.gd" id="mdoor"]
 [ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
 [ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
@@ -205,6 +206,20 @@ display_name = "the cellar"
 position = Vector2(690, 480)
 script = ExtResource("entry")
 entry_id = &"from_cellar"
+
+[node name="TrialDoor" type="Area2D" parent="."]
+position = Vector2(1500, 480)
+script = ExtResource("trialdoor")
+target_level = "res://world/levels/trial_ring.tscn"
+target_entry = &"from_manor"
+mode = 1
+size = Vector2(30, 70)
+display_name = "the Trial Ring"
+
+[node name="FromTrial" type="Marker2D" parent="."]
+position = Vector2(1550, 480)
+script = ExtResource("entry")
+entry_id = &"from_trial"
 
 [node name="Motes" type="CPUParticles2D" parent="."]
 position = Vector2(1250, 120)

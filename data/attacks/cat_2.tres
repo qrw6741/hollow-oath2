@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+[ext_resource type="Resource" path="res://data/attacks/cat_3.tres" id="2_next"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"cat_2"
+display_name = "Catalyst - Flicker"
+animation = &"thrust"
+startup_frames = 10
+active_frames = 2
+recovery_frames = 16
+chain_open_frame = 7
+dodge_cancel_frame = -1
+damage = 13.0
+poise_damage = 8.0
+stamina_cost = 10.0
+invulnerable_frames = 0
+knockback = Vector2(60, -10)
+hitbox_size = Vector2(4, 4)
+hitbox_offset = Vector2(0, 0)
+lunge_speed = 0.0
+lunge_start_frame = 0
+lunge_frames = 0
+projectile_speed = 270.0
+projectile_offset = Vector2(16, -22)
+hit_stop = 0.06
+shake = 1.5
+next_in_combo = ExtResource("2_next")

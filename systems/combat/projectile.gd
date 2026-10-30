@@ -21,6 +21,8 @@ var drop := 20.0
 ## When false the projectile passes through level geometry (ground waves).
 var hit_world := true
 var kind: StringName = &"ember"
+## Hurtbox layer this shot looks for: 8 = the player's (enemy shots), 16 = enemies' (the player's spells).
+var target_mask := 8
 
 
 ## opts may set: radius, size, drop, hit_world, kind, lifetime, color.
@@ -39,7 +41,7 @@ static func spawn(parent: Node, from: Vector2, vel: Vector2, hit: HitData, who: 
 func _ready() -> void:
 	add_to_group(&"projectiles")
 	collision_layer = 0
-	collision_mask = 8 | (1 if hit_world else 0)   # player hurtbox (+ world geometry)
+	collision_mask = target_mask | (1 if hit_world else 0)   # target hurtbox (+ world geometry)
 	monitoring = true
 	var cs := CollisionShape2D.new()
 	if size != Vector2.ZERO:
@@ -56,7 +58,7 @@ func _ready() -> void:
 	var l := PointLight2D.new()
 	l.texture = LightTex.radial()
 	l.texture_scale = 0.4
-	l.color = Palette.EMBER
+	l.color = color
 	l.energy = 0.8
 	add_child(l)
 	z_index = 6
@@ -81,7 +83,7 @@ func _on_area(a: Area2D) -> void:
 	hit.poise_damage = hit_template.poise_damage
 	hit.knockback = hit_template.knockback
 	hit.parryable = hit_template.parryable
-	hit.source = self
+	hit.source = shooter as Node2D if target_mask == 16 and shooter is Node2D else self
 	hit.attack_id = hit_template.attack_id
 	hit.hit_stop = hit_template.hit_stop
 	hit.status = hit_template.status
@@ -95,6 +97,8 @@ func _on_area(a: Area2D) -> void:
 			GameFeel.spark(global_position, Palette.GOLD_BRIGHT, 12)
 			_finish()
 		_:
+			if target_mask == 16 and shooter != null and shooter.has_method(&"add_focus"):
+				shooter.add_focus(6.0)
 			GameFeel.spark(global_position, color, 10)
 			Audio.sfx_at(&"hit_flesh", global_position)
 			_finish()

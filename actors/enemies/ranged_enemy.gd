@@ -25,11 +25,11 @@ func _state_chase(delta: float) -> void:
 			return
 	var desired := 0.0
 	if dist < keep_min:
-		desired = -facing * data.chase_speed * retreat_speed_mult
+		desired = -facing * data.chase_speed * speed_scale * retreat_speed_mult
 		if _ledge_behind() or _wall_behind():
 			desired = 0.0
 	elif dist > keep_max:
-		desired = facing * data.chase_speed
+		desired = facing * data.chase_speed * speed_scale
 		if _ledge_ahead():
 			desired = 0.0
 	velocity.x = move_toward(velocity.x, desired, 700.0 * delta)

@@ -82,6 +82,8 @@ func _run() -> void:
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
+		# --- expansion: region, weapons, arts, variety, secrets, trials ---
+		test_reliquary_region, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -2029,7 +2031,7 @@ func test_remapping() -> void:
 	var cp := ControlsPanel.new()
 	get_tree().root.add_child(cp)
 	await frames(2)
-	check(cp._kb.size() == 17 and cp._pad[&"move_left"].disabled, "a row per action; pad movement is fixed")
+	check(cp._kb.size() == 18 and cp._pad[&"move_left"].disabled, "a row per action; pad movement is fixed")
 	check((cp._kb[&"jump"] as Button).text == "Space", "jump shows Space (%s)" % cp._kb[&"jump"].text)
 	# Rebind jump to G via the listening flow.
 	cp.start_listening(&"jump", false)
@@ -3410,7 +3412,7 @@ func test_weapon_skills_data() -> void:
 			check(wd.skill.validate().is_empty(), "%s skill is valid: %s" % [w, wd.skill.validate()])
 			check(wd.skill_cost > 0.0 and wd.skill_cost <= Player.MAX_FOCUS, "%s skill cost is payable" % w)
 			check(wd.skill.damage > wd.heavy.damage * 0.9 or w == &"twin_blades" or w == &"sword_and_shield", "%s skill hits harder than a heavy" % w)
-		check(wd.block_reduction == 0.0 or w == &"sword_and_shield", "only the shield guards")
+		check(wd.block_reduction == 0.0 or w == &"sword_and_shield" or w == &"abbots_crozier", "only the shield and the crozier guard")
 
 
 func test_focus_and_skill() -> void:
@@ -3833,3 +3835,298 @@ func test_day_night() -> void:
 	var sky = level.get_node("Background/Sky/SkyDraw")
 	check(sky.darkness > 0.9, "the sky darkens")
 	DayNight.forced = -1.0
+
+
+# ------------------------------------------------------------------ expansion
+
+const RELIQUARY := "res://world/levels/sunken_reliquary.tscn"
+
+
+func test_reliquary_region() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(RELIQUARY, &"")
+	check(level.scene_file_path == RELIQUARY and WorldMap.LEVELS.has(RELIQUARY), "the Sunken Reliquary loads and is on the map")
+	for n in ["FromChapel", "ToChapel", "StairCandle", "SaltCandle", "VaultCandle", "Pell", "AbbotArena", "LurkerA", "PilgrimA", "JetA", "JetB", "NookWall", "AxeChest", "VaultWallBreak", "VaultBlock", "WickChest"]:
+		check(level.get_node_or_null(n) != null, "the reliquary has %s" % n)
+	var bad := placement_problems()
+	check(bad.is_empty(), "the reliquary: everything stands on something %s" % [bad])
+	check((level.get_node("Pell") as Npc).shop_id == &"salt_diver" and Shops.stock(&"salt_diver").size() >= 5, "Pell runs a shop")
+	await go_to_level("res://world/levels/ashen_chapel.tscn", &"from_reliquary")
+	check(level.find_entry(&"from_reliquary") != null and level.get_node_or_null("ToReliquary") != null, "the chapel links down to the reliquary")
+	for id in [&"drowned_pilgrim", &"reliquary_lurker", &"salt_abbot"]:
+		check(Bestiary.IDS.has(id) and Bestiary.data(id) != null, "%s is in the bestiary" % id)
+	var ab := Bestiary.data(&"salt_abbot")
+	check(ab.drop_item != null and ab.drop_item.id == &"abbots_signet", "the Abbot drops his signet")
+	check(Forge.recipe(&"abbots_crozier").relic == &"abbots_signet", "the signet is forged into the crozier")
+	check(Quests.DEFS.has(&"pell_lurkers") and Quests.DEFS.has(&"pell_signet"), "Pell has a two-part errand")
+	var c := Dialogues.conversation(&"pell")
+	check(c.speaker == "Pell" and c.lines.size() >= 2, "Pell introduces himself")
+
+
+func test_lurker_ambush() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(300.0, 480.0, 1)
+	var l: Lurker = load("res://actors/enemies/reliquary_lurker.tscn").instantiate()
+	l.position = Vector2(700, 480)
+	level.add_child(l)
+	await frames(6)
+	check(l.dormant and l.hurtbox.collision_layer == 0, "a lurker lies hidden and untouchable")
+	check(l.receive_hit(damage(50.0)) == HitData.Result.IGNORED and is_equal_approx(l.health.current, l.health.max_health), "hidden, it cannot be hurt")
+	await frames(60)
+	check(l.dormant, "it does not wake for a distant player")
+	await place_player(690.0, 480.0, 1)
+	await frames(4)
+	check(not l.dormant and l.hurtbox.collision_layer == 16, "it springs when you walk over it")
+	check(l.state == EnemyBase.State.ATTACK, "and lunges at once")
+	check(l.data.pack_alert, "lurkers call their neighbours")
+	l.queue_free()
+
+
+func test_elite_modifiers_and_alert() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(300.0, 480.0, 1)
+	var seen := {}
+	for x in [610, 617, 624, 631, 638, 645, 652]:
+		var e: EnemyBase = load("res://actors/enemies/gilded_penitent.tscn").instantiate()
+		e.position = Vector2(x, 480)
+		level.add_child(e)
+		await frames(2)
+		seen[e.modifier] = true
+		check(EnemyBase.MODIFIERS.has(e.modifier), "an elite rolls a modifier (%s)" % e.modifier)
+		match e.modifier:
+			&"frenzied": check(e.speed_scale > 1.0, "frenzied elites are faster")
+			&"stoneskin": check(e.damage_taken_scale < 1.0 and e.poise > e.data.max_poise, "stoneskin elites take less damage")
+			&"venomous": check(e.attack_runner.weapon_status == &"poison", "venomous elites poison")
+		e.queue_free()
+	check(seen.size() >= 2, "different spots give different modifiers (%s)" % [seen.keys()])
+	# Pack alert: spotting you wakes an unaware neighbour.
+	var a: EnemyBase = load("res://actors/enemies/drowned_pilgrim.tscn").instantiate()
+	a.position = Vector2(500, 480)
+	a.start_facing = -1
+	level.add_child(a)
+	var b: EnemyBase = load("res://actors/enemies/drowned_pilgrim.tscn").instantiate()
+	b.position = Vector2(560, 480)
+	b.start_facing = 1
+	level.add_child(b)
+	await place_player(430.0, 480.0, 1)
+	await frames(10)
+	check(a.target != null, "the first pilgrim sees you")
+	check(b.target != null, "and its neighbour joins in")
+	a.queue_free()
+	b.queue_free()
+
+
+func test_arts() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(400.0, 480.0, 1)
+	check(Arts.equipped() == &"" and not InputMap.has_action(&"") and InputMap.has_action(&"art"), "no art yet; the Art button exists")
+	check(not Arts.equip(&"ember_lance"), "an unlearned art cannot be equipped")
+	for id in Arts.ORDER:
+		check(Arts.attack(id) != null, "%s has its move" % id)
+	game_state.set_flag(&"boss_defeated_bell_warden", true)
+	events.boss_defeated.emit(&"bell_warden")
+	check(Arts.unlocked(&"toll_of_mercy") and Arts.equipped() == &"toll_of_mercy", "beating the Bell-Warden teaches and equips Toll of Mercy (%s / %s)" % [Arts.unlocked(&"toll_of_mercy"), game_state.get_flag(&"art_equipped", "?")])
+	player.set_focus(0.0)
+	await press(&"art")
+	await frames(6)
+	check(player.state != Player.State.ATTACK, "no art without focus")
+	var e := await spawn_enemy(428.0, -1)
+	e.health.set_max(99999.0)
+	e.health.restore_full()
+	e.set_physics_process(false)
+	player.set_focus(Player.MAX_FOCUS)
+	player.stamina.restore_full()
+	var hp := e.health.current
+	await press(&"art")
+	var seen := false
+	for i in 60:
+		await get_tree().physics_frame
+		if player.attack_runner.attack == Arts.attack(&"toll_of_mercy"):
+			seen = true
+	check(seen, "the Art button casts the equipped art")
+	check(e.health.current < hp, "Toll of Mercy hits")
+	check(player.focus <= Player.MAX_FOCUS - Arts.cost(&"toll_of_mercy") + 20.0, "and spends focus (%.0f)" % player.focus)
+	await frames(50)
+	# Healing art
+	game_state.set_flag(&"art_has_mending_glow", true)
+	check(Arts.equip(&"mending_glow") and Arts.equipped() == &"mending_glow", "Mending Glow equips")
+	player.health.set_max(100.0)
+	player.health.current = 40.0
+	player.set_focus(Player.MAX_FOCUS)
+	player.stamina.restore_full()
+	await frames(30)
+	await press(&"art")
+	await frames(20)
+	check(player.health.current >= 69.0, "Mending Glow restores 30%% (%.0f)" % player.health.current)
+	# Spell art needs the projectile path
+	game_state.set_flag(&"art_has_ember_lance", true)
+	Arts.equip(&"ember_lance")
+	await frames(40)
+	e.health.restore_full()
+	e.global_position = player.global_position + Vector2(60, 0)
+	player.set_focus(Player.MAX_FOCUS)
+	player.stamina.restore_full()
+	hp = e.health.current
+	await press(&"art")
+	await frames(60)
+	check(e.health.current < hp, "Ember Lance flies and hits")
+	# Screen
+	var inv: InventoryMenu = main.get_node("InventoryMenu")
+	inv.open(InventoryMenu.Tab.ARTS)
+	await frames(4)
+	check(inv._art_btns.size() == Arts.ORDER.size() and not inv._art_btns[0].disabled and inv._art_btns[5].disabled, "the Arts tab lists learned and unlearned arts")
+	inv.close()
+	check(Arts.title(&"tidecall") != "" and Arts.def(&"tidecall").boss == &"salt_abbot", "Tidecall is taught by the Salt Abbot")
+	e.queue_free()
+
+
+func test_second_weapon_set() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(400.0, 480.0, 1)
+	for id in [&"gravediggers_greataxe", &"veil_daggers", &"candle_catalyst", &"abbots_crozier"]:
+		var w := Weapons.get_weapon(id)
+		check(w != null and w.light_combo_start != null and w.heavy != null and w.aerial != null and w.riposte != null and w.skill != null, "%s is a complete weapon" % id)
+		check(IconArt.has_icon(id) and Weapons.IDS.has(id), "%s has an icon and is listed" % id)
+	check(Weapons.get_weapon(&"gravediggers_greataxe").look == PresetData.WeaponLook.AXE, "the greataxe is drawn as an axe")
+	check(Weapons.get_weapon(&"candle_catalyst").light_combo_start.is_ranged(), "the catalyst's light attacks are bolts")
+	check(Weapons.get_weapon(&"abbots_crozier").block_reduction > 0.0, "the crozier holds a guard")
+	check(Forge.recipe(&"veil_daggers").relic == &"lurker_fang" and Forge.recipe(&"candle_catalyst").relic == &"cantors_wick", "daggers and catalyst are forged from drops")
+	check(not Forge.recipe(&"gravediggers_greataxe").is_empty() == false, "the greataxe is not forged: it is found")
+	# Each weapon visibly draws and swings without error.
+	for id in [&"gravediggers_greataxe", &"veil_daggers", &"candle_catalyst", &"abbots_crozier"]:
+		game_state.grant_gear("weapon", id)
+		Loadout.equip_weapon(id)
+		await frames(3)
+		await place_player(400.0, 480.0, 1)
+		player.stamina.restore_full()
+		await press(&"attack_light")
+		await frames(30)
+		check(player.weapon.id == id, "%s equips and swings" % id)
+	# The catalyst's bolt hurts an enemy from range, and gives focus.
+	Loadout.equip_weapon(&"candle_catalyst")
+	await frames(3)
+	await place_player(400.0, 480.0, 1)
+	var e := await spawn_enemy(520.0, -1)
+	e.health.set_max(9999.0)
+	e.health.restore_full()
+	e.set_physics_process(false)
+	player.set_focus(0.0)
+	player.stamina.restore_full()
+	var hp := e.health.current
+	await press(&"attack_light")
+	await frames(60)
+	check(e.health.current < hp, "a catalyst bolt crosses the room and hurts")
+	check(player.focus > 0.0, "and a landed bolt gives focus (%.0f)" % player.focus)
+	e.queue_free()
+	# The axe chest gives the axe.
+	await go_to_level(RELIQUARY, &"")
+	var chest := level.get_node("AxeChest") as TreasureChest
+	check(chest.gear_kind == "weapon" and chest.gear_id == &"gravediggers_greataxe", "the hidden chest holds the Gravedigger's Greataxe")
+
+
+func test_secrets_and_hazards() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(RELIQUARY, &"")
+	check(Secrets.count() == 0, "no secrets found at the start")
+	var wall := level.get_node("NookWall") as IllusoryWall
+	check(wall.collision_layer == 0, "an illusory wall has no collision")
+	await place_player(wall.position.x - 40.0, 480.0, 1)
+	player.global_position = wall.global_position + Vector2(8, 60)
+	await frames(8)
+	check(Secrets.is_found(&"reliquary_axe") and Secrets.count() == 1, "walking into it reveals the secret")
+	for id in [&"a", &"b", &"c"]:
+		Secrets.record(id)
+	check(Deeds.has(&"secrets"), "four secrets earn the Seeker deed")
+	# A broken wall counts too.
+	Secrets.record_silent(&"extra")
+	check(Secrets.count() == 5, "a silently recorded secret counts")
+	# Fire jet: harmless while it warns, damaging in the burst.
+	var jet := level.get_node("JetA") as FireJet
+	player.health.set_max(200.0)
+	player.health.restore_full()
+	jet._t = jet.period - jet.burst_time - jet.warn_time + 0.2
+	check(jet.is_warning() and not jet.is_bursting(), "a jet warns before it bursts")
+	await place_player(jet.global_position.x, 480.0, 1)
+	var before := player.health.current
+	await frames(6)
+	check(player.health.current == before, "standing in the warning is safe")
+	jet._t = jet.period - jet.burst_time + 0.05
+	await frames(10)
+	check(player.health.current < before, "the burst burns (%.0f)" % player.health.current)
+
+
+func test_trials() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	check(not Trials.unlocked(), "the Ring is shut before an ending")
+	game_state.set_flag(&"ending_chosen", "keep")
+	check(Trials.unlocked(), "the Ring opens after an ending")
+	var emb: int = game_state.embers
+	var r := Trials.record_rush(312.4)
+	check(r.reward == Trials.RUSH_REWARD and r.record and is_equal_approx(Trials.best_rush(), 312.4), "the first Boss Rush pays and records %s %s" % [r, Trials.best_rush()])
+	r = Trials.record_rush(400.0)
+	check(r.reward == 0 and not r.record and is_equal_approx(Trials.best_rush(), 312.4), "a slower run pays nothing and keeps the record")
+	r = Trials.record_rush(290.0)
+	check(r.reward == 0 and r.record and is_equal_approx(Trials.best_rush(), 290.0), "a faster run improves it")
+	r = Trials.record_gauntlet(4, false)
+	check(r.reward == 0 and Trials.best_gauntlet() == 4, "a failed Gauntlet records the wave")
+	check(game_state.embers == emb + Trials.RUSH_REWARD, "only the rush reward was paid")
+	for p in Trials.RUSH_BOSSES:
+		check(ResourceLoader.exists(p), "rush boss %s exists" % p)
+	for w in Trials.WAVES:
+		for n in w:
+			check(ResourceLoader.exists(Trials.E + n + ".tscn"), "gauntlet enemy %s exists" % n)
+	# The ring level and its door
+	await go_to_level("res://world/levels/trial_ring.tscn", &"")
+	check(level.get_node_or_null("TrialRunner") != null and level.get_node_or_null("RushStone") != null and level.get_node_or_null("GauntletStone") != null, "the ring has its runner and stones")
+	var rn := level.get_node("TrialRunner") as TrialRunner
+	game_state.set_flag(&"ending_chosen", "")
+	check(not rn.start(&"gauntlet"), "a run will not start before an ending")
+	game_state.set_flag(&"ending_chosen", "keep")
+	check(rn.start(&"gauntlet"), "the Gauntlet starts")
+	await frames(10)
+	check(rn.running and enemies().size() == Trials.WAVES[0].size(), "wave one is on the floor (%d)" % enemies().size())
+	for e in enemies():
+		e.health.take_damage(99999.0)
+	await frames(200)
+	check(rn.step == 1 and enemies().size() == Trials.WAVES[1].size(), "clearing a wave sends the next (%d)" % enemies().size())
+	player.health.take_damage(99999.0)
+	await frames(30)
+	check(not rn.running and Trials.best_gauntlet() >= 1, "dying ends the run and keeps the record")
+	var door := TrialDoor.new()
+	check(door.has_method(&"try_open"), "the Manor's Trial Door exists")
+	door.free()
+
+
+func test_boss_intro_card() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(300.0, 480.0, 1)
+	var hud := main.get_node_or_null("HUD")
+	check(hud != null, "the HUD is in the main scene")
+	var b: BossBase = load("res://actors/bosses/cellarer_grume.tscn").instantiate()
+	b.position = Vector2(700, 480)
+	level.add_child(b)
+	await frames(3)
+	var kids_before := hud.get_child_count()
+	b.start_fight()
+	await frames(5)
+	check(game_state.get_flag(&"intro_cellarer", false), "the first meeting shows an intro card")
+	check(hud.get_child_count() > kids_before, "the card is on screen")
+	b.queue_free()
+	await frames(2)
+	var b2: BossBase = load("res://actors/bosses/cellarer_grume.tscn").instantiate()
+	b2.position = Vector2(700, 480)
+	level.add_child(b2)
+	await frames(3)
+	var n := hud.get_child_count()
+	b2.start_fight()
+	await frames(5)
+	check(hud.get_child_count() == n, "a retry skips the card")
+	b2.queue_free()

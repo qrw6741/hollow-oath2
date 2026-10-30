@@ -55,6 +55,7 @@ func receive_hit(hit: HitData) -> int:
 	Audio.sfx_at(&"land", global_position + size / 2.0, 2.0, 0.7)
 	if hits >= hits_needed:
 		GameState.set_flag(_flag(), true)
+		Secrets.record_silent(wall_id)
 		GameFeel.spark(global_position + size / 2.0, Palette.DUST, 26)
 		GameFeel.shake(3.0, 0.3)
 		Audio.sfx_at(&"gate_open", global_position + size / 2.0, -2.0, 1.3)

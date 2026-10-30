@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/weapon_data.gd" id="1_weapon"]
+[ext_resource type="Resource" path="res://data/attacks/dag_1.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/dag_heavy.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/attacks/dag_air.tres" id="a2"]
+[ext_resource type="Resource" path="res://data/attacks/dag_riposte.tres" id="a3"]
+[ext_resource type="Resource" path="res://data/attacks/skill_veil_daggers.tres" id="a4"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = &"veil_daggers"
+display_name = "Veilglass Daggers"
+description = "Twin blades ground from a lurker's fang. They weigh nothing and cut the air in rows. The poison is the fang's, not yours."
+light_combo_start = ExtResource("a0")
+heavy = ExtResource("a1")
+aerial = ExtResource("a2")
+riposte = ExtResource("a3")
+riposte_multiplier = 1.1
+look = 1
+two_handed = false
+damage_mult = 1.0
+status = &"poison"
+status_amount = 18.0
+skill = ExtResource("a4")
+skill_cost = 26.0
+parry_window_bonus = 0
+parry_recovery_bonus = -5

@@ -41,6 +41,19 @@ EXT = {
     "sergeant": ("PackedScene", "res://actors/enemies/pike_sergeant.tscn"),
     "captain": ("PackedScene", "res://actors/enemies/oathguard_captain.tscn"),
     "wall": ("Script", "res://world/blocks/breakable_wall.gd"),
+    "runner": ("Script", "res://world/trial/trial_runner.gd"),
+    "stone": ("Script", "res://world/trial/trial_stone.gd"),
+    "illusion": ("Script", "res://world/blocks/illusory_wall.gd"),
+    "water": ("Script", "res://world/hazards/water_zone.gd"),
+    "drown": ("Script", "res://world/hazards/drown_zone.gd"),
+    "spikes": ("Script", "res://world/hazards/spike_pit.gd"),
+    "jet": ("Script", "res://world/hazards/fire_jet.gd"),
+    "pilgrim": ("PackedScene", "res://actors/enemies/drowned_pilgrim.tscn"),
+    "lurker": ("PackedScene", "res://actors/enemies/reliquary_lurker.tscn"),
+    "abbot": ("PackedScene", "res://actors/bosses/salt_abbot.tscn"),
+    "it_wick": ("Resource", "res://data/items/cantors_wick.tres"),
+    "it_knot": ("Resource", "res://data/items/relic_knot.tres"),
+    "it_draught": ("Resource", "res://data/items/pilgrims_draught.tres"),
     "it_scrap": ("Resource", "res://data/items/forge_scrap.tres"),
     "it_shard": ("Resource", "res://data/items/ember_shard.tres"),
     "it_resin": ("Resource", "res://data/items/hollow_resin.tres"),
@@ -140,7 +153,7 @@ script = ExtResource("tablet")
 title = "{title}"
 text = "{text}"''')
 
-    def npc(self, name, x, nid, title, look, facing=-1):
+    def npc(self, name, x, nid, title, look, facing=-1, shop=None):
         self.use("npc")
         self.node(f'''
 [node name="{name}" type="Area2D" parent="."]
@@ -149,7 +162,7 @@ script = ExtResource("npc")
 npc_id = &"{nid}"
 display_name = "{title}"
 look = {look}
-start_facing = {facing}''')
+start_facing = {facing}''' + (f'\nshop_id = &"{shop}"' if shop else ""))
 
     def arena(self, name, x, y, scene, text, offset=420, width=560):
         self.use("bossarena"); self.use(scene)
@@ -163,6 +176,52 @@ gate_height = 96.0
 trigger_offset = 36.0
 trigger_width = {width}.0
 victory_text = "{text}"''')
+
+    def water(self, name, x, y, w, h):
+        self.use("water")
+        self.node(f'''
+[node name="{name}" type="Area2D" parent="."]
+position = Vector2({x}, {y})
+script = ExtResource("water")
+size = Vector2({w}, {h})''')
+
+    def spikes(self, name, x, y, w, dmg=20.0):
+        self.use("spikes")
+        self.node(f'''
+[node name="{name}" type="Area2D" parent="."]
+position = Vector2({x}, {y})
+script = ExtResource("spikes")
+width = {w}.0
+damage = {dmg}''')
+
+    def jet(self, name, x, y, phase=0.0, period=3.0, height=56):
+        self.use("jet")
+        self.node(f'''
+[node name="{name}" type="Area2D" parent="."]
+position = Vector2({x}, {y})
+script = ExtResource("jet")
+column = Vector2(14, {height})
+period = {period}
+phase = {phase}''')
+
+    def illusion(self, name, x, y, w, h, sid):
+        self.use("illusion")
+        self.node(f'''
+[node name="{name}" type="Area2D" parent="."]
+position = Vector2({x}, {y})
+script = ExtResource("illusion")
+size = Vector2({w}, {h})
+secret_id = &"{sid}"''')
+
+    def secret_wall(self, name, x, y, w, h, wid, hits=3):
+        self.use("wall")
+        self.node(f'''
+[node name="{name}" type="StaticBody2D" parent="."]
+position = Vector2({x}, {y})
+script = ExtResource("wall")
+size = Vector2({w}, {h})
+wall_id = &"{wid}"
+hits_needed = {hits}''')
 
     def write(self):
         ext = [("level",)] + [(k,) for k in self.used if k != "level"]
@@ -182,6 +241,7 @@ CELLAR = "res://world/levels/hollowmere_cellar.tscn"
 GALLERY = "res://world/levels/hollowmere_gallery.tscn"
 GRAVE = "res://world/levels/pilgrims_graveyard.tscn"
 CHAPEL = "res://world/levels/ashen_chapel.tscn"
+RELIQUARY = "res://world/levels/sunken_reliquary.tscn"
 
 
 # ------------------------------------------------------------------ the cellar
@@ -467,10 +527,184 @@ size = Vector2(16, 60)
 wall_id = &"ashfall_crypt"
 hits_needed = 3''')
     L.arena("AshfallArena", 4150, 480, "ashfall", "THE UNBURIED REST", 330, 440)
+    L.entry("FromReliquary", 3700, 480, "from_reliquary")
+    L.walk_exit("ToReliquary", 3730, 480, RELIQUARY, "from_chapel")
+    L.tablet("FloodedStair", 3660, 480, "A Flooded Stair",
+             "A stair runs down behind the vestry, and the bottom steps are underwater. Someone has chalked on the wall: 'THE RELIQUARY. WE BLESSED THE WATER. IT BLESSED US BACK.'")
+    L.write()
+
+
+def trial():
+    W = 1000
+    L = Level("trial_ring.tscn")
+    L.use("sky"); L.use("ruins"); L.use("props"); L.use("cycle")
+    L.node(f'''
+[node name="TrialRing" type="Node2D"]
+script = ExtResource("level")
+level_id = &"trial_ring"
+display_name = "The Trial Ring"
+bounds = Rect2(0, 0, {W}, 540)
+music = &"chapel"
+music_pitch = 0.9
+map_origin = Vector2(8800, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Background" type="ParallaxBackground" parent="."]
+
+[node name="Sky" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0, 0)
+
+[node name="SkyDraw" type="Node2D" parent="Background/Sky"]
+script = ExtResource("sky")
+moon_pos = Vector2(340, 56)
+daylight = false
+darkness = 0.9
+
+[node name="Far" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.1, 0.1)
+
+[node name="Hills" type="Node2D" parent="Background/Far"]
+script = ExtResource("ruins")
+base_y = 235.0
+max_height = 70.0
+color = Color(0.13, 0.1, 0.16, 1)
+seed_value = 7
+spacing = 90.0
+width = 1200.0
+haze = 0.4
+haze_color = Color(0.4, 0.3, 0.45, 1)
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.62, 0.5, 0.58, 1)
+
+[node name="Geometry" type="Node2D" parent="."]''')
+    L.block("CliffLeft", 0, 0, 16, 480)
+    L.block("Ground", 16, 480, W - 16, 60, style=3)
+    L.block("CliffRight", W - 40, 0, 40, 540)
+    L.entry("FromManor", 130, 480, "from_manor")
+    L.walk_exit("ToManor", 34, 480, "res://world/levels/hollowmere_manor.tscn", "from_trial")
+    L.candle("RingCandle", 170, 480, "ring_candle", "Ring Candle")
+    L.use("stone")
+    L.node('''
+[node name="RushStone" type="Area2D" parent="."]
+position = Vector2(250, 480)
+script = ExtResource("stone")
+trial = "rush"
+
+[node name="GauntletStone" type="Area2D" parent="."]
+position = Vector2(330, 480)
+script = ExtResource("stone")
+trial = "gauntlet"''')
+    L.use("runner")
+    L.node('''
+[node name="TrialRunner" type="Node2D" parent="."]
+script = ExtResource("runner")''')
+    L.tablet("RingStone", 420, 480, "The Trial Ring",
+             "Those who have decided are free to be tested. The left stone calls every lord of the road, one after another. The right stone calls what is left of everyone else. Dying here costs nothing but time.")
+    L.write()
+
+
+def reliquary():
+    W = 5400
+    L = Level("sunken_reliquary.tscn")
+    L.use("hall")
+    L.node(f'''
+[node name="SunkenReliquary" type="Node2D"]
+script = ExtResource("level")
+level_id = &"sunken_reliquary"
+display_name = "The Sunken Reliquary"
+bounds = Rect2(0, 0, {W}, 540)
+music = &"catacombs"
+music_pitch = 0.8
+map_origin = Vector2(7200, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("hall")
+width = {W}.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 77
+ghosts = 5
+style = 1
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.4, 0.62, 0.64, 1)
+
+[node name="Geometry" type="Node2D" parent="."]''')
+    L.block("CliffLeft", 0, 0, 16, 480)
+    L.block("Ground", 16, 480, W - 16, 60, style=3)
+    L.block("CliffRight", W - 60, 0, 60, 540)
+    L.block("Ceiling", 0, 40, W, 56)
+    # Stair and ossuary hall
+    L.block("StairStep", 520, 458, 160, 22, style=1)
+    L.plank("OssuaryLoft", 1250, 400, 140)
+    L.plank("OssuaryLoftB", 1560, 392, 120)
+    L.block("BellStep", 2420, 452, 220, 28, style=1)
+    L.plank("ChoirGallery", 2800, 398, 150)
+    L.block("VaultStep", 4400, 450, 160, 30, style=1)
+    # The axe nook: a roofed alcove closed by an illusory wall
+    L.block("NookRoof", 1880, 386, 200, 18)
+    L.block("NookEnd", 2080, 386, 18, 94)
+    L.illusion("NookWall", 1880, 404, 16, 76, "reliquary_axe")
+    # Water
+    L.water("StairWater", 420, 468, 600, 12)
+    L.water("OssuaryWater", 1000, 464, 800, 16)
+    L.water("ChoirWater", 2100, 468, 640, 12)
+    L.water("VaultWater", 4400, 466, 700, 14)
+    # Entry, candles, people
+    L.entry("FromChapel", 130, 480, "from_chapel")
+    L.walk_exit("ToChapel", 34, 480, CHAPEL, "from_reliquary")
+    L.candle("StairCandle", 360, 480, "reliquary_candle", "Stair Candle")
+    L.candle("SaltCandle", 3180, 480, "salt_candle", "Salt Candle")
+    L.candle("VaultCandle", 4260, 480, "vault_candle", "Vault Candle")
+    L.npc("Pell", 3060, "pell", "Pell", 0, 1, "salt_diver")
+    L.tablet("BlessedWater", 220, 480, "A Blessing, Half Legible",
+             "BLESSED BE THE WATER THAT KEEPS. Below, in salt: 'We asked it to keep us. It keeps everything.'")
+    L.tablet("AbbotLedger", 3320, 480, "The Abbot's Ledger",
+             "MERROW, ABBOT. A column of names, each ticked. The last tick is wet. Beneath: 'The water is a congregation I cannot dismiss.'")
+    # Enemies
+    L.enemy("PilgrimA", "pilgrim", 600, 458, 40)
+    L.enemy("PilgrimB", "pilgrim", 880, 480, 50)
+    L.enemy("LurkerA", "lurker", 1110, 480, 0)
+    L.enemy("LurkerB", "lurker", 1480, 480, 0)
+    L.enemy("ArcherLoft", "archer", 1280, 400, 20, -1)
+    L.enemy("PilgrimC", "pilgrim", 1720, 480, 40)
+    L.enemy("CantorChoir", "cantor", 2300, 480, 30)
+    L.enemy("GildedHall", "gilded", 2480, 452, 40)
+    L.enemy("LurkerC", "lurker", 2700, 480, 0)
+    L.enemy("PilgrimD", "pilgrim", 2820, 480, 40)
+    L.enemy("ArcherGallery", "archer", 2850, 398, 20, -1)
+    L.enemy("NightLurker", "lurker", 1300, 480, 0, 1, 2)
+    L.enemy("NightPilgrim", "pilgrim", 2150, 480, 60, 1, 2)
+    L.enemy("CaptainVault", "captain", 4640, 480, 40)
+    L.enemy("PilgrimVault", "pilgrim", 5010, 480, 40)
+    L.enemy("LurkerVault", "lurker", 5080, 480, 0)
+    # Hazards: alternating fire jets in the hall, spikes in the vault
+    L.jet("JetA", 1800, 480, 0.0)
+    L.jet("JetB", 1830, 480, 1.5)
+    L.jet("JetC", 4800, 480, 0.8, 2.6)
+    L.spikes("VaultSpikes", 4720, 480, 48)
+    # Chests (the secrets)
+    L.chest("PewChest2", 1180, 480, "reliquary_chest", count=2, embers=450, item="it_draught")
+    L.chest("AxeChest", 2010, 480, "reliquary_axe_chest", gear=("weapon", "gravediggers_greataxe"))
+    L.chest("ChoirChest", 2900, 398, "reliquary_chest_2", count=1, embers=600, item="it_knot")
+    # Boss
+    L.arena("AbbotArena", 3560, 480, "abbot", "THE BOOK IS CLOSED", 420, 620)
+    # Beyond the boss: the Salt Vault
+    L.secret_wall("VaultWallBreak", 5150, 280, 16, 200, "reliquary_vault", 3)
+    L.chest("VaultCache", 5260, 480, "reliquary_cache", count=2, embers=900, item="it_shard")
+    L.illusion("VaultBlock", 4850, 420, 100, 60, "reliquary_vault_block")
+    L.chest("WickChest", 4900, 480, "reliquary_wick", count=1, embers=300, item="it_wick")
+    L.tablet("VaultStone", 4340, 480, "The Salt Vault",
+             "Where the Abbot kept what the water returned. A rack of wicks, a rack of rings. Most are green. One shelf has been swept clean.")
     L.write()
 
 
 if __name__ == "__main__":
+    trial()
+    reliquary()
     cellar()
     gallery()
     graveyard()

@@ -10,7 +10,7 @@ extends CanvasLayer
 ## A JOURNAL tab lists open errands (see Quests).
 ## Switch tabs with Parry / Heal (L1 / R1) or by clicking. Keyboard, mouse and gamepad.
 
-enum Tab { EQUIPMENT, ITEMS, WEAPONS, JOURNAL, BESTIARY, DEEDS, RELICS }
+enum Tab { EQUIPMENT, ITEMS, WEAPONS, JOURNAL, BESTIARY, DEEDS, RELICS, ARTS }
 
 var is_open := false
 var tab := Tab.EQUIPMENT
@@ -88,12 +88,12 @@ func _build() -> void:
 	# Tabs
 	var tabs := HBoxContainer.new()
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
-	tabs.add_theme_constant_override(&"separation", 6)
+	tabs.add_theme_constant_override(&"separation", 4)
 	v.add_child(tabs)
-	for i in 7:
+	for i in 8:
 		var b := FancyButton.new()
-		b.text = ["EQUIPMENT", "ITEMS", "WEAPONS", "JOURNAL", "BESTIARY", "DEEDS", "RELICS"][i]
-		b.custom_minimum_size = Vector2(60, 18)
+		b.text = ["EQUIPMENT", "ITEMS", "WEAPONS", "JOURNAL", "BESTIARY", "DEEDS", "RELICS", "ARTS"][i]
+		b.custom_minimum_size = Vector2(54, 18)
 		b.add_theme_font_override(&"font", UITheme.title_font())
 		b.add_theme_font_size_override(&"font_size", 8)
 		b.focus_mode = Control.FOCUS_NONE
@@ -111,6 +111,7 @@ func _build() -> void:
 	_pages.append(_build_scroll_text(stack, "_bestiary_label"))
 	_pages.append(_build_scroll_text(stack, "_deeds_label"))
 	_pages.append(_build_relics(stack))
+	_pages.append(_build_arts(stack))
 	_close_btn = FancyButton.new()
 	_close_btn.text = "Close"
 	_close_btn.custom_minimum_size = Vector2(110, 15)
@@ -448,6 +449,62 @@ func _refresh_relics() -> void:
 		_relic_btns[0].grab_focus.call_deferred()
 
 
+var _art_head: Label
+var _art_list: VBoxContainer
+var _art_btns: Array[Button] = []
+
+
+func _build_arts(stack: Control) -> Control:
+	var p := _framed(stack, Vector2(460, 194))
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 3)
+	p.add_child(v)
+	_art_head = Label.new()
+	UITheme.title(_art_head, 10, Palette.GOLD_BRIGHT)
+	_art_head.add_theme_font_override(&"font", UITheme.body_font())
+	v.add_child(_art_head)
+	_art_list = VBoxContainer.new()
+	_art_list.add_theme_constant_override(&"separation", 2)
+	v.add_child(_art_list)
+	return p
+
+
+## Every art: learned ones can be equipped (one at a time); the rest show who teaches them.
+func _refresh_arts() -> void:
+	for c in _art_list.get_children():
+		_art_list.remove_child(c)
+		c.queue_free()
+	_art_btns.clear()
+	var eq := Arts.equipped()
+	_art_head.text = "ARTS    learned %d / %d    equipped: %s    (%s casts it)" % [Arts.learned_count(), Arts.ORDER.size(),
+		Arts.title(eq) if eq != &"" else "none", "Art button"]
+	var first: Button = null
+	for id in Arts.ORDER:
+		var d := Arts.def(id)
+		var b := FancyButton.new()
+		b.custom_minimum_size = Vector2(440, 26)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		UITheme.compact(b)
+		if Arts.unlocked(id):
+			b.text = "%s  %s  (%d focus)\n     %s" % ["[x]" if id == eq else "[ ]", d.title, int(d.cost), d.desc]
+			b.pressed.connect(func():
+				Arts.equip(id)
+				_msg.text = "%s equipped." % d.title
+				_refresh_arts())
+			if first == null or id == eq:
+				first = b
+		else:
+			b.text = "[ ]  ? ? ?\n     Taught by a boss you have not yet defeated."
+			b.disabled = true
+			b.modulate = Color(1, 1, 1, 0.5)
+		_art_list.add_child(b)
+		_art_btns.append(b)
+	if first:
+		first.grab_focus.call_deferred()
+	else:
+		_close_btn.grab_focus()
+
+
 func _build_scroll_text(stack: Control, field: String) -> Control:
 	var p := _framed(stack, Vector2(460, 194))
 	var sc := ScrollContainer.new()
@@ -562,6 +619,8 @@ func show_tab(t: int) -> void:
 		_close_btn.grab_focus()
 	elif tab == Tab.RELICS:
 		_refresh_relics()
+	elif tab == Tab.ARTS:
+		_refresh_arts()
 	else:
 		_rebuild()
 	Audio.sfx(&"ui_move", -4.0)

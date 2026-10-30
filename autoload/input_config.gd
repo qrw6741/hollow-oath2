@@ -25,6 +25,7 @@ const DEFAULTS := {
 	&"map": ["k:%d" % KEY_M, "j:%d" % JOY_BUTTON_TOUCHPAD, "j:%d" % JOY_BUTTON_LEFT_STICK],
 	&"travel_manor": ["k:%d" % KEY_T, "j:%d" % JOY_BUTTON_MISC1],
 	&"skill": ["k:%d" % KEY_O, "a:%d:1" % JOY_AXIS_TRIGGER_RIGHT],
+	&"art": ["k:%d" % KEY_U, "a:%d:1" % JOY_AXIS_TRIGGER_LEFT],
 	&"pause": ["k:%d" % KEY_ESCAPE, "j:%d" % JOY_BUTTON_START],
 	&"debug_toggle": ["k:%d" % KEY_F3],
 }
@@ -81,13 +82,13 @@ const MOVE_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"move_up"
 ## Actions shown on the Controls page, in order (debug_toggle is not remappable).
 const REMAPPABLE: Array[StringName] = [&"move_left", &"move_right", &"move_up", &"move_down",
 	&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal", &"interact",
-	&"use_item", &"skill", &"travel_manor", &"inventory", &"map", &"pause"]
+	&"use_item", &"skill", &"art", &"travel_manor", &"inventory", &"map", &"pause"]
 const ACTION_NAMES := {
 	&"move_left": "Move left", &"move_right": "Move right", &"move_up": "Look up / climb",
 	&"move_down": "Crouch / drop", &"jump": "Jump", &"attack_light": "Light attack",
 	&"attack_heavy": "Heavy attack", &"dodge": "Dodge", &"parry": "Parry",
 	&"heal": "Heal", &"interact": "Interact", &"use_item": "Use quick item",
-	&"skill": "Weapon skill", &"travel_manor": "Hollowmere travel",
+	&"skill": "Weapon skill", &"art": "Art", &"travel_manor": "Hollowmere travel",
 	&"inventory": "Inventory", &"map": "Map", &"pause": "Pause",
 }
 

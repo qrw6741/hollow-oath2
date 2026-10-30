@@ -336,6 +336,54 @@ func _on_boss_fight_started(b: Node) -> void:
 	_boss_box.visible = true
 	create_tween().tween_property(_boss_box, "modulate:a", 1.0, 0.6)
 	_prompt.visible = false
+	_boss_intro(boss)
+
+
+## First meeting with a boss: letterbox bars close in and a line of its story is shown. Once per
+## boss (world flag `intro_<id>`), so retries after a death are not slowed down.
+func _boss_intro(boss: BossBase) -> void:
+	var key := StringName("intro_" + String(boss.boss_id))
+	if bool(GameState.get_flag(key, false)):
+		return
+	GameState.set_flag(key, true)
+	var lore := String(boss.data.lore)
+	var cut := lore.find(". ")
+	var line := lore if cut < 0 else lore.substr(0, cut + 1)
+	var holder := Control.new()
+	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(holder)
+	var bars: Array[ColorRect] = []
+	for top in [true, false]:
+		var r := ColorRect.new()
+		r.color = Color(0, 0, 0, 0.92)
+		r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		r.size = Vector2(480, 0)
+		r.position = Vector2(0, 0 if top else 270)
+		holder.add_child(r)
+		bars.append(r)
+	var name_l := _label(holder, boss.data.display_name.to_upper(), 16, HORIZONTAL_ALIGNMENT_CENTER)
+	UITheme.title(name_l, 16, Palette.GOLD_BRIGHT)
+	name_l.position = Vector2(0, 236)
+	name_l.size = Vector2(480, 18)
+	name_l.modulate.a = 0.0
+	var lore_l := _label(holder, line, 8, HORIZONTAL_ALIGNMENT_CENTER)
+	lore_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lore_l.position = Vector2(30, 6)
+	lore_l.size = Vector2(420, 22)
+	lore_l.add_theme_color_override(&"font_color", Palette.BONE)
+	lore_l.modulate.a = 0.0
+	var t := create_tween().set_parallel(true)
+	t.tween_property(bars[0], "size:y", 30.0, 0.5)
+	t.tween_property(bars[1], "size:y", 30.0, 0.5)
+	t.tween_property(bars[1], "position:y", 240.0, 0.5)
+	t.tween_property(name_l, "modulate:a", 1.0, 0.7).set_delay(0.3)
+	t.tween_property(lore_l, "modulate:a", 1.0, 0.7).set_delay(0.6)
+	var out := create_tween()
+	out.tween_interval(3.2)
+	out.set_parallel(true)
+	out.tween_property(holder, "modulate:a", 0.0, 0.8)
+	out.chain().tween_callback(holder.queue_free)
 
 
 func _on_boss_fight_ended(victory: bool) -> void:

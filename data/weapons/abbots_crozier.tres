@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/weapon_data.gd" id="1_weapon"]
+[ext_resource type="Resource" path="res://data/attacks/croz_1.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/croz_heavy.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/attacks/croz_air.tres" id="a2"]
+[ext_resource type="Resource" path="res://data/attacks/croz_riposte.tres" id="a3"]
+[ext_resource type="Resource" path="res://data/attacks/skill_abbots_crozier.tres" id="a4"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = &"abbots_crozier"
+display_name = "Abbot's Crozier"
+description = "A shepherd's hook of salt-white wood. It was made to pull things back from the water. It guards as well as it strikes."
+light_combo_start = ExtResource("a0")
+heavy = ExtResource("a1")
+aerial = ExtResource("a2")
+riposte = ExtResource("a3")
+riposte_multiplier = 1.3
+look = 10
+two_handed = true
+damage_mult = 1.15
+status = &"frost"
+status_amount = 24.0
+skill = ExtResource("a4")
+skill_cost = 30.0
+parry_window_bonus = 2
+parry_recovery_bonus = 2
+block_reduction = 0.6

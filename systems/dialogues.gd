@@ -47,6 +47,16 @@ const OMMEN_IDLE := [
 	"I have been counting the days since the Night. I lost the number somewhere in the second year.",
 ]
 
+const PELL_FIRST := [
+	"Oh! You are dry. Nobody comes down the stair dry. Sit if you like - it is only the floor that is wet.",
+	"I dive the Reliquary for what the water has not finished with. Candle-ends, coin, now and then a saint's finger. I sell what I bring up.",
+]
+const PELL_GREETINGS := [
+	"Mind the ripples that have no wind behind them.",
+	"The Abbot's bell rings under the water on still nights. I stopped counting the strokes.",
+	"If you hear singing from the wall, do not answer it. It likes to be answered.",
+]
+
 const LANTERN_FIRST := [
 	"Evening. Or morning, if you are being generous. I walk the road when the sun is off it. Someone should.",
 	"I sell what the dark leaves lying about. The prices are lower at night. Nobody is looking, you see.",
@@ -247,6 +257,8 @@ static func conversation(npc: StringName) -> Dictionary:
 			return {"speaker": "Hobb", "lines": HOBB_FIRST if n == 0 else _greeting(npc, HOBB_GREETINGS, n - 1)}
 		&"ilse":
 			return {"speaker": "Sister Ilse", "lines": ILSE_FIRST if n == 0 else _greeting(npc, ILSE_GREETINGS, n - 1)}
+		&"pell":
+			return {"speaker": "Pell", "lines": PELL_FIRST if n == 0 else [PELL_GREETINGS[(n - 1) % PELL_GREETINGS.size()]]}
 		&"lantern_man":
 			return {"speaker": "The Lantern-Man", "lines": LANTERN_FIRST if n == 0 else [LANTERN_GREETINGS[(n - 1) % LANTERN_GREETINGS.size()]]}
 		&"aldous":
@@ -262,7 +274,7 @@ static func conversation(npc: StringName) -> Dictionary:
 
 
 static func _speaker_for(npc: StringName) -> String:
-	return {&"ommen": "Ommen", &"wenna": "Wenna", &"hobb": "Hobb", &"ilse": "Sister Ilse", &"aldous": "Aldous Vane", &"lantern_man": "The Lantern-Man"}.get(npc, "...")
+	return {&"ommen": "Ommen", &"wenna": "Wenna", &"hobb": "Hobb", &"ilse": "Sister Ilse", &"aldous": "Aldous Vane", &"lantern_man": "The Lantern-Man", &"pell": "Pell"}.get(npc, "...")
 
 
 ## Records that the conversation happened (advances the story).

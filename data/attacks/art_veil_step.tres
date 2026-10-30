@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"art_veil_step"
+display_name = "Art - Veil Step"
+animation = &"thrust"
+startup_frames = 6
+active_frames = 5
+recovery_frames = 16
+chain_open_frame = -1
+dodge_cancel_frame = 6
+damage = 22.0
+poise_damage = 30.0
+stamina_cost = 0.0
+invulnerable_frames = 22
+knockback = Vector2(150, -40)
+hitbox_size = Vector2(46, 22)
+hitbox_offset = Vector2(30, -20)
+lunge_speed = 300.0
+lunge_start_frame = 5
+lunge_frames = 6
+projectile_speed = 0.0
+projectile_offset = Vector2(16, -22)
+hit_stop = 0.08
+shake = 4.0

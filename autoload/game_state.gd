@@ -112,7 +112,7 @@ func _on_player_died() -> void:
 # ------------------------------------------------------------------ New Game+
 ## A cycle restarts the story with everything you built kept. Enemies get tougher each time.
 ## Flags kept across a cycle (prefixes): what the player has *learned or earned for good*.
-const KEEP_FLAG_PREFIXES := ["deed_", "bs_", "bk_", "tip_", "fx_", "infuse_", "relics_eq", "night_survived", "ng_cycle", "ending_", "candle_lit_"]
+const KEEP_FLAG_PREFIXES := ["deed_", "bs_", "bk_", "tip_", "fx_", "infuse_", "relics_eq", "night_survived", "ng_cycle", "ending_", "candle_lit_", "art_", "secret_"]
 
 
 func ng_cycle() -> int:

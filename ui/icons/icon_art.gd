@@ -15,7 +15,7 @@ static func has_icon(id: StringName) -> bool:
 	return id in [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard",
 		&"penitents_tear", &"candlewright_note", &"canon_seal", &"pilgrims_draught", &"marshals_crest", &"oathblade", &"twin_blades",
 		&"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark",
-		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil", &"gallery_key", &"sextons_lantern", &"cinder_heart", &"ashfall_seal"] \
+		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil", &"gallery_key", &"sextons_lantern", &"cinder_heart", &"ashfall_seal", &"lurker_fang", &"cantors_wick", &"abbots_signet"] \
 		or String(id).begins_with("relic_") or Weapons.IDS.has(id) or (String(id).begins_with("armor_") and Armors.is_valid_id(String(id).substr(6)))
 
 
@@ -47,7 +47,7 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"gallery_key": _gallery_key(ci)
 		&"sextons_lantern": _lantern(ci, t)
 		&"cinder_heart": _relic(ci, id, t)
-		&"ashfall_seal": _relic(ci, id, t)
+		&"ashfall_seal", &"lurker_fang", &"cantors_wick", &"abbots_signet": _relic(ci, id, t)
 		&"hollow_resin": _resin(ci)
 		&"vial": _vial(ci)
 		&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte": _relic(ci, id, t)
@@ -56,6 +56,9 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"toll_hammer": _hammer(ci)
 		&"marshals_lance", &"ashfall_pike": _lance(ci)
 		&"tide_sabre": _sabre(ci)
+		&"gravediggers_greataxe": _axe(ci)
+		&"veil_daggers": _daggers(ci)
+		&"candle_catalyst", &"abbots_crozier": _staff(ci, id)
 		&"armor_pilgrim_coat", &"armor_penitent_shroud", &"armor_canons_mail", &"armor_marshal_plate", &"armor_ghostlight_raiment": _armor_generic(ci, id)
 		_: _unknown(ci)
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
@@ -249,6 +252,27 @@ static func _lance(ci: CanvasItem) -> void:
 	ci.draw_line(Vector2(2, 14), Vector2(11, 5), Color("6a4a30"), 1.6)
 	_poly(ci, [Vector2(10, 3.5), Vector2(14.5, 1.5), Vector2(12.5, 6), Vector2(9.5, 6.5)], Color("c3c7d0"))
 	ci.draw_line(Vector2(9.2, 5.0), Vector2(11.8, 7.6), Color("8e1b22"), 1.4)
+
+
+static func _axe(ci: CanvasItem) -> void:
+	ci.draw_line(Vector2(3, 14), Vector2(11, 4), Color("6a4a30"), 1.8)
+	_poly(ci, [Vector2(8.5, 2.5), Vector2(14.5, 4.5), Vector2(14, 9), Vector2(10.5, 6.5)], Color("c3c7d0"))
+	ci.draw_line(Vector2(14.5, 4.5), Vector2(14, 9), Color("e9e1cc"), 0.8)
+
+
+static func _daggers(ci: CanvasItem) -> void:
+	for o in [Vector2(0, 0), Vector2(3, 2)]:
+		ci.draw_line(Vector2(3, 13) + o, Vector2(10, 4) + o, Color("a9c7d4"), 1.6)
+		ci.draw_line(Vector2(2, 11) + o, Vector2(5, 14) + o, Color("c9a24e"), 1.2)
+
+
+static func _staff(ci: CanvasItem, id: StringName) -> void:
+	ci.draw_line(Vector2(3, 14), Vector2(11, 4), Color("6a4a30"), 1.6)
+	ci.draw_arc(Vector2(11.5, 3.5), 2.8, 0.0, TAU, 10, Color("c9a24e"), 1.2)
+	if id == &"candle_catalyst":
+		ci.draw_circle(Vector2(11.5, 3.5), 1.3, Color("ffb050"))
+	else:
+		ci.draw_arc(Vector2(11.5, 3.5), 2.8, -0.4, PI * 1.2, 10, Color("9fd6e0"), 1.4)
 
 
 static func _sabre(ci: CanvasItem) -> void:

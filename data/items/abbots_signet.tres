@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"abbots_signet"
+display_name = "Abbot's Signet"
+description = "A signet crusted with salt. It sealed every drowning in the Reliquary for a hundred years."
+kind = 1
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(0.62, 0.82, 0.88, 1)

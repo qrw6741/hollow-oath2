@@ -84,7 +84,7 @@ const WATER_JUMP := 0.88
 ## Last standing spot that was not a hazard; lost embers fall here.
 var last_safe_position := Vector2.ZERO
 
-const BUFFERED: Array[StringName] = [&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal", &"skill"]
+const BUFFERED: Array[StringName] = [&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal", &"skill", &"art"]
 
 
 func _ready() -> void:
@@ -102,6 +102,8 @@ func _ready() -> void:
 	last_safe_position = global_position
 	health.died.connect(_on_died)
 	attack_runner.hit_confirmed.connect(_on_attack_hit)
+	attack_runner.projectile_fired.connect(_fire_player_projectile)
+	Events.boss_defeated.connect(_on_boss_defeated_arts)
 	_add_lantern()
 	var snd := Node.new()
 	snd.name = &"Sounds"
@@ -309,6 +311,11 @@ func _try_actions() -> bool:
 			Audio.sfx(&"skill_cast", -2.0)
 			_start_attack(weapon.skill)
 			Audio.sfx_at(&"parry", global_position, -8.0, 0.7)
+			return true
+	if _buffered(&"art"):
+		_consume(&"art")
+		if can_use_art():
+			_cast_art()
 			return true
 	if _buffered(&"attack_light") and stamina.can_spend() and weapon:
 		_consume(&"attack_light")
@@ -568,6 +575,58 @@ func set_focus(v: float) -> void:
 		Audio.sfx(&"focus_ready", -6.0)
 	GameState.focus = focus
 	focus_changed.emit(focus, MAX_FOCUS)
+
+
+func _on_boss_defeated_arts(boss_id: StringName) -> void:
+	for id in Arts.ORDER:
+		var told := StringName("art_told_" + String(id))
+		if Arts.def(id).boss == boss_id and Arts.unlocked(id) and not bool(GameState.get_flag(told, false)):
+			GameState.set_flag(told, true)
+			Events.banner_requested.emit("ART LEARNED: " + Arts.title(id).to_upper())
+	Arts.auto_equip()
+
+
+func can_use_art() -> bool:
+	var id := Arts.equipped()
+	return id != &"" and focus >= Arts.cost(id) and stamina.can_spend() and is_on_floor()
+
+
+## Spends focus and performs the equipped art (a short attack move, or a heal).
+func _cast_art() -> void:
+	var id := Arts.equipped()
+	var d := Arts.def(id)
+	set_focus(focus - Arts.cost(id))
+	Audio.sfx(&"skill_cast", -2.0)
+	if d.get("kind", "attack") == "heal":
+		var got := health.heal(health.max_health * float(d.get("heal", 0.3)))
+		GameFeel.damage_number(global_position + Vector2(0, -40), got, false)
+		GameFeel.spark(global_position + Vector2(0, -20), Color(1.0, 0.9, 0.5), 18)
+	_start_attack(Arts.attack(id))
+	Events.art_cast.emit(id)
+
+
+## Spells fired by the equipped weapon (catalyst) or an art: a straight bolt from the player.
+func _fire_player_projectile(a: AttackData) -> void:
+	var from := global_position + Vector2(a.projectile_offset.x * facing, a.projectile_offset.y)
+	var hit := HitData.new()
+	hit.damage = a.damage * attack_runner.damage_multiplier * attack_runner.damage_bonus
+	hit.poise_damage = a.poise_damage
+	hit.knockback = Vector2(a.knockback.x * facing, a.knockback.y)
+	hit.attack_id = a.id
+	hit.hit_stop = a.hit_stop
+	hit.shake = a.shake
+	if a.status != &"":
+		hit.status = a.status
+		hit.status_amount = a.status_amount
+	elif attack_runner.weapon_status != &"":
+		hit.status = attack_runner.weapon_status
+		hit.status_amount = attack_runner.weapon_status_amount
+	var col := Color(0.62, 0.8, 1.0)
+	if hit.status != &"":
+		col = StatusFx.color_of(hit.status)
+	Projectile.spawn(get_parent(), from, Vector2(facing * a.projectile_speed, 0.0), hit, self,
+		{"target_mask": 16, "drop": 0.0, "color": col, "lifetime": 1.2, "radius": 4.0})
+	Audio.sfx_at(&"throw", from, -2.0, 1.3)
 
 
 func can_use_skill() -> bool:

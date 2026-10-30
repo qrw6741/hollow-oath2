@@ -122,7 +122,7 @@ def elite(base, new, name, lore, hp, poise, dmg, spd, embers, resist):
     s = setv("drop_chance", "1.0", s) if "drop_chance" in s else s
     s = setv("bonus_drop_chance", "1.0", s) if "bonus_drop_chance" in s else s
     s = setv("bonus_drop_count", "3", s) if "bonus_drop_count" in s else s
-    s = s.rstrip("\n") + f"\nelite = true\ndamage_mult = {dmg}\nstatus_resist = " + "{" + ", ".join(f'"{k}": {v}' for k, v in resist.items()) + "}\n"
+    s = s.rstrip("\n") + f"\nelite = true\npack_alert = true\ndamage_mult = {dmg}\nstatus_resist = " + "{" + ", ".join(f'"{k}": {v}' for k, v in resist.items()) + "}\n"
     # status_resist may already exist from the base: drop the first occurrence
     first = s.find("status_resist = ")
     last = s.rfind("status_resist = ")

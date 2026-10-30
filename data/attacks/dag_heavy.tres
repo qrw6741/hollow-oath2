@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"dag_heavy"
+display_name = "Daggers - Fan of Knives"
+animation = &"twin_x"
+startup_frames = 10
+active_frames = 5
+recovery_frames = 18
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 20.0
+poise_damage = 26.0
+stamina_cost = 18.0
+invulnerable_frames = 0
+knockback = Vector2(80, -20)
+hitbox_size = Vector2(46, 28)
+hitbox_offset = Vector2(6, -15)
+lunge_speed = 130.0
+lunge_start_frame = 9
+lunge_frames = 4
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -22)
+hit_stop = 0.06
+shake = 2.5

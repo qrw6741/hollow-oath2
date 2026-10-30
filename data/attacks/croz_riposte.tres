@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"croz_riposte"
+display_name = "Crozier - Drowning Turn"
+animation = &"riposte"
+startup_frames = 9
+active_frames = 4
+recovery_frames = 30
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 68.0
+poise_damage = 999.0
+stamina_cost = 0.0
+invulnerable_frames = 0
+knockback = Vector2(60, -10)
+hitbox_size = Vector2(48, 30)
+hitbox_offset = Vector2(22, -14)
+lunge_speed = 80.0
+lunge_start_frame = 7
+lunge_frames = 3
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -22)
+hit_stop = 0.06
+shake = 1.5

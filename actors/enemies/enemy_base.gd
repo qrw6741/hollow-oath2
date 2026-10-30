@@ -33,6 +33,13 @@ var _rng := RandomNumberGenerator.new()
 var status: StatusComponent
 ## Bosses are immune to status effects; mini-bosses opt back in with a high resistance.
 var takes_status := true
+## Elite modifier (&"frenzied", &"stoneskin", &"venomous" or empty) and its multipliers.
+var modifier: StringName = &""
+var speed_scale := 1.0
+var damage_taken_scale := 1.0
+const MODIFIERS: Array[StringName] = [&"frenzied", &"stoneskin", &"venomous"]
+const MODIFIER_NAMES := {&"frenzied": "Frenzied", &"stoneskin": "Stoneskin", &"venomous": "Venomous"}
+const MODIFIER_COLORS := {&"frenzied": Color("e0702a"), &"stoneskin": Color("9aa3ad"), &"venomous": Color("7fbf5a")}
 
 
 func _ready() -> void:
@@ -60,11 +67,42 @@ func _ready() -> void:
 func _make_elite() -> void:
 	var mark := EliteMark.new()
 	mark.name = &"EliteMark"
+	modifier = data.modifier if data.modifier != &"" else MODIFIERS[(absi(int(global_position.x)) / 7 + absi(int(global_position.y))) % MODIFIERS.size()]
+	_apply_modifier()
+	mark.tint = MODIFIER_COLORS.get(modifier, Palette.EMBER)
 	add_child(mark)
 	var v := get_node_or_null(^"Visual")
 	if v is Node2D:
 		(v as Node2D).modulate = Color(1.18, 1.05, 0.78)
 		(v as Node2D).scale.y = 1.1
+
+
+func _apply_modifier() -> void:
+	match modifier:
+		&"frenzied":
+			speed_scale = 1.3
+		&"stoneskin":
+			damage_taken_scale = 0.75
+			poise = data.max_poise * 1.5
+		&"venomous":
+			attack_runner.weapon_status = &"poison"
+			attack_runner.weapon_status_amount = 24.0
+
+
+## Elites call their neighbours: every unaware enemy that can hear (within [param radius]) joins in.
+func alert_allies(radius := 230.0) -> void:
+	for e in get_tree().get_nodes_in_group(&"enemies"):
+		if e == self or not (e is EnemyBase):
+			continue
+		var o := e as EnemyBase
+		if o.target != null or o.state == State.DEAD or o.state in [State.STAGGER, State.PARRIED]:
+			continue
+		if o.global_position.distance_to(global_position) > radius or not o.data.pack_alert:
+			continue
+		o.target = target
+		o.on_target_acquired()
+		if o.state in [State.IDLE, State.PATROL, State.RETURN]:
+			o._set_state(State.CHASE)
 
 
 func _add_status() -> void:
@@ -118,6 +156,8 @@ func _sense() -> void:
 			on_target_acquired()
 			if state in [State.IDLE, State.PATROL, State.RETURN]:
 				_set_state(State.CHASE)
+			if data.pack_alert:
+				alert_allies()
 	else:
 		var from_home := absf(global_position.x - home.x)
 		if from_home > data.leash_range or d.length() > data.detection_range * 1.8:
@@ -169,9 +209,9 @@ func _state_chase(delta: float) -> void:
 		if a:
 			_start_attack(a)
 			return
-	var desired := facing * data.chase_speed
+	var desired := facing * data.chase_speed * speed_scale
 	if dist < 22.0:
-		desired = -facing * data.chase_speed * 0.4   # Give a little space.
+		desired = -facing * data.chase_speed * speed_scale * 0.4   # Give a little space.
 	elif _cooldown > 0 and dist < 60.0:
 		desired = 0.0                                # Hold spacing while waiting.
 	if _ledge_ahead() and signf(desired) == float(facing):
@@ -288,7 +328,7 @@ func receive_hit(hit: HitData) -> int:
 	if state == State.DEAD:
 		return HitData.Result.IGNORED
 	var was_parried := state == State.PARRIED
-	var applied := health.take_damage(hit.damage)
+	var applied := health.take_damage(hit.damage * damage_taken_scale)
 	hit_flash = 6
 	if status and hit.status != &"":
 		status.apply(hit.status, hit.status_amount)

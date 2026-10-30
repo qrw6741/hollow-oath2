@@ -112,3 +112,11 @@
 - **Night-only person**: an Npc with `when = 2`.
 - **Unique weapon**: copy a weapon .tres, set `damage_mult`, a skill, and a Forge.RECIPES entry that needs a boss relic.
 - **New Game+**: flags kept across a cycle are listed in `GameState.KEEP_FLAG_PREFIXES`.
+
+## Expansion systems (added later)
+- **A new art**: add an entry to `Arts.DEFS` (title, cost, teaching boss id, kind attack|heal) and its id to `Arts.ORDER`; add `art(...)` to tools/gen_arts.py and run it (writes data/attacks/art_<id>.tres). Ranged arts set `proj=`.
+- **A new weapon set**: see tools/gen_weapons2.py (`atk`, `weapon`, `item`). New silhouettes need a `PresetData.WeaponLook` value and a draw branch in `player_visual.gd` (`_draw_long_weapon`) plus an icon in `icon_art.gd`. Ranged light attacks: give the AttackData `projectile_speed`.
+- **A new region**: add a function to tools/levels/gen_side_levels.py (see `reliquary()`), use the helpers (`water`, `jet`, `spikes`, `illusion`, `secret_wall`, `chest`, `npc(..., shop=)`), add the path to `WorldMap.LEVELS`, link exits both ways, and add a test like `test_reliquary_region`.
+- **Elite modifiers**: `EnemyBase.MODIFIERS`; force one with `EnemyData.modifier`. Set `EnemyData.pack_alert` for enemies that call neighbours.
+- **Secrets**: `IllusoryWall` (secret_id) and `BreakableWall` (wall_id) both count towards `Secrets.count()`.
+- **Trials**: waves are `Trials.WAVES` (enemy scene names), the rush is `Trials.RUSH_BOSSES`.

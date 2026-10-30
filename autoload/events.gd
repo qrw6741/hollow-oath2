@@ -71,6 +71,9 @@ signal interact_prompt_hidden
 signal banner_requested(text: String)
 ## Ask for a one-time tutorial tip (see Tutorial); the HUD decides whether to show it.
 signal tip_requested(id: StringName)
+## An art was cast (id) / the equipped art changed.
+signal art_cast(id: StringName)
+signal art_changed(id: StringName)
 signal tip_shown(id: StringName)
 signal bestiary_changed(enemy_id: StringName)
 ## The Oath Gate asks for the ending choice; the EndingMenu opens.

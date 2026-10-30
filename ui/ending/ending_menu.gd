@@ -71,6 +71,8 @@ func open() -> void:
 	GameState.ui_modal = true
 	Events.interact_prompt_hidden.emit()
 	_panel.visible = true
+	_panel.color = Color(0.02, 0.018, 0.03, 0.96)
+	_body.visible_ratio = 1.0
 	_show_choice()
 
 
@@ -111,7 +113,25 @@ func _pick(id: StringName) -> void:
 	_title.text = String(Endings.DEFS[id].title).to_upper()
 	_body.text = pages[0]
 	_hint.text = "Interact to continue"
+	_wash(id)
+	_type()
 	Audio.sting(&"victory")
+
+
+## Each ending tints the screen its own colour, so the epilogue reads as a scene, not a menu.
+const WASH := {&"keep": Color(0.16, 0.05, 0.05, 0.97), &"break": Color(0.03, 0.06, 0.12, 0.97), &"mend": Color(0.13, 0.1, 0.03, 0.97)}
+
+
+func _wash(id: StringName) -> void:
+	var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw.tween_property(_panel, "color", WASH.get(id, _panel.color), 1.2)
+
+
+## The page appears letter by letter. Purely visual: the full text is always in the label.
+func _type() -> void:
+	_body.visible_ratio = 0.0
+	var tw := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw.tween_property(_body, "visible_ratio", 1.0, clampf(_body.text.length() * 0.028, 0.6, 4.0))
 
 
 func advance() -> void:
@@ -122,6 +142,7 @@ func advance() -> void:
 		close()
 		return
 	_body.text = pages[page]
+	_type()
 	_hint.text = "Interact to continue" if page < pages.size() - 1 else "Interact to return to the road"
 
 

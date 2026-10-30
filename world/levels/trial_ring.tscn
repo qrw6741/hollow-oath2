@@ -1,0 +1,111 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/sky.gd" id="sky"]
+[ext_resource type="Script" path="res://world/background/ruins_silhouette.gd" id="ruins"]
+[ext_resource type="Script" path="res://world/background/graveyard_props.gd" id="props"]
+[ext_resource type="Script" path="res://world/background/day_night_cycle.gd" id="cycle"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/trial/trial_stone.gd" id="stone"]
+[ext_resource type="Script" path="res://world/trial/trial_runner.gd" id="runner"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+
+[node name="TrialRing" type="Node2D"]
+script = ExtResource("level")
+level_id = &"trial_ring"
+display_name = "The Trial Ring"
+bounds = Rect2(0, 0, 1000, 540)
+music = &"chapel"
+music_pitch = 0.9
+map_origin = Vector2(8800, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Background" type="ParallaxBackground" parent="."]
+
+[node name="Sky" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0, 0)
+
+[node name="SkyDraw" type="Node2D" parent="Background/Sky"]
+script = ExtResource("sky")
+moon_pos = Vector2(340, 56)
+daylight = false
+darkness = 0.9
+
+[node name="Far" type="ParallaxLayer" parent="Background"]
+motion_scale = Vector2(0.1, 0.1)
+
+[node name="Hills" type="Node2D" parent="Background/Far"]
+script = ExtResource("ruins")
+base_y = 235.0
+max_height = 70.0
+color = Color(0.13, 0.1, 0.16, 1)
+seed_value = 7
+spacing = 90.0
+width = 1200.0
+haze = 0.4
+haze_color = Color(0.4, 0.3, 0.45, 1)
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.62, 0.5, 0.58, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(984, 60)
+style = 3
+seed_value = 902
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(960, 0)
+script = ExtResource("block")
+size = Vector2(40, 540)
+style = 1
+seed_value = 903
+
+[node name="FromManor" type="Marker2D" parent="."]
+position = Vector2(130, 480)
+script = ExtResource("entry")
+entry_id = &"from_manor"
+
+[node name="ToManor" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/hollowmere_manor.tscn"
+target_entry = &"from_trial"
+size = Vector2(12, 80)
+
+[node name="RingCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(170, 480)
+checkpoint_id = &"ring_candle"
+display_name = "Ring Candle"
+
+[node name="RushStone" type="Area2D" parent="."]
+position = Vector2(250, 480)
+script = ExtResource("stone")
+trial = "rush"
+
+[node name="GauntletStone" type="Area2D" parent="."]
+position = Vector2(330, 480)
+script = ExtResource("stone")
+trial = "gauntlet"
+
+[node name="TrialRunner" type="Node2D" parent="."]
+script = ExtResource("runner")
+
+[node name="RingStone" type="Area2D" parent="."]
+position = Vector2(420, 480)
+script = ExtResource("tablet")
+title = "The Trial Ring"
+text = "Those who have decided are free to be tested. The left stone calls every lord of the road, one after another. The right stone calls what is left of everyone else. Dying here costs nothing but time."

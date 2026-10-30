@@ -286,3 +286,21 @@ gate_height = 96.0
 trigger_offset = 36.0
 trigger_width = 440.0
 victory_text = "THE UNBURIED REST"
+
+[node name="FromReliquary" type="Marker2D" parent="."]
+position = Vector2(3700, 480)
+script = ExtResource("entry")
+entry_id = &"from_reliquary"
+
+[node name="ToReliquary" type="Area2D" parent="."]
+position = Vector2(3730, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/sunken_reliquary.tscn"
+target_entry = &"from_chapel"
+size = Vector2(12, 80)
+
+[node name="FloodedStair" type="Area2D" parent="."]
+position = Vector2(3660, 480)
+script = ExtResource("tablet")
+title = "A Flooded Stair"
+text = "A stair runs down behind the vestry, and the bottom steps are underwater. Someone has chalked on the wall: 'THE RELIQUARY. WE BLESSED THE WATER. IT BLESSED US BACK.'"

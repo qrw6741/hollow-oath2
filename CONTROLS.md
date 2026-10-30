@@ -11,6 +11,7 @@
 | Heal (Ember Vial) | R | RB |
 | Interact / Rest at candle | E | D-pad up |
 | Weapon skill (costs focus) | O | Right trigger (RT) |
+| Art (your equipped art, costs focus) | U | Left trigger (LT) |
 | Travel to / from Hollowmere | T | Xbox: View-share button (Misc) |
 | Inventory (pack) | Tab | Create / Select |
 | Use quick item | F | R3 (press right stick) |
@@ -72,3 +73,7 @@ Rebind any action in **Settings → Controls**: pick the keyboard or controller 
 - **Forge**: WEAPONS / ARMOUR tabs (Parry / Heal); the Infusion button under the description cycles the weapon's status.
 - **Oath Gate** (end of the Vaelmoor Road, after the Marshal): Interact to choose an ending. After an ending, Interact twice to begin New Game+.
 - **Settings > Game**: Colourblind status colours, Tutorial tips.
+
+- **Arts**: each boss teaches one. Equip one on the ARTS tab of the pack; the Art button (U / LT) casts it for its focus cost. Toll of Mercy (Bell-Warden), Veil Step (Marshal), Gravebind (Sexton), Ember Lance (Mother Cinder), Mending Glow (Drowned Canon), Tidecall (Salt Abbot).
+- **Secrets**: some walls and floors are only paint. Walk into suspicious masonry; cracked walls can be struck.
+- **The Trial Ring**: after you choose an ending, a door in Hollowmere Manor opens it. The left stone starts the Boss Rush, the right one the Gauntlet.

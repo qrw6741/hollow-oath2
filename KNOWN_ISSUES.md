@@ -131,3 +131,13 @@
 
 ## Download size
 - The Windows build must fit one chat file (< 31,457,280 bytes zipped). The Godot template alone zips to ~30.1 MB, leaving ~1.3 MB for the game. To fit, music is encoded at 8 kHz / 10 kbps and effects at 12 kHz / 12 kbps (muffled; originals can be regenerated with tools/audio/gen_audio.py and gen_audio_extra.py, whose Ogg settings are higher quality). Publishing builds as GitHub Releases would remove this limit.
+
+## Expansion (Sunken Reliquary, arts, trials)
+- **Nobody has played any of it.** Tests cover rules (loads, grounded placement, ambush wakes, arts cost and cast, weapons equip and hit, trial waves, records). Numbers (boss health, art costs, wave sizes, rewards, modifier strength) are first guesses.
+- Placeholder art: Salt Abbot is a recolour of the brute; Lurker and Drowned Pilgrim are new/tinted placeholders; the Reliquary backdrop reuses the cellar's casks and racks; catalyst/crozier/axe icons are simple drawings.
+- Arts have no icons and no HUD indicator (the Arts tab shows the equipped one). Tidecall and Ember Lance are straight bolts (no wave).
+- The Boss Rush skips the Drowned Canon (needs its flooded arena). Winning it marks every rush boss defeated, which also unlocks their arts for a save that had not beaten them.
+- The Gauntlet and Rush spawn in the ring without gates; the player can still wander left; only the exit is sealed during a run.
+- No ShortcutGate in the Reliquary (the village still has the only one).
+- New weapon/art sounds reuse existing effects; the Art button on a pad shows a generic trigger glyph.
+- Download size: ~55 KB under the single-file cap. Any further content needs audio trimmed or the build published elsewhere.

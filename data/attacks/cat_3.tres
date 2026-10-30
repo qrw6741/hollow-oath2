@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"cat_3"
+display_name = "Catalyst - Candlefall"
+animation = &"thrust"
+startup_frames = 14
+active_frames = 2
+recovery_frames = 22
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 18.0
+poise_damage = 15.0
+stamina_cost = 14.0
+invulnerable_frames = 0
+knockback = Vector2(60, -10)
+hitbox_size = Vector2(4, 4)
+hitbox_offset = Vector2(0, 0)
+lunge_speed = 0.0
+lunge_start_frame = 0
+lunge_frames = 0
+projectile_speed = 230.0
+projectile_offset = Vector2(16, -22)
+hit_stop = 0.06
+shake = 2.0
