@@ -301,6 +301,7 @@ func _build_weapons(stack: Control) -> Control:
 	left.add_child(lv)
 	_w_head = Label.new()
 	UITheme.title(_w_head, 10, Palette.GOLD_BRIGHT)
+	_w_head.add_theme_font_override(&"font", UITheme.body_font())
 	lv.add_child(_w_head)
 	var grid := GridContainer.new()
 	grid.columns = 5
@@ -398,6 +399,7 @@ func _build_relics(stack: Control) -> Control:
 	p.add_child(v)
 	_relic_head = Label.new()
 	UITheme.title(_relic_head, 10, Palette.GOLD_BRIGHT)
+	_relic_head.add_theme_font_override(&"font", UITheme.body_font())
 	v.add_child(_relic_head)
 	_relic_list = VBoxContainer.new()
 	_relic_list.add_theme_constant_override(&"separation", 2)

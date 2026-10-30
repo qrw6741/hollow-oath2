@@ -43,7 +43,7 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var f := UITheme.title_font()
+	var f := UITheme.body_font()   # lining digits (the title font has old-style numerals)
 	var s := str(roundi(shown))
 	var col := Palette.GOLD_BRIGHT.lerp(flash_color, flash)
 	var w := f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x

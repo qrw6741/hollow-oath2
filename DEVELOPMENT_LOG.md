@@ -331,3 +331,8 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 ## Step: Weapons tab, single-file download
 - Inventory has a WEAPONS tab (after Items): every weapon in the game in a grid; ones you have show their icon, the rest are a grey "?" with "???" details. Press a found weapon to equip. Header counts found / total. IconSlot gained `locked`. Test: test_weapons_tab.
 - Download is again one zip (31,352,644 bytes, under the 31,457,280 limit) by re-encoding music (8 kHz, 10 kbps) and effects (12 kHz, 12 kbps). Sound quality is worse than before; not listened to.
+
+## Text smoothing (inventory / weapons / shop)
+- Font imports: hinting off, subpixel positioning 4, mipmaps on (Lora + GFS Baskerville).
+- Numbers in ember chip / stat cards / weapons+relics headers use the Lora body font (lining digits) instead of old-style numerals.
+- Verified: screenshot at 1920x1080 looks smooth; 4 UI tests pass. Not verified: appearance on a real Windows display, or in the low-res chunky (non-hires) mode.

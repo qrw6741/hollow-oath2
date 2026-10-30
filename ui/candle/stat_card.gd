@@ -59,7 +59,7 @@ func _draw() -> void:
 	if _pop > 0.0:
 		draw_rect(r.grow(_pop * 3.0), Color(c, _pop * 0.6), false, 1.5)
 	_emblem(Vector2(size.x / 2.0, 20), c, dim)
-	var tf := UITheme.title_font()
+	var tf := UITheme.body_font()   # lining digits for the numbers
 	var bf := UITheme.body_font()
 	_centered(tf, title.to_upper(), 43.0, 9, Color(Palette.BONE, dim))
 	_centered(tf, str(value), 59.0, 17, Color(c, dim))
