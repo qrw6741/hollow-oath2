@@ -134,13 +134,15 @@ func apply_loadout() -> void:
 	damage_taken_mult = Loadout.damage_taken_mult()
 	if status:
 		status.resist = Armors.resist_of(GameState.armor_id, GameState.armor_level(GameState.armor_id))
-	attack_runner.weapon_status = weapon.status if weapon else &""
-	attack_runner.weapon_status_amount = weapon.status_amount if weapon else 0.0
+		status.extra_resist = Relics.mult("status_resist")
+	var fx := Forge.effective_status(weapon)
+	attack_runner.weapon_status = fx.kind
+	attack_runner.weapon_status_amount = float(fx.amount) * Relics.mult("weapon_status")
 	run_speed = _base_run_speed * Armors.speed_mult(GameState.armor_id)
 	dodge_stamina = preset.dodge_stamina + Armors.dodge_add(GameState.armor_id)
 	var old_max := max_flasks
 	max_flasks = preset.flasks + Forge.vial_extra(GameState.flask_level)
-	flask_heal = preset.flask_heal + Forge.vial_heal_bonus(GameState.flask_level)
+	flask_heal = (preset.flask_heal + Forge.vial_heal_bonus(GameState.flask_level)) * Relics.mult("flask_heal")
 	if max_flasks > old_max:
 		flasks += max_flasks - old_max
 	flasks = mini(flasks, max_flasks)
@@ -555,7 +557,7 @@ var blocking := false
 
 
 func add_focus(amount: float) -> void:
-	set_focus(focus + amount)
+	set_focus(focus + (amount * Relics.mult("focus_gain") if amount > 0.0 else amount))
 
 
 func set_focus(v: float) -> void:
@@ -594,7 +596,7 @@ func _faces(source: Node2D) -> bool:
 
 func _on_parry_success(hit: HitData) -> void:
 	_parried = true
-	add_focus(FOCUS_PER_PARRY)
+	add_focus(FOCUS_PER_PARRY + Relics.mult("parry_focus"))
 	state_frame = 0
 	parry_flash = 18
 	_iframes = maxi(_iframes, 20)

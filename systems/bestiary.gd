@@ -86,6 +86,15 @@ static func entry_text(id: StringName) -> String:
 
 static func text() -> String:
 	var out := PackedStringArray(["BESTIARY    met %d / %d" % [total_seen(), IDS.size()]])
+	var unknown := 0
 	for id in IDS:
+		if not seen(id):
+			unknown += 1
+			continue
+		if unknown > 0:
+			out.append("??? x%d" % unknown)
+			unknown = 0
 		out.append(entry_text(id))
+	if unknown > 0:
+		out.append("??? x%d" % unknown)
 	return "\n".join(out)

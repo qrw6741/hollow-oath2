@@ -77,7 +77,7 @@ func _run() -> void:
 		# --- new enemies ---
 		test_flying_enemy, test_shield_enemy, test_mimic_and_chest,
 		# --- after the prologue ---
-		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
+		test_dialogue_box, test_shop, test_shop_selling, test_tips_and_access, test_bestiary_and_deeds, test_relics_and_infusion, test_npc_story, test_road_level, test_road_enemies, test_marshal_boss,
 		# --- weapons, armour, upgrades ---
 		test_gear_data, test_loadout_equip, test_forge_rules, test_gear_save, test_forge_menu, test_equip_ui, test_new_weapons_land, test_gear_npcs,
 		# --- Hollowmere Manor and the sigil ---
@@ -2323,6 +2323,56 @@ func test_dialogue_box() -> void:
 	await frames(14)
 	await tap_action(&"ui_cancel")
 	check(not box.is_open, "Cancel skips the conversation")
+
+
+func test_relics_and_infusion() -> void:
+	await fresh_game()
+	var pl: Player = main.current_level().player
+	for id in Relics.IDS:
+		check(Items.get_item(id) != null and Relics.DEFS.has(id), "relic item exists: %s" % id)
+	check(not Relics.toggle(&"relic_locket").ok, "you cannot wear a relic you do not own")
+	game_state.add_item(&"relic_locket", 1)
+	game_state.add_item(&"relic_knot", 1)
+	game_state.add_item(&"relic_coin", 1)
+	check(Relics.toggle(&"relic_locket").ok and Relics.toggle(&"relic_knot").ok, "two relics can be worn")
+	check(not Relics.toggle(&"relic_coin").ok and Relics.equipped().size() == 2, "a third does not fit")
+	check(is_equal_approx(Relics.mult("focus_gain"), 1.25) and is_equal_approx(Relics.mult("status_resist"), 0.15), "worn relics give their effects")
+	pl.set_focus(0.0)
+	pl.add_focus(10.0)
+	check(is_equal_approx(pl.focus, 12.5), "the locket speeds focus (%.1f)" % pl.focus)
+	await frames(2)
+	check(is_equal_approx(pl.status.resist_of(&"bleed"), clampf(StatusFx.lookup(pl.status.resist, &"bleed") + 0.15, -1.0, 1.0)), "the knot adds status resistance")
+	check(Relics.toggle(&"relic_locket").ok and not Relics.is_worn(&"relic_locket"), "a relic can be taken off")
+	var before: int = game_state.embers
+	Relics.toggle(&"relic_coin")
+	var base := 100
+	check(is_equal_approx(Relics.mult("ember_gain"), 1.2) and roundi(base * Relics.mult("ember_gain")) == 120, "the coin raises ember rewards")
+	# infusion
+	var w: StringName = game_state.weapon_id
+	game_state.embers = 1000
+	game_state.add_item(&"hollow_resin", 5)
+	check(Forge.infusion_of(w) == &"" and Forge.next_infusion(w) == &"bleed", "weapons start clean; first infusion is bleed")
+	var r := Forge.infuse(w, &"poison")
+	check(r.ok and Forge.infusion_of(w) == &"poison" and game_state.embers == 700 and game_state.item_count(&"hollow_resin") == 3, "infusing costs embers and resin")
+	check(not Forge.infuse(w, &"poison").ok, "the same infusion twice is refused")
+	pl.apply_loadout()
+	check(pl.attack_runner.weapon_status == &"poison" and pl.attack_runner.weapon_status_amount >= 28.0, "the player's hits carry the infusion")
+	game_state.embers = 0
+	check(not Forge.infuse(w, &"burn").ok and Forge.infusion_of(w) == &"poison", "too poor: nothing changes")
+	check(Forge.infuse(w, &"").ok and Forge.infusion_of(w) == &"", "cleaning is free")
+	var fm: ForgeMenu = main.get_node("ForgeMenu")
+	events.station_requested.emit(&"forge")
+	await frames(3)
+	fm._describe(w)
+	check(fm._infuse_btn.visible, "the forge shows an infusion button for an owned weapon")
+	fm.close()
+	await frames(2)
+	var inv: InventoryMenu = main.get_node("InventoryMenu")
+	inv.open(InventoryMenu.Tab.RELICS)
+	await frames(3)
+	check(inv._relic_btns.size() == 3, "the relics tab lists the relics you carry")
+	inv.close()
+	await frames(2)
 
 
 func test_bestiary_and_deeds() -> void:

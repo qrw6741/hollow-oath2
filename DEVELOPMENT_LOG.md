@@ -303,3 +303,10 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Deeds (systems/deeds.gd): 13 achievements (kills, bosses, errands, bestiary, level, all four statuses, gallery, surviving a night), flags `deed_<id>`, toast on unlock.
 - Inventory menu now has 5 tabs: Equipment, Items, Journal, Bestiary, Deeds.
 - Tests: new test_bestiary_and_deeds (subset passed). Not yet looked at in a screenshot.
+
+## Step: Weapon infusions and relics
+- Infusions (Forge.infuse): Hobb soaks a weapon in bleed/poison/burn/frost (300 embers + 2 Hollow Resin; cleaning is free). Stored as flag `infuse_<weapon>`; applied in Player.apply_loadout via Forge.effective_status. Button in the Forge detail pane cycles the infusion.
+- Relics (systems/relics.gd): six passive trinkets as key-kind items, 2 worn at once from the new Relics tab (flag `relics_eq`). Effects: focus gain, weapon status buildup, status resist, ember gain, vial healing, parry focus. Sources: four errand rewards, Sexton's graveyard chest (Widow's Thorn), Gallery chest (Duellist's Glove).
+- Sexton's second graveyard chest no longer gives 3 Ember Shards (now the Thorn).
+- Inventory menu now has 6 tabs.
+- Tests: new test_relics_and_infusion; affected forge/quest/chest/level tests pass in a subset run. Balance numbers are guesses.

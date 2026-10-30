@@ -118,7 +118,7 @@ func _on_enemy_killed(enemy: Node) -> void:
 	if d == null:
 		return
 	if d.ember_reward > 0:
-		add_embers(d.ember_reward)
+		add_embers(roundi(d.ember_reward * Relics.mult("ember_gain")))
 	if d.drop_item != null and d.drop_chance > 0.0 and randf() < d.drop_chance:
 		add_item(d.drop_item.id, d.drop_count)
 	if d.bonus_drop_item != null and d.bonus_drop_chance > 0.0 and randf() < d.bonus_drop_chance:

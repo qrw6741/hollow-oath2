@@ -18,6 +18,8 @@ var _big: IconSlot
 var _d_name: Label
 var _d_sub: Label
 var _d_cost: Label
+var _infuse_btn: Button
+var _focus_id: StringName = &""
 var _list: VBoxContainer
 var _desc: Label
 var _msg: Label
@@ -117,6 +119,11 @@ func _ready() -> void:
 	_desc.add_theme_color_override(&"font_color", Palette.BONE)
 	_desc.add_theme_constant_override(&"line_spacing", -2)
 	rv.add_child(_desc)
+	_infuse_btn = FancyButton.new()
+	_infuse_btn.custom_minimum_size = Vector2(180, 14)
+	_infuse_btn.pressed.connect(func(): infuse_focused())
+	UITheme.compact(_infuse_btn)
+	rv.add_child(_infuse_btn)
 	_msg = Label.new()
 	_msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_msg.custom_minimum_size.y = 10
@@ -274,7 +281,29 @@ func _refresh() -> void:
 
 
 ## What the focused row would give you.
+## Infuses (or cycles the infusion of) the highlighted weapon.
+func infuse_focused() -> Dictionary:
+	if kind != &"forge" or tab != "weapon" or not Forge.owns("weapon", _focus_id):
+		return {"ok": false, "msg": ""}
+	var nxt := Forge.next_infusion(_focus_id)
+	var res := Forge.infuse(_focus_id, nxt)
+	_msg.text = res.msg
+	Audio.sfx(&"coin" if res.ok else &"fizzle", -4.0)
+	_refresh()
+	_describe(_focus_id)
+	return res
+
+
 func _describe(id: StringName) -> void:
+	_focus_id = id
+	var can := kind == &"forge" and tab == "weapon" and Forge.owns("weapon", id)
+	_infuse_btn.visible = can
+	if can:
+		var nxt := Forge.next_infusion(id)
+		var cur := Forge.infusion_of(id)
+		_infuse_btn.text = "Infusion: %s   ->   %s (%d embers + %d resin)" % [
+			StatusFx.name_of(cur) if cur != &"" else "none",
+			"clean" if nxt == &"" else StatusFx.name_of(nxt), Forge.INFUSE_COST.embers, Forge.INFUSE_COST.mat] if nxt != &"" else "Infusion: %s   ->   clean (free)" % StatusFx.name_of(cur)
 	_desc.text = describe(id)
 	_big.icon_id = &"vial" if id == &"vials" else (id if tab == "weapon" else StringName("armor_" + String(id)))
 	_d_name.text = "Ember Vials" if id == &"vials" else _name_of(id)
@@ -308,8 +337,9 @@ func describe(id: StringName) -> String:
 			t += "Light combo %d   Heavy %d" % [now.light_total, now.heavy]
 		if w.skill:
 			t += "\nSkill: %s (%d focus)" % [w.skill.display_name, roundi(w.skill_cost)]
-		if w.status != &"":
-			t += "   Inflicts %s" % StatusFx.name_of(w.status)
+		var fx := Forge.effective_status(w)
+		if fx.kind != &"":
+			t += "   Inflicts %s%s" % [StatusFx.name_of(fx.kind), " (infused)" if Forge.infusion_of(id) != &"" else ""]
 		return t
 	var a := Armors.get_armor(id)
 	var lv3 := Forge.level_of("armor", id)

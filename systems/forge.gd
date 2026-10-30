@@ -82,6 +82,55 @@ static func vial_extra(level: int) -> int:
 	return (1 if level >= 2 else 0) + (1 if level >= 5 else 0)
 
 
+# ------------------------------------------------------------------ infusions
+## Hobb can soak a weapon in a status. Stored as world flag `infuse_<weapon>` (no save change).
+## Re-infusing replaces the old one; `&""` cleans the weapon (free).
+const INFUSE_COST := {"embers": 300, "mat": 2}   ## embers + Hollow Resin
+const INFUSE_AMOUNT := 28.0
+
+
+static func infusion_of(weapon_id: StringName) -> StringName:
+	return StringName(str(GameState.get_flag(StringName("infuse_" + String(weapon_id)), "")))
+
+
+## The status a weapon's hits carry right now: {"kind": StringName, "amount": float}.
+static func effective_status(w: WeaponData) -> Dictionary:
+	if w == null:
+		return {"kind": &"", "amount": 0.0}
+	var inf := infusion_of(w.id)
+	if inf != &"":
+		return {"kind": inf, "amount": maxf(INFUSE_AMOUNT, w.status_amount if w.status == inf else 0.0)}
+	return {"kind": w.status, "amount": w.status_amount}
+
+
+static func infuse(weapon_id: StringName, kind: StringName) -> Dictionary:
+	if not owns("weapon", weapon_id):
+		return {"ok": false, "msg": "You do not own that."}
+	if kind == &"":
+		GameState.set_flag(StringName("infuse_" + String(weapon_id)), "")
+		Events.loadout_changed.emit()
+		return {"ok": true, "msg": "The blade is cleaned."}
+	if not StatusFx.is_kind(kind):
+		return {"ok": false, "msg": "He knows no such oil."}
+	if infusion_of(weapon_id) == kind:
+		return {"ok": false, "msg": "Already soaked in that."}
+	var r := _pay(INFUSE_COST, RESIN)
+	if not r.ok:
+		return r
+	GameState.set_flag(StringName("infuse_" + String(weapon_id)), String(kind))
+	Events.loadout_changed.emit()
+	return {"ok": true, "msg": "Soaked in %s." % StatusFx.name_of(kind)}
+
+
+## Next infusion in the cycle none -> bleed -> poison -> burn -> frost -> none.
+static func next_infusion(weapon_id: StringName) -> StringName:
+	var cur := infusion_of(weapon_id)
+	if cur == &"":
+		return StatusFx.KINDS[0]
+	var i := StatusFx.KINDS.find(cur)
+	return &"" if i < 0 or i + 1 >= StatusFx.KINDS.size() else StatusFx.KINDS[i + 1]
+
+
 # ------------------------------------------------------------------ actions
 
 static func _pay(c: Dictionary, material: StringName) -> Dictionary:

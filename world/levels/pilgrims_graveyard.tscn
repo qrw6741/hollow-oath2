@@ -17,7 +17,7 @@
 [ext_resource type="PackedScene" path="res://actors/enemies/roadside_pikeman.tscn" id="pikeman"]
 [ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
 [ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="it_resin"]
-[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Resource" path="res://data/items/relic_thorn.tres" id="it_thorn"]
 [ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
 [ext_resource type="PackedScene" path="res://actors/bosses/sexton_hale.tscn" id="gravewarden"]
@@ -229,9 +229,9 @@ item = ExtResource("it_resin")
 position = Vector2(2560, 480)
 script = ExtResource("chest")
 chest_id = &"graveyard_chest_2"
-count = 3
+count = 1
 embers = 300
-item = ExtResource("it_shard")
+item = ExtResource("it_thorn")
 
 [node name="SextonStone" type="Area2D" parent="."]
 position = Vector2(700, 480)

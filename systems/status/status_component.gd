@@ -9,6 +9,8 @@ signal changed
 var health: HealthComponent
 ## kind -> fraction (see Status). Owners set this.
 var resist := {}
+## Flat extra resistance to everything (relics), 0..1.
+var extra_resist := 0.0
 var buildup := {}
 var active := {}
 var _idle := {}
@@ -37,7 +39,7 @@ func speed_mult() -> float:
 
 
 func resist_of(kind: StringName) -> float:
-	return StatusFx.lookup(resist, kind)
+	return clampf(StatusFx.lookup(resist, kind) + extra_resist, -1.0, 1.0)
 
 
 ## Adds buildup. Returns true if the effect triggered this call.

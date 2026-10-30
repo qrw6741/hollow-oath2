@@ -39,6 +39,8 @@ EXT = {
     "it_scrap": ("Resource", "res://data/items/forge_scrap.tres"),
     "it_shard": ("Resource", "res://data/items/ember_shard.tres"),
     "it_resin": ("Resource", "res://data/items/hollow_resin.tres"),
+    "it_thorn": ("Resource", "res://data/items/relic_thorn.tres"),
+    "it_glove": ("Resource", "res://data/items/relic_riposte.tres"),
     "it_band": ("Resource", "res://data/items/ash_bandage.tres"),
 }
 
@@ -269,6 +271,7 @@ color = Color(0.68, 0.66, 0.86, 1)
              "A tall woman in grey, painted at the moment before she smiles. The brass plate reads: 'Lady Hollowmere, Patroness of the Candlewrights. She never signed the oath. She is the reason the house still stands.'")
     L.tablet("LastDraft", 1060, 480, "The Last Draft",
              "A page pinned in a glass case. The liturgy of the Hollow Oath, in its final form, with one line struck through and rewritten above it. The new line is the one that turned the oath over. The hand that rewrote it is Ommen's.")
+    L.chest("RelicChest", 1180, 480, "gallery_chest_2", count=1, item="it_glove")
     L.chest("GhostlightChest", 1300, 480, "gallery_chest", embers=800, gear=("armor", "ghostlight_raiment"))
     L.write()
 
@@ -353,7 +356,7 @@ sky_path = NodePath("")
     L.enemy("NightPenitentB", "penitent", 1650, 480, 60, 1, 2)
     L.enemy("NightPikeman", "pikeman", 2450, 480, 60, 1, 2)
     L.chest("GraveChest", 1120, 480, "graveyard_chest", count=3, embers=400, item="it_resin")
-    L.chest("SextonChest", 2560, 480, "graveyard_chest_2", count=3, embers=300, item="it_shard")
+    L.chest("SextonChest", 2560, 480, "graveyard_chest_2", count=1, embers=300, item="it_thorn")
     L.tablet("SextonStone", 700, 480, "A Sexton's Stone",
              "HALE. Sexton of this yard, forty-one years. 'He dug them all and saw them all filled.' Someone has scratched underneath, with a spade-edge: 'Not yet.'")
     L.arena("SextonArena", 2740, 480, "gravewarden", "THE YARD IS FILLED", 420, 620)

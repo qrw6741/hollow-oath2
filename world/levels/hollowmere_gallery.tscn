@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
 [ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
 [ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/relic_riposte.tres" id="it_glove"]
 
 [node name="HollowmereGallery" type="Node2D"]
 script = ExtResource("level")
@@ -99,6 +100,14 @@ position = Vector2(1060, 480)
 script = ExtResource("tablet")
 title = "The Last Draft"
 text = "A page pinned in a glass case. The liturgy of the Hollow Oath, in its final form, with one line struck through and rewritten above it. The new line is the one that turned the oath over. The hand that rewrote it is Ommen's."
+
+[node name="RelicChest" type="Area2D" parent="."]
+position = Vector2(1180, 480)
+script = ExtResource("chest")
+chest_id = &"gallery_chest_2"
+count = 1
+embers = 0
+item = ExtResource("it_glove")
 
 [node name="GhostlightChest" type="Area2D" parent="."]
 position = Vector2(1300, 480)

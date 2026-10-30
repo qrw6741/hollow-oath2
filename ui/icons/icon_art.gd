@@ -16,7 +16,7 @@ static func has_icon(id: StringName) -> bool:
 		&"penitents_tear", &"candlewright_note", &"canon_seal", &"pilgrims_draught", &"marshals_crest", &"oathblade", &"twin_blades",
 		&"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark",
 		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil", &"gallery_key", &"sextons_lantern"] \
-		or Weapons.IDS.has(id) or (String(id).begins_with("armor_") and Armors.is_valid_id(String(id).substr(6)))
+		or String(id).begins_with("relic_") or Weapons.IDS.has(id) or (String(id).begins_with("armor_") and Armors.is_valid_id(String(id).substr(6)))
 
 
 static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
@@ -48,6 +48,7 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"sextons_lantern": _lantern(ci, t)
 		&"hollow_resin": _resin(ci)
 		&"vial": _vial(ci)
+		&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte": _relic(ci, id, t)
 		&"wayfarers_rapier": _rapier(ci)
 		&"kingsfall_greatsword": _greatsword(ci)
 		&"toll_hammer": _hammer(ci)
@@ -359,3 +360,15 @@ static func _sigil(ci: CanvasItem, t: float) -> void:
 static func _unknown(ci: CanvasItem) -> void:
 	ci.draw_rect(Rect2(3, 3, 10, 10), Color(0.3, 0.3, 0.35))
 	ci.draw_string(ThemeDB.fallback_font, Vector2(6, 12), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color.WHITE)
+
+
+## One shared shape for relics: a ringed charm on a cord, tinted by the item's own colour.
+static func _relic(ci: CanvasItem, id: StringName, t: float) -> void:
+	var item := Items.get_item(id)
+	var c := item.icon_color if item else Palette.GOLD
+	ci.draw_line(Vector2(8, 1), Vector2(8, 5), OUTLINE, 3.0)
+	ci.draw_line(Vector2(8, 1), Vector2(8, 5), Color(0.55, 0.5, 0.45), 1.2)
+	ci.draw_circle(Vector2(8, 10), 5.6, OUTLINE)
+	ci.draw_circle(Vector2(8, 10), 4.6, c.darkened(0.25))
+	ci.draw_circle(Vector2(8, 10), 3.0, c)
+	ci.draw_circle(Vector2(6.8, 8.8), 1.1, Color(1, 1, 1, 0.55 + 0.2 * sin(t * 3.0)))

@@ -25,7 +25,7 @@ const DEFS := {
 		"offer": ["Those blasted crows took a whole string of my best beads. Three of them, I counted. Drop three Carrion Crows for me, and I'll make it worth your while."],
 		"remind": "The crows, dear. Three of them. They are still laughing at me.",
 		"complete": ["Ha! I heard them hit the ground from here. Take these - the last of my good tonic, and some coin for your trouble."],
-		"reward": {"embers": 250, "items": {&"pilgrims_draught": 2}},
+		"reward": {"embers": 250, "items": {&"pilgrims_draught": 2, &"relic_locket": 1}},
 	},
 	&"ilse_resin": {
 		"giver": &"ilse", "after_talks": 1, "title": "Resin for the Vials", "kind": "collect",
@@ -34,7 +34,7 @@ const DEFS := {
 		"offer": ["My vials grow thin. If you could find two lumps of Hollow Resin - the moths and the crows leave it behind, I'm told - I could mend a good many things. I would be grateful."],
 		"remind": "Two lumps of resin, if you come across them. The moths and the crows leave it behind.",
 		"complete": ["Oh, this is lovely - it still glows a little. Thank you. Take these; they are no use to me, but they may be to you."],
-		"reward": {"embers": 200, "items": {&"stamina_tonic": 2, &"ash_bandage": 2}},
+		"reward": {"embers": 200, "items": {&"stamina_tonic": 2, &"ash_bandage": 2, &"relic_candle": 1}},
 	},
 	&"ommen_cantors": {
 		"giver": &"ommen", "after_talks": 5, "title": "The Silent Choir", "kind": "kill",
@@ -43,7 +43,7 @@ const DEFS := {
 		"offer": ["There is something I should have asked sooner. The graveyard behind the road - the cantors sing there, still, the old liturgy, backwards. I wrote some of those words.", "Silence two of them, if you can. It is not cruelty. It is the only mercy I have left to ask."],
 		"remind": "Two cantors. Behind the road, in the graveyard. I can hear them from here when the wind is right.",
 		"complete": ["It is quiet. I had forgotten what quiet sounded like.", "Take this. Resin from the first candles we ever lit - I kept it for the right hour."],
-		"reward": {"embers": 600, "items": {&"hollow_resin": 3}},
+		"reward": {"embers": 600, "items": {&"hollow_resin": 3, &"relic_knot": 1}},
 	},
 	&"aldous_gallery": {
 		"giver": &"aldous", "after_talks": 1, "title": "The Gallery Key", "kind": "have",
@@ -52,7 +52,7 @@ const DEFS := {
 		"offer": ["The Gallery has been sealed since the Night. The key went down to the cellar with the last cellarer, and he has not come up again - he is, I am told, rather large now.", "Should you find the cellar - the way is behind the old shelving in the Hall, I believe - and the key, the Gallery door will answer to it."],
 		"remind": "The key is below the house, in the cellar. Mind the cellarer; he was never fond of guests.",
 		"complete": ["The key! Splendid. The Gallery door will answer to it - go in, Archivist Vesper will be delighted. She has been waiting a very long time to be useful."],
-		"reward": {"embers": 500, "items": {}},
+		"reward": {"embers": 500, "items": {&"relic_coin": 1}},
 	},
 }
 const ORDER: Array[StringName] = [&"hobb_scrap", &"wenna_crows", &"ilse_resin", &"ommen_cantors", &"aldous_gallery"]

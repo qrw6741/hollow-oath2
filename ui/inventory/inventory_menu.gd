@@ -10,7 +10,7 @@ extends CanvasLayer
 ## A JOURNAL tab lists open errands (see Quests).
 ## Switch tabs with Parry / Heal (L1 / R1) or by clicking. Keyboard, mouse and gamepad.
 
-enum Tab { EQUIPMENT, ITEMS, JOURNAL, BESTIARY, DEEDS }
+enum Tab { EQUIPMENT, ITEMS, JOURNAL, BESTIARY, DEEDS, RELICS }
 
 var is_open := false
 var tab := Tab.EQUIPMENT
@@ -18,6 +18,9 @@ var _was_paused := false
 var _prev_modal := false
 var _panel: ColorRect
 var _tab_btns: Array[Button] = []
+var _relic_list: VBoxContainer
+var _relic_head: Label
+var _relic_btns: Array[Button] = []
 var _bestiary_label: Label
 var _deeds_label: Label
 var _pages: Array[Control] = []
@@ -81,12 +84,12 @@ func _build() -> void:
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
 	tabs.add_theme_constant_override(&"separation", 6)
 	v.add_child(tabs)
-	for i in 5:
+	for i in 6:
 		var b := FancyButton.new()
-		b.text = ["EQUIPMENT", "ITEMS", "JOURNAL", "BESTIARY", "DEEDS"][i]
-		b.custom_minimum_size = Vector2(78, 18)
+		b.text = ["EQUIPMENT", "ITEMS", "JOURNAL", "BESTIARY", "DEEDS", "RELICS"][i]
+		b.custom_minimum_size = Vector2(70, 18)
 		b.add_theme_font_override(&"font", UITheme.title_font())
-		b.add_theme_font_size_override(&"font_size", 10)
+		b.add_theme_font_size_override(&"font_size", 9)
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(show_tab.bind(i))
 		tabs.add_child(b)
@@ -100,6 +103,7 @@ func _build() -> void:
 	_pages.append(_build_journal(stack))
 	_pages.append(_build_scroll_text(stack, "_bestiary_label"))
 	_pages.append(_build_scroll_text(stack, "_deeds_label"))
+	_pages.append(_build_relics(stack))
 	_close_btn = FancyButton.new()
 	_close_btn.text = "Close"
 	_close_btn.custom_minimum_size = Vector2(110, 15)
@@ -280,6 +284,61 @@ func _build_journal(stack: Control) -> Control:
 	return p
 
 
+func _build_relics(stack: Control) -> Control:
+	var p := _framed(stack, Vector2(460, 194))
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 3)
+	p.add_child(v)
+	_relic_head = Label.new()
+	UITheme.title(_relic_head, 10, Palette.GOLD_BRIGHT)
+	v.add_child(_relic_head)
+	_relic_list = VBoxContainer.new()
+	_relic_list.add_theme_constant_override(&"separation", 2)
+	v.add_child(_relic_list)
+	return p
+
+
+## Rebuilds the relic rows: every relic you carry, [x] when worn. Press to wear / remove.
+func _refresh_relics() -> void:
+	for c in _relic_list.get_children():
+		_relic_list.remove_child(c)
+		c.queue_free()
+	_relic_btns.clear()
+	_relic_head.text = "RELICS    worn %d / %d" % [Relics.equipped().size(), Relics.SLOTS]
+	var any := false
+	for id in Relics.IDS:
+		if not Relics.owned(id):
+			continue
+		any = true
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", 4)
+		var slot := IconSlot.new()
+		slot.custom_minimum_size = Vector2(22, 22)
+		slot.focus_mode = Control.FOCUS_NONE
+		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.icon_id = id
+		row.add_child(slot)
+		var b := FancyButton.new()
+		b.custom_minimum_size = Vector2(400, 22)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.text = "%s  %s    %s" % ["[x]" if Relics.is_worn(id) else "[ ]", Relics.DEFS[id].title, Relics.DEFS[id].desc]
+		UITheme.compact(b)
+		b.pressed.connect(func():
+			var r := Relics.toggle(id)
+			_msg.text = r.msg
+			_refresh_relics())
+		row.add_child(b)
+		_relic_list.add_child(row)
+		_relic_btns.append(b)
+	if not any:
+		var l := Label.new()
+		l.text = "You carry no relics yet. Errands, bosses and hidden chests give them."
+		l.add_theme_color_override(&"font_color", Palette.STONE_LIGHT)
+		_relic_list.add_child(l)
+	if not _relic_btns.is_empty():
+		_relic_btns[0].grab_focus.call_deferred()
+
+
 func _build_scroll_text(stack: Control, field: String) -> Control:
 	var p := _framed(stack, Vector2(460, 194))
 	var sc := ScrollContainer.new()
@@ -390,6 +449,8 @@ func show_tab(t: int) -> void:
 	elif tab == Tab.DEEDS:
 		_deeds_label.text = Deeds.text()
 		_close_btn.grab_focus()
+	elif tab == Tab.RELICS:
+		_refresh_relics()
 	else:
 		_rebuild()
 	Audio.sfx(&"ui_move", -4.0)
