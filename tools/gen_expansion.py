@@ -74,8 +74,12 @@ for mi, group in enumerate(E.BOSSES):
         role = b["role"]
         # The Descent follows the Crownless King (2,200 hp), so it ramps up steadily map by map from there.
         hp = {"mini": 1500 + 130 * mi, "main": 2600 + 280 * mi, "final": 9000}[role]
+        if mi >= 11:   # beyond the Hollow Heart: the mains outgrow the Oath Eternal, the last boss tops them all
+            hp = {"mini": 1500 + 130 * mi, "main": 9500 + 450 * (mi - 11), "final": 16000}[role]
         poise = {"mini": 110 + 8 * mi, "main": 150 + 12 * mi, "final": 280}[role]
         embers = {"mini": 2200 + 250 * mi, "main": 4800 + 450 * mi, "final": 20000}[role]
+        if mi >= 11:
+            embers = {"mini": 2200 + 250 * mi, "main": 22000 + 1500 * (mi - 11), "final": 40000}[role]
         chase = {"heavy": 50, "brute": 54, "caster": 52, "duelist": 62, "stalker": 70}[b["arch"]]
         G.enemy(b["id"], b["name"], b["lore"], ids[:3], hp, poise, chase, embers, b["drop"], "ember_shard")
         G.boss(pascal(b["id"]), b["id"], b["id"], ids, 13, hurt=(28, 54), music_pitch=round(0.66 - 0.01 * mi - (0.06 if role == "final" else 0.0), 2))
@@ -90,6 +94,10 @@ CLONES = [  # new id, base id, name, description, status, amount, damage_mult, m
     ("thornwood_sabre", "tide_sabre", "Thornwood Sabre", "A sabre cut from a tree that fed on the dead. It drinks and gives back poison.", "poison", 26.0, 1.12, 3),
     ("glasswrights_shards", "veil_daggers", "Glasswright's Shards", "Twin shards of the Gallery's windows. They cut sharply, and the cut shows you your own face.", "bleed", 28.0, 1.14, 6),
     ("vowbreaker", "kingsfall_greatsword", "Vowbreaker", "A greatsword with a cracked blade, bound by oaths it does not honour. It is very, very sharp.", "frost", 20.0, 1.2, 10),
+    ("choirmasters_baton", "wayfarers_rapier", "Choirmaster's Baton", "A slim baton that conducts the choir's last note. Each flick leaves a cinder where it points.", "burn", 24.0, 1.12, 11),
+    ("lantern_hook", "tide_sabre", "Lantern-Hook", "A ferryman's hook-blade with a marsh light caught in its curve. It pulls what it cuts.", "poison", 28.0, 1.14, 12),
+    ("namebreaker", "gravediggers_greataxe", "Namebreaker", "A chisel as long as an axe-haft. It cuts a name out of whatever it strikes.", "frost", 32.0, 1.18, 13),
+    ("unkept_blade", "kingsfall_greatsword", "The Unkept Blade", "A greatsword that was promised to someone and never given. It is very heavy with it.", "burn", 30.0, 1.24, 14),
 ]
 for nid, base, name, desc, st, amt, dm, _ in CLONES:
     s = open(f"{R}/data/weapons/{base}.tres").read()
@@ -111,7 +119,7 @@ def add_to_list(path, anchor_regex, new_ids, quoted=True):
     missing = [i for i in new_ids if f'&"{i}"' not in s[m.start():m.end()]]
     if not missing:
         return
-    add = ", " + ", ".join(f'&"{i}"' for i in missing)
+    add = (" " if body.rstrip().endswith(",") else ", ") + ", ".join(f'&"{i}"' for i in missing)
     s = s[:m.end(1)] + add + s[m.end(1):]
     open(f"{R}/{path}", "w").write(s)
 

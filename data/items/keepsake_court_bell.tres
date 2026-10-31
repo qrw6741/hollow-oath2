@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"keepsake_court_bell"
+display_name = "The Court Bell"
+description = "A small brass bell, tarnished, with a tiny cap-and-bells jester's face worn almost smooth. It rings, once, the instant someone tells the truth near it."
+kind = 2
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(0.85, 0.78, 0.55, 1)

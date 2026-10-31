@@ -184,3 +184,4 @@
 - bot_all sweep shows no script errors but the bot is invulnerable and mashes attack: balance, dialogue and shop flow are still untested by anyone.
 - New post-process (bloom, grain) and fog layer are untested for frame rate on real GPUs/Windows; Settings > 'Glow & colour grading' turns the post pass off.
 - Outline pass skipped for 5 enemy visuals + Lurker/Mimic (internal draw_set_transform). Art is still procedural, not hand-made sprites.
+- The 4 new maps reuse existing backdrop looks and the 12 new bosses reuse existing boss visuals with new colours; difficulty is untested by a human. Balance unknown.

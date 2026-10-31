@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/weapon_data.gd" id="1_weapon"]
+[ext_resource type="Resource" path="res://data/attacks/sabre_1.tres" id="2_a"]
+[ext_resource type="Resource" path="res://data/attacks/sabre_heavy.tres" id="3_a"]
+[ext_resource type="Resource" path="res://data/attacks/sabre_air.tres" id="4_a"]
+[ext_resource type="Resource" path="res://data/attacks/sabre_riposte.tres" id="5_a"]
+[ext_resource type="Resource" path="res://data/attacks/skill_tide_sabre.tres" id="99_skill"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = &"lantern_hook"
+display_name = "Lantern-Hook"
+description = "A ferryman's hook-blade with a marsh light caught in its curve. It pulls what it cuts."
+light_combo_start = ExtResource("2_a")
+heavy = ExtResource("3_a")
+aerial = ExtResource("4_a")
+riposte = ExtResource("5_a")
+riposte_multiplier = 1.1
+look = 8
+two_handed = false
+status = &"poison"
+status_amount = 28.0
+skill = ExtResource("99_skill")
+skill_cost = 30.0
+parry_window_bonus = 1
+parry_recovery_bonus = 0

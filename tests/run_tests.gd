@@ -3967,6 +3967,9 @@ func test_progress_goal() -> void:
 		check(Bestiary.IDS.has(g.boss), "%s is a real boss" % g.boss)
 		game_state.set_flag(StringName("boss_defeated_" + String(g.boss)), true)
 	check(Progress.next_goal().is_empty() and Progress.text() != "", "after the last boss there is no goal")
+	for reach in [&"verse_mother_ilse", &"the_lantern_mother", &"the_unnamed_archon", &"the_unkept_promise"]:
+		game_state.set_flag(StringName("boss_defeated_" + String(reach)), false)
+	check(Progress.next_goal().name == "the Verse-Mother Ilse".replace("the ", "") and "Cinder Choir" in Progress.text(), "after the Hollow Heart the road leads on to the Cinder Choir")
 	game_state.set_flag(&"boss_defeated_the_oath_eternal", false)
 	game_state.set_flag(&"boss_defeated_pale_sovereign", false)
 	check(Progress.next_goal().name == "the Pale Sovereign" and "Barrow" in Progress.text(), "goals are taken in story order")

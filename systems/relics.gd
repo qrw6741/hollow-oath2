@@ -39,8 +39,12 @@ const DEFS := {
 	&"relic_x_prioress_silence": {"title": "Silence's Veil-Pin", "desc": "Resist 40% of every status buildup.", "effect": "status_resist", "value": 0.4},
 	&"relic_x_pale_sovereign": {"title": "The Sovereign's Pale Crown", "desc": "Foes pay 60% more embers.", "effect": "ember_gain", "value": 1.6},
 	&"relic_x_the_oath_eternal": {"title": "Wend's Oath-Knot", "desc": "Ember Vials heal 100% more.", "effect": "flask_heal", "value": 2.0},
+	&"relic_x_verse_mother_ilse": {"title": "Ilse's Tuning-Fork", "desc": "A parry gives 35 extra focus.", "effect": "parry_focus", "value": 35.0},
+	&"relic_x_the_lantern_mother": {"title": "The Lantern-Mother's Wick", "desc": "Focus builds 70% faster.", "effect": "focus_gain", "value": 1.7},
+	&"relic_x_the_unnamed_archon": {"title": "The Archon's Borrowed Name", "desc": "Your weapon's status builds 90% faster.", "effect": "weapon_status", "value": 1.9},
+	&"relic_x_the_unkept_promise": {"title": "The Unkept Seal", "desc": "Resist 35% of every status buildup.", "effect": "status_resist", "value": 0.35},
 }
-const IDS: Array[StringName] = [&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte", &"relic_shackle", &"relic_slag", &"relic_regent", &"relic_clapper", &"relic_briar", &"relic_gear", &"relic_chalice", &"relic_oathbreaker", &"relic_x_ossuary_king_veyl", &"relic_x_chandler_ulme", &"relic_x_chancellor_vorne", &"relic_x_mother_sylve", &"relic_x_auctioneer_mordant", &"relic_x_admiral_sorrel", &"relic_x_glasswright_orm", &"relic_x_vowsmith_anaxe", &"relic_x_prioress_silence", &"relic_x_pale_sovereign", &"relic_x_the_oath_eternal"]
+const IDS: Array[StringName] = [&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte", &"relic_shackle", &"relic_slag", &"relic_regent", &"relic_clapper", &"relic_briar", &"relic_gear", &"relic_chalice", &"relic_oathbreaker", &"relic_x_ossuary_king_veyl", &"relic_x_chandler_ulme", &"relic_x_chancellor_vorne", &"relic_x_mother_sylve", &"relic_x_auctioneer_mordant", &"relic_x_admiral_sorrel", &"relic_x_glasswright_orm", &"relic_x_vowsmith_anaxe", &"relic_x_prioress_silence", &"relic_x_pale_sovereign", &"relic_x_the_oath_eternal", &"relic_x_verse_mother_ilse", &"relic_x_the_lantern_mother", &"relic_x_the_unnamed_archon", &"relic_x_the_unkept_promise"]
 
 
 static func owned(id: StringName) -> bool:

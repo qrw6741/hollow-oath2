@@ -37,9 +37,21 @@ const BOSSES := {
 	&"keeper_first_oath": {"name": "Keeper of the First Oath", "short": "Keeper", "role": &"mini", "map": &"hollow_heart", "index": 10},
 	&"the_unsworn": {"name": "The Unsworn", "short": "Unsworn", "role": &"mini", "map": &"hollow_heart", "index": 10},
 	&"the_oath_eternal": {"name": "The Oath Eternal", "short": "Oath", "role": &"final", "map": &"hollow_heart", "index": 10},
+	&"chorister_vael": {"name": "Chorister Vael", "short": "Vael", "role": &"mini", "map": &"cinder_choir", "index": 11},
+	&"ash_deacon_ruth": {"name": "Ash-Deacon Ruth", "short": "Ruth", "role": &"mini", "map": &"cinder_choir", "index": 11},
+	&"verse_mother_ilse": {"name": "Verse-Mother Ilse", "short": "Ilse", "role": &"main", "map": &"cinder_choir", "index": 11},
+	&"wisp_warden_nell": {"name": "Wisp-Warden Nell", "short": "Nell", "role": &"mini", "map": &"lantern_marsh", "index": 12},
+	&"ferryman_obol": {"name": "Ferryman Obol", "short": "Obol", "role": &"mini", "map": &"lantern_marsh", "index": 12},
+	&"the_lantern_mother": {"name": "The Lantern-Mother", "short": "Lantern", "role": &"main", "map": &"lantern_marsh", "index": 12},
+	&"namekeeper_ish": {"name": "Namekeeper Ish", "short": "Ish", "role": &"mini", "map": &"undercrypt_of_names", "index": 13},
+	&"chiselmaster_tor": {"name": "Chiselmaster Tor", "short": "Tor", "role": &"mini", "map": &"undercrypt_of_names", "index": 13},
+	&"the_unnamed_archon": {"name": "The Unnamed Archon", "short": "Archon", "role": &"main", "map": &"undercrypt_of_names", "index": 13},
+	&"jessamy_court_fool": {"name": "Jessamy, the Court Fool", "short": "Jessamy", "role": &"mini", "map": &"wakeless_court", "index": 14},
+	&"chamberlain_hollin": {"name": "Chamberlain Hollin", "short": "Hollin", "role": &"mini", "map": &"wakeless_court", "index": 14},
+	&"the_unkept_promise": {"name": "The Unkept Promise", "short": "Unkept", "role": &"final", "map": &"wakeless_court", "index": 14},
 }
-const MAPS: Array[StringName] = [&"weeping_ossuary", &"tallow_mines", &"gilded_archive", &"sunless_orchard", &"bone_market", &"tidal_vaults", &"shattered_gallery", &"forge_of_vows", &"hush_cloister", &"barrow_of_kings", &"hollow_heart"]
-const WEAPONS := {&"bone_cleaver": &"weeping_ossuary", &"chandlers_maul": &"tallow_mines", &"archivists_needle": &"gilded_archive", &"thornwood_sabre": &"sunless_orchard", &"glasswrights_shards": &"shattered_gallery", &"vowbreaker": &"hollow_heart"}
+const MAPS: Array[StringName] = [&"weeping_ossuary", &"tallow_mines", &"gilded_archive", &"sunless_orchard", &"bone_market", &"tidal_vaults", &"shattered_gallery", &"forge_of_vows", &"hush_cloister", &"barrow_of_kings", &"hollow_heart", &"cinder_choir", &"lantern_marsh", &"undercrypt_of_names", &"wakeless_court"]
+const WEAPONS := {&"bone_cleaver": &"weeping_ossuary", &"chandlers_maul": &"tallow_mines", &"archivists_needle": &"gilded_archive", &"thornwood_sabre": &"sunless_orchard", &"glasswrights_shards": &"shattered_gallery", &"vowbreaker": &"hollow_heart", &"choirmasters_baton": &"cinder_choir", &"lantern_hook": &"lantern_marsh", &"namebreaker": &"undercrypt_of_names", &"unkept_blade": &"wakeless_court"}
 
 
 static func boss_ids() -> Array:

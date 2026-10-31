@@ -85,6 +85,34 @@ NPCS = [
          greet=["Do not hate him. He is being faithful. It is simply that faithfulness has no off switch.", "The Keeper and the Unsworn are what's left of his doubt. He needed them to keep standing. He did not know he was building a prison.", "You can break the promise, or you can finish it. I cannot tell you which is kinder."],
          after=["He is at rest. Or he is released, which is not the same thing, and I find I am glad of either.", "Thank you. The oath was nine words. I never imagined it would cost so many people so much.", "Take this. It is the candle I promised I would keep lit. It can go out now. You can carry it up."],
          gift=("keepsake_aures_candle", "Aure's Candle", "A stub of white candle that has been burning for a thousand years. It gives light but no heat, and it can finally be put out.")),
+    dict(map=11, id="choir_cinder_nun", name="Sister Ember-Ash", look=3, x=1560,
+         first=["Do not mind the singing. It stopped a long time ago. It is only the walls remembering.",
+                "We sang the first half of every oath. It was lovely. We did not know there was a second half until the second half arrived.",
+                "Past the choir the road goes on, beyond the Last Door. I stayed because someone has to listen when it finally ends."],
+         greet=["Vael sings what was meant. It is always kinder than what was said.", "Ruth swings a censer that burned our chapel. He loved us. That is the worst of it.", "If the singing starts again, do not answer it."],
+         after=["Ilse is quiet. The walls are quiet. I did not know quiet could ring so.", "You put the choir to rest. I think it is grateful. It is difficult to tell with choirs."],
+         gift=("keepsake_choir_ember", "A Choir-Ember", "A coal from the choir's last fire. It hums, very faintly, a note a half-step flat.")),
+    dict(map=12, id="marsh_ferry_hand", name="Reed-Hand Pell", look=0, x=1560,
+         first=["Careful of the lights. They are friendlier than they look, and that is how they get you.",
+                "The ferry takes a promise for the crossing. I pay mine in small ones. I promise to be back by dark. I never am.",
+                "The far shore is lit. People say nobody lands there. People are not always right."],
+         greet=["Nell herds the lights. They like her. They do not like you. Yet.", "Obol is not cruel. He is fair, in the way a tide is fair.", "Mind the water. It remembers every foot."],
+         after=["The Lantern-Mother is dark. The marsh is darker than I have ever seen it, and quieter. It is rather lovely.", "You put out the lights. I do not know whether to thank you or to count them."],
+         gift=("keepsake_marsh_lantern", "A Marsh Lantern", "A little cage of reeds holding a light that is not a flame. It leans, very gently, towards the nearest person who has promised to come back.")),
+    dict(map=13, id="crypt_name_reader", name="The Name-Reader", look=5, x=1560,
+         first=["Hush. I am reading. There are a great many of them, and they are shy.",
+                "Each name here was cut, and then cut out. The gaps are the names now. It is a tidier system than memory.",
+                "If you listen, you can hear them asking to be read. I read them. It is all I do. It is, I think, enough."],
+         greet=["Ish writes the names. Tor cuts them. I read what is left. We are not friends, exactly. We are a process.", "A name is only a promise someone makes on your behalf.", "Do not give the Archon your name. It will want it."],
+         after=["The Archon has gone quiet. It has a name now, I think. I did not catch it. I was not meant to.", "You will have a name, afterwards. A good one. Try to keep hold of it."],
+         gift=("keepsake_blank_slab", "A Blank Slab Shard", "A palm-sized sliver of fresh stone, warm as a hand. It is waiting for a name. It would like it to be yours, and has been very patient about it.")),
+    dict(map=14, id="court_fool_echo", name="The Court's Last Laugh", look=1, x=1560,
+         first=["Ha. Ha. A visitor! Do sit. Not there. Oh, anywhere. Everything is a throne here, if you wait.",
+                "They keep a roll of every promise never kept. I am the entry marked 'a joke, probably.' It is a very honest roll.",
+                "The Oath Eternal was only the kept half. This is the other half. It is very large. It is very quiet. It has waited a very long time to be forgiven."],
+         greet=["Jessamy is the only honest one. Nobody believes her. It is the safest way to be.", "Hollin reads the list in a steady voice. He has to. If it wavered, the Court would hear it.", "The Unkept has been practising an apology for a thousand years. It will be a long one."],
+         after=["Look at that. A Court with nothing left to keep. I am almost sorry.", "Everything promised and not done has finally been seen. That is all it wanted. To be seen. Ha. Ha. Oh."],
+         gift=("keepsake_court_bell", "The Court Bell", "A small brass bell, tarnished, with a tiny cap-and-bells jester's face worn almost smooth. It rings, once, the instant someone tells the truth near it.")),
 ]
 
 # New wearable armour, one per map: (id, name, look 1 LIGHT / 2 KNIGHT / 3 HEAVY, damage mult, speed mult, resist, dodge, cloth, light, accent, description)
@@ -100,6 +128,10 @@ ARMORS = [
     ("hush_habit", "Hush Habit", 1, 0.9, 1.1, {"poison": 0.3, "frost": 0.3}, -4.0, "#9aa8b6", "#c4d0dc", "#ffffff", "A grey habit that muffles every step. Dodging in it costs almost nothing, the Cloister made sure of that."),
     ("barrow_regalia", "Barrow Regalia", 2, 0.78, 0.94, {"bleed": 0.3, "frost": 0.3, "burn": 0.3}, 0.0, "#4a4458", "#706888", "#e0c860", "The grave-regalia of a king long dead. Heavy with honour, and with the weight of everyone who is still owed it."),
     ("aures_vigil", "Aure's Vigil", 2, 0.7, 1.0, {"bleed": 0.4, "poison": 0.4, "frost": 0.4, "burn": 0.4}, -2.0, "#a06070", "#d08898", "#fff0c0", "The oldest armour in the kingdom: a soldier's coat re-sewn by a candlewright's hand. It remembers being loved."),
+    ("cinder_surplice", "Cinder Surplice", 1, 0.92, 1.06, {"burn": 0.6, "frost": 0.1}, -2.0, "#5a2a22", "#8a4a38", "#ffc070", "A choir surplice scorched at every hem. It was white once; it has agreed to be grey."),
+    ("marsh_reed_cloak", "Marsh-Reed Cloak", 1, 0.9, 1.1, {"poison": 0.6, "frost": 0.2}, -3.0, "#3a5a40", "#5a8a60", "#c0ffd0", "A cloak of woven marsh-reed that carries a faint, friendly glow. It will lead you on, if you let it."),
+    ("namekeepers_mail", "Namekeeper's Mail", 2, 0.78, 0.96, {"frost": 0.6, "bleed": 0.3}, 0.0, "#40506a", "#6a80a8", "#d0e0ff", "Mail with a name cut into every link and cut out again. It sits very lightly. You will not remember wearing it."),
+    ("unkept_regalia", "Unkept Regalia", 2, 0.68, 0.98, {"bleed": 0.4, "poison": 0.4, "frost": 0.4, "burn": 0.4}, -2.0, "#6a3a64", "#9a6090", "#ffc8f0", "The court-dress of the Wakeless Court: a promise made and not worn. It is the finest cloth in the kingdom, and it has never once been used."),
 ]
 
 # New consumables: (id, name, description, colour, effect 1 HEAL / 2 STAMINA / 3 EMBERS, amount, stack)
@@ -132,7 +164,12 @@ VESPER = {
     "keepsake_hush_bell": "The Hush Bell, no clapper. The Cloister fell silent so that the oath could be heard clearly. Nobody noticed that it had stopped saying anything worth hearing.",
     "keepsake_roll_of_kings": "Twelve kings, and a thirteenth line, empty. Every king of Vaelmoor swore the oath and kept it badly. The thirteenth niche was kept for the one who would keep it well. That is why the Sovereign is so pale. He is waiting for a better king than himself.",
     "keepsake_aures_candle": "Aure's candle! A thousand years alight, and you carried it up. I will not ask how. I will say this: all the candles in Vaelmoor were lit from this one. You are holding where the light came from.",
+    "keepsake_choir_ember": "A coal from the Choir. The Candlewrights sang the first half of the vow in unison, and the second half alone, and then nobody was left to sing it. The silence after is called the Cinder Choir.",
+    "keepsake_marsh_lantern": "A marsh lantern. I wonder if the light was ever a person, or only the thing a person meant to do. The two look much the same by night, and much the same on the water.",
+    "keepsake_blank_slab": "A shard of the blank slab. Every name in the Undercrypt was given away, in the end, to make the stone more comfortable. It is the only crypt I know that has cushioned the dead.",
+    "keepsake_court_bell": "The Court Bell. Beyond the Heart there is a court of every promise not kept, and its jester is the only truthful member. I find that unsurprising, and a little unbearable.",
 }
 
 RELIC_NAMES = ["Veyl's Knucklebone", "Ulme's Drip-Candle", "Vorne's Seal", "Sylve's Heartwood", "Mordant's Ledger", "Sorrel's Compass",
-               "Orm's Eyepiece", "Anaxe's Hammer-Charm", "Silence's Veil-Pin", "The Sovereign's Pale Crown", "Wend's Oath-Knot"]
+               "Orm's Eyepiece", "Anaxe's Hammer-Charm", "Silence's Veil-Pin", "The Sovereign's Pale Crown", "Wend's Oath-Knot",
+               "Ilse's Tuning-Fork", "The Lantern-Mother's Wick", "The Archon's Borrowed Name", "The Unkept Seal"]

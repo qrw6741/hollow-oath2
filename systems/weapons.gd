@@ -4,7 +4,7 @@ extends RefCounted
 
 const IDS: Array[StringName] = [&"oathblade", &"twin_blades", &"sword_and_shield", &"fists",
 	&"wayfarers_rapier", &"kingsfall_greatsword", &"toll_hammer", &"marshals_lance", &"tide_sabre", &"cinderbrand", &"ashfall_pike",
-	&"gravediggers_greataxe", &"veil_daggers", &"candle_catalyst", &"abbots_crozier", &"bone_cleaver", &"chandlers_maul", &"archivists_needle", &"thornwood_sabre", &"glasswrights_shards", &"vowbreaker"]
+	&"gravediggers_greataxe", &"veil_daggers", &"candle_catalyst", &"abbots_crozier", &"bone_cleaver", &"chandlers_maul", &"archivists_needle", &"thornwood_sabre", &"glasswrights_shards", &"vowbreaker", &"choirmasters_baton", &"lantern_hook", &"namebreaker", &"unkept_blade"]
 const DIR := "res://data/weapons/"
 ## Where each weapon can be found, shown on the WEAPONS tab while you do not own it.
 const HINTS := {
@@ -25,6 +25,10 @@ const HINTS := {
 	&"thornwood_sabre": "A hidden chest in the Sunless Orchard, past the Last Tree.",
 	&"glasswrights_shards": "A hidden chest in the Shattered Gallery, past the Glasswright.",
 	&"vowbreaker": "A hidden chest in the Hollow Heart, past the Oath Eternal.",
+	&"choirmasters_baton": "A hidden chest in the Cinder Choir, past Verse-Mother Ilse.",
+	&"lantern_hook": "A hidden chest in the Lantern Marsh, past the Lantern-Mother.",
+	&"namebreaker": "A hidden chest in the Undercrypt of Names, past the Unnamed Archon.",
+	&"unkept_blade": "A hidden chest in the Wakeless Court, past the Unkept Promise.",
 }
 ## Each upgrade level adds this fraction of the weapon's base damage.
 const LEVEL_BONUS := 0.10

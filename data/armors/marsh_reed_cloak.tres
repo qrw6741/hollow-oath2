@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"marsh_reed_cloak"
+display_name = "Marsh-Reed Cloak"
+description = "A cloak of woven marsh-reed that carries a faint, friendly glow. It will lead you on, if you let it."
+look = 1
+damage_taken_mult = 0.9
+run_speed_mult = 1.1
+dodge_stamina_add = -3.0
+cloth_color = Color(0.227, 0.353, 0.251, 1)
+cloth_light_color = Color(0.353, 0.541, 0.376, 1)
+accent_color = Color(0.753, 1.000, 0.816, 1)
+resist = {"poison": 0.6, "frost": 0.2}

@@ -70,6 +70,30 @@ MAPS = [
             ("The Pulse", "The walls beat. Slow, then slower. You realise the beat is the same as your own, and has been since the Citadel."),
             ("The Last Door", "Beyond it, no sound. The door is open. It has been open since the first oath. Nobody has ever wished to go through.")],
       cands=["Heart Gate Candle", "First Chamber Candle", "Pulse Candle", "Last Door Candle"]),
+ dict(key="cinder_choir", name="The Cinder Choir", node="CinderChoir", tint="(1.0, 0.64, 0.52, 1)", style=1, hazard="jet", look=7,
+      ground=["cantor", "gilded", "captain", "cantor", "sergeant", "gilded"], step=["captain", "gilded"], loft=["archer", "cantor"],
+      tabs=[("The Burnt Hymnal", "Every page is scorched at the same place: the second half of every vow. The first halves are still perfectly legible."),
+            ("A Chorister's Rule", "WE SANG THE PROMISE. WE DID NOT SING THE KEEPING OF IT. The line below is smudged by a thumb, as if someone wished to unsay it."),
+            ("The Silent Pews", "The pews face a wall. On the wall, in soot: 'Beyond this is where we put what we did not mean.'")],
+      cands=["Choir Gate Candle", "Burnt Pew Candle", "Hymn Stair Candle", "Last Verse Candle"]),
+ dict(key="lantern_marsh", name="The Lantern Marsh", node="LanternMarsh", tint="(0.55, 0.8, 0.64, 1)", style=0, hazard="water", look=3,
+      ground=["moth", "pilgrim", "lurker", "moth", "penitent", "pilgrim"], step=["gilded", "captain"], loft=["archer", "archer"],
+      tabs=[("A Ferryman's Post", "A pole, a lantern, a sign: PAY WITH A PROMISE. A heap of unspent promises lies beneath it, like coins."),
+            ("What the Lights Are", "The lights over the water are not will-o'-wisps. They are the intentions of people who meant to come back."),
+            ("The Far Shore", "There is a far shore. It is lit. Nobody has ever been seen to land on it.")],
+      cands=["Marsh Gate Candle", "Ferry Post Candle", "Reed Candle", "Lantern Hall Candle"]),
+ dict(key="undercrypt_of_names", name="The Undercrypt of Names", node="UndercryptOfNames", tint="(0.6, 0.72, 0.92, 1)", style=1, hazard="spikes", look=5,
+      ground=["lurker", "pilgrim", "cantor", "gilded", "lurker", "captain"], step=["captain", "pilgrim"], loft=["archer", "cantor"],
+      tabs=[("The Chisel Wall", "Names are cut into the wall, row on row, and then cut out again. Only the gaps remain, in the shape of letters."),
+            ("A Namekeeper's Count", "Forgotten: 1,204. Remembered: 1,204. The two columns are the same people. Nobody is able to explain this."),
+            ("The Blank Slab", "A slab of fresh stone, the size of a person, waiting. A chisel rests on it. It is warm.")],
+      cands=["Undercrypt Gate Candle", "Chisel Hall Candle", "Name Row Candle", "Blank Slab Candle"]),
+ dict(key="wakeless_court", name="The Wakeless Court", node="WakelessCourt", tint="(0.82, 0.64, 0.8, 1)", style=1, hazard="jet", look=9,
+      ground=["captain", "gilded", "sergeant", "cantor", "captain", "pilgrim"], step=["captain", "gilded"], loft=["archer", "cantor"],
+      tabs=[("The Court Roll", "Every promise ever made and not kept is entered here, with a date, and a name, and a small seal of regret."),
+            ("The Fool's Chair", "The jester's seat is the only one with a cushion. It is the only seat that ever told the truth."),
+            ("The Unkept Throne", "The throne is empty. It is empty because what sits on it is the shape of everything that never happened.")],
+      cands=["Court Gate Candle", "Chamberlain's Candle", "Fool's Candle", "Unkept Throne Candle"]),
 ]
 
 # arch: brute | duelist | caster | heavy | stalker.  role: mini | main | final.
@@ -122,4 +146,20 @@ BOSSES = [
  [B("keeper_first_oath", "Keeper of the First Oath", "Keeper", "He guards the oldest promise in Vaelmoor. It says: do not leave.", "heavy", "none", "mini", "#2a2230", "#d8b8c8", 2, True, 1.2, "pilgrims_draught"),
   B("the_unsworn", "The Unsworn", "Unsworn", "The only one who ever refused. They have been alone down here since.", "stalker", "bleed", "mini", "#202028", "#f0f0f0", 3, False, 1.0, "ash_bandage"),
   B("the_oath_eternal", "The Oath Eternal", "Oath", "It is not a god. It is not a king. It is a sentence that has been said so many times it has become a creature.", "heavy", "burn", "final", "#3a1828", "#ff6080", 8, True, 1.3, "ember_shard")],
+ # 11 Cinder Choir
+ [B("chorister_vael", "Chorister Vael", "Vael", "She sings the first half of every vow, beautifully. She has never learned the second.", "caster", "burn", "mini", "#3a1c18", "#ffb070", 8, True, 1.0, "hollow_resin"),
+  B("ash_deacon_ruth", "Ash-Deacon Ruth", "Ruth", "He swings the censer that burned the choir. It still smells of lilies.", "heavy", "burn", "mini", "#2a2220", "#e0a070", 4, False, 1.15, "forge_scrap"),
+  B("verse_mother_ilse", "Verse-Mother Ilse", "Ilse", "She leads the choir that sings what was meant and not what was said. It is much louder than the truth.", "caster", "burn", "main", "#4a2018", "#ffd090", 2, True, 1.2, "ember_shard")],
+ # 12 Lantern Marsh
+ [B("wisp_warden_nell", "Wisp-Warden Nell", "Nell", "She herds the lights over the water. They go where she points, and the pilgrims follow.", "stalker", "poison", "mini", "#2a3a30", "#a8e8b0", 1, True, 0.95, "hollow_resin"),
+  B("ferryman_obol", "Ferryman Obol", "Obol", "He takes a promise for the crossing. He has never once been paid in anything else.", "brute", "frost", "mini", "#222c34", "#90b8c8", 5, True, 1.15, "ash_bandage"),
+  B("the_lantern_mother", "The Lantern-Mother", "Lantern", "Every light on the marsh is hers. She counts them each night. She has never once got the number right.", "caster", "poison", "main", "#1e3a2c", "#b0ffc0", 8, True, 1.25, "ember_shard")],
+ # 13 Undercrypt of Names
+ [B("namekeeper_ish", "Namekeeper Ish", "Ish", "He writes the names. He has written yours. It is already in the wrong place.", "duelist", "frost", "mini", "#2a3040", "#c8d8f0", 7, True, 1.0, "pilgrims_draught"),
+  B("chiselmaster_tor", "Chiselmaster Tor", "Tor", "He cuts names out of the stone, and the stone out of the people who carried them.", "heavy", "bleed", "mini", "#3a3a44", "#a8b8d0", 4, False, 1.2, "forge_scrap"),
+  B("the_unnamed_archon", "The Unnamed Archon", "Archon", "It was given a name once. It gave it away. It has been looking for another ever since.", "brute", "frost", "main", "#242a3c", "#b8c8ff", 6, True, 1.3, "ember_shard")],
+ # 14 Wakeless Court
+ [B("jessamy_court_fool", "Jessamy, the Court Fool", "Jessamy", "She is the only one in the Court who says what she means. She says it as a joke, and nobody laughs.", "stalker", "bleed", "mini", "#4a2a44", "#f0c0e0", 3, True, 1.0, "stamina_tonic"),
+  B("chamberlain_hollin", "Chamberlain Hollin", "Hollin", "He announces every promise that was not kept. The list is endless, and he reads it in a perfectly steady voice.", "duelist", "none", "mini", "#3a2838", "#e0c0d0", 5, True, 1.05, "pilgrims_draught"),
+  B("the_unkept_promise", "The Unkept Promise", "Unkept", "The other half of the Oath Eternal: everything that was meant, and never done. It is much larger than the first.", "heavy", "burn", "final", "#2a1630", "#ff90d0", 8, True, 1.4, "ember_shard")],
 ]

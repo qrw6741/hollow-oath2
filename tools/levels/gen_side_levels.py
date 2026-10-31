@@ -1034,7 +1034,7 @@ color = Color{sp["tint"]}
 
 # Which map holds which new weapon (the Descent): index into XD.MAPS -> (weapon id).
 GRAND_WEAPONS = {0: "bone_cleaver", 1: "chandlers_maul", 2: "archivists_needle", 3: "thornwood_sabre",
-                 6: "glasswrights_shards", 10: "vowbreaker"}
+                 6: "glasswrights_shards", 10: "vowbreaker", 11: "choirmasters_baton", 12: "lantern_hook", 13: "namebreaker", 14: "unkept_blade"}
 
 
 def grand():
@@ -1060,7 +1060,7 @@ default_spawn = Vector2(130, 480)
 [node name="Hall" type="Node2D" parent="."]
 z_index = -10
 script = ExtResource("backdrop")
-theme = {i}
+theme = {mp.get('look', i)}
 width = {W}.0
 floor_y = 480.0
 ceiling_y = 96.0

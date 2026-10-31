@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"keepsake_blank_slab"
+display_name = "A Blank Slab Shard"
+description = "A palm-sized sliver of fresh stone, warm as a hand. It is waiting for a name. It would like it to be yours, and has been very patient about it."
+kind = 2
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(0.85, 0.78, 0.55, 1)

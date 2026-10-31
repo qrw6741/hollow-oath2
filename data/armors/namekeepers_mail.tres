@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"namekeepers_mail"
+display_name = "Namekeeper's Mail"
+description = "Mail with a name cut into every link and cut out again. It sits very lightly. You will not remember wearing it."
+look = 2
+damage_taken_mult = 0.78
+run_speed_mult = 0.96
+dodge_stamina_add = 0.0
+cloth_color = Color(0.251, 0.314, 0.416, 1)
+cloth_light_color = Color(0.416, 0.502, 0.659, 1)
+accent_color = Color(0.816, 0.878, 1.000, 1)
+resist = {"frost": 0.6, "bleed": 0.3}

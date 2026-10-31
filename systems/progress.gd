@@ -25,6 +25,10 @@ const GOALS := [
 	{"boss": &"prioress_silence", "name": "Silence", "area": "The Hush Cloister"},
 	{"boss": &"pale_sovereign", "name": "the Pale Sovereign", "area": "The Barrow of Kings"},
 	{"boss": &"the_oath_eternal", "name": "the Oath Eternal", "area": "The Hollow Heart"},
+	{"boss": &"verse_mother_ilse", "name": "Verse-Mother Ilse", "area": "The Cinder Choir (through the Hollow Heart's Last Door)"},
+	{"boss": &"the_lantern_mother", "name": "the Lantern-Mother", "area": "The Lantern Marsh"},
+	{"boss": &"the_unnamed_archon", "name": "the Unnamed Archon", "area": "The Undercrypt of Names"},
+	{"boss": &"the_unkept_promise", "name": "the Unkept Promise", "area": "The Wakeless Court"},
 ]
 
 

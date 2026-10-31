@@ -1,0 +1,447 @@
+[gd_scene load_steps=28 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
+[ext_resource type="Script" path="res://world/background/descent_backdrop.gd" id="backdrop"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/candle_cantor.tscn" id="cantor"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gilded_penitent.tscn" id="gilded"]
+[ext_resource type="PackedScene" path="res://actors/enemies/oathguard_captain.tscn" id="captain"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
+[ext_resource type="Script" path="res://world/hazards/fire_jet.gd" id="jet"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
+[ext_resource type="Resource" path="res://data/items/relic_knot.tres" id="it_knot"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Resource" path="res://data/items/forge_scrap.tres" id="it_scrap"]
+[ext_resource type="PackedScene" path="res://actors/enemies/pike_sergeant.tscn" id="sergeant"]
+[ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="it_resin"]
+[ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
+[ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
+[ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
+[ext_resource type="PackedScene" path="res://actors/bosses/chorister_vael.tscn" id="x_chorister_vael"]
+[ext_resource type="PackedScene" path="res://actors/bosses/ash_deacon_ruth.tscn" id="x_ash_deacon_ruth"]
+[ext_resource type="PackedScene" path="res://actors/bosses/verse_mother_ilse.tscn" id="x_verse_mother_ilse"]
+
+[node name="CinderChoir" type="Node2D"]
+script = ExtResource("level")
+level_id = &"cinder_choir"
+display_name = "The Cinder Choir"
+bounds = Rect2(0, 0, 7400, 540)
+music = &"catacombs"
+music_pitch = 0.448
+map_origin = Vector2(37100, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("backdrop")
+theme = 7
+width = 7400.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 487
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(1.0, 0.64, 0.52, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(7384, 60)
+style = 4
+seed_value = 902
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(7340, 0)
+script = ExtResource("block")
+size = Vector2(60, 540)
+style = 1
+seed_value = 903
+
+[node name="Ceiling" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 40)
+script = ExtResource("block")
+size = Vector2(7400, 56)
+style = 1
+seed_value = 904
+
+[node name="FromPrev" type="Marker2D" parent="."]
+position = Vector2(130, 480)
+script = ExtResource("entry")
+entry_id = &"from_prev"
+
+[node name="ToPrev" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/hollow_heart.tscn"
+target_entry = &"from_next"
+size = Vector2(12, 80)
+
+[node name="FromNext" type="Marker2D" parent="."]
+position = Vector2(7260, 480)
+script = ExtResource("entry")
+entry_id = &"from_next"
+
+[node name="ToNext" type="Area2D" parent="."]
+position = Vector2(7310, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/lantern_marsh.tscn"
+target_entry = &"from_prev"
+size = Vector2(12, 80)
+
+[node name="Candle0" parent="." instance=ExtResource("candle")]
+position = Vector2(300, 480)
+checkpoint_id = &"cinder_choir_candle_0"
+display_name = "Choir Gate Candle"
+
+[node name="Candle1" parent="." instance=ExtResource("candle")]
+position = Vector2(1450, 480)
+checkpoint_id = &"cinder_choir_candle_1"
+display_name = "Burnt Pew Candle"
+
+[node name="Candle2" parent="." instance=ExtResource("candle")]
+position = Vector2(3750, 480)
+checkpoint_id = &"cinder_choir_candle_2"
+display_name = "Hymn Stair Candle"
+
+[node name="Candle3" parent="." instance=ExtResource("candle")]
+position = Vector2(6050, 480)
+checkpoint_id = &"cinder_choir_candle_3"
+display_name = "Last Verse Candle"
+
+[node name="Tablet0" type="Area2D" parent="."]
+position = Vector2(420, 480)
+script = ExtResource("tablet")
+title = "The Burnt Hymnal"
+text = "Every page is scorched at the same place: the second half of every vow. The first halves are still perfectly legible."
+
+[node name="Tablet1" type="Area2D" parent="."]
+position = Vector2(3500, 480)
+script = ExtResource("tablet")
+title = "A Chorister's Rule"
+text = "WE SANG THE PROMISE. WE DID NOT SING THE KEEPING OF IT. The line below is smudged by a thumb, as if someone wished to unsay it."
+
+[node name="Tablet2" type="Area2D" parent="."]
+position = Vector2(5600, 480)
+script = ExtResource("tablet")
+title = "The Silent Pews"
+text = "The pews face a wall. On the wall, in soot: 'Beyond this is where we put what we did not mean.'"
+
+[node name="Step0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(600, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 905
+
+[node name="Loft0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1000, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 906
+one_way = true
+
+[node name="GroundA0" type="Marker2D" parent="."]
+position = Vector2(450, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 40
+start_facing = -1
+
+[node name="GroundB0" type="Marker2D" parent="."]
+position = Vector2(1250, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoe0" type="Marker2D" parent="."]
+position = Vector2(780, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Archer0" type="Marker2D" parent="."]
+position = Vector2(1040, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="JetA0" type="Area2D" parent="."]
+position = Vector2(1380, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="JetB0" type="Area2D" parent="."]
+position = Vector2(1420, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.5
+
+[node name="Chest0" type="Area2D" parent="."]
+position = Vector2(900, 480)
+script = ExtResource("chest")
+chest_id = &"cinder_choir_chest_0"
+count = 1
+embers = 900
+item = ExtResource("it_draught")
+
+[node name="LoftChest0" type="Area2D" parent="."]
+position = Vector2(1100, 400)
+script = ExtResource("chest")
+chest_id = &"cinder_choir_loft_chest_0"
+count = 1
+embers = 3200
+item = ExtResource("it_knot")
+
+[node name="Step1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2900, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 907
+
+[node name="Loft1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3300, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 908
+one_way = true
+
+[node name="GroundA1" type="Marker2D" parent="."]
+position = Vector2(2750, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="GroundB1" type="Marker2D" parent="."]
+position = Vector2(3550, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoe1" type="Marker2D" parent="."]
+position = Vector2(3080, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Archer1" type="Marker2D" parent="."]
+position = Vector2(3340, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 20
+start_facing = -1
+
+[node name="JetA1" type="Area2D" parent="."]
+position = Vector2(3680, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="JetB1" type="Area2D" parent="."]
+position = Vector2(3720, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.5
+
+[node name="Chest1" type="Area2D" parent="."]
+position = Vector2(3200, 480)
+script = ExtResource("chest")
+chest_id = &"cinder_choir_chest_1"
+count = 2
+embers = 1200
+item = ExtResource("it_shard")
+
+[node name="LoftChest1" type="Area2D" parent="."]
+position = Vector2(3400, 400)
+script = ExtResource("chest")
+chest_id = &"cinder_choir_loft_chest_1"
+count = 1
+embers = 3200
+item = ExtResource("it_scrap")
+
+[node name="Step2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(5200, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 909
+
+[node name="Loft2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(5600, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 910
+one_way = true
+
+[node name="GroundA2" type="Marker2D" parent="."]
+position = Vector2(5050, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 40
+start_facing = -1
+
+[node name="GroundB2" type="Marker2D" parent="."]
+position = Vector2(5850, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoe2" type="Marker2D" parent="."]
+position = Vector2(5380, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Archer2" type="Marker2D" parent="."]
+position = Vector2(5640, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="JetA2" type="Area2D" parent="."]
+position = Vector2(5980, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="JetB2" type="Area2D" parent="."]
+position = Vector2(6020, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.5
+
+[node name="Chest2" type="Area2D" parent="."]
+position = Vector2(5500, 480)
+script = ExtResource("chest")
+chest_id = &"cinder_choir_chest_2"
+count = 3
+embers = 1500
+item = ExtResource("it_resin")
+
+[node name="LoftChest2" type="Area2D" parent="."]
+position = Vector2(5700, 400)
+script = ExtResource("chest")
+chest_id = &"cinder_choir_loft_chest_2"
+count = 1
+embers = 3200
+item = ExtResource("it_band")
+
+[node name="Wayfarer" type="Area2D" parent="."]
+position = Vector2(1560, 480)
+script = ExtResource("npc")
+npc_id = &"choir_cinder_nun"
+display_name = "Sister Ember-Ash"
+look = 3
+start_facing = -1
+
+[node name="ArmorChest" type="Area2D" parent="."]
+position = Vector2(3650, 480)
+script = ExtResource("chest")
+chest_id = &"cinder_choir_armor_chest"
+count = 0
+embers = 0
+gear_kind = "armor"
+gear_id = &"cinder_surplice"
+
+[node name="Cache" type="Area2D" parent="."]
+position = Vector2(7200, 480)
+script = ExtResource("chest")
+chest_id = &"cinder_choir_cache"
+count = 3
+embers = 5800
+item = ExtResource("it_shard")
+
+[node name="WeaponChest" type="Area2D" parent="."]
+position = Vector2(7100, 480)
+script = ExtResource("chest")
+chest_id = &"cinder_choir_weapon_chest"
+count = 0
+embers = 0
+gear_kind = "weapon"
+gear_id = &"choirmasters_baton"
+
+[node name="Arena0" type="Node2D" parent="."]
+position = Vector2(1700, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("x_chorister_vael")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "VAEL FALLS"
+
+[node name="Arena1" type="Node2D" parent="."]
+position = Vector2(4000, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("x_ash_deacon_ruth")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "RUTH FALLS"
+
+[node name="Arena2" type="Node2D" parent="."]
+position = Vector2(6300, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("x_verse_mother_ilse")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "ILSE IS NO MORE"
+
+[node name="Loft0Step" type="StaticBody2D" parent="Geometry"]
+position = Vector2(956.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 911
+
+[node name="Loft1Step" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3256.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 912
+
+[node name="Loft2Step" type="StaticBody2D" parent="Geometry"]
+position = Vector2(5750, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 913
