@@ -4,6 +4,8 @@ extends Node2D
 
 enum Kind { RING, RISE, DUST }
 
+static var _add_mat: CanvasItemMaterial   ## shared by every burst
+
 var kind := Kind.RING
 var color := Color.WHITE
 var radius := 20.0
@@ -36,9 +38,10 @@ func setup(k: Kind, c: Color, amount := 10, r := 20.0) -> void:
 					"v": Vector2(dir * rng.randf_range(14.0, 42.0), rng.randf_range(-18.0, -4.0)),
 					"s": rng.randf_range(1.5, 3.2), "d": rng.randf_range(0.7, 1.0)})
 	if k != Kind.DUST:
-		var m := CanvasItemMaterial.new()
-		m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-		material = m
+		if _add_mat == null:
+			_add_mat = CanvasItemMaterial.new()
+			_add_mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		material = _add_mat
 
 
 func _process(dt: float) -> void:

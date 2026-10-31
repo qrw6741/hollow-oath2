@@ -4,12 +4,17 @@ extends Node2D
 
 const LIFETIME := 0.28
 
+## One shared additive material for every spark (a new material per effect is needless churn on the GPU).
+static var _add_mat: CanvasItemMaterial
+
 var _color := Color.WHITE
 var _parts: Array[Dictionary] = []
 var _t := 0.0
 
 
 func setup(color: Color, amount: int, direction: int) -> void:
+	if Settings.classic_gfx:
+		amount = maxi(3, amount / 2)
 	_color = color
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
@@ -20,9 +25,11 @@ func setup(color: Color, amount: int, direction: int) -> void:
 		var spd := rng.randf_range(60.0, 170.0)
 		_parts.append({"p": Vector2.ZERO, "v": Vector2.from_angle(ang) * spd, "len": rng.randf_range(2.0, 5.0)})
 	z_index = 20
-	var m := CanvasItemMaterial.new()
-	m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-	material = m
+	if not Settings.classic_gfx:   # Classic: plain alpha blending, no additive pass
+		if _add_mat == null:
+			_add_mat = CanvasItemMaterial.new()
+			_add_mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		material = _add_mat
 
 
 func _process(delta: float) -> void:

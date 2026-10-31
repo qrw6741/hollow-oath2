@@ -7,6 +7,7 @@ const DamageNumber := preload("res://fx/damage_number.gd")
 const Burst := preload("res://fx/fx_burst.gd")
 
 const HIT_STOP_SCALE := 0.05
+const MAX_LIVE_FX := 14   ## sparks + bursts alive at once; extra ones are skipped so a flurry of blocks never piles up
 
 var _hit_stop_token := 0
 
@@ -48,8 +49,15 @@ func shake(strength: float, duration := 0.18) -> void:
 	Events.screen_shake_requested.emit(strength * Settings.screen_shake, duration)
 
 
+func _fx_full() -> bool:
+	return get_tree().get_nodes_in_group(&"fx_live").size() >= MAX_LIVE_FX
+
+
 func spark(at: Vector2, color: Color, amount := 10, direction := 0) -> void:
+	if _fx_full():
+		return
 	var fx := HitSpark.new()
+	fx.add_to_group(&"fx_live")
 	fx.setup(color, amount, direction)
 	_fx_parent().add_child(fx)
 	fx.global_position = at
@@ -71,9 +79,10 @@ func dust(at: Vector2, amount := 6, color := Color(0.62, 0.58, 0.52)) -> void:
 
 
 func _burst(k: int, at: Vector2, color: Color, amount: int, r: float) -> void:
-	if Settings.classic_gfx:
+	if Settings.classic_gfx or _fx_full():
 		return
 	var fx := Burst.new()
+	fx.add_to_group(&"fx_live")
 	fx.setup(k, color, amount, r)
 	_fx_parent().add_child(fx)
 	fx.global_position = at

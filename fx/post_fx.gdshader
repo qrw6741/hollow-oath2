@@ -32,13 +32,13 @@ void fragment() {
 	// bloom: two rings of taps, scaled with the screen so it looks alike at every size
 	float s = max(1.0, 1.0 / (px.y * 270.0)) * 1.6;
 	vec3 b = vec3(0.0);
-	for (int i = 0; i < 8; i++) {
-		float a = float(i) * 0.7853982;
+	for (int i = 0; i < 4; i++) {   // 4 + 4 taps (was 8 + 8): same look, half the texture reads
+		float a = float(i) * 1.5707963 + 0.7853982;
 		vec2 o = vec2(cos(a), sin(a));
-		b += bright(uv + o * px * s * 2.0);
-		b += bright(uv + o * px * s * 5.0) * 0.7;
+		b += bright(uv + o * px * s * 2.5);
+		b += bright(uv + o * px * s * 5.5) * 0.7;
 	}
-	b /= 13.6;
+	b /= 6.8;
 	col += b * bloom * vec3(1.0, 0.88, 0.7);
 	// split-tone grade: cool violet shadows, warm highlights, a touch more contrast
 	float l = dot(col, vec3(0.299, 0.587, 0.114));

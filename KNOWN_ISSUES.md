@@ -192,3 +192,4 @@
 - PC lag report: the FPS-cap default was changed to 60 as the most likely cause, but real-hardware performance is unmeasured. The soak test shows no leak in 2 min of headless play on one map; other maps and boss fights were not soaked. soak.gd ends with a "previously freed" error when the bot leaves the level (believed test artefact).
 - The status tip no longer overlaps boss bars (tips are suppressed during boss fights).
 - 'Classic visuals' reduces GPU work but its effect on a real GPU is unmeasured; it also does not recreate the exact pre-graphics-pass look.
+- GPU freeze on blocks/particles: mitigations applied (chunked stone blocks, capped/shared effect materials, lighter glow shader) but unverified on real hardware. Classic visuals (Settings > Display) is the safest setting.
