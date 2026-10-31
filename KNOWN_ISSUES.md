@@ -181,3 +181,4 @@
 - The Oath Gate asks a second time after the Oath Eternal falls (only Go Unsworn is offered then); the earlier choice stays recorded as a deed. Not played through by a human.
 - Endings are switched off (Endings.enabled = false): the "The Oath Decided" deed, New Game+ and the five epilogues cannot be reached in the shipped game until they are switched back on. Old saves that already chose an ending keep that flag (Trials stay open for them).
 - Reachability is checked by a geometric audit and a bot on two maps (Reliquary, Weeping Ossuary); the other maps are audit-only, not walked. Auto-added steps are plain blocks (temporary look).
+- bot_all sweep shows no script errors but the bot is invulnerable and mashes attack: balance, dialogue and shop flow are still untested by anyone.

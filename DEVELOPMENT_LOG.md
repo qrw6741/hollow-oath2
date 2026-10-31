@@ -429,3 +429,8 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - **Fix:** nook rebuilt as a raised block (44 px, one jump) with a roof and an illusory entrance wall; the road passes over it, nothing closes it. `Level.auto_steps()` in `tools/levels/gen_side_levels.py` now adds a low step beside any unreachable perch that holds an enemy/chest/NPC. `tools/audit_reach.py` (no Godot needed) reports tall walls on the road and unreachable/floating things; currently "21 levels, clean". `test_levels_reachable` runs it (skipped if python3 missing).
 - **Verified (headless bot, `tests/bot_walk`):** Reliquary walked from start to x=3400 (Abbot arena at 3560) and Weeping Ossuary start to x=7100. Full suite 140 passed, 0 failed.
 - **Not verified:** a human playthrough, other Descent maps by bot (audit only), Windows launch.
+
+## Full-map bot sweep (tests/bot_all)
+- `tests/bot_all.tscn` plays every level (run right, spam light attack, jump on stall, step back from dead ends; invulnerable). One run over all 28 playable maps (4 parallel shards, headless): **no script errors**; 22 maps reached the far end or the last arena/exit; the hand-built early maps (village, road, manor, gallery) stopped at their right-hand wall/door as designed; Tidal Vaults and Hollow Heart (final boss) used up the 9000-frame budget while fighting/wading, not stuck (Tidal Vaults re-walked alone to x=7300).
+- **Fixed:** Drowned Catacombs' pillar ledges (acolytes + tonic) were 100 px up from the nave floor, unreachable; lowered to 48 px up.
+- Not covered: the bot is invulnerable and does not use items, so it says nothing about difficulty/balance, shops, dialogue or quests. No human playtest; Windows still unlaunched.
