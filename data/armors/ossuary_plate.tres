@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"ossuary_plate"
+display_name = "Ossuary Plate"
+description = "Plate cut from the old shelving of the Weeping Ossuary. It rattles like a counting."
+look = 3
+damage_taken_mult = 0.74
+run_speed_mult = 0.86
+dodge_stamina_add = 0.0
+cloth_color = Color(0.847, 0.816, 0.722, 1)
+cloth_light_color = Color(0.941, 0.910, 0.816, 1)
+accent_color = Color(0.416, 0.353, 0.251, 1)
+resist = {"bleed": 0.5, "poison": 0.2}

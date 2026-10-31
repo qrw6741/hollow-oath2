@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"tallow_cowl"
+display_name = "Tallow Cowl"
+description = "A cowl dipped in hard wax so many times it has become a second skin. Wick-Wives swear by it."
+look = 1
+damage_taken_mult = 0.94
+run_speed_mult = 1.08
+dodge_stamina_add = -2.0
+cloth_color = Color(0.784, 0.722, 0.565, 1)
+cloth_light_color = Color(0.902, 0.847, 0.659, 1)
+accent_color = Color(1.000, 0.690, 0.314, 1)
+resist = {"burn": 0.5}

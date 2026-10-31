@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"keepsake_black_seed"
+display_name = "A Black Seed"
+description = "A seed no larger than a tooth, dark as a bruise. It has been trying to sprout for a very long time."
+kind = 2
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(0.85, 0.78, 0.55, 1)

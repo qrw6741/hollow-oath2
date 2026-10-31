@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"vowsmith_plate"
+display_name = "Vowsmith Plate"
+description = "Plate struck in the oath-forge itself, warm to the touch. Very heavy. Very sure of itself."
+look = 3
+damage_taken_mult = 0.72
+run_speed_mult = 0.84
+dodge_stamina_add = 1.0
+cloth_color = Color(0.416, 0.227, 0.157, 1)
+cloth_light_color = Color(0.659, 0.376, 0.235, 1)
+accent_color = Color(1.000, 0.690, 0.376, 1)
+resist = {"burn": 0.6, "bleed": 0.3}

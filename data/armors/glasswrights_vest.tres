@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"glasswrights_vest"
+display_name = "Glasswright's Vest"
+description = "A vest of sewn glass scales, ground thin. It catches light and, occasionally, a blade."
+look = 1
+damage_taken_mult = 0.9
+run_speed_mult = 1.06
+dodge_stamina_add = -2.0
+cloth_color = Color(0.541, 0.502, 0.659, 1)
+cloth_light_color = Color(0.722, 0.690, 0.847, 1)
+accent_color = Color(0.941, 0.941, 1.000, 1)
+resist = {"frost": 0.2, "burn": 0.2, "poison": 0.2}

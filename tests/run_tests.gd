@@ -83,7 +83,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_wayfarers, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -3951,6 +3951,35 @@ func test_descent() -> void:
 		check(Bestiary.IDS.has(id) and Bestiary.data(id) != null, "%s is in the bestiary" % id)
 	for w in Expansion.WEAPONS.keys():
 		check(Weapons.IDS.has(w) and Weapons.HINTS.has(w), "%s is a weapon with a where-to-find hint" % w)
+
+
+func test_wayfarers() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	check(DescentNpcs.DATA.size() >= 11, "a Wayfarer for every Descent map (%d)" % DescentNpcs.DATA.size())
+	for id in DescentNpcs.DATA:
+		var d: Dictionary = DescentNpcs.DATA[id]
+		var c := Dialogues.conversation(id)
+		check(c.speaker == d.speaker and c.lines.size() >= 3, "%s greets you with a story" % id)
+		Dialogues.finish(id)
+		check(not DescentNpcs.farewell_due(id), "%s: no farewell before the boss falls" % id)
+		c = Dialogues.conversation(id)
+		check(c.lines.size() == 1, "%s: then one passing line" % id)
+		Dialogues.finish(id)
+		game_state.set_flag(StringName("boss_defeated_" + String(d.boss)), true)
+		check(DescentNpcs.farewell_due(id), "%s: farewell once %s is down" % [id, d.boss])
+		c = Dialogues.conversation(id)
+		check(c.lines == d.after, "%s says goodbye" % id)
+		Dialogues.finish(id)
+		check(game_state.item_count(d.gift) == 1 and Items.get_item(d.gift) != null, "%s gives %s" % [id, d.gift])
+		check(not DescentNpcs.farewell_due(id), "%s: the farewell happens once" % id)
+	for k in DescentNpcs.SHOPS:
+		for e in Shops.stock(k):
+			check(Items.get_item(e.item) != null and e.price > 0, "shop %s sells a real item (%s)" % [k, e.item])
+	for a in ["ossuary_plate", "aures_vigil", "hush_habit"]:
+		check(Armors.get_armor(a) != null and Armors.get_armor(a).validate().is_empty(), "armour %s is valid" % a)
+	for i in ["salt_of_the_dead", "kings_wine", "ember_cluster", "hush_draught"]:
+		check(Items.get_item(i) != null and Items.get_item(i).validate().is_empty(), "item %s is valid" % i)
 
 
 func test_four_parts() -> void:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" path="res://actors/enemies/reliquary_lurker.tscn" id="lurker"]
 [ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="it_resin"]
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
+[ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
 [ext_resource type="PackedScene" path="res://actors/bosses/gardener_hobthorne.tscn" id="x_gardener_hobthorne"]
 [ext_resource type="PackedScene" path="res://actors/bosses/windfall_twins.tscn" id="x_windfall_twins"]
@@ -337,6 +338,23 @@ chest_id = &"sunless_orchard_loft_chest_2"
 count = 1
 embers = 1600
 item = ExtResource("it_band")
+
+[node name="Wayfarer" type="Area2D" parent="."]
+position = Vector2(1560, 480)
+script = ExtResource("npc")
+npc_id = &"graft_gardener"
+display_name = "Old Hob"
+look = 4
+start_facing = -1
+
+[node name="ArmorChest" type="Area2D" parent="."]
+position = Vector2(3650, 480)
+script = ExtResource("chest")
+chest_id = &"sunless_orchard_armor_chest"
+count = 0
+embers = 0
+gear_kind = "armor"
+gear_id = &"thornwood_mantle"
 
 [node name="Cache" type="Area2D" parent="."]
 position = Vector2(7200, 480)

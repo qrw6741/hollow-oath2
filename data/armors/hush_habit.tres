@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"hush_habit"
+display_name = "Hush Habit"
+description = "A grey habit that muffles every step. Dodging in it costs almost nothing, the Cloister made sure of that."
+look = 1
+damage_taken_mult = 0.9
+run_speed_mult = 1.1
+dodge_stamina_add = -4.0
+cloth_color = Color(0.604, 0.659, 0.714, 1)
+cloth_light_color = Color(0.769, 0.816, 0.863, 1)
+accent_color = Color(1.000, 1.000, 1.000, 1)
+resist = {"poison": 0.3, "frost": 0.3}

@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" path="res://actors/enemies/roadside_pikeman.tscn" id="pikeman"]
 [ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="it_resin"]
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
+[ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
 [ext_resource type="PackedScene" path="res://actors/bosses/smelter_brask.tscn" id="x_smelter_brask"]
 [ext_resource type="PackedScene" path="res://actors/bosses/cinderpriest_imre.tscn" id="x_cinderpriest_imre"]
@@ -361,6 +362,24 @@ chest_id = &"forge_of_vows_loft_chest_2"
 count = 1
 embers = 2400
 item = ExtResource("it_band")
+
+[node name="Wayfarer" type="Area2D" parent="."]
+position = Vector2(1560, 480)
+script = ExtResource("npc")
+npc_id = &"tove_ashmaid"
+display_name = "Ashmaid Tove"
+look = 2
+start_facing = -1
+shop_id = &"forgevows"
+
+[node name="ArmorChest" type="Area2D" parent="."]
+position = Vector2(3650, 480)
+script = ExtResource("chest")
+chest_id = &"forge_of_vows_armor_chest"
+count = 0
+embers = 0
+gear_kind = "armor"
+gear_id = &"vowsmith_plate"
 
 [node name="Cache" type="Area2D" parent="."]
 position = Vector2(7200, 480)

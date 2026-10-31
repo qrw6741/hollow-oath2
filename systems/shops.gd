@@ -33,10 +33,14 @@ const NAMES := {&"pedlar": "THE PEDLAR'S WARES", &"lantern": "THE LANTERN-MAN'S 
 
 
 static func stock(shop_id: StringName) -> Array:
+	if DescentNpcs.SHOPS.has(shop_id):
+		return DescentNpcs.SHOPS[shop_id].stock
 	return STOCK.get(shop_id, [])
 
 
 static func shop_name(shop_id: StringName) -> String:
+	if DescentNpcs.SHOPS.has(shop_id):
+		return DescentNpcs.SHOPS[shop_id].name
 	return NAMES.get(shop_id, "WARES")
 
 

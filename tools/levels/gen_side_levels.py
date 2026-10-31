@@ -75,6 +75,7 @@ EXT = {
 import sys as _sys
 _sys.path.insert(0, os.path.join(ROOT, "tools"))
 import expansion_data as XD
+import descent2_data as D2
 for _g in XD.BOSSES:
     for _b in _g:
         EXT["x_" + _b["id"]] = ("PackedScene", "res://actors/bosses/%s.tscn" % _b["id"])
@@ -1041,6 +1042,10 @@ color = Color{mp["tint"]}
                 L.water("Flood%d" % s_i, b + 1330, 466, 280, 14)
             L.chest("Chest%d" % s_i, b + 900, 480, "%s_chest_%d" % (key, s_i), count=1 + s_i, embers=900 + 300 * s_i, item=("it_draught", "it_shard", "it_resin")[s_i])
             L.chest("LoftChest%d" % s_i, b + 1100, 400, "%s_loft_chest_%d" % (key, s_i), count=1, embers=1000 + 200 * i, item=("it_knot", "it_scrap", "it_band")[s_i])
+        wf = D2.NPCS[i]
+        L.npc("Wayfarer", wf["x"], wf["id"], wf["name"], wf["look"], -1, wf.get("shop"))
+        am = D2.ARMORS[i]
+        L.chest("ArmorChest", 3650, 480, key + "_armor_chest", gear=("armor", am[0]))
         L.chest("Cache", 7200, 480, key + "_cache", count=3, embers=2500 + 300 * i, item="it_shard")
         if i in GRAND_WEAPONS:
             L.chest("WeaponChest", 7100, 480, key + "_weapon_chest", gear=("weapon", GRAND_WEAPONS[i]))

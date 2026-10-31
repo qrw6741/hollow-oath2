@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"aures_vigil"
+display_name = "Aure's Vigil"
+description = "The oldest armour in the kingdom: a soldier's coat re-sewn by a candlewright's hand. It remembers being loved."
+look = 2
+damage_taken_mult = 0.7
+run_speed_mult = 1.0
+dodge_stamina_add = -2.0
+cloth_color = Color(0.627, 0.376, 0.439, 1)
+cloth_light_color = Color(0.816, 0.533, 0.596, 1)
+accent_color = Color(1.000, 0.941, 0.753, 1)
+resist = {"bleed": 0.4, "poison": 0.4, "frost": 0.4, "burn": 0.4}

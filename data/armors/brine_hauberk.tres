@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"brine_hauberk"
+display_name = "Brine Hauberk"
+description = "Salt-crusted mail from the Drowned Fleet. It has not rusted in a thousand years, which is more worrying than it sounds."
+look = 2
+damage_taken_mult = 0.8
+run_speed_mult = 0.96
+dodge_stamina_add = 0.0
+cloth_color = Color(0.251, 0.376, 0.478, 1)
+cloth_light_color = Color(0.416, 0.565, 0.659, 1)
+accent_color = Color(0.659, 0.878, 0.941, 1)
+resist = {"frost": 0.5, "burn": 0.2}

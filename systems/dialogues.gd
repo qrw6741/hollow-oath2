@@ -290,6 +290,8 @@ static func conversation(npc: StringName) -> Dictionary:
 			else:
 				lines3 = [ALDOUS_GREETINGS[(n - 1) % ALDOUS_GREETINGS.size()]]
 			return {"speaker": "Aldous Vane", "lines": lines3}
+	if DescentNpcs.has(npc):
+		return DescentNpcs.conversation(npc)
 	return {"speaker": "...", "lines": ["..."]}
 
 
@@ -313,6 +315,8 @@ static func finish(npc: StringName) -> void:
 			Quests.complete(q.id)
 		GameState.set_flag(StringName("talks_" + String(npc)), talks(npc) + 1)
 		return
+	if DescentNpcs.has(npc):
+		DescentNpcs.finish(npc)
 	if npc == &"ommen" and bool(GameState.get_flag(MARSHAL_FLAG, false)) and not bool(GameState.get_flag(&"ommen_heard_after", false)):
 		GameState.set_flag(&"ommen_heard_after", true)
 		return

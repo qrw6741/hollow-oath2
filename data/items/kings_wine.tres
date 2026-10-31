@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"kings_wine"
+display_name = "King's Wine"
+description = "Dark, old and excellent. Restores 170 health. Sealed in a barrow for a thousand years, and not one bit sour."
+kind = 0
+effect = 1
+effect_amount = 170.0
+max_stack = 3
+icon_color = Color(0.6, 0.15, 0.3, 1)

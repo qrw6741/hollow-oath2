@@ -5,7 +5,7 @@ extends RefCounted
 ## it is what you wear when you take everything off.
 
 const IDS: Array[StringName] = [&"sworn_knight", &"duelist", &"bulwark", &"unsworn",
-	&"pilgrim_coat", &"penitent_shroud", &"canons_mail", &"marshal_plate", &"ghostlight_raiment"]
+	&"pilgrim_coat", &"penitent_shroud", &"canons_mail", &"marshal_plate", &"ghostlight_raiment", &"ossuary_plate", &"tallow_cowl", &"archivists_robe", &"thornwood_mantle", &"market_finery", &"brine_hauberk", &"glasswrights_vest", &"vowsmith_plate", &"hush_habit", &"barrow_regalia", &"aures_vigil"]
 const DIR := "res://data/armors/"
 const NONE: StringName = &"none"
 ## Wearing nothing: quick and fragile.

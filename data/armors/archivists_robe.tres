@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ArmorData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/armor_data.gd" id="1_armor"]
+
+[resource]
+script = ExtResource("1_armor")
+id = &"archivists_robe"
+display_name = "Archivist's Robe"
+description = "A scholar's robe stiff with gilt thread. It smells of vellum and of nobody asking questions."
+look = 2
+damage_taken_mult = 0.88
+run_speed_mult = 1.0
+dodge_stamina_add = 0.0
+cloth_color = Color(0.416, 0.353, 0.188, 1)
+cloth_light_color = Color(0.659, 0.565, 0.235, 1)
+accent_color = Color(0.941, 0.878, 0.627, 1)
+resist = {"frost": 0.3, "poison": 0.3}

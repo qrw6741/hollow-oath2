@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"marrow_broth"
+display_name = "Marrow Broth"
+description = "A thin, hot broth. Restores a good measure of stamina. Do not ask whose marrow."
+kind = 0
+effect = 2
+effect_amount = 70.0
+max_stack = 7
+icon_color = Color(0.8, 0.72, 0.6, 1)
