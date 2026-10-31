@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://data/attacks/x_heavy_burn_2_0.tres" id="a0"]
 [ext_resource type="Resource" path="res://data/attacks/x_heavy_burn_2_1.tres" id="a1"]
 [ext_resource type="Resource" path="res://data/attacks/x_heavy_burn_2_2.tres" id="a2"]
-[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="drop"]
+[ext_resource type="Resource" path="res://data/items/relic_x_the_oath_eternal.tres" id="drop"]
 [ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="bonus"]
 
 [resource]

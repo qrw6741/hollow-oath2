@@ -213,9 +213,19 @@ static func _greeting(npc: StringName, field_pool: Array, n: int) -> Array:
 
 
 ## Items from the archive the player carries and has not yet heard about.
+static func _archive_ids() -> Array:
+	var ids: Array = ARCHIVE.keys()
+	ids.append_array(DescentNpcs.ARCHIVE.keys())
+	return ids
+
+
+static func archive_line(id: StringName) -> String:
+	return String(ARCHIVE[id]) if ARCHIVE.has(id) else String(DescentNpcs.ARCHIVE.get(id, ""))
+
+
 static func archive_pending() -> Array:
 	var out := []
-	for id in ARCHIVE:
+	for id in _archive_ids():
 		if GameState.item_count(id) > 0 and not bool(GameState.get_flag(StringName("arch_" + String(id)), false)):
 			out.append(id)
 	return out
@@ -241,7 +251,7 @@ static func conversation(npc: StringName) -> Dictionary:
 		if not pend.is_empty():
 			var lines4 := []
 			for id in pend.slice(0, 2):
-				lines4.append(ARCHIVE[id])
+				lines4.append(archive_line(id))
 			return {"speaker": "Vesper", "lines": lines4}
 		return {"speaker": "Vesper", "lines": [VESPER_GREETINGS[(n - 1) % VESPER_GREETINGS.size()]]}
 	var q := _quest_for(npc)

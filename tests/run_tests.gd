@@ -3973,6 +3973,14 @@ func test_wayfarers() -> void:
 		Dialogues.finish(id)
 		check(game_state.item_count(d.gift) == 1 and Items.get_item(d.gift) != null, "%s gives %s" % [id, d.gift])
 		check(not DescentNpcs.farewell_due(id), "%s: the farewell happens once" % id)
+	for id in DescentNpcs.DATA:
+		var rid := StringName("relic_x_" + String(DescentNpcs.DATA[id].boss))
+		check(Relics.DEFS.has(rid) and Relics.IDS.has(rid) and Items.IDS.has(rid), "%s is a wearable relic" % rid)
+		check(Bestiary.data(DescentNpcs.DATA[id].boss).drop_item.id == rid, "%s drops it" % DescentNpcs.DATA[id].boss)
+	for id in DescentNpcs.ARCHIVE:
+		check(Dialogues.archive_line(id).length() > 40, "Vesper has something to say about %s" % id)
+	game_state.add_item(&"keepsake_aures_candle", 1)
+	check(Dialogues.archive_pending().has(&"keepsake_aures_candle"), "Vesper notices a keepsake you carry")
 	for k in DescentNpcs.SHOPS:
 		for e in Shops.stock(k):
 			check(Items.get_item(e.item) != null and e.price > 0, "shop %s sells a real item (%s)" % [k, e.item])

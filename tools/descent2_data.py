@@ -118,3 +118,21 @@ SHOPS = {
     "market": ("HAGGLE'S WARES", [("salt_of_the_dead", 160), ("glass_tonic", 170), ("kings_wine", 380), ("ember_cluster", 1300), ("ember_shard", 250), ("forge_scrap", 95)]),
     "forgevows": ("TOVE'S WARES", [("forge_scrap", 80), ("hush_draught", 300), ("glass_tonic", 160), ("kings_wine", 360), ("ember_cluster", 1250), ("ember_shard", 230)]),
 }
+
+# What Vesper the archivist says about each keepsake (the story of the Descent, told sideways).
+VESPER = {
+    "keepsake_bone_ring": "A bone ring from the Ossuary. The first burial there was not a king. He was only the first to be buried, and the first to refuse to be dug up again. Titles come later.",
+    "keepsake_last_wick": "Ulme's wick. He did not set out to burn the kingdom. He set out to light one room, once, for one person. I think that is where the first oath comes from: a light kept for someone.",
+    "keepsake_first_page": "The First Page! It is in two hands. One is a soldier's, blocky and careful. One is a candlewright's, fine and fast. They wrote it together. The oath was a letter before it was a law.",
+    "keepsake_black_seed": "A grafted seed. Sylve held the roots still because the orchard was dying of loneliness. I do not think the tree ever understood that she was a gift. It only understood that she stayed.",
+    "keepsake_gavel": "Mordant's gavel. He sold everything, in the end, including the one thing he was never able to price: the first oath. Nobody bid. He took that as an insult.",
+    "keepsake_tide_glass": "A tide-glass. The Drowned Fleet was not lost at sea. It sailed down, on purpose, to find the bottom of the oath. They never came back up. Sorrel gave the order and then, I think, regretted it.",
+    "keepsake_kind_shard": "The Kind Shard. It is the only lens in the Gallery that shows you as someone who is loved. Orm ground it first and could not bear that all the others were so cruel in comparison.",
+    "keepsake_vowsmiths_ring": "An open ring. Anaxe forged ten thousand closed ones. His own he left open, because he knew, from the very first, that a vow you cannot step out of is not a vow. He kept making them anyway.",
+    "keepsake_hush_bell": "The Hush Bell, no clapper. The Cloister fell silent so that the oath could be heard clearly. Nobody noticed that it had stopped saying anything worth hearing.",
+    "keepsake_roll_of_kings": "Twelve kings, and a thirteenth line, empty. Every king of Vaelmoor swore the oath and kept it badly. The thirteenth niche was kept for the one who would keep it well. That is why the Sovereign is so pale. He is waiting for a better king than himself.",
+    "keepsake_aures_candle": "Aure's candle! A thousand years alight, and you carried it up. I will not ask how. I will say this: all the candles in Vaelmoor were lit from this one. You are holding where the light came from.",
+}
+
+RELIC_NAMES = ["Veyl's Knucklebone", "Ulme's Drip-Candle", "Vorne's Seal", "Sylve's Heartwood", "Mordant's Ledger", "Sorrel's Compass",
+               "Orm's Eyepiece", "Anaxe's Hammer-Charm", "Silence's Veil-Pin", "The Sovereign's Pale Crown", "Wend's Oath-Knot"]

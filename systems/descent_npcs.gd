@@ -51,6 +51,31 @@ const DATA := {
 		"greet": ["Do not hate him. He is being faithful. It is simply that faithfulness has no off switch.", "The Keeper and the Unsworn are what's left of his doubt. He needed them to keep standing. He did not know he was building a prison.", "You can break the promise, or you can finish it. I cannot tell you which is kinder."],
 		"after": ["He is at rest. Or he is released, which is not the same thing, and I find I am glad of either.", "Thank you. The oath was nine words. I never imagined it would cost so many people so much.", "Take this. It is the candle I promised I would keep lit. It can go out now. You can carry it up."]},
 }
+## What Vesper says about a keepsake or relic of the Descent (merged into Dialogues.archive_pending).
+const ARCHIVE := {
+	&"keepsake_bone_ring": "A bone ring from the Ossuary. The first burial there was not a king. He was only the first to be buried, and the first to refuse to be dug up again. Titles come later.",
+	&"keepsake_last_wick": "Ulme's wick. He did not set out to burn the kingdom. He set out to light one room, once, for one person. I think that is where the first oath comes from: a light kept for someone.",
+	&"keepsake_first_page": "The First Page! It is in two hands. One is a soldier's, blocky and careful. One is a candlewright's, fine and fast. They wrote it together. The oath was a letter before it was a law.",
+	&"keepsake_black_seed": "A grafted seed. Sylve held the roots still because the orchard was dying of loneliness. I do not think the tree ever understood that she was a gift. It only understood that she stayed.",
+	&"keepsake_gavel": "Mordant's gavel. He sold everything, in the end, including the one thing he was never able to price: the first oath. Nobody bid. He took that as an insult.",
+	&"keepsake_tide_glass": "A tide-glass. The Drowned Fleet was not lost at sea. It sailed down, on purpose, to find the bottom of the oath. They never came back up. Sorrel gave the order and then, I think, regretted it.",
+	&"keepsake_kind_shard": "The Kind Shard. It is the only lens in the Gallery that shows you as someone who is loved. Orm ground it first and could not bear that all the others were so cruel in comparison.",
+	&"keepsake_vowsmiths_ring": "An open ring. Anaxe forged ten thousand closed ones. His own he left open, because he knew, from the very first, that a vow you cannot step out of is not a vow. He kept making them anyway.",
+	&"keepsake_hush_bell": "The Hush Bell, no clapper. The Cloister fell silent so that the oath could be heard clearly. Nobody noticed that it had stopped saying anything worth hearing.",
+	&"keepsake_roll_of_kings": "Twelve kings, and a thirteenth line, empty. Every king of Vaelmoor swore the oath and kept it badly. The thirteenth niche was kept for the one who would keep it well. That is why the Sovereign is so pale. He is waiting for a better king than himself.",
+	&"keepsake_aures_candle": "Aure's candle! A thousand years alight, and you carried it up. I will not ask how. I will say this: all the candles in Vaelmoor were lit from this one. You are holding where the light came from.",
+	&"relic_x_ossuary_king_veyl": "Veyl's Knucklebone. He was buried first, and has never let a later grave be dug without his leave. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_chandler_ulme": "Ulme's Drip-Candle. He swore to give light to the whole kingdom, and has been melting himself to do it. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_chancellor_vorne": "Vorne's Seal. He wrote the law that made the oath binding. He is quite certain he is still correct. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_mother_sylve": "Sylve's Heartwood. The orchard's oldest. She has been dead for so long she no longer remembers why she stands. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_auctioneer_mordant": "Mordant's Ledger. Going once. Going twice. He has never said the third. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_admiral_sorrel": "Sorrel's Compass. She has never lost a ship. The fleet is at the bottom, still in formation. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_glasswright_orm": "Orm's Eyepiece. He built the Gallery to show the world to itself. It showed him instead. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_vowsmith_anaxe": "Anaxe's Hammer-Charm. She makes the vows. She has never been asked to unmake one, and has never offered. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_prioress_silence": "Silence's Veil-Pin. The rule of the cloister, given a voice at last, and the voice is a blade. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_pale_sovereign": "The Sovereign's Pale Crown. The twelfth king. He did not need a crown, because the oath was already on his head. I would wear it myself, but archivists are meant to keep things, not use them.",
+	&"relic_x_the_oath_eternal": "Wend's Oath-Knot. It is not a god. It is not a king. It is a sentence that has been said so many times it has become a creature. I would wear it myself, but archivists are meant to keep things, not use them.",
+}
 const SHOPS := {
 	&"tallow": {"name": "OUSE'S WARES", "stock": [{"item": &"grave_wax_balm", "price": 60}, {"item": &"salt_of_the_dead", "price": 150}, {"item": &"marrow_broth", "price": 90}, {"item": &"hollow_resin", "price": 150}, {"item": &"ember_pip", "price": 450}]},
 	&"market": {"name": "HAGGLE'S WARES", "stock": [{"item": &"salt_of_the_dead", "price": 160}, {"item": &"glass_tonic", "price": 170}, {"item": &"kings_wine", "price": 380}, {"item": &"ember_cluster", "price": 1300}, {"item": &"ember_shard", "price": 250}, {"item": &"forge_scrap", "price": 95}]},

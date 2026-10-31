@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://data/attacks/x_brute_burn_1_0.tres" id="a0"]
 [ext_resource type="Resource" path="res://data/attacks/x_brute_burn_1_1.tres" id="a1"]
 [ext_resource type="Resource" path="res://data/attacks/x_brute_burn_1_2.tres" id="a2"]
-[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="drop"]
+[ext_resource type="Resource" path="res://data/items/relic_x_vowsmith_anaxe.tres" id="drop"]
 [ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="bonus"]
 
 [resource]

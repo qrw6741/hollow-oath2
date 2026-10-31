@@ -171,3 +171,9 @@
 - Music loops for four tracks were shortened to 32 s (not listened to; a loop seam may be audible). Candle order in the travel list within one map is reversed.
 - The Unsworn ending, new weapon icons (reusing existing shapes) and the 33 talisman emblems (8 generic shapes) are placeholder.
 - Windows build still not launched on Windows; Hall backdrops and the 5-button ending menu were not checked on screen.
+
+## Wayfarers update
+- Dialogue and lore are first drafts for the creative director to rewrite; the Descent story (the First Oath) is new and not yet foreshadowed by earlier tablets or NPCs.
+- Armour numbers, relic strengths and shop prices are untested guesses. The 11 relics are stronger than the old ones; with 2 slots they can trivialise the late game.
+- The backdrops draw per frame (cheap per slot) but were not profiled; frame rate on a real Windows machine is unverified. Backdrop colour and silhouette art are procedural placeholders.
+- Keepsakes have no mechanical use (lore only) and use the generic item icon.

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"relic_x_vowsmith_anaxe"
+display_name = "Anaxe's Hammer-Charm"
+description = "Your weapon's status builds 60% faster. She makes the vows. She has never been asked to unmake one, and has never offered."
+kind = 1
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(1.000, 0.627, 0.251, 1)

@@ -28,8 +28,19 @@ const DEFS := {
 	&"relic_chalice": {"title": "Drowned Chalice", "desc": "Ember Vials heal 60% more.", "effect": "flask_heal", "value": 1.6},
 	&"relic_oathbreaker": {"title": "Oathbreaker's Ring", "desc": "A parry gives 30 extra focus.", "effect": "parry_focus", "value": 30.0},
 	&"relic_regent": {"title": "Hollow Crown", "desc": "A parry gives 20 extra focus.", "effect": "parry_focus", "value": 20.0},
+	&"relic_x_ossuary_king_veyl": {"title": "Veyl's Knucklebone", "desc": "Focus builds 50% faster.", "effect": "focus_gain", "value": 1.5},
+	&"relic_x_chandler_ulme": {"title": "Ulme's Drip-Candle", "desc": "Your weapon's status builds 70% faster.", "effect": "weapon_status", "value": 1.7},
+	&"relic_x_chancellor_vorne": {"title": "Vorne's Seal", "desc": "Resist 45% of every status buildup.", "effect": "status_resist", "value": 0.45},
+	&"relic_x_mother_sylve": {"title": "Sylve's Heartwood", "desc": "Foes pay 70% more embers.", "effect": "ember_gain", "value": 1.7},
+	&"relic_x_auctioneer_mordant": {"title": "Mordant's Ledger", "desc": "Ember Vials heal 70% more.", "effect": "flask_heal", "value": 1.7},
+	&"relic_x_admiral_sorrel": {"title": "Sorrel's Compass", "desc": "A parry gives 40 extra focus.", "effect": "parry_focus", "value": 40.0},
+	&"relic_x_glasswright_orm": {"title": "Orm's Eyepiece", "desc": "Focus builds 80% faster.", "effect": "focus_gain", "value": 1.8},
+	&"relic_x_vowsmith_anaxe": {"title": "Anaxe's Hammer-Charm", "desc": "Your weapon's status builds 60% faster.", "effect": "weapon_status", "value": 1.6},
+	&"relic_x_prioress_silence": {"title": "Silence's Veil-Pin", "desc": "Resist 40% of every status buildup.", "effect": "status_resist", "value": 0.4},
+	&"relic_x_pale_sovereign": {"title": "The Sovereign's Pale Crown", "desc": "Foes pay 60% more embers.", "effect": "ember_gain", "value": 1.6},
+	&"relic_x_the_oath_eternal": {"title": "Wend's Oath-Knot", "desc": "Ember Vials heal 100% more.", "effect": "flask_heal", "value": 2.0},
 }
-const IDS: Array[StringName] = [&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte", &"relic_shackle", &"relic_slag", &"relic_regent", &"relic_clapper", &"relic_briar", &"relic_gear", &"relic_chalice", &"relic_oathbreaker"]
+const IDS: Array[StringName] = [&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte", &"relic_shackle", &"relic_slag", &"relic_regent", &"relic_clapper", &"relic_briar", &"relic_gear", &"relic_chalice", &"relic_oathbreaker", &"relic_x_ossuary_king_veyl", &"relic_x_chandler_ulme", &"relic_x_chancellor_vorne", &"relic_x_mother_sylve", &"relic_x_auctioneer_mordant", &"relic_x_admiral_sorrel", &"relic_x_glasswright_orm", &"relic_x_vowsmith_anaxe", &"relic_x_prioress_silence", &"relic_x_pale_sovereign", &"relic_x_the_oath_eternal"]
 
 
 static func owned(id: StringName) -> bool:

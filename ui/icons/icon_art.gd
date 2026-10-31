@@ -11,12 +11,18 @@ extends RefCounted
 const OUTLINE := Color(0.05, 0.04, 0.06, 0.9)
 
 
+## Consumables added with the Descent: which existing picture each one borrows.
+const EXTRA_ITEMS := {&"salt_of_the_dead": &"pilgrims_draught", &"kings_wine": &"pilgrims_draught", &"grave_wax_balm": &"ash_bandage",
+	&"marrow_broth": &"stamina_tonic", &"glass_tonic": &"stamina_tonic", &"hush_draught": &"stamina_tonic",
+	&"ember_pip": &"ember_shard", &"ember_cluster": &"ember_shard"}
+
+
 static func has_icon(id: StringName) -> bool:
 	return id in [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard",
 		&"penitents_tear", &"candlewright_note", &"canon_seal", &"pilgrims_draught", &"marshals_crest", &"oathblade", &"twin_blades",
 		&"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark",
 		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil", &"gallery_key", &"sextons_lantern", &"cinder_heart", &"ashfall_seal", &"lurker_fang", &"cantors_wick", &"abbots_signet"] \
-		or String(id).begins_with("relic_") or String(id).begins_with("tal_") or String(id).begins_with("potion_") or Weapons.IDS.has(id) or (String(id).begins_with("armor_") and Armors.is_valid_id(String(id).substr(6)))
+		or String(id).begins_with("keepsake_") or EXTRA_ITEMS.has(id) or String(id).begins_with("relic_") or String(id).begins_with("tal_") or String(id).begins_with("potion_") or Weapons.IDS.has(id) or (String(id).begins_with("armor_") and Armors.is_valid_id(String(id).substr(6)))
 
 
 static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
@@ -61,7 +67,15 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"candle_catalyst", &"abbots_crozier": _staff(ci, id)
 		&"armor_pilgrim_coat", &"armor_penitent_shroud", &"armor_canons_mail", &"armor_marshal_plate", &"armor_ghostlight_raiment": _armor_generic(ci, id)
 		_:
-			if String(id).begins_with("tal_"):
+			if EXTRA_ITEMS.has(id):
+				match EXTRA_ITEMS[id]:
+					&"pilgrims_draught": _draught(ci)
+					&"ash_bandage": _bandage(ci)
+					&"ember_shard": _shard(ci, t)
+					_: _tonic(ci)
+			elif String(id).begins_with("keepsake_"):
+				_relic(ci, id, t)
+			elif String(id).begins_with("tal_"):
 				TalismanArt.draw(ci, id, t)
 			elif String(id).begins_with("potion_"):
 				_vial(ci)
