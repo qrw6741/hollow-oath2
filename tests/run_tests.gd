@@ -83,7 +83,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_wayfarers, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -3951,6 +3951,26 @@ func test_descent() -> void:
 		check(Bestiary.IDS.has(id) and Bestiary.data(id) != null, "%s is in the bestiary" % id)
 	for w in Expansion.WEAPONS.keys():
 		check(Weapons.IDS.has(w) and Weapons.HINTS.has(w), "%s is a weapon with a where-to-find hint" % w)
+
+
+func test_progress_goal() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	check(Progress.next_goal().name == "the Bell-Warden", "the first goal is the Bell-Warden")
+	for g in Progress.GOALS:
+		check(Bestiary.IDS.has(g.boss), "%s is a real boss" % g.boss)
+		game_state.set_flag(StringName("boss_defeated_" + String(g.boss)), true)
+	check(Progress.next_goal().is_empty() and Progress.text() != "", "after the last boss there is no goal")
+	game_state.set_flag(&"boss_defeated_the_oath_eternal", false)
+	game_state.set_flag(&"boss_defeated_pale_sovereign", false)
+	check(Progress.next_goal().name == "the Pale Sovereign" and "Barrow" in Progress.text(), "goals are taken in story order")
+	var prev := 0.0
+	for i in Expansion.MAPS.size():
+		var main: StringName = Progress.GOALS[8 + i].boss
+		var hp: float = Bestiary.data(main).max_health
+		check(hp > prev, "%s has more health than the previous main boss (%d)" % [main, hp])
+		prev = hp
+	check(Bestiary.data(&"crownless_king").max_health < Bestiary.data(&"ossuary_king_veyl").max_health, "the Descent starts above the Citadel's boss")
 
 
 func test_wayfarers() -> void:

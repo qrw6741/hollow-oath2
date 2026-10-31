@@ -403,3 +403,7 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - **Gear**: 11 new armours (data/armors, one hidden chest per map at x=3650), 8 consumables (heal / stamina / embers), 11 wearable relics (one dropped by each new main boss; effects reuse the six existing relic effects at higher values). Icons for armour/relic use the generic routines (placeholder).
 - **Graphics**: world/background/descent_backdrop.gd replaces the manor hall in the 11 maps: 11 themes, two parallax silhouette layers drawn only for the visible part, haze, light shafts, themed ambient particles (embers, bubbles, pages, glints, spores, snow) and flickering PointLights; the Hollow Heart pulses. Contact sheet checked in Xvfb (all 11 look distinct); not on a Windows display.
 - Tests: test_wayfarers (conversations, farewell once, gifts, shops, armour/item/relic validity, Vesper). Generators: tools/gen_descent2.py (idempotent).
+
+## Step: Progressive, simple path
+- **Where next?** systems/progress.gd (Progress): the 19 main-story bosses in order (Bell-Warden to the Oath Eternal); the first one not yet defeated is the goal, shown in gold at the top of the rest-candle menu ("Onward: defeat X in Y."). Optional areas and mini-bosses are never required. World flags only.
+- **Difficulty ramp**: the Descent started easier than the Citadel's boss (760 hp vs 2,200). Re-tuned: Descent mini-bosses 1,500 to 2,790 hp and main bosses 2,600 to 5,400 hp rising map by map; Oath Eternal 9,000. test_progress_goal asserts the main bosses rise and start above the Citadel's.

@@ -177,3 +177,4 @@
 - Armour numbers, relic strengths and shop prices are untested guesses. The 11 relics are stronger than the old ones; with 2 slots they can trivialise the late game.
 - The backdrops draw per frame (cheap per slot) but were not profiled; frame rate on a real Windows machine is unverified. Backdrop colour and silhouette art are procedural placeholders.
 - Keepsakes have no mechanical use (lore only) and use the generic item icon.
+- The Descent difficulty ramp is by health only (attack damage is shared by tier); nobody has played it, so the pacing is a guess.

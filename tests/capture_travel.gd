@@ -30,6 +30,7 @@ func _run() -> void:
 	var cm: CandleMenu = main.get_node("CandleMenu")
 	cm.open()
 	await frames(30)
+	await shot("candle_main")
 	cm._travel_btn.pressed.emit()
 	await frames(10)
 	await shot("travel_top")

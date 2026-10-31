@@ -5,6 +5,7 @@ extends CanvasLayer
 
 var is_open := false
 var _panel: ColorRect
+var _goal: Label
 var _info: Label
 var _chip: EmberChip
 var _msg: Label
@@ -56,6 +57,10 @@ func _build() -> void:
 	UITheme.title(title, 16)
 	v.add_child(title)
 	v.add_child(UITheme.rule(220))
+	_goal = Label.new()
+	_goal.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_goal.add_theme_color_override(&"font_color", Palette.GOLD)
+	v.add_child(_goal)
 	var head := HBoxContainer.new()
 	head.custom_minimum_size.x = 330
 	v.add_child(head)
@@ -232,6 +237,7 @@ func open() -> void:
 	GameFeel.reset()
 	GameState.ui_modal = true
 	_msg.text = ""
+	_goal.text = Progress.text()
 	_panel.visible = true
 	_refresh()
 	_chip.set_value(GameState.embers, true)

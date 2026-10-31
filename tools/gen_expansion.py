@@ -72,8 +72,9 @@ for mi, group in enumerate(E.BOSSES):
         tier = TIER[b["role"]]
         ids = attack_set(b["arch"], b["status"], tier, mi)
         role = b["role"]
-        hp = {"mini": 760 + 70 * mi, "main": 1500 + 160 * mi, "final": 5500}[role]
-        poise = {"mini": 100 + 8 * mi, "main": 140 + 12 * mi, "final": 260}[role]
+        # The Descent follows the Crownless King (2,200 hp), so it ramps up steadily map by map from there.
+        hp = {"mini": 1500 + 130 * mi, "main": 2600 + 280 * mi, "final": 9000}[role]
+        poise = {"mini": 110 + 8 * mi, "main": 150 + 12 * mi, "final": 280}[role]
         embers = {"mini": 2200 + 250 * mi, "main": 4800 + 450 * mi, "final": 20000}[role]
         chase = {"heavy": 50, "brute": 54, "caster": 52, "duelist": 62, "stalker": 70}[b["arch"]]
         G.enemy(b["id"], b["name"], b["lore"], ids[:3], hp, poise, chase, embers, b["drop"], "ember_shard")
