@@ -25,6 +25,8 @@ func _ready() -> void:
 
 
 func _prompt() -> String:
+	if Endings.gate_open():
+		return "Face the gate"
 	if Endings.chosen() != &"":
 		return "Begin anew (New Game+)" if Progress.next_goal().is_empty() else "The gate (your road is not finished)"
 	return "Face the gate" if Endings.gate_open() else "The gate is sealed"
@@ -37,7 +39,7 @@ func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint() or _player_inside == null:
 		return
 	if Input.is_action_just_pressed(&"interact") and _player_inside.can_interact():
-		if Endings.chosen() != &"":
+		if Endings.chosen() != &"" and not Endings.gate_open():
 			if _confirm > 0.0:
 				_confirm = 0.0
 				Events.new_cycle_requested.emit()

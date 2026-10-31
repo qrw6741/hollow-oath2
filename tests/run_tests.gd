@@ -3927,6 +3927,11 @@ func test_belfry_and_crown() -> void:
 	game_state.set_flag(&"boss_defeated_the_oath_eternal", true)
 	check(Endings.available(&"unsworn") and Endings.DEFS[&"unsworn"].pages.size() >= 3, "defeating the Oath Eternal unlocks the Unsworn ending")
 	game_state.set_flag(&"boss_defeated_the_oath_eternal", false)
+	# a player who already chose at the gate is asked once more after the Oath Eternal
+	check(Endings.chosen() == &"crown" and not Endings.gate_open(), "choosing an ending closes the gate")
+	game_state.set_flag(&"boss_defeated_the_oath_eternal", true)
+	check(Endings.gate_open() and Endings.available(&"unsworn") and not Endings.available(&"break"), "the Oath Eternal reopens it for the last ending only")
+	check(Endings.choose(&"unsworn") and Endings.chosen() == &"unsworn" and not Endings.gate_open(), "the last ending can be chosen after another")
 
 
 func test_descent() -> void:

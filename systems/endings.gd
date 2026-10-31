@@ -72,11 +72,17 @@ static func chosen() -> StringName:
 	return StringName(str(GameState.get_flag(&"ending_chosen", "")))
 
 
+## The gate asks once after the Marshal falls, and once more at the very end of the Descent (only the
+## last ending is offered the second time) so a player who chose early can still finish the story.
 static func gate_open() -> bool:
-	return bool(GameState.get_flag(MARSHAL_FLAG, false)) and chosen() == &""
+	if bool(GameState.get_flag(MARSHAL_FLAG, false)) and chosen() == &"":
+		return true
+	return bool(GameState.get_flag(ETERNAL_FLAG, false)) and chosen() != &"" and chosen() != &"unsworn"
 
 
 static func available(id: StringName) -> bool:
+	if chosen() != &"" and id != &"unsworn":
+		return false   # a second asking only offers the last ending
 	if id == &"crown":
 		return bool(GameState.get_flag(REGENT_FLAG, false))
 	if id == &"unsworn":
