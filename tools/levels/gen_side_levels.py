@@ -717,7 +717,7 @@ color = Color(0.4, 0.62, 0.64, 1)
 
 [node name="Geometry" type="Node2D" parent="."]''')
     L.block("CliffLeft", 0, 0, 16, 480)
-    L.block("Ground", 16, 480, W - 16, 60, style=3)
+    L.block("Ground", 16, 480, W - 16, 60, style=4)
     L.block("CliffRight", W - 60, 0, 60, 540)
     L.block("Ceiling", 0, 40, W, 56)
     # Stair and ossuary hall
@@ -817,7 +817,7 @@ color = Color(0.7, 0.56, 0.5, 1)
 
 [node name="Geometry" type="Node2D" parent="."]''')
     L.block("CliffLeft", 0, 0, 16, 480)
-    L.block("Ground", 16, 480, W - 16, 60, style=3)
+    L.block("Ground", 16, 480, W - 16, 60, style=4)
     L.block("CliffRight", W - 60, 0, 60, 540)
     L.block("Ceiling", 0, 40, W, 56)
     L.block("CellStep", 600, 456, 180, 24, style=1)
@@ -892,7 +892,7 @@ color = Color(0.66, 0.62, 0.78, 1)
 
 [node name="Geometry" type="Node2D" parent="."]''')
     L.block("CliffLeft", 0, 0, 16, 480)
-    L.block("Ground", 16, 480, W - 16, 60, style=3)
+    L.block("Ground", 16, 480, W - 16, 60, style=4)
     L.block("CliffRight", W - 60, 0, 60, 540)
     L.block("Ceiling", 0, 40, W, 56)
     L.block("StairA", 600, 452, 200, 28, style=1)
@@ -985,7 +985,7 @@ color = Color{sp["tint"]}
 
 [node name="Geometry" type="Node2D" parent="."]''')
         L.block("CliffLeft", 0, 0, 16, 480)
-        L.block("Ground", 16, 480, W - 16, 60, style=3)
+        L.block("Ground", 16, 480, W - 16, 60, style=4)
         L.block("CliffRight", W - 60, 0, 60, 540)
         L.block("Ceiling", 0, 40, W, 56)
         L.block("StepA", 600, 452, 200, 28, style=1)
@@ -1071,7 +1071,7 @@ color = Color{mp["tint"]}
 
 [node name="Geometry" type="Node2D" parent="."]''')
         L.block("CliffLeft", 0, 0, 16, 480)
-        L.block("Ground", 16, 480, W - 16, 60, style=3)
+        L.block("Ground", 16, 480, W - 16, 60, style=4)
         L.block("CliffRight", W - 60, 0, 60, 540)
         L.block("Ceiling", 0, 40, W, 56)
         prev_path = "res://world/levels/crownless_citadel.tscn" if i == 0 else "res://world/levels/%s.tscn" % XD.MAPS[i - 1]["key"]

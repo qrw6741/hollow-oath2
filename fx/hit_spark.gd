@@ -20,6 +20,9 @@ func setup(color: Color, amount: int, direction: int) -> void:
 		var spd := rng.randf_range(60.0, 170.0)
 		_parts.append({"p": Vector2.ZERO, "v": Vector2.from_angle(ang) * spd, "len": rng.randf_range(2.0, 5.0)})
 	z_index = 20
+	var m := CanvasItemMaterial.new()
+	m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	material = m
 
 
 func _process(delta: float) -> void:
@@ -37,10 +40,13 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	var k := 1.0 - _t / LIFETIME
 	# Core flash on the first frames.
-	if _t < 0.06:
+	if _t < 0.08:
 		draw_circle(Vector2.ZERO, 5.0 * k + 1.0, Color(1, 0.97, 0.9, 0.9))
+		draw_circle(Vector2.ZERO, 11.0 * k + 2.0, Color(_color, 0.22))
+	draw_arc(Vector2.ZERO, 4.0 + (1.0 - k) * 12.0, 0.0, TAU, 16, Color(_color, 0.35 * k), 1.0)
 	for p in _parts:
 		var dir: Vector2 = (p.v as Vector2).normalized()
 		var c := _color
 		c.a = k
-		draw_line(p.p, p.p - dir * float(p.len), c, 1.0)
+		draw_line(p.p, p.p - dir * float(p.len) * 1.8, c, 1.0)
+		draw_circle(p.p, 1.6, Color(c, 0.35 * k))

@@ -4,6 +4,7 @@ extends Node
 
 const HitSpark := preload("res://fx/hit_spark.gd")
 const DamageNumber := preload("res://fx/damage_number.gd")
+const Burst := preload("res://fx/fx_burst.gd")
 
 const HIT_STOP_SCALE := 0.05
 
@@ -38,6 +39,28 @@ func shake(strength: float, duration := 0.18) -> void:
 func spark(at: Vector2, color: Color, amount := 10, direction := 0) -> void:
 	var fx := HitSpark.new()
 	fx.setup(color, amount, direction)
+	_fx_parent().add_child(fx)
+	fx.global_position = at
+
+
+## Expanding shock ring (parries, big hits, boss moments).
+func ring(at: Vector2, color: Color, radius := 22.0) -> void:
+	_burst(Burst.Kind.RING, at, color, 0, radius)
+
+
+## Slow rising motes: embers, souls, healing light.
+func rise(at: Vector2, color: Color, amount := 12, spread := 14.0) -> void:
+	_burst(Burst.Kind.RISE, at, color, amount, spread)
+
+
+## Low dust puffs kicked out sideways (landings, dodges).
+func dust(at: Vector2, amount := 6, color := Color(0.62, 0.58, 0.52)) -> void:
+	_burst(Burst.Kind.DUST, at, color, amount, 0.0)
+
+
+func _burst(k: int, at: Vector2, color: Color, amount: int, r: float) -> void:
+	var fx := Burst.new()
+	fx.setup(k, color, amount, r)
 	_fx_parent().add_child(fx)
 	fx.global_position = at
 

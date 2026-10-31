@@ -434,3 +434,11 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - `tests/bot_all.tscn` plays every level (run right, spam light attack, jump on stall, step back from dead ends; invulnerable). One run over all 28 playable maps (4 parallel shards, headless): **no script errors**; 22 maps reached the far end or the last arena/exit; the hand-built early maps (village, road, manor, gallery) stopped at their right-hand wall/door as designed; Tidal Vaults and Hollow Heart (final boss) used up the 9000-frame budget while fighting/wading, not stuck (Tidal Vaults re-walked alone to x=7300).
 - **Fixed:** Drowned Catacombs' pillar ledges (acolytes + tonic) were 100 px up from the nave floor, unreachable; lowered to 48 px up.
 - Not covered: the bot is invulnerable and does not use items, so it says nothing about difficulty/balance, shops, dialogue or quests. No human playtest; Windows still unlaunched.
+
+## Graphics + effects pass
+- **Post pass** (`fx/post_fx.gd` + `.gdshader`, layer 7, toggle "Glow & colour grading" in Settings, saved): soft bloom on bright pixels, split-tone grade (cool shadows/warm highlights), edge fringe, fine grain.
+- **Atmosphere** (`world/background/mist.gd`, added by `Level._ready`, `atmosphere` export): two drifting fog banks and faint light shafts, tinted from the level's CanvasModulate.
+- **Crypt floor** (`StoneBlock.Style.CRYPT`): the Reliquary, Keep, Belfry, four parts and 11 Descent maps had bright daylight grass floors; now dark soil, dim moss, bone chips. Outdoor maps keep grass.
+- **Effects** (`fx/fx_burst.gd`, via `GameFeel.ring/rise/dust`): additive hit sparks with flash + shock ring; dust on landing/dodge; block ring; parry gold ring; heal rising light + ring; enemy death embers; boss death ring + ember fountain.
+- **Verified:** screenshots (Xvfb, software GL) of Ossuary, Bone Market, Road, Hollow Heart, and an FX test frame; suite 141/141 (new `test_graphics_pass`). Caught a compile error in fx_burst by `--check-only`: the test suite had not flagged it, so run that after adding scripts.
+- **Not verified:** real-GPU frame rate (bloom is 16 taps/pixel; use the Settings toggle if slow), look on Windows, any hand playtest. Art is still procedural, not final sprites.

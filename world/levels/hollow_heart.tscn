@@ -65,7 +65,7 @@ seed_value = 901
 position = Vector2(16, 480)
 script = ExtResource("block")
 size = Vector2(7384, 60)
-style = 3
+style = 4
 seed_value = 902
 
 [node name="CliffRight" type="StaticBody2D" parent="Geometry"]

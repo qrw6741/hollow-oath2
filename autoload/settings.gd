@@ -35,6 +35,7 @@ const RESOLUTIONS: Array[Vector2i] = [Vector2i(1280, 720), Vector2i(1600, 900), 
 const FPS_CAPS: Array[int] = [30, 60, 120, 144, 240, 0]   ## 0 = unlimited
 var fullscreen := false
 var resolution_index := 2        ## 1920x1080 when windowed.
+var glow := true                 ## Bloom / colour grade / grain finishing pass.
 var hires := true                ## true: render at native resolution; false: chunky 480x270 pixels.
 var fps_cap := 0
 var vsync := true
@@ -67,6 +68,7 @@ func load_settings() -> void:
 	fullscreen = bool(cfg.get_value("video", "fullscreen", fullscreen))
 	resolution_index = clampi(int(cfg.get_value("video", "resolution_index", resolution_index)), 0, RESOLUTIONS.size() - 1)
 	hires = bool(cfg.get_value("video", "hires", hires))
+	glow = bool(cfg.get_value("video", "glow", glow))
 	var cap := int(cfg.get_value("video", "fps_cap", fps_cap))
 	fps_cap = cap if FPS_CAPS.has(cap) else 0
 	vsync = bool(cfg.get_value("video", "vsync", vsync))
@@ -92,6 +94,7 @@ func save_settings() -> void:
 	cfg.set_value("video", "fullscreen", fullscreen)
 	cfg.set_value("video", "resolution_index", resolution_index)
 	cfg.set_value("video", "hires", hires)
+	cfg.set_value("video", "glow", glow)
 	cfg.set_value("video", "fps_cap", fps_cap)
 	cfg.set_value("video", "vsync", vsync)
 	cfg.save(PATH)

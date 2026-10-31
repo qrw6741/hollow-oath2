@@ -239,7 +239,11 @@ func _physics_process(delta: float) -> void:
 		State.REST: _state_rest(delta)
 		State.DEAD: _state_dead(delta)
 
+	var _vy_before := velocity.y
+	var _was_floor := is_on_floor()
 	move_and_slide()
+	if not _was_floor and is_on_floor() and _vy_before > 90.0:
+		GameFeel.dust(global_position, 4 + mini(int(_vy_before / 160.0), 6))
 
 
 # ------------------------------------------------------------------ input
@@ -418,6 +422,7 @@ func _start_dodge() -> void:
 	if dir != 0.0:
 		facing = signi(int(signf(dir)))
 	stamina.spend(dodge_stamina)
+	GameFeel.dust(global_position, 7)
 	_set_state(State.DODGE)
 
 
@@ -536,6 +541,7 @@ func receive_hit(hit: HitData) -> int:
 			combat_frames = COMBAT_LOCK_FRAMES
 			health.take_damage(hit.damage * (1.0 - weapon.block_reduction) * damage_taken_mult * Settings.damage_taken_pct / 100.0)
 			GameFeel.spark(global_position + Vector2(facing * 12, -16), Palette.BONE, 10, facing)
+			GameFeel.ring(global_position + Vector2(facing * 12, -16), Palette.STEEL, 14.0)
 			GameFeel.shake(2.0, 0.12)
 			velocity.x = -facing * 70.0
 			if health.is_dead:
@@ -611,6 +617,8 @@ func _cast_art() -> void:
 		var got := health.heal(health.max_health * float(d.get("heal", 0.3)))
 		GameFeel.damage_number(global_position + Vector2(0, -40), got, false)
 		GameFeel.spark(global_position + Vector2(0, -20), Color(1.0, 0.9, 0.5), 18)
+		GameFeel.rise(global_position + Vector2(0, -6), Color(1.0, 0.85, 0.45), 16, 12.0)
+		GameFeel.ring(global_position + Vector2(0, -16), Color(1.0, 0.85, 0.45), 26.0)
 	_start_attack(Arts.attack(id))
 	Events.art_cast.emit(id)
 
@@ -681,6 +689,7 @@ func _on_parry_success(hit: HitData) -> void:
 	if src:
 		at = (global_position + src.global_position) * 0.5 + Vector2(0, -16)
 	GameFeel.spark(at, Palette.GOLD_BRIGHT, 18)
+	GameFeel.ring(at, Palette.GOLD_BRIGHT, 30.0)
 
 
 func _on_attack_hit(_target: Hurtbox, result: int, hit: HitData) -> void:

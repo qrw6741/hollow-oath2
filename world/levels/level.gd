@@ -6,6 +6,8 @@ extends Node2D
 
 @export var level_id: StringName = &"level"
 @export var display_name := ""
+## Drifting fog and light shafts over the level (cosmetic).
+@export var atmosphere := true
 ## Defaults to the standard player scene when left empty.
 @export var player_scene: PackedScene
 ## Camera limits in world pixels.
@@ -34,6 +36,8 @@ func _ready() -> void:
 	player.position = spawn_position()
 	add_child(player)
 	_spawn_remnant()
+	if atmosphere:
+		add_child(Mist.new())
 	Audio.music(music, 1.2, music_pitch)
 	Events.respawn_requested.connect(_on_respawn_requested)
 	Events.checkpoint_rested.connect(_on_checkpoint_rested)

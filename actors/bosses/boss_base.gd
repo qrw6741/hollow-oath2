@@ -185,6 +185,8 @@ func _on_died() -> void:
 	# A boss dying is an event: a long freeze, a heavy shake and a burst of sparks.
 	GameFeel.hit_stop(0.3)
 	GameFeel.shake(12.0, 0.7)
+	GameFeel.ring(global_position + Vector2(0, -26), Palette.GOLD_BRIGHT, 90.0)
+	GameFeel.rise(global_position + Vector2(0, -10), Palette.EMBER, 40, 40.0)
 	for i in 3:
 		GameFeel.spark(global_position + Vector2(randf_range(-14, 14), -26 + randf_range(-14, 14)), Palette.EMBER, 14)
 	Events.boss_defeated.emit(boss_id)

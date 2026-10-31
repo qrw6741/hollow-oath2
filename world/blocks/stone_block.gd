@@ -6,7 +6,7 @@ extends StaticBody2D
 ## Origin = top-left corner. Drop it into a level, set size, done.
 ## TEMPORARY ART: procedural masonry until the region tilesets exist (Milestone 5).
 
-enum Style { MASONRY, RUBBLE, PLANKS, GRASS }
+enum Style { MASONRY, RUBBLE, PLANKS, GRASS, CRYPT }
 
 @export var size := Vector2(64, 32):
 	set(v):
@@ -71,6 +71,9 @@ func _draw() -> void:
 	if style == Style.GRASS:
 		_draw_grass(rng)
 		return
+	if style == Style.CRYPT:
+		_draw_crypt(rng)
+		return
 	draw_rect(Rect2(Vector2.ZERO, size), Palette.STONE_DARK)
 	var row_h := 8.0
 	var y := 0.0
@@ -111,3 +114,22 @@ func _draw_grass(rng: RandomNumberGenerator) -> void:
 		var h := rng.randf_range(2.0, 6.0)
 		draw_line(Vector2(x, 1), Vector2(x + rng.randf_range(-1.5, 1.5), -h), Color("7aa84c") if rng.randf() < 0.7 else Color("a7c96a"), 1.0)
 		x += rng.randf_range(2.0, 5.0)
+
+
+## Underground earth: cold dark soil, packed stone, a thin crust of dim moss and bone chips.
+func _draw_crypt(rng: RandomNumberGenerator) -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), Color("2c2a31"))
+	for i in int(size.x * size.y / 220.0):
+		var p := Vector2(rng.randf() * size.x, 6.0 + rng.randf() * maxf(0.0, size.y - 6.0))
+		var c := Color("3a3740") if rng.randf() < 0.55 else Color("201e25")
+		draw_rect(Rect2(p, Vector2(rng.randi_range(2, 6), rng.randi_range(1, 3))), c)
+	for i in int(size.x / 90.0) + 1:
+		var bp := Vector2(rng.randf() * size.x, 8.0 + rng.randf() * maxf(0.0, size.y - 10.0))
+		draw_rect(Rect2(bp, Vector2(rng.randi_range(3, 6), 1)), Color("8d867e", 0.55))
+	draw_rect(Rect2(0, 0, size.x, 4), Color("3d4a44"))
+	draw_rect(Rect2(0, 0, size.x, 1), Color("5d7068"))
+	var x := 0.0
+	while x < size.x:
+		var h := rng.randf_range(1.0, 4.0)
+		draw_line(Vector2(x, 1), Vector2(x + rng.randf_range(-1.0, 1.0), -h), Color("4a5d54") if rng.randf() < 0.75 else Color("788a7c"), 1.0)
+		x += rng.randf_range(3.0, 8.0)

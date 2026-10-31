@@ -410,6 +410,7 @@ func _on_died() -> void:
 	hurtbox.enabled = false
 	collision_layer = 0
 	GameFeel.spark(global_position + Vector2(0, -16), Palette.EMBER, 22)
+	GameFeel.rise(global_position + Vector2(0, -10), Palette.EMBER, 12, 10.0)
 	died.emit(self)
 	play_death_sound()
 	Events.enemy_killed.emit(self)
