@@ -82,6 +82,12 @@ func _show_line() -> void:
 	var p := _line_parts(index)
 	_name.text = p.who
 	_text.text = p.text
+	# Very long lines shrink a little so the box never grows off the top of the screen.
+	var fnt := _text.get_theme_font(&"font")
+	var fs := 8
+	while fs > 6 and fnt.get_multiline_string_size(String(p.text), HORIZONTAL_ALIGNMENT_LEFT, 324.0, fs).y > 96.0:
+		fs -= 1
+	_text.add_theme_font_size_override(&"font_size", fs)
 	_text.visible_characters = 0
 	_shown = 0.0
 	_panel.reset_size()

@@ -41,6 +41,11 @@ func _run() -> void:
 			GameFeel.rise(at + Vector2(-50, -6), Palette.EMBER, 16, 12.0)
 			GameFeel.dust(at, 8)
 			await frames(9)
+		if OS.get_environment("TEXTSHOT") != "":
+			Events.banner_requested.emit("The Drowned Cathedral of the Last Unbroken Vow and Sorrow")
+			Events.tip_requested.emit(&"focus")
+			Events.message_requested.emit("Old Tablet", "Here lies a very long inscription that goes on and on about the oaths broken beneath the bell, the keepers who wept in the dark, and the long road that every pilgrim of Vaelmoor must walk before the last candle is lit and the final door opens at last into the hollow.")
+			await frames(40)
 		if OS.get_environment("ZOOM") != "":
 			get_viewport().get_camera_2d().zoom = Vector2(3, 3)
 			await frames(10)

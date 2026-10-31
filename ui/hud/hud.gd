@@ -130,8 +130,10 @@ func _build() -> void:
 	_ember_label.size = Vector2(108, 14)
 	_ember_label.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
 	_tip = _label(root, "", 8, HORIZONTAL_ALIGNMENT_CENTER)
-	_tip.position = Vector2(60, 226)
-	_tip.size = Vector2(360, 30)
+	_tip.position = Vector2(50, 190)
+	_tip.size = Vector2(380, 36)
+	_tip.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	_tip.add_theme_stylebox_override(&"normal", UITheme.box(Color(0.04, 0.035, 0.05, 0.72), Color(Palette.STONE, 0.6), 1, Vector2(6, 3)))
 	_tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_tip.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
 	_tip.modulate.a = 0.0
@@ -213,7 +215,7 @@ func _build() -> void:
 	_banner = _label(root, "", 16, HORIZONTAL_ALIGNMENT_CENTER)
 	_banner.position = Vector2(0, 70)
 	_banner.size = Vector2(480, 24)
-	UITheme.title(_banner, 20, Palette.BONE)
+	UITheme.title(_banner, 16, Palette.BONE)
 	_banner.modulate.a = 0.0
 	for ry in [-8.0, 32.0]:
 		var rl := UITheme.rule(150)
@@ -247,6 +249,20 @@ func _build() -> void:
 	_debug.position = Vector2(280, 6)
 	_debug.size = Vector2(192, 60)
 	_debug.visible = Settings.show_debug
+
+
+## Shrinks a label's font until its text fits max_w x max_h (word-wrapped), never below min_size.
+## Keeps pop-up text on screen whatever its length.
+func _fit(l: Label, text: String, max_w: float, max_h: float, base: int, min_size := 6) -> void:
+	l.text = text
+	var f := l.get_theme_font(&"font")
+	var size := base
+	while size > min_size:
+		var sz := f.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, max_w, size)
+		if sz.y <= max_h and (l.autowrap_mode != TextServer.AUTOWRAP_OFF or sz.x <= max_w):
+			break
+		size -= 1
+	l.add_theme_font_size_override(&"font_size", size)
 
 
 func _label(parent: Node, text: String, font_size: int, align: HorizontalAlignment) -> Label:
@@ -318,9 +334,9 @@ func _draw_vials() -> void:
 
 func _on_message(title: String, text: String) -> void:
 	_msg_title.text = title
-	_msg_text.text = text
+	_fit(_msg_text, text, 284.0, 120.0, 8, 6)
 	_msg_panel.reset_size()
-	_msg_panel.position = Vector2(240 - _msg_panel.size.x / 2.0, 200 - _msg_panel.size.y)
+	_msg_panel.position = Vector2(240 - _msg_panel.size.x / 2.0, maxf(8.0, 184.0 - _msg_panel.size.y))
 	_msg_panel.visible = true
 
 
@@ -368,6 +384,7 @@ func _boss_intro(boss: BossBase) -> void:
 		bars.append(r)
 	var name_l := _label(holder, boss.data.display_name.to_upper(), 16, HORIZONTAL_ALIGNMENT_CENTER)
 	UITheme.title(name_l, 16, Palette.GOLD_BRIGHT)
+	_fit(name_l, boss.data.display_name.to_upper(), 440.0, 20.0, 16, 9)
 	name_l.position = Vector2(0, 236)
 	name_l.size = Vector2(480, 18)
 	name_l.modulate.a = 0.0
@@ -375,6 +392,7 @@ func _boss_intro(boss: BossBase) -> void:
 	lore_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lore_l.position = Vector2(30, 6)
 	lore_l.size = Vector2(420, 22)
+	_fit(lore_l, line, 420.0, 24.0, 8, 6)
 	lore_l.add_theme_color_override(&"font_color", Palette.BONE)
 	lore_l.modulate.a = 0.0
 	var t := create_tween().set_parallel(true)
@@ -447,7 +465,10 @@ func show_tip(id: StringName) -> void:
 	var t: Dictionary = Tutorial.TIPS[id]
 	var txt: String = t.text
 	txt = txt.replace("{skill}", _key_name(&"skill")).replace("{travel}", _key_name(&"travel_manor")).replace("{parry}", _key_name(&"parry"))
-	_tip.text = "%s: %s" % [t.title, txt]
+	_fit(_tip, "%s: %s" % [t.title, txt], 366.0, 30.0, 8, 6)
+	var tip_h := _tip.get_theme_font(&"font").get_multiline_string_size(_tip.text, HORIZONTAL_ALIGNMENT_LEFT, 366.0, _tip.get_theme_font_size(&"font_size")).y
+	_tip.size = Vector2(380, tip_h + 8.0)
+	_tip.position = Vector2(50, 226.0 - tip_h - 8.0)
 	_tip.modulate.a = 1.0
 	if _tip_tween:
 		_tip_tween.kill()
@@ -481,7 +502,7 @@ func _key_name(action: StringName) -> String:
 
 
 func show_banner(text: String) -> void:
-	_banner.text = text
+	_fit(_banner, text, 300.0, 22.0, 16, 9)
 	if _banner_tween:
 		_banner_tween.kill()
 	_banner_tween = create_tween()
