@@ -3977,6 +3977,9 @@ func test_progress_goal() -> void:
 	for early in [&"bell_warden", &"drowned_canon", &"hollow_marshal"]:
 		game_state.set_flag(StringName("boss_defeated_" + String(early)), true)
 	check(Progress.next_goal().name == "the Salt Abbot" and "Reliquary" in Progress.text(), "after the Marshal the road leads to the Reliquary")
+	game_state.set_flag(&"boss_defeated_bell_warden", false)
+	check(Progress.next_goal().name == "the Salt Abbot", "a skipped earlier boss never sends you backwards")
+	game_state.set_flag(&"boss_defeated_bell_warden", true)
 	game_state.set_flag(&"boss_defeated_the_oath_eternal", false)
 	game_state.set_flag(&"boss_defeated_pale_sovereign", false)
 	var prev := 0.0

@@ -420,3 +420,6 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 ## Step: endings switched off for now
 - Creative direction: the story will keep expanding, so no ending is offered yet. `Endings.enabled` (static, default false) turns the Oath Gate into a signpost: after the Marshal it says "THE ROAD GOES ON. Onward: ..." (Progress); nothing is chosen, nothing ends, New Game+ is not offered. All ending data, the ending menu and their tests are kept (the test runner sets `Endings.enabled = true`; test_no_ending_yet checks the shipped default). The Trial Ring opens after the Marshal instead of after an ending (Trials.unlocked). Ommen's line after the Marshal no longer promises a question from the gate.
 - To bring endings back: set `Endings.enabled := true` (and decide the final order of the five).
+
+## Step: goal line never goes backwards
+- Report: the "Onward" line still named the Bell-Warden. Progress.next_goal now starts after the furthest main boss already beaten, so a skipped or unflagged earlier boss (or an older save) can no longer pull the line back. test_progress_goal covers it. Cause for the player's case not confirmed (their save was not inspected).

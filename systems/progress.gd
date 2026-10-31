@@ -28,13 +28,18 @@ const GOALS := [
 ]
 
 
-## The first main boss still standing, as {"name", "area", "index"}; empty once the Descent is done.
+## The next main boss on the road, as {"name", "area", "index"}; empty once the Descent is done.
+## Anything before the furthest boss you have already beaten counts as done (you may have skipped
+## it, or your save may be older than its flag), so the line never sends you backwards.
 static func next_goal() -> Dictionary:
+	var last := -1
 	for i in GOALS.size():
-		var g: Dictionary = GOALS[i]
-		if not bool(GameState.get_flag(StringName("boss_defeated_" + String(g.boss)), false)):
-			return {"name": g.name, "area": g.area, "index": i}
-	return {}
+		if bool(GameState.get_flag(StringName("boss_defeated_" + String(GOALS[i].boss)), false)):
+			last = i
+	if last + 1 >= GOALS.size():
+		return {}
+	var g: Dictionary = GOALS[last + 1]
+	return {"name": g.name, "area": g.area, "index": last + 1}
 
 
 static func text() -> String:
