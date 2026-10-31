@@ -154,6 +154,9 @@ func close() -> void:
 	get_tree().paused = false
 	GameState.ui_modal = false
 	Events.banner_requested.emit("THE OATH IS %s" % ["KEPT", "BROKEN", "MENDED", "CROWNED", "LAID DOWN"][Endings.ORDER.find(Endings.chosen())])
+	# The story is not over: say where the road goes on (the Descent lies beyond the Crownless Citadel).
+	if not Progress.next_goal().is_empty():
+		get_tree().create_timer(3.5, true, false, true).timeout.connect(func(): Events.banner_requested.emit("THE ROAD GOES ON.  " + Progress.text()))
 
 
 func _process(_d: float) -> void:

@@ -26,7 +26,7 @@ func _ready() -> void:
 
 func _prompt() -> String:
 	if Endings.chosen() != &"":
-		return "Begin anew (New Game+)"
+		return "Begin anew (New Game+)" if Progress.next_goal().is_empty() else "The gate (your road is not finished)"
 	return "Face the gate" if Endings.gate_open() else "The gate is sealed"
 
 
@@ -43,7 +43,10 @@ func _physics_process(delta: float) -> void:
 				Events.new_cycle_requested.emit()
 			else:
 				_confirm = 5.0
-				Events.banner_requested.emit("INTERACT AGAIN TO BEGIN ANEW  -  NEW GAME+ (CYCLE %d)" % (GameState.ng_cycle() + 1))
+				if Progress.next_goal().is_empty():
+					Events.banner_requested.emit("INTERACT AGAIN TO BEGIN ANEW  -  NEW GAME+ (CYCLE %d)" % (GameState.ng_cycle() + 1))
+				else:
+					Events.banner_requested.emit("THE ROAD GOES ON.  " + Progress.text() + "  (Interact again to start New Game+ instead.)")
 		elif Endings.gate_open():
 			Events.ending_requested.emit()
 		else:

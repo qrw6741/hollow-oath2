@@ -178,3 +178,4 @@
 - The backdrops draw per frame (cheap per slot) but were not profiled; frame rate on a real Windows machine is unverified. Backdrop colour and silhouette art are procedural placeholders.
 - Keepsakes have no mechanical use (lore only) and use the generic item icon.
 - The Descent difficulty ramp is by health only (attack damage is shared by tier); nobody has played it, so the pacing is a guess.
+- The fifth ending (Go Unsworn) is unlocked by the Oath Eternal but can only be chosen at the Oath Gate while no ending has been chosen this cycle; a player who already chose an ending at the gate (before the Descent) cannot choose it. Needs a design decision (allow a second, final choice after the Oath Eternal?).

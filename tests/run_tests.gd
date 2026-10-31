@@ -3964,9 +3964,18 @@ func test_progress_goal() -> void:
 	game_state.set_flag(&"boss_defeated_the_oath_eternal", false)
 	game_state.set_flag(&"boss_defeated_pale_sovereign", false)
 	check(Progress.next_goal().name == "the Pale Sovereign" and "Barrow" in Progress.text(), "goals are taken in story order")
+	game_state.set_flag(&"boss_defeated_the_oath_eternal", true)
+	game_state.set_flag(&"boss_defeated_pale_sovereign", true)
+	for g in Progress.GOALS:
+		game_state.set_flag(StringName("boss_defeated_" + String(g.boss)), false)
+	for early in [&"bell_warden", &"drowned_canon", &"hollow_marshal"]:
+		game_state.set_flag(StringName("boss_defeated_" + String(early)), true)
+	check(Progress.next_goal().name == "the Salt Abbot" and "Reliquary" in Progress.text(), "after the Marshal the road leads to the Reliquary")
+	game_state.set_flag(&"boss_defeated_the_oath_eternal", false)
+	game_state.set_flag(&"boss_defeated_pale_sovereign", false)
 	var prev := 0.0
 	for i in Expansion.MAPS.size():
-		var main: StringName = Progress.GOALS[8 + i].boss
+		var main: StringName = Progress.GOALS[Progress.GOALS.size() - Expansion.MAPS.size() + i].boss
 		var hp: float = Bestiary.data(main).max_health
 		check(hp > prev, "%s has more health than the previous main boss (%d)" % [main, hp])
 		prev = hp
