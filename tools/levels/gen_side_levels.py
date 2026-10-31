@@ -18,6 +18,7 @@ EXT = {
     "block": ("Script", "res://world/blocks/stone_block.gd"),
     "candle": ("PackedScene", "res://world/checkpoint/oath_candle.tscn"),
     "hall": ("Script", "res://world/background/manor_hall.gd"),
+    "backdrop": ("Script", "res://world/background/descent_backdrop.gd"),
     "exit": ("Script", "res://world/transitions/level_exit.gd"),
     "entry": ("Script", "res://world/transitions/level_entry.gd"),
     "tablet": ("Script", "res://world/story/lore_tablet.gd"),
@@ -984,6 +985,7 @@ def grand():
         key = mp["key"]
         L = Level(key + ".tscn")
         L.use("hall")
+        L.use("backdrop")
         L.node(f'''
 [node name="{mp["node"]}" type="Node2D"]
 script = ExtResource("level")
@@ -997,13 +999,12 @@ default_spawn = Vector2(130, 480)
 
 [node name="Hall" type="Node2D" parent="."]
 z_index = -10
-script = ExtResource("hall")
+script = ExtResource("backdrop")
+theme = {i}
 width = {W}.0
 floor_y = 480.0
 ceiling_y = 96.0
 seed_value = {300 + 17 * i}
-ghosts = 5
-style = {mp["style"]}
 
 [node name="Light" type="CanvasModulate" parent="."]
 color = Color{mp["tint"]}
