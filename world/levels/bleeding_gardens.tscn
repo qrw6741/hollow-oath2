@@ -297,3 +297,24 @@ gate_height = 96.0
 trigger_offset = 36.0
 trigger_width = 620.0
 victory_text = "THE GARDEN GOES TO SEED"
+
+[node name="LoftAStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(956.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 911
+
+[node name="LoftBStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1256.0, 436.0)
+script = ExtResource("block")
+size = Vector2(44.0, 44.0)
+style = 1
+seed_value = 912
+
+[node name="LoftCStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3856.0, 442.0)
+script = ExtResource("block")
+size = Vector2(44.0, 38.0)
+style = 1
+seed_value = 913

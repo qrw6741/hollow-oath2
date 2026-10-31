@@ -423,3 +423,9 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 
 ## Step: goal line never goes backwards
 - Report: the "Onward" line still named the Bell-Warden. Progress.next_goal now starts after the furthest main boss already beaten, so a skipped or unflagged earlier boss (or an older save) can no longer pull the line back. test_progress_goal covers it. Cause for the player's case not confirmed (their save was not inspected).
+
+## Reliquary axe nook no longer traps; reachability audit
+- **Bug (user screenshot):** the Sunken Reliquary's axe nook was a roofed box with an end wall standing on the road, so the player could walk into a closed stone alcove and be stuck. Many "perch" ledges (archers/chests ~80 px up) in the Descent maps, Keep, parts, etc. were also above jump height (~52 px).
+- **Fix:** nook rebuilt as a raised block (44 px, one jump) with a roof and an illusory entrance wall; the road passes over it, nothing closes it. `Level.auto_steps()` in `tools/levels/gen_side_levels.py` now adds a low step beside any unreachable perch that holds an enemy/chest/NPC. `tools/audit_reach.py` (no Godot needed) reports tall walls on the road and unreachable/floating things; currently "21 levels, clean". `test_levels_reachable` runs it (skipped if python3 missing).
+- **Verified (headless bot, `tests/bot_walk`):** Reliquary walked from start to x=3400 (Abbot arena at 3560) and Weeping Ossuary start to x=7100. Full suite 140 passed, 0 failed.
+- **Not verified:** a human playthrough, other Descent maps by bot (audit only), Windows launch.

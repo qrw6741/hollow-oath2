@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -4002,6 +4002,16 @@ func test_no_ending_yet() -> void:
 	var pq := Dialogues.OMMEN_AFTER_MARSHAL.duplicate()
 	check("not finished" in " ".join(pq), "Ommen says the story is not finished")
 	Endings.enabled = true
+
+
+func test_levels_reachable() -> void:
+	# Runs tools/audit_reach.py: no wall taller than a jump on any road, nothing placed on an unreachable ledge.
+	var out: Array = []
+	var code := OS.execute("python3", [ProjectSettings.globalize_path("res://tools/audit_reach.py")], out, true)
+	if code == -1:
+		print("  (skipped: python3 not available)")
+		return
+	check(code == 0, "every level road is open and every perch is reachable: " + (str(out[0]).strip_edges().right(300) if out.size() > 0 else ""))
 
 
 func test_reliquary_opens() -> void:

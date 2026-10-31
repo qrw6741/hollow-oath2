@@ -269,3 +269,17 @@ script = ExtResource("exit")
 target_level = "res://world/levels/ashen_chapel.tscn"
 target_entry = &"from_graveyard"
 size = Vector2(12, 80)
+
+[node name="CryptRoofStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1136.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 908
+
+[node name="FenceTopStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2006.0, 449.0)
+script = ExtResource("block")
+size = Vector2(44.0, 31.0)
+style = 1
+seed_value = 909

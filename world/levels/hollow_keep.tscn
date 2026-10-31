@@ -330,3 +330,17 @@ npc_id = &"hesk"
 display_name = "Hesk"
 look = 1
 start_facing = -1
+
+[node name="CellLoftStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(906.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 910
+
+[node name="FoundryGantryStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2756.0, 442.0)
+script = ExtResource("block")
+size = Vector2(44.0, 38.0)
+style = 1
+seed_value = 911

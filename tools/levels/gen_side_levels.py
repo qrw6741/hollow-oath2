@@ -85,6 +85,8 @@ for _g in XD.BOSSES:
 class Level:
     def __init__(self, fname):
         self.fname = fname
+        self.blocks = []     # (name, x, y, w, h, one_way): geometry, for the reachability pass
+        self.things = []     # (kind, name, x, y): what stands on it
         self.nodes = []
         self.used = []
         self.seed = 900
@@ -98,6 +100,7 @@ class Level:
         self.nodes.append(t.strip("\n"))
 
     def block(self, name, x, y, w, h, style=1, one_way=False):
+        self.blocks.append((name, x, y, w, h, one_way))
         self.use("block")
         self.seed += 1
         self.node(f'''
@@ -112,6 +115,7 @@ seed_value = {self.seed}''' + ("\none_way = true" if one_way else ""))
         self.block(name, x, y, w, 6, style=2, one_way=True)
 
     def enemy(self, name, scene, x, y, patrol=40.0, facing=-1, when=0):
+        self.things.append(("enemy", name, x, y))
         self.use("spawner"); self.use(scene)
         self.node(f'''
 [node name="{name}" type="Marker2D" parent="."]
@@ -122,6 +126,7 @@ patrol_distance = {patrol}
 start_facing = {facing}''' + (f"\nwhen = {when}" if when else ""))
 
     def candle(self, name, x, y, cid, title):
+        self.things.append(("candle", name, x, y))
         self.use("candle")
         self.node(f'''
 [node name="{name}" parent="." instance=ExtResource("candle")]
@@ -148,6 +153,7 @@ target_entry = &"{tentry}"
 size = Vector2({size[0]}, {size[1]})''')
 
     def chest(self, name, x, y, cid, count=0, embers=0, item=None, gear=None):
+        self.things.append(("chest", name, x, y))
         self.use("chest")
         t = f'''
 [node name="{name}" type="Area2D" parent="."]
@@ -164,6 +170,7 @@ embers = {embers}'''
         self.node(t)
 
     def tablet(self, name, x, y, title, text):
+        self.things.append(("tablet", name, x, y))
         self.use("tablet")
         self.node(f'''
 [node name="{name}" type="Area2D" parent="."]
@@ -173,6 +180,7 @@ title = "{title}"
 text = "{text}"''')
 
     def npc(self, name, x, nid, title, look, facing=-1, shop=None):
+        self.things.append(("npc", name, x, 480))
         self.use("npc")
         self.node(f'''
 [node name="{name}" type="Area2D" parent="."]
@@ -242,7 +250,59 @@ size = Vector2({w}, {h})
 wall_id = &"{wid}"
 hits_needed = {hits}''' + (f'\nopens_when_boss = &"{opens_when}"' if opens_when else ""))
 
+    # ---- reachability (the player's jump rises ~52 px and crosses ~100 px) -------------------
+    RISE, GAP, STEP = 48.0, 90.0, 44.0
+
+    def _surfaces(self):
+        return [(n, x, x + w, y, o) for (n, x, y, w, h, o) in self.blocks if n not in ("CliffLeft", "CliffRight", "Ceiling")]
+
+    def reachable(self):
+        surf = self._surfaces()
+        ground = next((t for t in surf if t[0] == "Ground"), None)
+        if ground is None:
+            return surf, None
+        seen = {ground[0]}
+        todo = [ground]
+        while todo:
+            a = todo.pop()
+            for b in surf:
+                if b[0] not in seen and b[3] >= a[3] - self.RISE and max(0.0, b[1] - a[2], a[1] - b[2]) <= self.GAP:
+                    seen.add(b[0]); todo.append(b)
+        return surf, seen
+
+    def auto_steps(self):
+        """Gives every perch that something stands on (archers, chests...) a way up: one low step beside it.
+        Without this a ledge 80 px up is out of reach (a jump only rises about 52 px)."""
+        for _ in range(8):
+            surf, seen = self.reachable()
+            if seen is None:
+                return
+            fixed = False
+            for (kind, name, x, y) in self.things:
+                host = [t for t in surf if abs(t[3] - y) <= 2.0 and t[1] - 2 <= x <= t[2] + 2]
+                if not host or any(h[0] in seen for h in host):
+                    continue
+                h = host[0]
+                top = h[3] + self.STEP
+                if top > 470:
+                    continue
+                for side in (-1, 1):
+                    sx = h[1] - self.STEP if side < 0 else h[2]
+                    clear = not any(abs(tx - (sx + self.STEP / 2)) < self.STEP / 2 + 14 and ty >= 470 for (_k, _n, tx, ty) in self.things)
+                    clear = clear and not any(bn != h[0] and bx < sx + self.STEP and sx < bx + bw and by < 480 and by + bh > top - 4 and bn not in ("Ground", "Ceiling") for (bn, bx, by, bw, bh, _o) in self.blocks)
+                    if clear:
+                        self.block(h[0] + "Step", sx, top, self.STEP, 480 - top, style=1)
+                        fixed = True
+                        break
+                else:
+                    print("  !! no room for a step beside", h[0], "in", self.fname)
+                if fixed:
+                    break
+            if not fixed:
+                break
+
     def write(self):
+        self.auto_steps()
         ext = [("level",)] + [(k,) for k in self.used if k != "level"]
         lines = []
         keys = ["level"] + [k for k in self.used if k != "level"]
@@ -668,9 +728,9 @@ color = Color(0.4, 0.62, 0.64, 1)
     L.plank("ChoirGallery", 2800, 398, 150)
     L.block("VaultStep", 4400, 450, 160, 30, style=1)
     # The axe nook: a roofed alcove closed by an illusory wall
-    L.block("NookRoof", 1880, 386, 200, 18)
-    L.block("NookEnd", 2080, 386, 18, 94)
-    L.illusion("NookWall", 1880, 404, 16, 76, "reliquary_axe")
+    L.block("NookBase", 1840, 436, 200, 44, style=1)
+    L.block("NookRoof", 1840, 372, 200, 14)
+    L.illusion("NookWall", 1840, 386, 16, 50, "reliquary_axe")
     # Water
     L.water("StairWater", 420, 468, 600, 12)
     L.water("OssuaryWater", 1000, 464, 800, 16)
@@ -705,13 +765,13 @@ color = Color(0.4, 0.62, 0.64, 1)
     L.enemy("PilgrimVault", "pilgrim", 5010, 480, 40)
     L.enemy("LurkerVault", "lurker", 5080, 480, 0)
     # Hazards: alternating fire jets in the hall, spikes in the vault
-    L.jet("JetA", 1800, 480, 0.0)
-    L.jet("JetB", 1830, 480, 1.5)
+    L.jet("JetA", 1640, 480, 0.0)
+    L.jet("JetB", 1670, 480, 1.5)
     L.jet("JetC", 4800, 480, 0.8, 2.6)
     L.spikes("VaultSpikes", 4720, 480, 48)
     # Chests (the secrets)
     L.chest("PewChest2", 1180, 480, "reliquary_chest", count=2, embers=450, item="it_draught")
-    L.chest("AxeChest", 2010, 480, "reliquary_axe_chest", gear=("weapon", "gravediggers_greataxe"))
+    L.chest("AxeChest", 1990, 436, "reliquary_axe_chest", gear=("weapon", "gravediggers_greataxe"))
     L.chest("ChoirChest", 2900, 398, "reliquary_chest_2", count=1, embers=600, item="it_knot")
     # Boss
     L.arena("AbbotArena", 3560, 480, "abbot", "THE BOOK IS CLOSED", 420, 620)

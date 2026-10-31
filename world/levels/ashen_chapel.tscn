@@ -304,3 +304,24 @@ position = Vector2(3660, 480)
 script = ExtResource("tablet")
 title = "A Flooded Stair"
 text = "A stair runs down behind the vestry, and the bottom steps are underwater. Someone has chalked on the wall: 'THE RELIQUARY. WE BLESSED THE WATER. IT BLESSED US BACK.'"
+
+[node name="ChoirLoftStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1256.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 910
+
+[node name="BellLoftStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2610, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 911
+
+[node name="VestryLoftStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3476.0, 449.0)
+script = ExtResource("block")
+size = Vector2(44.0, 31.0)
+style = 1
+seed_value = 912

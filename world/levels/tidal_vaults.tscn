@@ -389,3 +389,24 @@ gate_height = 96.0
 trigger_offset = 36.0
 trigger_width = 620.0
 victory_text = "SORREL IS NO MORE"
+
+[node name="Loft0Step" type="StaticBody2D" parent="Geometry"]
+position = Vector2(956.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 911
+
+[node name="Loft1Step" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3256.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 912
+
+[node name="Loft2Step" type="StaticBody2D" parent="Geometry"]
+position = Vector2(5750, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 913

@@ -276,3 +276,17 @@ chest_id = &"belfry_cache"
 count = 3
 embers = 1500
 item = ExtResource("it_shard")
+
+[node name="LoftAStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(956.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 909
+
+[node name="LoftBStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1256.0, 436.0)
+script = ExtResource("block")
+size = Vector2(44.0, 44.0)
+style = 1
+seed_value = 910
