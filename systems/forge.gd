@@ -61,7 +61,10 @@ static func entries(kind: String) -> Array[StringName]:
 	var out: Array[StringName] = []
 	var ids: Array[StringName] = Weapons.IDS if kind == "weapon" else Armors.IDS
 	for id in ids:
-		if owns(kind, id) or (RECIPES.has(id) and RECIPES[id].kind == kind):
+		if owns(kind, id):
+			out.append(id)
+	for id in ids:
+		if not owns(kind, id) and RECIPES.has(id) and RECIPES[id].kind == kind:
 			out.append(id)
 	return out
 

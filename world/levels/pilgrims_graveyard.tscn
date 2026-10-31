@@ -225,6 +225,15 @@ count = 3
 embers = 400
 item = ExtResource("it_resin")
 
+[node name="GreatswordChest" type="Area2D" parent="."]
+position = Vector2(1800, 480)
+script = ExtResource("chest")
+chest_id = &"graveyard_greatsword_chest"
+count = 0
+embers = 0
+gear_kind = "weapon"
+gear_id = &"kingsfall_greatsword"
+
 [node name="SextonChest" type="Area2D" parent="."]
 position = Vector2(2560, 480)
 script = ExtResource("chest")

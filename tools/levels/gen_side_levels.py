@@ -72,6 +72,13 @@ EXT = {
     "it_band": ("Resource", "res://data/items/ash_bandage.tres"),
 }
 
+import sys as _sys
+_sys.path.insert(0, os.path.join(ROOT, "tools"))
+import expansion_data as XD
+for _g in XD.BOSSES:
+    for _b in _g:
+        EXT["x_" + _b["id"]] = ("PackedScene", "res://actors/bosses/%s.tscn" % _b["id"])
+
 
 class Level:
     def __init__(self, fname):
@@ -301,6 +308,7 @@ color = Color(0.5, 0.46, 0.56, 1)
     L.enemy("ArcherB", "archer", 1240, 400, 20, -1)
     L.enemy("GildedWarden", "gilded", 1380, 480, 40)
     L.chest("CellarChest", 1090, 480, "cellar_chest", count=3, embers=200, item="it_scrap")
+    L.chest("RapierChest", 800, 480, "cellar_rapier_chest", gear=("weapon", "wayfarers_rapier"))
     L.tablet("CellarLedger", 480, 480, "The Cellar Book",
              "Stock-book of Hollowmere. The last entries are in a steady hand: 'One cask, sound. One cask, sour. The key to the Gallery goes on the hook by the stair, as ever.' Under it, in a different ink: 'Grume has taken the key down to the cold end. He says no one is to be let past him. He means it.'")
     L.arena("CellarerArena", 1560, 480, "cellarer", "THE CELLAR IS QUIET", 380, 640)
@@ -434,6 +442,7 @@ sky_path = NodePath("")
     L.enemy("NightPenitentB", "penitent", 1650, 480, 60, 1, 2)
     L.enemy("NightPikeman", "pikeman", 2450, 480, 60, 1, 2)
     L.chest("GraveChest", 1120, 480, "graveyard_chest", count=3, embers=400, item="it_resin")
+    L.chest("GreatswordChest", 1800, 480, "graveyard_greatsword_chest", gear=("weapon", "kingsfall_greatsword"))
     L.chest("SextonChest", 2560, 480, "graveyard_chest_2", count=1, embers=300, item="it_thorn")
     L.tablet("SextonStone", 700, 480, "A Sexton's Stone",
              "HALE. Sexton of this yard, forty-one years. 'He dug them all and saw them all filled.' Someone has scratched underneath, with a spade-edge: 'Not yet.'")
@@ -874,7 +883,7 @@ PART_SPECS = [
          ground=["pilgrim", "lurker", "pilgrim", "cantor", "lurker", "pilgrim"], step=["pilgrim", "gilded"], loft=["archer", "archer"],
          hazard="water", tabs=("The Pulpit Scrawl", "Scratched under the water line: 'HE IS STILL PREACHING. WE ARE STILL KNEELING. THE WATER HAS REACHED THE SECOND PEW.'", "The Flooded Nave", "The pews are in rows. The rows are under water. The hymn board reads, in drowned numerals: ONE HUNDRED AND FOUR."),
          cands=("Basilica Gate Candle", "Nave Candle")),
-    dict(level="crownless_citadel", name="The Crownless Citadel", node="CrownlessCitadel", prev=("sunken_basilica", None), nxt=None,
+    dict(level="crownless_citadel", name="The Crownless Citadel", node="CrownlessCitadel", prev=("sunken_basilica", None), nxt="weeping_ossuary",
          tint="(0.7, 0.66, 0.78, 1)", pitch=0.6, origin=16800, seed=211, style=1, boss="crownless", text="THE THRONE IS EMPTY",
          ground=["captain", "gilded", "sergeant", "captain", "cantor", "gilded"], step=["captain", "gilded"], loft=["archer", "archer"],
          hazard="jet", tabs=("The Roll of Kings", "A scroll of names, each crossed out. The last has no name, only a crown drawn in ink and left unfinished.", "The Empty Hall", "A long hall of chairs, all facing a throne. On the throne sits nothing, very carefully."),
@@ -961,7 +970,90 @@ color = Color{sp["tint"]}
         L.write()
 
 
+# Which map holds which new weapon (the Descent): index into XD.MAPS -> (weapon id).
+GRAND_WEAPONS = {0: "bone_cleaver", 1: "chandlers_maul", 2: "archivists_needle", 3: "thornwood_sabre",
+                 6: "glasswrights_shards", 10: "vowbreaker"}
+
+
+def grand():
+    """The Descent: eleven long maps (W=7400), each with three boss arenas (mini, mini, main/final)."""
+    n = len(XD.MAPS)
+    for i, mp in enumerate(XD.MAPS):
+        W = 7400
+        key = mp["key"]
+        L = Level(key + ".tscn")
+        L.use("hall")
+        L.node(f'''
+[node name="{mp["node"]}" type="Node2D"]
+script = ExtResource("level")
+level_id = &"{key}"
+display_name = "{mp["name"]}"
+bounds = Rect2(0, 0, {W}, 540)
+music = &"catacombs"
+music_pitch = {round(0.58 - 0.012 * i, 3)}
+map_origin = Vector2({18400 + 1700 * i}, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("hall")
+width = {W}.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = {300 + 17 * i}
+ghosts = 5
+style = {mp["style"]}
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color{mp["tint"]}
+
+[node name="Geometry" type="Node2D" parent="."]''')
+        L.block("CliffLeft", 0, 0, 16, 480)
+        L.block("Ground", 16, 480, W - 16, 60, style=3)
+        L.block("CliffRight", W - 60, 0, 60, 540)
+        L.block("Ceiling", 0, 40, W, 56)
+        prev_path = "res://world/levels/crownless_citadel.tscn" if i == 0 else "res://world/levels/%s.tscn" % XD.MAPS[i - 1]["key"]
+        L.entry("FromPrev", 130, 480, "from_prev")
+        L.walk_exit("ToPrev", 34, 480, prev_path, "from_next")
+        L.entry("FromNext", W - 140, 480, "from_next")
+        if i < n - 1:
+            L.walk_exit("ToNext", W - 90, 480, "res://world/levels/%s.tscn" % XD.MAPS[i + 1]["key"], "from_prev")
+        cands = mp["cands"]
+        for ci, cx in enumerate((300, 1450, 3750, 6050)):
+            L.candle("Candle%d" % ci, cx, 480, "%s_candle_%d" % (key, ci), cands[ci])
+        tabs = mp["tabs"]
+        for ti, tx in enumerate((420, 3500, 5600)):
+            L.tablet("Tablet%d" % ti, tx, 480, tabs[ti][0], tabs[ti][1])
+        g = mp["ground"]
+        for s_i, b in enumerate((0, 2300, 4600)):
+            L.block("Step%d" % s_i, b + 600, 452, 200, 28, style=1)
+            L.plank("Loft%d" % s_i, b + 1000, 400, 150)
+            L.enemy("GroundA%d" % s_i, g[2 * s_i], b + 450, 480, 0 if g[2 * s_i] == "lurker" else 40)
+            L.enemy("GroundB%d" % s_i, g[2 * s_i + 1], b + 1250, 480, 0 if g[2 * s_i + 1] == "lurker" else 40)
+            L.enemy("StepFoe%d" % s_i, mp["step"][s_i % 2], b + 780, 452, 40)
+            L.enemy("Archer%d" % s_i, mp["loft"][s_i % 2], b + 1040, 400, 20, -1)
+            if mp["hazard"] == "spikes":
+                L.spikes("Spikes%d" % s_i, b + 1400, 480, 48)
+            elif mp["hazard"] == "jet":
+                L.jet("JetA%d" % s_i, b + 1380, 480, 0.0)
+                L.jet("JetB%d" % s_i, b + 1420, 480, 1.5)
+            else:
+                L.water("Flood%d" % s_i, b + 1330, 466, 280, 14)
+            L.chest("Chest%d" % s_i, b + 900, 480, "%s_chest_%d" % (key, s_i), count=1 + s_i, embers=900 + 300 * s_i, item=("it_draught", "it_shard", "it_resin")[s_i])
+            L.chest("LoftChest%d" % s_i, b + 1100, 400, "%s_loft_chest_%d" % (key, s_i), count=1, embers=1000 + 200 * i, item=("it_knot", "it_scrap", "it_band")[s_i])
+        L.chest("Cache", 7200, 480, key + "_cache", count=3, embers=2500 + 300 * i, item="it_shard")
+        if i in GRAND_WEAPONS:
+            L.chest("WeaponChest", 7100, 480, key + "_weapon_chest", gear=("weapon", GRAND_WEAPONS[i]))
+        for s_i, b in enumerate((0, 2300, 4600)):
+            bs = XD.BOSSES[i][s_i]
+            word = bs["short"].upper()
+            text = word + (" IS NO MORE" if bs["role"] != "mini" else " FALLS")
+            L.arena("Arena%d" % s_i, b + 1700, 480, "x_" + bs["id"], text, 420, 620)
+        L.write()
+
+
 if __name__ == "__main__":
+    grand()
     trial()
     reliquary()
     keep()

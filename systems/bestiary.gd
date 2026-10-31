@@ -9,6 +9,7 @@ const IDS: Array[StringName] = [
 	&"oathguard", &"mimic", &"hollow_archer", &"candle_cantor", &"gilded_penitent",
 	&"pike_sergeant", &"oathguard_captain", &"bell_bearer", &"drowned_canon",
 	&"cellarer_grume", &"sexton_hale", &"mother_cinder", &"ser_ashfall", &"drowned_pilgrim", &"reliquary_lurker", &"salt_abbot", &"gaoler_vess", &"foundrymaster_brand", &"hollow_regent", &"last_ringer", &"crownless_king", &"drowned_bishop", &"orrerist", &"thornmother", &"bell_warden", &"hollow_marshal",
+	&"skarn_bone_counter", &"marrow_mother_ide", &"ossuary_king_veyl", &"wickmaster_dorr", &"tallow_hound_grise", &"chandler_ulme", &"archivist_pellos", &"the_index", &"chancellor_vorne", &"gardener_hobthorne", &"windfall_twins", &"mother_sylve", &"barker_quill", &"pawnbroker_hask", &"auctioneer_mordant", &"brineknight_calder", &"drowned_cantor_eun", &"admiral_sorrel", &"lensgrinder_fay", &"mirror_knight_ysolde", &"glasswright_orm", &"smelter_brask", &"cinderpriest_imre", &"vowsmith_anaxe", &"sister_quiet", &"brother_lull", &"prioress_silence", &"hollow_houndking", &"bannerbearer_rook", &"pale_sovereign", &"keeper_first_oath", &"the_unsworn", &"the_oath_eternal",
 ]
 const LORE_AT := 1
 const WEAK_AT := 3

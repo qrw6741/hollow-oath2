@@ -127,9 +127,18 @@ func _build_travel() -> void:
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_color_override(&"font_color", Palette.BONE_DIM)
 	_travel_v.add_child(hint)
+	# The list can grow long (dozens of candles), so it lives in a scroll area: mouse wheel,
+	# drag, or simply moving the focus with the keys / stick scrolls it.
+	var sc := ScrollContainer.new()
+	sc.name = &"TravelScroll"
+	sc.custom_minimum_size = Vector2(250, 150)
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sc.follow_focus = true
+	_travel_v.add_child(sc)
 	_travel_list = VBoxContainer.new()
 	_travel_list.add_theme_constant_override(&"separation", 1)
-	_travel_v.add_child(_travel_list)
+	_travel_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sc.add_child(_travel_list)
 	var back := FancyButton.new()
 	back.text = "Back"
 	back.custom_minimum_size = Vector2(230, 15)

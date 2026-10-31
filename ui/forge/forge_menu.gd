@@ -8,6 +8,7 @@ extends CanvasLayer
 
 var is_open := false
 var kind: StringName = &"forge"
+var rows_headers: Array = []
 var tab := "weapon"   ## "weapon" or "armor" (forge only)
 var rows: Array = []  ## [{"id": StringName, "kind": String, "button": Button, "slot": IconSlot}]
 var _panel: ColorRect
@@ -83,9 +84,15 @@ func _ready() -> void:
 	left.custom_minimum_size = Vector2(176, 118)
 	body.add_child(left)
 	UITheme.frame(left)
+	var scroll := ScrollContainer.new()
+	scroll.name = &"ListScroll"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	left.add_child(scroll)
 	_list = VBoxContainer.new()
 	_list.add_theme_constant_override(&"separation", 1)
-	left.add_child(_list)
+	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(_list)
 	var right := PanelContainer.new()
 	right.custom_minimum_size = Vector2(196, 118)
 	body.add_child(right)
@@ -171,8 +178,22 @@ func _build_rows() -> void:
 	for r in rows:
 		(r.row as Node).queue_free()
 	rows.clear()
+	for h in rows_headers:
+		(h as Node).queue_free()
+	rows_headers.clear()
 	var ids: Array = [&"vials"] if kind == &"vials" else Forge.entries(tab)
+	var section := ""
 	for id in ids:
+		if id != &"vials":
+			var sec := "yours" if Forge.owns(tab, id) else "new"
+			if sec != section:
+				section = sec
+				var hl := Label.new()
+				UITheme.title(hl, 7, Palette.GOLD_BRIGHT if sec == "yours" else Palette.CRIMSON_BRIGHT)
+				hl.text = "YOURS - UPGRADE" if sec == "yours" else "NOT OWNED - FORGE A NEW ONE"
+				hl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				_list.add_child(hl)
+				rows_headers.append(hl)
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override(&"separation", 3)
 		var slot := IconSlot.new()
@@ -272,7 +293,7 @@ func _refresh() -> void:
 		var ok := _affordable(r.id)
 		var lv := GameState.flask_level if r.id == &"vials" else (Forge.level_of(tab, r.id) if Forge.owns(tab, r.id) else -1)
 		var nm := "Ember Vials" if r.id == &"vials" else _name_of(r.id)
-		(r.button as Button).text = nm + ("  +%d" % lv if lv >= 0 else "  new")
+		(r.button as Button).text = nm + ("  +%d" % lv if lv >= 0 else "  (not owned)")
 		(r.button as Button).tooltip_text = row_text(r.id)
 		var pl := r.price as Label
 		pl.text = _short_cost(r.id)
@@ -309,7 +330,7 @@ func _describe(id: StringName) -> void:
 	_d_name.text = "Ember Vials" if id == &"vials" else _name_of(id)
 	var owned := id == &"vials" or Forge.owns(tab, id)
 	var lv := GameState.flask_level if id == &"vials" else (Forge.level_of(tab, id) if owned else 0)
-	_d_sub.text = ("Level +%d of +%d" % [lv, Forge.MAX_LEVEL]) if owned else "Not yet forged"
+	_d_sub.text = ("Level +%d of +%d" % [lv, Forge.MAX_LEVEL]) if owned else "You do not own this - it cannot be upgraded until it is forged or found"
 	var sc := _short_cost(id)
 	_d_cost.text = "At its finest" if sc == "MAX" else ("Upgrade: " if owned else "Forge: ") + sc.replace(" + ", " embers + ") + (" resin" if id == &"vials" else " scrap")
 

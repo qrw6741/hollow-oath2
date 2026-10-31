@@ -136,6 +136,13 @@ position = Vector2(4860, 480)
 script = ExtResource("entry")
 entry_id = &"from_next"
 
+[node name="ToNext" type="Area2D" parent="."]
+position = Vector2(4910, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/weeping_ossuary.tscn"
+target_entry = &"from_prev"
+size = Vector2(12, 80)
+
 [node name="GateCandle" parent="." instance=ExtResource("candle")]
 position = Vector2(300, 480)
 checkpoint_id = &"crownless_citadel_gate_candle"

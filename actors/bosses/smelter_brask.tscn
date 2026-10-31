@@ -1,0 +1,72 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://actors/bosses/boss_base.gd" id="1_boss"]
+[ext_resource type="Resource" path="res://data/enemies/smelter_brask.tres" id="2_data"]
+[ext_resource type="Script" path="res://systems/combat/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://systems/combat/hurtbox.gd" id="4_hurtbox"]
+[ext_resource type="Script" path="res://systems/combat/hitbox.gd" id="5_hitbox"]
+[ext_resource type="Script" path="res://systems/combat/attack_runner.gd" id="6_runner"]
+[ext_resource type="Script" path="res://actors/bosses/brute_visual.gd" id="7_visual"]
+[ext_resource type="Resource" path="res://data/attacks/x_heavy_burn_0_0.tres" id="p0"]
+[ext_resource type="Resource" path="res://data/attacks/x_heavy_burn_0_1.tres" id="p1"]
+[ext_resource type="Resource" path="res://data/attacks/x_heavy_burn_0_2.tres" id="p2"]
+[ext_resource type="Resource" path="res://data/attacks/x_heavy_burn_0_3.tres" id="p3"]
+
+[sub_resource type="RectangleShape2D" id="body_shape"]
+size = Vector2(20, 46)
+
+[sub_resource type="RectangleShape2D" id="hurt_shape"]
+size = Vector2(28, 54)
+
+[sub_resource type="RectangleShape2D" id="hit_shape"]
+size = Vector2(56, 44)
+
+[node name="SmelterBrask" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+floor_snap_length = 4.0
+script = ExtResource("1_boss")
+data = ExtResource("2_data")
+patrol_distance = 0.0
+boss_id = &"smelter_brask"
+phase2_attacks = [ExtResource("p0"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3")]
+phase2_threshold = 0.5
+music_pitch = 0.59
+
+[node name="Body" type="CollisionShape2D" parent="."]
+position = Vector2(0, -23)
+shape = SubResource("body_shape")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("4_hurtbox")
+
+[node name="Shape" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -26)
+shape = SubResource("hurt_shape")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+script = ExtResource("5_hitbox")
+
+[node name="Shape" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(34, -24)
+shape = SubResource("hit_shape")
+
+[node name="AttackRunner" type="Node" parent="." node_paths=PackedStringArray("hitbox")]
+script = ExtResource("6_runner")
+hitbox = NodePath("../Hitbox")
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("7_visual")
+style = 13
+custom_coat = Color(0.290, 0.141, 0.094, 1)
+custom_trim = Color(1.000, 0.502, 0.188, 1)
+custom_long = false
+custom_prop = 4
+custom_scale = 1.15

@@ -4,7 +4,7 @@ systems/talisman_data.gd. Run: python3 tools/gen_talismans.py
 Talismans are KEY-kind items (unique); wearing them is handled by systems/talismans.gd.
 Effects: multiplicative names damage, damage_taken, max_health, stamina_regen, run_speed,
 ember_gain, flask_heal, focus_gain, weapon_status; additive names status_resist, parry_focus."""
-import os
+import os, re
 R = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 # id, title, source (boss_id or "elite"), effects, lore, colour
@@ -44,6 +44,40 @@ POTIONS = [  # id, name, desc, colour
  ("potion_focus", "Focus Tincture", "Focus builds 50% faster and a parry gives 8 extra focus for four minutes.", "Color(0.45, 0.55, 0.95, 1)"),
 ]
 DUR = {"potion_might": 240, "potion_ward": 240, "potion_vigor": 300, "potion_swift": 180, "potion_greed": 300, "potion_resolve": 240, "potion_focus": 240}
+
+
+import sys
+sys.path.insert(0, os.path.dirname(__file__))
+import expansion_data as XD
+
+# Talismans for the 33 expansion bosses: 1 effect (mini), 2 (main) or 3 (final).
+_WEIGHT = {"damage": 1.0, "damage_taken": 0.8, "max_health": 1.0, "stamina_regen": 1.5, "run_speed": 0.5, "ember_gain": 1.5,
+           "flask_heal": 1.5, "focus_gain": 2.0, "weapon_status": 3.0, "status_resist": 1.5, "parry_focus": 1.0}
+_ORDER = ["damage", "damage_taken", "max_health", "stamina_regen", "ember_gain", "flask_heal", "focus_gain", "weapon_status", "status_resist", "run_speed", "parry_focus"]
+_NOUN = ["Charm", "Token", "Sigil", "Locket", "Band", "Bead", "Mark", "Pin"]
+_STR = {"mini": 0.05, "main": 0.09, "final": 0.14}
+_N = {"mini": 1, "main": 2, "final": 3}
+_n = 0
+for _mi, _group in enumerate(XD.BOSSES):
+    for _b in _group:
+        sc = _STR[_b["role"]]
+        eff = {}
+        for k in range(_N[_b["role"]]):
+            name = _ORDER[(_n * 3 + k * 4) % len(_ORDER)]
+            w = _WEIGHT[name]
+            if name == "damage_taken":
+                eff[name] = round(1.0 - sc * w, 3)
+            elif name == "status_resist":
+                eff[name] = round(sc * w, 3)
+            elif name == "parry_focus":
+                eff[name] = float(round(sc * 100 / 1.5))
+            else:
+                eff[name] = round(1.0 + sc * w, 3)
+        h = _b["trim"].lstrip("#")
+        col = "Color(%.2f, %.2f, %.2f, 1)" % tuple(int(h[i:i + 2], 16) / 255.0 for i in (0, 2, 4))
+        TAL.append(("tal_x_" + _b["id"], "%s's %s" % (_b["short"], _NOUN[_n % len(_NOUN)]), _b["id"], eff,
+                    "Taken from %s. %s" % (_b["name"], _b["lore"]), col))
+        _n += 1
 
 
 def item(id_, name, desc, col, kind, effect=0, amount=0.0, stack=1):
@@ -89,4 +123,11 @@ const IDS: Array[StringName] = [{ids}]
 const ELITE_POOL: Array[StringName] = [{elite}]
 const POTION_IDS: Array[StringName] = [{potions}]
 ''')
+# keep Items.IDS in step (a class constant cannot be built from another class's constant)
+ip = f"{R}/systems/items/items.gd"
+it = open(ip).read()
+add = [i for i in [t[0] for t in TAL] + [p[0] for p in POTIONS] if f'&"{i}"' not in it]
+if add:
+    it = re.sub(r"(const IDS: Array\[StringName\] = \[.*?)(\])", lambda m: m.group(1) + ", " + ", ".join(f'&"{i}"' for i in add) + m.group(2), it, count=1, flags=re.S)
+    open(ip, "w").write(it)
 print("talismans ok", len(TAL), len(POTIONS))

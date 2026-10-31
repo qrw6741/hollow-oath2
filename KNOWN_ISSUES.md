@@ -165,3 +165,9 @@
 - Potion icons all use one vial picture (colour not varied); talismans use the relic icon style. Placeholder art.
 - Talisman and potion text, drop chances (12% for elites) and recipe costs are untested by a human. The elite pool only drops talismans you do not own yet.
 - Boss Rush grants boss talismans (as it does arts).
+
+## The Descent
+- All 11 maps share one layout template and all 33 bosses are brute-rig recolours with generated attack sets: expect repetition. Balance numbers (hp, embers, talisman strengths) are guesses nobody has played; a full playthrough was not done.
+- Music loops for four tracks were shortened to 32 s (not listened to; a loop seam may be audible). Candle order in the travel list within one map is reversed.
+- The Unsworn ending, new weapon icons (reusing existing shapes) and the 33 talisman emblems (8 generic shapes) are placeholder.
+- Windows build still not launched on Windows; Hall backdrops and the 5-button ending menu were not checked on screen.

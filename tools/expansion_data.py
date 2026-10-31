@@ -1,0 +1,125 @@
+"""Data for 'The Descent': 11 new maps after the Crownless Citadel, each with two mini-bosses and
+one main boss (33 bosses). Used by gen_expansion.py (bosses, talismans, registration),
+gen_talismans.py and levels/gen_side_levels.py (grand())."""
+
+# Level enemy keys: penitent archer cantor gilded pikeman sergeant captain pilgrim lurker bearer moth
+MAPS = [
+ dict(key="weeping_ossuary", name="The Weeping Ossuary", node="WeepingOssuary", tint="(0.82, 0.8, 0.72, 1)", style=1, hazard="spikes",
+      ground=["pilgrim", "lurker", "penitent", "pilgrim", "gilded", "lurker"], step=["captain", "gilded"], loft=["archer", "archer"],
+      tabs=[("The First Shelf", "Skulls on a shelf, each labelled with a trade. The labels are in the same hand. The hand is not human."),
+            ("Marrow Count", "A tally of bones scratched into the wall. It is wrong by one. Someone has added a bone to make it right."),
+            ("The Weeping Wall", "Water runs down the wall from the stone itself. It tastes of salt and of something older than salt.")],
+      cands=["Ossuary Gate Candle", "Charnel Candle", "Marrow Hall Candle", "Reliquary Steps Candle"]),
+ dict(key="tallow_mines", name="The Tallow Mines", node="TallowMines", tint="(0.9, 0.72, 0.5, 1)", style=1, hazard="jet",
+      ground=["pikeman", "sergeant", "bearer", "penitent", "gilded", "sergeant"], step=["captain", "sergeant"], loft=["archer", "cantor"],
+      tabs=[("The Chandlers' Rule", "THE WICK IS THE OATH. THE WAX IS THE OATH-TAKER. Below, in a newer hand: 'We were the wax.'"),
+            ("A Miner's Count", "Forty candles to a shift, one oath to a candle. A tally of men, struck through, to the last page."),
+            ("The Deep Seam", "The wax seam runs on, white and warm, farther than any lamp. It is not a vein. It is a body.")],
+      cands=["Mine Gate Candle", "Tallow Seam Candle", "Wick Hall Candle", "Chandler's Rest Candle"]),
+ dict(key="gilded_archive", name="The Gilded Archive", node="GildedArchive", tint="(0.88, 0.82, 0.6, 1)", style=0, hazard="jet",
+      ground=["cantor", "gilded", "captain", "cantor", "sergeant", "gilded"], step=["captain", "gilded"], loft=["archer", "cantor"],
+      tabs=[("The Reading Rule", "SILENCE. NO ONE MAY READ WHAT IS WRITTEN OF THEM. Every page in the hall has been turned face down."),
+            ("A Catalogue Entry", "Entry 4,411: THE OATH. Held in the usual place. Condition: alive. It has been moved to the usual place."),
+            ("The Index Room", "The index has an index. The index of the index is a single page, blank, with one name pencilled in: yours.")],
+      cands=["Archive Gate Candle", "Reading Room Candle", "Stacks Candle", "Index Candle"]),
+ dict(key="sunless_orchard", name="The Sunless Orchard", node="SunlessOrchard", tint="(0.62, 0.74, 0.6, 1)", style=0, hazard="spikes",
+      ground=["moth", "penitent", "pilgrim", "moth", "lurker", "penitent"], step=["gilded", "captain"], loft=["archer", "archer"],
+      tabs=[("A Gardener's Row", "Rows of trees with grey fruit. Each tree has a name plate. Each plate is a headstone."),
+            ("What the Fruit Is", "The fruit is hard and cold and, when split, full of small teeth. Do not mistake them for seeds."),
+            ("The Last Tree", "The oldest tree has a door in its trunk. The door is locked from the inside.")],
+      cands=["Orchard Gate Candle", "Windfall Candle", "Graft Candle", "Root Hall Candle"]),
+ dict(key="bone_market", name="The Bone Market", node="BoneMarket", tint="(0.85, 0.7, 0.6, 1)", style=1, hazard="water",
+      ground=["pikeman", "pilgrim", "sergeant", "lurker", "penitent", "bearer"], step=["gilded", "sergeant"], loft=["archer", "archer"],
+      tabs=[("A Stall Sign", "BONES, SOUND. BONES, OTHERWISE. NO REFUNDS ON OATHS. A hook beneath holds a coin purse, stitched shut."),
+            ("Ledger of Sales", "Sold: one marrow, one name, one hundred years. The buyer is listed as 'the House'. The house is not listed."),
+            ("The Auction Bell", "The bell has no clapper, but it rings at the hour of every sale, and a sale is always in progress.")],
+      cands=["Market Gate Candle", "Stall Row Candle", "Pawn Candle", "Auction Candle"]),
+ dict(key="tidal_vaults", name="The Tidal Vaults", node="TidalVaults", tint="(0.5, 0.66, 0.8, 1)", style=1, hazard="water",
+      ground=["pilgrim", "lurker", "pilgrim", "cantor", "lurker", "gilded"], step=["pilgrim", "captain"], loft=["archer", "cantor"],
+      tabs=[("High Water Mark", "A line of black on the wall, taller than a man. Beneath, in salt: 'It was never this high before the oath.'"),
+            ("The Fleet Roll", "A list of ships and their crews, all marked 'moored'. None have left. None are listed as lost."),
+            ("The Drowned Dock", "The pier runs on into black water. At the end, a lantern burns without a flame.")],
+      cands=["Vault Gate Candle", "Tide Stair Candle", "Dockside Candle", "Anchor Hall Candle"]),
+ dict(key="shattered_gallery", name="The Shattered Gallery", node="ShatteredGallery", tint="(0.78, 0.74, 0.9, 1)", style=0, hazard="spikes",
+      ground=["gilded", "captain", "cantor", "sergeant", "gilded", "captain"], step=["captain", "gilded"], loft=["archer", "archer"],
+      tabs=[("A Cracked Pane", "Every window is broken from the inside. The glass lies pointing outward, as if something wished to leave."),
+            ("The Glasswright's Note", "I made a mirror that showed the oath as it was. It showed it so well that the oath saw me back."),
+            ("The Long Mirror", "Your reflection is two steps behind you. You are not sure it is yours.")],
+      cands=["Gallery Gate Candle", "Glass Hall Candle", "Lens Room Candle", "Mirror Walk Candle"]),
+ dict(key="forge_of_vows", name="The Forge of Vows", node="ForgeOfVows", tint="(1.0, 0.66, 0.46, 1)", style=1, hazard="jet",
+      ground=["sergeant", "captain", "gilded", "bearer", "pikeman", "sergeant"], step=["captain", "gilded"], loft=["archer", "cantor"],
+      tabs=[("The Smith's Charge", "FOR EACH OATH, ONE LINK. FOR EACH LINK, ONE HAND. The hands are on a rack by the door. They are warm."),
+            ("A Cooling Tray", "A tray of half-made vows, red at the edges. Someone has been working them for a very long time."),
+            ("The Great Anvil", "The anvil is split down the middle. Whatever was forged on it was not meant to be struck.")],
+      cands=["Forge Gate Candle", "Bellows Candle", "Quench Candle", "Anvil Hall Candle"]),
+ dict(key="hush_cloister", name="The Hush Cloister", node="HushCloister", tint="(0.74, 0.8, 0.86, 1)", style=0, hazard="spikes",
+      ground=["pilgrim", "cantor", "penitent", "cantor", "gilded", "pilgrim"], step=["captain", "gilded"], loft=["archer", "archer"],
+      tabs=[("The Rule of Silence", "NO WORD SPOKEN AFTER THE BELL. Under it, scratched: 'It was not a rule. It was a request. We obeyed it forever.'"),
+            ("A Brother's Slate", "The slate says: I have not spoken in sixty years. The slate is very full. The rest is only one word, written over and over."),
+            ("The Quiet Garden", "The garden does not rustle. The birds in it are carved, and each carving has its beak open.")],
+      cands=["Cloister Gate Candle", "Scriptorium Candle", "Quiet Garden Candle", "Chapter House Candle"]),
+ dict(key="barrow_of_kings", name="The Barrow of Kings", node="BarrowOfKings", tint="(0.72, 0.7, 0.78, 1)", style=1, hazard="jet",
+      ground=["captain", "gilded", "sergeant", "pikeman", "captain", "gilded"], step=["captain", "sergeant"], loft=["archer", "cantor"],
+      tabs=[("The Line of Kings", "Eleven kings, eleven niches. The twelfth niche is empty, and carved all around it, as if recently, are fingermarks."),
+            ("A Herald's Roll", "Long live the king. Long live the king. Long live the king. The roll continues for sixty pages, and the king is never named."),
+            ("The Open Sarcophagus", "The lid has been pushed out, not in. Whatever lay here did not need the dead to open it.")],
+      cands=["Barrow Gate Candle", "Herald's Hall Candle", "Kings' Row Candle", "Twelfth Niche Candle"]),
+ dict(key="hollow_heart", name="The Hollow Heart", node="HollowHeart", tint="(0.62, 0.4, 0.5, 1)", style=1, hazard="jet",
+      ground=["captain", "gilded", "lurker", "sergeant", "cantor", "pilgrim"], step=["captain", "gilded"], loft=["archer", "cantor"],
+      tabs=[("The First Oath", "Carved at the entrance, older than the Crown: 'WE SWEAR TO BE KEPT.' It was never an oath of service. It was an oath to be held, and not let go."),
+            ("The Pulse", "The walls beat. Slow, then slower. You realise the beat is the same as your own, and has been since the Citadel."),
+            ("The Last Door", "Beyond it, no sound. The door is open. It has been open since the first oath. Nobody has ever wished to go through.")],
+      cands=["Heart Gate Candle", "First Chamber Candle", "Pulse Candle", "Last Door Candle"]),
+]
+
+# arch: brute | duelist | caster | heavy | stalker.  role: mini | main | final.
+# visual: coat, trim, prop (0-9), long coat?, scale.
+def B(id_, name, short, lore, arch, status, role, coat, trim, prop, long_=True, scale=1.0, drop="ember_shard"):
+    return dict(id=id_, name=name, short=short, lore=lore, arch=arch, status=status, role=role, coat=coat, trim=trim, prop=prop, long=long_, scale=scale, drop=drop)
+
+BOSSES = [
+ # 0 Weeping Ossuary
+ [B("skarn_bone_counter", "Skarn, the Bone-Counter", "Skarn", "He counts the dead. Every time he reaches the end, there is one more, and he starts again.", "heavy", "bleed", "mini", "#4a4438", "#d8d0b8", 4, False, 1.1, "forge_scrap"),
+  B("marrow_mother_ide", "Marrow-Mother Ide", "Ide", "She feeds the shelves. They take what she gives and ask for more.", "caster", "poison", "mini", "#3a3a30", "#a8c070", 3, True, 1.0, "hollow_resin"),
+  B("ossuary_king_veyl", "Veyl, King of the Ossuary", "Veyl", "He was buried first, and has never let a later grave be dug without his leave.", "brute", "bleed", "main", "#2c2824", "#e8e0c8", 7, True, 1.15, "ember_shard")],
+ # 1 Tallow Mines
+ [B("wickmaster_dorr", "Wickmaster Dorr", "Dorr", "He lit the first candle in the mine and never lived to put one out.", "duelist", "burn", "mini", "#4a3020", "#ffb050", 9, True, 1.0, "hollow_resin"),
+  B("tallow_hound_grise", "Grise, the Tallow Hound", "Grise", "Something that was a dog, once, and was poured.", "stalker", "bleed", "mini", "#d8c8a0", "#fff0c0", 1, False, 0.95, "forge_scrap"),
+  B("chandler_ulme", "Chandler Ulme, Lord of Wax", "Ulme", "He swore to give light to the whole kingdom, and has been melting himself to do it.", "heavy", "burn", "main", "#c8b890", "#ffcc60", 2, True, 1.2, "ember_shard")],
+ # 2 Gilded Archive
+ [B("archivist_pellos", "Archivist Pell-Os", "Pell-Os", "Keeper of what no one may read. He has read all of it. He has not stopped screaming for years.", "caster", "none", "mini", "#3a3446", "#e8d890", 8, True, 1.0, "pilgrims_draught"),
+  B("the_index", "The Index", "Index", "A walking catalogue of the dead, bound in the skin of the people it lists.", "duelist", "bleed", "mini", "#5a4a30", "#f0d890", 3, False, 1.05, "ash_bandage"),
+  B("chancellor_vorne", "Chancellor Vorne", "Vorne", "He wrote the law that made the oath binding. He is quite certain he is still correct.", "caster", "frost", "main", "#26283a", "#c8d0f0", 2, True, 1.1, "ember_shard")],
+ # 3 Sunless Orchard
+ [B("gardener_hobthorne", "Gardener Hob-Thorne", "Hob-Thorne", "He tends the trees by hand. The trees, he says, do not need tending, but do not mind.", "brute", "poison", "mini", "#2a3a2a", "#a0d070", 4, False, 1.1, "hollow_resin"),
+  B("windfall_twins", "The Windfall Twins", "Twins", "They fell together and have been one thing since. They do not agree with each other.", "duelist", "poison", "mini", "#4a3a44", "#d890b0", 8, True, 1.0, "stamina_tonic"),
+  B("mother_sylve", "Mother Sylve, the Last Tree", "Sylve", "The orchard's oldest. She has been dead for so long she no longer remembers why she stands.", "heavy", "poison", "main", "#3a2e22", "#70b060", 6, True, 1.25, "ember_shard")],
+ # 4 Bone Market
+ [B("barker_quill", "Barker Quill", "Quill", "He sells what you are about to need. He is never wrong.", "stalker", "bleed", "mini", "#4a2a2a", "#e8b050", 1, True, 1.0, "forge_scrap"),
+  B("pawnbroker_hask", "Pawnbroker Hask", "Hask", "He will take anything in exchange. He has taken a great deal of things from people who did not know they had them.", "duelist", "none", "mini", "#3a3a3a", "#c8c8a0", 5, True, 1.0, "ash_bandage"),
+  B("auctioneer_mordant", "The Auctioneer Mordant", "Mordant", "Going once. Going twice. He has never said the third.", "caster", "burn", "main", "#34202a", "#f0c860", 7, True, 1.15, "ember_shard")],
+ # 5 Tidal Vaults
+ [B("brineknight_calder", "Brine-Knight Calder", "Calder", "He guards the water-gate. The water never asks to be let in; it was here first.", "brute", "frost", "mini", "#2a3a4a", "#a0d0e8", 4, False, 1.1, "forge_scrap"),
+  B("drowned_cantor_eun", "Drowned Cantor Eun", "Eun", "She sings the tide-hymn. The tide has learned the words.", "caster", "frost", "mini", "#223040", "#80c0d0", 8, True, 1.0, "penitents_tear"),
+  B("admiral_sorrel", "Admiral Sorrel of the Drowned Fleet", "Sorrel", "She has never lost a ship. The fleet is at the bottom, still in formation.", "heavy", "frost", "main", "#1c2a3a", "#90c8e0", 2, True, 1.2, "ember_shard")],
+ # 6 Shattered Gallery
+ [B("lensgrinder_fay", "Lens-Grinder Fay", "Fay", "She cut the glass that shows what a thing is. She has not looked in a mirror since.", "caster", "burn", "mini", "#3a3248", "#f0e0ff", 2, True, 1.0, "pilgrims_draught"),
+  B("mirror_knight_ysolde", "Mirror-Knight Ysolde", "Ysolde", "She fights as you do. She has been practising on everyone who came before you.", "duelist", "bleed", "mini", "#c8c8d8", "#ffffff", 5, True, 1.0, "ash_bandage"),
+  B("glasswright_orm", "Glasswright Orm", "Orm", "He built the Gallery to show the world to itself. It showed him instead.", "stalker", "bleed", "main", "#2a2438", "#d0b0f0", 6, True, 1.15, "ember_shard")],
+ # 7 Forge of Vows
+ [B("smelter_brask", "Smelter Brask", "Brask", "He melts down broken promises. There is a great deal of metal in a promise.", "heavy", "burn", "mini", "#4a2418", "#ff8030", 4, False, 1.15, "forge_scrap"),
+  B("cinderpriest_imre", "Cinder-Priest Imre", "Imre", "He blesses the forge each hour, and the forge answers.", "caster", "burn", "mini", "#3a1c14", "#ffc070", 9, True, 1.0, "hollow_resin"),
+  B("vowsmith_anaxe", "The Vowsmith Anaxe", "Anaxe", "She makes the vows. She has never been asked to unmake one, and has never offered.", "brute", "burn", "main", "#3c1a10", "#ffa040", 2, True, 1.25, "ember_shard")],
+ # 8 Hush Cloister
+ [B("sister_quiet", "Sister Quiet", "Quiet", "She has not spoken in sixty years. She is the quiet one. The others are worse.", "stalker", "none", "mini", "#d8d8e0", "#8a90a0", 3, True, 0.95, "ash_bandage"),
+  B("brother_lull", "Brother Lull", "Lull", "He soothes. The sound that follows him is a lullaby, and no one who hears it wakes.", "brute", "frost", "mini", "#9aa0b0", "#e8f0ff", 8, True, 1.1, "stamina_tonic"),
+  B("prioress_silence", "Prioress Silence", "Silence", "The rule of the cloister, given a voice at last, and the voice is a blade.", "duelist", "frost", "main", "#26283a", "#d8e0ff", 7, True, 1.1, "ember_shard")],
+ # 9 Barrow of Kings
+ [B("hollow_houndking", "The Hollow Hound-King", "Hound-King", "The kings kept hounds. The hounds buried their masters, and then each other.", "stalker", "bleed", "mini", "#3a3236", "#c0a070", 1, False, 1.1, "forge_scrap"),
+  B("bannerbearer_rook", "Banner-Bearer Rook", "Rook", "He carries the banner of a kingdom that has no flag any more.", "brute", "none", "mini", "#2a2a3a", "#c04040", 5, True, 1.1, "ash_bandage"),
+  B("pale_sovereign", "The Pale Sovereign", "Sovereign", "The twelfth king. He did not need a crown, because the oath was already on his head.", "duelist", "none", "main", "#d0d0d8", "#202030", 7, True, 1.2, "ember_shard")],
+ # 10 Hollow Heart
+ [B("keeper_first_oath", "Keeper of the First Oath", "Keeper", "He guards the oldest promise in Vaelmoor. It says: do not leave.", "heavy", "none", "mini", "#2a2230", "#d8b8c8", 2, True, 1.2, "pilgrims_draught"),
+  B("the_unsworn", "The Unsworn", "Unsworn", "The only one who ever refused. They have been alone down here since.", "stalker", "bleed", "mini", "#202028", "#f0f0f0", 3, False, 1.0, "ash_bandage"),
+  B("the_oath_eternal", "The Oath Eternal", "Oath", "It is not a god. It is not a king. It is a sentence that has been said so many times it has become a creature.", "heavy", "burn", "final", "#3a1828", "#ff6080", 8, True, 1.3, "ember_shard")],
+]

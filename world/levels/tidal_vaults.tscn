@@ -1,0 +1,373 @@
+[gd_scene load_steps=27 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/drowned_pilgrim.tscn" id="pilgrim"]
+[ext_resource type="PackedScene" path="res://actors/enemies/reliquary_lurker.tscn" id="lurker"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
+[ext_resource type="Script" path="res://world/hazards/water_zone.gd" id="water"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
+[ext_resource type="Resource" path="res://data/items/relic_knot.tres" id="it_knot"]
+[ext_resource type="PackedScene" path="res://actors/enemies/candle_cantor.tscn" id="cantor"]
+[ext_resource type="PackedScene" path="res://actors/enemies/oathguard_captain.tscn" id="captain"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Resource" path="res://data/items/forge_scrap.tres" id="it_scrap"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gilded_penitent.tscn" id="gilded"]
+[ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="it_resin"]
+[ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
+[ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
+[ext_resource type="PackedScene" path="res://actors/bosses/brineknight_calder.tscn" id="x_brineknight_calder"]
+[ext_resource type="PackedScene" path="res://actors/bosses/drowned_cantor_eun.tscn" id="x_drowned_cantor_eun"]
+[ext_resource type="PackedScene" path="res://actors/bosses/admiral_sorrel.tscn" id="x_admiral_sorrel"]
+
+[node name="TidalVaults" type="Node2D"]
+script = ExtResource("level")
+level_id = &"tidal_vaults"
+display_name = "The Tidal Vaults"
+bounds = Rect2(0, 0, 7400, 540)
+music = &"catacombs"
+music_pitch = 0.52
+map_origin = Vector2(26900, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("hall")
+width = 7400.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 385
+ghosts = 5
+style = 1
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.5, 0.66, 0.8, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(7384, 60)
+style = 3
+seed_value = 902
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(7340, 0)
+script = ExtResource("block")
+size = Vector2(60, 540)
+style = 1
+seed_value = 903
+
+[node name="Ceiling" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 40)
+script = ExtResource("block")
+size = Vector2(7400, 56)
+style = 1
+seed_value = 904
+
+[node name="FromPrev" type="Marker2D" parent="."]
+position = Vector2(130, 480)
+script = ExtResource("entry")
+entry_id = &"from_prev"
+
+[node name="ToPrev" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/bone_market.tscn"
+target_entry = &"from_next"
+size = Vector2(12, 80)
+
+[node name="FromNext" type="Marker2D" parent="."]
+position = Vector2(7260, 480)
+script = ExtResource("entry")
+entry_id = &"from_next"
+
+[node name="ToNext" type="Area2D" parent="."]
+position = Vector2(7310, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/shattered_gallery.tscn"
+target_entry = &"from_prev"
+size = Vector2(12, 80)
+
+[node name="Candle0" parent="." instance=ExtResource("candle")]
+position = Vector2(300, 480)
+checkpoint_id = &"tidal_vaults_candle_0"
+display_name = "Vault Gate Candle"
+
+[node name="Candle1" parent="." instance=ExtResource("candle")]
+position = Vector2(1450, 480)
+checkpoint_id = &"tidal_vaults_candle_1"
+display_name = "Tide Stair Candle"
+
+[node name="Candle2" parent="." instance=ExtResource("candle")]
+position = Vector2(3750, 480)
+checkpoint_id = &"tidal_vaults_candle_2"
+display_name = "Dockside Candle"
+
+[node name="Candle3" parent="." instance=ExtResource("candle")]
+position = Vector2(6050, 480)
+checkpoint_id = &"tidal_vaults_candle_3"
+display_name = "Anchor Hall Candle"
+
+[node name="Tablet0" type="Area2D" parent="."]
+position = Vector2(420, 480)
+script = ExtResource("tablet")
+title = "High Water Mark"
+text = "A line of black on the wall, taller than a man. Beneath, in salt: 'It was never this high before the oath.'"
+
+[node name="Tablet1" type="Area2D" parent="."]
+position = Vector2(3500, 480)
+script = ExtResource("tablet")
+title = "The Fleet Roll"
+text = "A list of ships and their crews, all marked 'moored'. None have left. None are listed as lost."
+
+[node name="Tablet2" type="Area2D" parent="."]
+position = Vector2(5600, 480)
+script = ExtResource("tablet")
+title = "The Drowned Dock"
+text = "The pier runs on into black water. At the end, a lantern burns without a flame."
+
+[node name="Step0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(600, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 905
+
+[node name="Loft0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1000, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 906
+one_way = true
+
+[node name="GroundA0" type="Marker2D" parent="."]
+position = Vector2(450, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pilgrim")
+patrol_distance = 40
+start_facing = -1
+
+[node name="GroundB0" type="Marker2D" parent="."]
+position = Vector2(1250, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("lurker")
+patrol_distance = 0
+start_facing = -1
+
+[node name="StepFoe0" type="Marker2D" parent="."]
+position = Vector2(780, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pilgrim")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Archer0" type="Marker2D" parent="."]
+position = Vector2(1040, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="Flood0" type="Area2D" parent="."]
+position = Vector2(1330, 466)
+script = ExtResource("water")
+size = Vector2(280, 14)
+
+[node name="Chest0" type="Area2D" parent="."]
+position = Vector2(900, 480)
+script = ExtResource("chest")
+chest_id = &"tidal_vaults_chest_0"
+count = 1
+embers = 900
+item = ExtResource("it_draught")
+
+[node name="LoftChest0" type="Area2D" parent="."]
+position = Vector2(1100, 400)
+script = ExtResource("chest")
+chest_id = &"tidal_vaults_loft_chest_0"
+count = 1
+embers = 2000
+item = ExtResource("it_knot")
+
+[node name="Step1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2900, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 907
+
+[node name="Loft1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3300, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 908
+one_way = true
+
+[node name="GroundA1" type="Marker2D" parent="."]
+position = Vector2(2750, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pilgrim")
+patrol_distance = 40
+start_facing = -1
+
+[node name="GroundB1" type="Marker2D" parent="."]
+position = Vector2(3550, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoe1" type="Marker2D" parent="."]
+position = Vector2(3080, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Archer1" type="Marker2D" parent="."]
+position = Vector2(3340, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 20
+start_facing = -1
+
+[node name="Flood1" type="Area2D" parent="."]
+position = Vector2(3630, 466)
+script = ExtResource("water")
+size = Vector2(280, 14)
+
+[node name="Chest1" type="Area2D" parent="."]
+position = Vector2(3200, 480)
+script = ExtResource("chest")
+chest_id = &"tidal_vaults_chest_1"
+count = 2
+embers = 1200
+item = ExtResource("it_shard")
+
+[node name="LoftChest1" type="Area2D" parent="."]
+position = Vector2(3400, 400)
+script = ExtResource("chest")
+chest_id = &"tidal_vaults_loft_chest_1"
+count = 1
+embers = 2000
+item = ExtResource("it_scrap")
+
+[node name="Step2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(5200, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 909
+
+[node name="Loft2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(5600, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 910
+one_way = true
+
+[node name="GroundA2" type="Marker2D" parent="."]
+position = Vector2(5050, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("lurker")
+patrol_distance = 0
+start_facing = -1
+
+[node name="GroundB2" type="Marker2D" parent="."]
+position = Vector2(5850, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoe2" type="Marker2D" parent="."]
+position = Vector2(5380, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pilgrim")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Archer2" type="Marker2D" parent="."]
+position = Vector2(5640, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="Flood2" type="Area2D" parent="."]
+position = Vector2(5930, 466)
+script = ExtResource("water")
+size = Vector2(280, 14)
+
+[node name="Chest2" type="Area2D" parent="."]
+position = Vector2(5500, 480)
+script = ExtResource("chest")
+chest_id = &"tidal_vaults_chest_2"
+count = 3
+embers = 1500
+item = ExtResource("it_resin")
+
+[node name="LoftChest2" type="Area2D" parent="."]
+position = Vector2(5700, 400)
+script = ExtResource("chest")
+chest_id = &"tidal_vaults_loft_chest_2"
+count = 1
+embers = 2000
+item = ExtResource("it_band")
+
+[node name="Cache" type="Area2D" parent="."]
+position = Vector2(7200, 480)
+script = ExtResource("chest")
+chest_id = &"tidal_vaults_cache"
+count = 3
+embers = 4000
+item = ExtResource("it_shard")
+
+[node name="Arena0" type="Node2D" parent="."]
+position = Vector2(1700, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("x_brineknight_calder")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "CALDER FALLS"
+
+[node name="Arena1" type="Node2D" parent="."]
+position = Vector2(4000, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("x_drowned_cantor_eun")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "EUN FALLS"
+
+[node name="Arena2" type="Node2D" parent="."]
+position = Vector2(6300, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("x_admiral_sorrel")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "SORREL IS NO MORE"

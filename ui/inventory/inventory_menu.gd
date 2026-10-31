@@ -379,6 +379,8 @@ func _show_weapon(id: StringName) -> void:
 		_w_name.text = "???"
 		_w_state.text = "Not yet found"
 		_w_text.text = "Somewhere in Vaelmoor there is a weapon for this slot. Explore, defeat what guards it, or ask the smith."
+		if Weapons.HINTS.has(id):
+			_w_text.text = "Where to find it: " + String(Weapons.HINTS[id])
 		return
 	var w := Weapons.get_weapon(id)
 	var lvl := GameState.weapon_level(id)

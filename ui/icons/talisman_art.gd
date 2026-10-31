@@ -142,4 +142,44 @@ static func _emblem(ci: CanvasItem, id: StringName, e: Color, c: Color, t: float
 			ci.draw_arc(m + Vector2(0, 1.0), 3.2, 0.3, PI - 0.3, 8, e.darkened(0.2), 0.8)
 			ci.draw_arc(m + Vector2(0, 2.0), 3.8, 0.4, PI - 0.4, 8, e.darkened(0.35), 0.8)
 		_:
-			ci.draw_circle(m, 2.0, e)
+			_generic(ci, id, e, c, t)
+
+
+## Emblems for the generated (expansion) talismans: one of eight shapes picked from the id.
+static func _generic(ci: CanvasItem, id: StringName, e: Color, c: Color, t: float) -> void:
+	var m := M
+	var k := absi(String(id).hash()) % 8
+	match k:
+		0:  # eight-point star
+			var pts := []
+			for i in 16:
+				pts.append(m + Vector2.from_angle(i * TAU / 16.0 - PI / 2.0) * (3.8 if i % 2 == 0 else 1.6))
+			_poly(ci, pts, e)
+		1:  # diamond
+			_poly(ci, [m + Vector2(0, -3.8), m + Vector2(3.0, 0), m + Vector2(0, 3.8), m + Vector2(-3.0, 0)], e)
+			_poly(ci, [m + Vector2(0, -1.6), m + Vector2(1.2, 0), m + Vector2(0, 1.6), m + Vector2(-1.2, 0)], c.darkened(0.5))
+		2:  # triangle with an eye
+			_poly(ci, [m + Vector2(0, -3.8), m + Vector2(3.6, 2.8), m + Vector2(-3.6, 2.8)], e)
+			ci.draw_circle(m + Vector2(0, 0.8), 0.9, c.darkened(0.6))
+		3:  # crescent
+			ci.draw_circle(m, 3.4, e)
+			ci.draw_circle(m + Vector2(1.5, -0.6), 2.9, c.darkened(0.45))
+		4:  # cross
+			_ln(ci, m + Vector2(0, -3.6), m + Vector2(0, 3.6), e, 1.6)
+			_ln(ci, m + Vector2(-3.0, -0.8), m + Vector2(3.0, -0.8), e, 1.6)
+		5:  # spiral
+			var prev := m
+			for i in 20:
+				var a := i * 0.55
+				var p := m + Vector2.from_angle(a) * (0.4 + i * 0.17)
+				ci.draw_line(prev, p, e, 1.1)
+				prev = p
+		6:  # hexagon with a dot
+			var hp := []
+			for i in 6:
+				hp.append(m + Vector2.from_angle(i * TAU / 6.0) * 3.6)
+			_poly(ci, hp, e)
+			ci.draw_circle(m, 1.2, c.darkened(0.55))
+		_:  # eye
+			_poly(ci, [m + Vector2(-3.8, 0), m + Vector2(0, -2.6), m + Vector2(3.8, 0), m + Vector2(0, 2.6)], e)
+			ci.draw_circle(m, 1.3 + 0.2 * sin(t * 3.0), c.darkened(0.6))

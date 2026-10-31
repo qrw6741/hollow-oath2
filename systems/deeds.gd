@@ -22,6 +22,18 @@ const DEFS := {
 	&"orrery_down": {"title": "Time Called", "desc": "Defeat Calloway, the Orrerist."},
 	&"basilica_down": {"title": "Amen", "desc": "Defeat Bishop Anselm."},
 	&"king_down": {"title": "Long Live No One", "desc": "Defeat the Crownless King."},
+	&"x_ossuary_king_veyl": {"title": "Veyl Falls", "desc": "Defeat Veyl, King of the Ossuary."},
+	&"x_chandler_ulme": {"title": "Ulme Falls", "desc": "Defeat Chandler Ulme, Lord of Wax."},
+	&"x_chancellor_vorne": {"title": "Vorne Falls", "desc": "Defeat Chancellor Vorne."},
+	&"x_mother_sylve": {"title": "Sylve Falls", "desc": "Defeat Mother Sylve, the Last Tree."},
+	&"x_auctioneer_mordant": {"title": "Mordant Falls", "desc": "Defeat The Auctioneer Mordant."},
+	&"x_admiral_sorrel": {"title": "Sorrel Falls", "desc": "Defeat Admiral Sorrel of the Drowned Fleet."},
+	&"x_glasswright_orm": {"title": "Orm Falls", "desc": "Defeat Glasswright Orm."},
+	&"x_vowsmith_anaxe": {"title": "Anaxe Falls", "desc": "Defeat The Vowsmith Anaxe."},
+	&"x_prioress_silence": {"title": "Silence Falls", "desc": "Defeat Prioress Silence."},
+	&"x_pale_sovereign": {"title": "Sovereign Falls", "desc": "Defeat The Pale Sovereign."},
+	&"x_the_oath_eternal": {"title": "Oath Falls", "desc": "Defeat The Oath Eternal."},
+	&"giants_25": {"title": "Giant Killer", "desc": "Defeat 25 different bosses."},
 	&"secrets": {"title": "Seeker", "desc": "Find 4 hidden places."},
 	&"all_arts": {"title": "Every Art", "desc": "Learn every art."},
 	&"elite_ten": {"title": "Giant Slayer", "desc": "Slay 10 elite foes."},
@@ -35,7 +47,7 @@ const DEFS := {
 	&"survive_night": {"title": "Night Walker", "desc": "Reach dawn after a night on the road."},
 }
 const ORDER: Array[StringName] = [
-	&"first_blood", &"hundred_dead", &"warden_down", &"marshal_down", &"cellarer_down", &"sexton_down", &"cinder_down", &"ashfall_down", &"abbot_down", &"gaoler_down", &"brand_down", &"regent_down", &"ringer_down", &"gardens_down", &"orrery_down", &"basilica_down", &"king_down", &"secrets", &"all_arts", &"elite_ten",
+	&"first_blood", &"hundred_dead", &"warden_down", &"marshal_down", &"cellarer_down", &"sexton_down", &"cinder_down", &"ashfall_down", &"abbot_down", &"gaoler_down", &"brand_down", &"regent_down", &"ringer_down", &"gardens_down", &"orrery_down", &"basilica_down", &"king_down", &"x_ossuary_king_veyl", &"x_chandler_ulme", &"x_chancellor_vorne", &"x_mother_sylve", &"x_auctioneer_mordant", &"x_admiral_sorrel", &"x_glasswright_orm", &"x_vowsmith_anaxe", &"x_prioress_silence", &"x_pale_sovereign", &"x_the_oath_eternal", &"giants_25", &"secrets", &"all_arts", &"elite_ten",
 	&"errands", &"bestiary_half", &"bestiary_full", &"level_10", &"all_status", &"gallery", &"survive_night", &"ending",
 ]
 
@@ -75,6 +87,18 @@ static func _met(id: StringName) -> bool:
 		&"orrery_down": return _boss("orrerist")
 		&"basilica_down": return _boss("drowned_bishop")
 		&"king_down": return _boss("crownless_king")
+		&"x_ossuary_king_veyl": return _boss("ossuary_king_veyl")
+		&"x_chandler_ulme": return _boss("chandler_ulme")
+		&"x_chancellor_vorne": return _boss("chancellor_vorne")
+		&"x_mother_sylve": return _boss("mother_sylve")
+		&"x_auctioneer_mordant": return _boss("auctioneer_mordant")
+		&"x_admiral_sorrel": return _boss("admiral_sorrel")
+		&"x_glasswright_orm": return _boss("glasswright_orm")
+		&"x_vowsmith_anaxe": return _boss("vowsmith_anaxe")
+		&"x_prioress_silence": return _boss("prioress_silence")
+		&"x_pale_sovereign": return _boss("pale_sovereign")
+		&"x_the_oath_eternal": return _boss("the_oath_eternal")
+		&"giants_25": return Expansion.bosses_defeated() >= 25
 		&"secrets": return Secrets.count() >= Secrets.NEEDED_FOR_DEED
 		&"all_arts": return Arts.learned_count() >= Arts.ORDER.size()
 		&"elite_ten": return Bestiary.kills(&"gilded_penitent") + Bestiary.kills(&"oathguard_captain") + Bestiary.kills(&"pike_sergeant") >= 10

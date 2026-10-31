@@ -83,7 +83,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -2489,7 +2489,7 @@ func test_weapons_tab() -> void:
 		check(inv._w_slots[i].locked == not has, "%s is %s" % [Weapons.IDS[i], "shown" if has else "a grey question mark"])
 	check("%d / %d" % [owned, Weapons.IDS.size()] in inv._w_head.text, "the header counts what you have found")
 	inv._show_weapon(&"cinderbrand")
-	check(inv._w_name.text == "???" and not ("Cinder" in inv._w_text.text), "an unfound weapon reveals nothing")
+	check(inv._w_name.text == "???" and not ("Cinderbrand" in inv._w_text.text) and "Where to find it" in inv._w_text.text, "an unfound weapon reveals nothing")
 	game_state.grant_gear("weapon", &"toll_hammer")
 	inv.show_tab(InventoryMenu.Tab.WEAPONS)
 	var idx := Weapons.IDS.find(&"toll_hammer")
@@ -3923,6 +3923,34 @@ func test_belfry_and_crown() -> void:
 	game_state.set_flag(&"boss_defeated_hollow_regent", true)
 	check(Endings.available(&"crown") and Endings.choose(&"crown") and Endings.chosen() == &"crown", "defeating the Regent unlocks the Crown ending")
 	check(Endings.DEFS[&"crown"].pages.size() >= 3, "the Crown ending has an epilogue")
+	check(Endings.ORDER.has(&"unsworn") and not Endings.available(&"unsworn") and Endings.reason(&"unsworn") != "", "the Unsworn ending is locked until the Oath Eternal falls")
+	game_state.set_flag(&"boss_defeated_the_oath_eternal", true)
+	check(Endings.available(&"unsworn") and Endings.DEFS[&"unsworn"].pages.size() >= 3, "defeating the Oath Eternal unlocks the Unsworn ending")
+	game_state.set_flag(&"boss_defeated_the_oath_eternal", false)
+
+
+func test_descent() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	var keys: Array = []
+	for m in Expansion.MAPS:
+		keys.append(String(m))
+	check(keys.size() >= 10, "the Descent has 10+ new maps (%d)" % keys.size())
+	check(Expansion.BOSSES.size() >= 25, "25+ new bosses (%d)" % Expansion.BOSSES.size())
+	for i in keys.size():
+		var path := "res://world/levels/%s.tscn" % keys[i]
+		await go_to_level(path, &"")
+		check(level.scene_file_path == path and WorldMap.LEVELS.has(path), "%s loads and is on the map" % keys[i])
+		for n in ["FromPrev", "ToPrev", "Arena0", "Arena1", "Arena2", "Candle0", "Candle3", "Tablet2", "Cache"]:
+			check(level.get_node_or_null(n) != null, "%s has %s" % [keys[i], n])
+		check((level.get_node_or_null("ToNext") != null) == (i < keys.size() - 1), "%s chains on correctly" % keys[i])
+		var bad := placement_problems()
+		check(bad.is_empty(), "%s: everything stands on something %s" % [keys[i], bad])
+	for b in Expansion.BOSSES:
+		var id: StringName = b
+		check(Bestiary.IDS.has(id) and Bestiary.data(id) != null, "%s is in the bestiary" % id)
+	for w in Expansion.WEAPONS.keys():
+		check(Weapons.IDS.has(w) and Weapons.HINTS.has(w), "%s is a weapon with a where-to-find hint" % w)
 
 
 func test_four_parts() -> void:
@@ -3937,10 +3965,7 @@ func test_four_parts() -> void:
 		check(level.scene_file_path == path and WorldMap.LEVELS.has(path), "%s loads and is on the map" % chain[i])
 		for n in ["FromPrev", "FromNext", "ToPrev", "GateCandle", "MidCandle", "BossArena", "ChestA", "ChestB", "ChestC", "Cache", "TabletA", "TabletB", "Ground0", "StepFoeA", "LoftArcherA", "RearGuard"]:
 			check(level.get_node_or_null(n) != null, "%s has %s" % [chain[i], n])
-		if i < chain.size() - 1:
-			check(level.get_node_or_null("ToNext") != null, "%s leads on" % chain[i])
-		else:
-			check(level.get_node_or_null("ToNext") == null, "the Citadel is the end of the road")
+		check(level.get_node_or_null("ToNext") != null, "%s leads on" % chain[i])
 		var bad := placement_problems()
 		check(bad.is_empty(), "%s: everything stands on something %s" % [chain[i], bad])
 		var bid: StringName = bosses[chain[i]]

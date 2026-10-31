@@ -119,7 +119,7 @@ func _pick(id: StringName) -> void:
 
 
 ## Each ending tints the screen its own colour, so the epilogue reads as a scene, not a menu.
-const WASH := {&"keep": Color(0.16, 0.05, 0.05, 0.97), &"break": Color(0.03, 0.06, 0.12, 0.97), &"mend": Color(0.13, 0.1, 0.03, 0.97), &"crown": Color(0.12, 0.09, 0.02, 0.97)}
+const WASH := {&"keep": Color(0.16, 0.05, 0.05, 0.97), &"break": Color(0.03, 0.06, 0.12, 0.97), &"mend": Color(0.13, 0.1, 0.03, 0.97), &"crown": Color(0.12, 0.09, 0.02, 0.97), &"unsworn": Color(0.06, 0.08, 0.1, 0.97)}
 
 
 func _wash(id: StringName) -> void:
@@ -153,7 +153,7 @@ func close() -> void:
 	_panel.visible = false
 	get_tree().paused = false
 	GameState.ui_modal = false
-	Events.banner_requested.emit("THE OATH IS %s" % ["KEPT", "BROKEN", "MENDED", "CROWNED"][Endings.ORDER.find(Endings.chosen())])
+	Events.banner_requested.emit("THE OATH IS %s" % ["KEPT", "BROKEN", "MENDED", "CROWNED", "LAID DOWN"][Endings.ORDER.find(Endings.chosen())])
 
 
 func _process(_d: float) -> void:

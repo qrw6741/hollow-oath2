@@ -4,8 +4,14 @@ extends Node2D
 ## style SEXTON: wide hat, long black coat, a grave-spade, a cold blue lantern on the belt.
 ## Telegraphs: overhead (smash) glints = parryable; sweep glows red where it can't be parried.
 
-enum Style { CELLARER, SEXTON, CINDER, ASHFALL, SALT, GAOLER, FOUNDRY, REGENT, RINGER, THORN, IRON, BASILICA, CROWNLESS }
+enum Style { CELLARER, SEXTON, CINDER, ASHFALL, SALT, GAOLER, FOUNDRY, REGENT, RINGER, THORN, IRON, BASILICA, CROWNLESS, CUSTOM }
 @export var style := Style.CELLARER
+## style CUSTOM (the generated expansion bosses): colours, silhouette, a decorative prop and a size.
+@export var custom_coat := Color("2a2530")
+@export var custom_trim := Color("8a7a9a")
+@export var custom_long := true          ## long coat (true) or short apron (false)
+@export_range(0, 9) var custom_prop := 0 ## 0 none 1 horns 2 halo 3 tendrils 4 back spikes 5 wings 6 antlers 7 crown 8 orbs 9 ember eyes
+@export_range(0.8, 1.3) var custom_scale := 1.0
 
 var enemy: EnemyBase
 var _t := 0.0
@@ -19,7 +25,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_t += delta
 	if enemy:
-		scale.x = enemy.facing
+		scale = Vector2(enemy.facing * custom_scale, custom_scale) if style == Style.CUSTOM else Vector2(enemy.facing, 1.0)
 	queue_redraw()
 
 
@@ -114,7 +120,8 @@ func _draw() -> void:
 	var iron := style == Style.IRON
 	var basilica := style == Style.BASILICA
 	var crownless := style == Style.CROWNLESS
-	var sexton := style == Style.SEXTON or ashfall or salt or regent or ringer or thorn or basilica or crownless   # long-coat silhouette with a blade
+	var custom := style == Style.CUSTOM
+	var sexton := style == Style.SEXTON or ashfall or salt or regent or ringer or thorn or basilica or crownless or (custom and custom_long)   # long-coat silhouette with a blade
 	var coat := Color("2a2530") if sexton else Color("5a4a3a")
 	var trim := Color("4a4258") if sexton else Color("8a7a60")
 	if cinder:
@@ -132,6 +139,9 @@ func _draw() -> void:
 	elif foundry:
 		coat = Color("4a2a1e")
 		trim = Color("ff9a3c")
+	elif custom:
+		coat = custom_coat
+		trim = custom_trim
 	elif thorn:
 		coat = Color("3a2a34")
 		trim = Color("c04060")
@@ -202,6 +212,8 @@ func _draw() -> void:
 		for i in 5:
 			var cx := -10.0 + i * 5.0
 			draw_circle(shoulder + Vector2(cx, 10 + sin(_t * 3.0 + i) * 1.5), 1.6, _c(Palette.STEEL, flash, alpha))
+	if custom:
+		_custom_prop(head, shoulder, hip, flash, alpha)
 	# Head
 	draw_circle(head, 5.0, _c(Color("9a8f7c") if not sexton else Color("7a7468"), flash, alpha))
 	if sexton:
@@ -242,3 +254,47 @@ func _draw() -> void:
 	if enemy.is_riposte_ready():
 		var y := -62.0 + sin(_t * 6.0) * 1.5
 		draw_colored_polygon(PackedVector2Array([Vector2(0, y - 4), Vector2(3, y), Vector2(0, y + 4), Vector2(-3, y)]), Palette.GOLD_BRIGHT)
+
+
+## The decorative prop of a CUSTOM boss (see custom_prop). Kept simple: a few shapes each.
+func _custom_prop(head: Vector2, shoulder: Vector2, hip: Vector2, flash: float, alpha: float) -> void:
+	var tc := _c(custom_trim, flash, alpha)
+	match custom_prop:
+		1:  # horns
+			for sx in [-1.0, 1.0]:
+				draw_colored_polygon(PackedVector2Array([head + Vector2(sx * 3.0, -4.0), head + Vector2(sx * 7.5, -11.0), head + Vector2(sx * 5.0, -3.0)]), tc)
+		2:  # halo
+			draw_arc(head + Vector2(0, -9), 6.0, 0.0, TAU, 16, tc, 1.2)
+			draw_circle(head + Vector2(0, -2), 12.0 + sin(_t * 2.0), Color(custom_trim, 0.08 * alpha))
+		3:  # tendrils
+			for i in 5:
+				var sx := -8.0 + i * 4.0
+				var end := shoulder + Vector2(sx * 1.3 + sin(_t * 2.0 + i) * 3.0, 20.0 + (i % 2) * 6.0)
+				draw_line(shoulder + Vector2(sx, 6), end, tc, 1.3)
+		4:  # back spikes
+			for i in 5:
+				var b := shoulder + Vector2(-9.0, 2.0 + i * 4.0)
+				draw_colored_polygon(PackedVector2Array([b, b + Vector2(-7.0, -2.0), b + Vector2(0, 3.0)]), tc)
+		5:  # wings
+			var flap := sin(_t * 2.5) * 3.0
+			for sx in [-1.0, 1.0]:
+				draw_colored_polygon(PackedVector2Array([shoulder + Vector2(sx * 3.0, 4), shoulder + Vector2(sx * 16.0, -8.0 + flap), shoulder + Vector2(sx * 12.0, 8.0), shoulder + Vector2(sx * 5.0, 12.0)]), Color(custom_coat.lightened(0.15), 0.85 * alpha))
+		6:  # antlers
+			for sx in [-1.0, 1.0]:
+				var base := head + Vector2(sx * 3.0, -4.0)
+				draw_line(base, base + Vector2(sx * 3.0, -8.0), tc, 1.2)
+				draw_line(base + Vector2(sx * 1.5, -4.0), base + Vector2(sx * 6.5, -7.0), tc, 1.0)
+				draw_line(base + Vector2(sx * 3.0, -8.0), base + Vector2(sx * 5.0, -12.0), tc, 1.0)
+		7:  # crown
+			for k in 5:
+				var tx := -5.0 + k * 2.5
+				draw_colored_polygon(PackedVector2Array([head + Vector2(tx - 1.2, -4.5), head + Vector2(tx, -9.0 - (k % 2) * 3.0), head + Vector2(tx + 1.2, -4.5)]), tc)
+		8:  # orbiting orbs
+			for i in 3:
+				var a := _t * 1.8 + i * TAU / 3.0
+				var p := head + Vector2(cos(a) * 14.0, sin(a) * 5.0 - 4.0)
+				draw_circle(p, 2.0, tc)
+				draw_circle(p, 4.0, Color(custom_trim, 0.15 * alpha))
+		9:  # ember eyes / smouldering head
+			draw_circle(head, 9.0 + sin(_t * 5.0), Color(1.0, 0.5, 0.15, 0.16 * alpha))
+			draw_circle(head + Vector2(2.0, -0.5), 1.4, Color(1.0, 0.7, 0.2, alpha))

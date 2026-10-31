@@ -2,6 +2,8 @@
 
 A 2D dark-fantasy Soulslike action-platformer built in **Godot 4.3 (GDScript)**, targeting Windows 10/11 64-bit.
 
+**Latest: the Descent.** After the Crownless Citadel the road continues through 11 more maps (Weeping Ossuary to the Hollow Heart) with 33 new bosses and mini-bosses, new talismans and weapons, and a fifth ending. See DEVELOPMENT_LOG.md and KNOWN_ISSUES.md.
+
 **Current state: Milestone 1 vertical slice + save system and main menu (v0.1.0-m1).** The full prologue: three Hollow areas — *The Penitent's Yard* (intro boss: the Bell-Warden), *The Forsaken Village* and *The Drowned Catacombs* (boss: the Drowned Canon) — ending in a light that carries you to *Vaelmoor, Awake*, the real world; three enemy types, six checkpoints, a shortcut, a secret wall, a world map, a hazard, the death/respawn loop, three save slots and a main menu. All art is **temporary procedural placeholder art** (see `docs/ART_BIBLE.md`); audio is synthesised placeholder (see `docs/AUDIO.md`).
 
 ## Run it

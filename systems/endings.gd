@@ -9,7 +9,8 @@ extends RefCounted
 
 const MARSHAL_FLAG := &"boss_defeated_hollow_marshal"
 const REGENT_FLAG := &"boss_defeated_hollow_regent"
-const ORDER: Array[StringName] = [&"keep", &"break", &"mend", &"crown"]
+const ETERNAL_FLAG := &"boss_defeated_the_oath_eternal"
+const ORDER: Array[StringName] = [&"keep", &"break", &"mend", &"crown", &"unsworn"]
 const DEFS := {
 	&"keep": {
 		"title": "Keep the Oath",
@@ -42,6 +43,17 @@ const DEFS := {
 			"You have a court now. It will be a long time before you learn whether it is a kindness to rule the dead.",
 		],
 	},
+	&"unsworn": {
+		"title": "Go Unsworn",
+		"blurb": "Walk back up the Descent with nothing owed to anyone.",
+		"requires": "Defeat the Oath Eternal in the Hollow Heart, at the bottom of the Descent.",
+		"pages": [
+			"At the bottom of the Descent the first oath lay still. It had been a kindness once: two people, a promise, a candle.",
+			"You do not take it up and you do not break it. You carry it to the surface and set it, unopened, on the gate.",
+			"The gate has nothing to hold. It opens the way a hand opens when it has stopped being a fist.",
+			"The sworn walk past you into a morning that owes them nothing. You follow, owing nobody, and it is the lightest thing you have ever carried.",
+		],
+	},
 	&"mend": {
 		"title": "Mend the Oath",
 		"blurb": "Rewrite the struck line. Ommen's hand, and yours.",
@@ -67,6 +79,8 @@ static func gate_open() -> bool:
 static func available(id: StringName) -> bool:
 	if id == &"crown":
 		return bool(GameState.get_flag(REGENT_FLAG, false))
+	if id == &"unsworn":
+		return bool(GameState.get_flag(ETERNAL_FLAG, false))
 	if id != &"mend":
 		return DEFS.has(id)
 	for q in Quests.ORDER:
