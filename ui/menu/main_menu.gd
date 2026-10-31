@@ -81,6 +81,34 @@ func _ready() -> void:
 
 	Events.save_failed.connect(_on_save_failed)
 	open()
+	_intro()
+
+
+## One-time entrance when the game starts: the title column fades up from below, its buttons
+## follow one after another, and the title glow pulses slowly afterwards.
+func _intro() -> void:
+	var col := (_screens[Screen.TITLE] as Control).get_child(0) as Control
+	if col == null:
+		return
+	var kids := col.get_child(0).get_children() if col.get_child_count() > 0 else []
+	var i := 0
+	for k in kids:
+		if not (k is CanvasItem):
+			continue
+		var c := k as CanvasItem
+		c.modulate.a = 0.0
+		var tw := create_tween()
+		tw.tween_interval(0.25 + i * 0.12)
+		tw.tween_property(c, "modulate:a", 1.0, 0.5)
+		i += 1
+	var veil := ColorRect.new()
+	veil.color = Color.BLACK
+	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	(get_node("Root") as Control).add_child(veil)
+	var vt := create_tween()
+	vt.tween_property(veil, "color:a", 0.0, 1.2)
+	vt.tween_callback(veil.queue_free)
 
 
 func _process(_delta: float) -> void:
@@ -124,9 +152,10 @@ func _build_backdrop() -> void:
 	var sky := Node2D.new()
 	sky.set_script(load("res://world/background/sky.gd"))
 	add_child(sky)
-	_ruins(196.0, 120.0, Color("17141c"), Color(0.549, 0.239, 0.133, 0.55), 7, 60.0)
-	_ruins(232.0, 90.0, Color("1d1922"), Color(0, 0, 0, 0), 11, 90.0)
-	_ruins(262.0, 60.0, Color("241f29"), Color(0, 0, 0, 0), 5, 130.0)
+	var layers: Array[Node2D] = []
+	layers.append(_ruins(196.0, 120.0, Color("17141c"), Color(0.549, 0.239, 0.133, 0.55), 7, 60.0))
+	layers.append(_ruins(232.0, 90.0, Color("1d1922"), Color(0, 0, 0, 0), 11, 90.0))
+	layers.append(_ruins(262.0, 60.0, Color("241f29"), Color(0, 0, 0, 0), 5, 130.0))
 	# Foreground: low mist, a stone ledge, and a distant candle glow.
 	var fg := Control.new()
 	fg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -139,11 +168,12 @@ func _build_backdrop() -> void:
 		fg.draw_rect(Rect2(0, 250, 480, 1), Color(Palette.STONE_LIGHT, 0.5))
 		for k in 24:
 			fg.draw_rect(Rect2(k * 21 + 4, 256 + (k % 3) * 4, 14, 1), Color(Palette.STONE, 0.45))
-		for r in [34.0, 22.0, 12.0]:
-			fg.draw_circle(Vector2(412, 247), r, Color(Palette.GOLD, 0.05))
-		fg.draw_rect(Rect2(411, 240, 2, 8), Palette.BONE_DIM)
-		fg.draw_rect(Rect2(411, 237, 2, 3), Palette.GOLD_BRIGHT))
+		fg.draw_rect(Rect2(411, 240, 2, 8), Palette.BONE_DIM))
 	add_child(fg)
+	var anim := MenuAnim.new()
+	anim.name = &"MenuAnim"
+	anim.ruins = layers
+	add_child(anim)
 	var ash := CPUParticles2D.new()
 	ash.position = Vector2(240, -6)
 	ash.amount = 60
@@ -160,7 +190,7 @@ func _build_backdrop() -> void:
 	add_child(ash)
 
 
-func _ruins(base_y: float, height: float, color: Color, window: Color, seed_value: int, spacing: float) -> void:
+func _ruins(base_y: float, height: float, color: Color, window: Color, seed_value: int, spacing: float) -> Node2D:
 	var r := RuinsSilhouette.new()
 	r.width = 700.0
 	r.base_y = base_y
@@ -171,6 +201,7 @@ func _ruins(base_y: float, height: float, color: Color, window: Color, seed_valu
 	r.spacing = spacing
 	r.position.x = -110.0
 	add_child(r)
+	return r
 
 
 func _centered(parent: Control, separation := 4) -> VBoxContainer:

@@ -370,3 +370,8 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Relics: Briar Locket (focus +40%), Orrery Gear (weapon status +50%), Drowned Chalice (vial heal +60%), Oathbreaker's Ring (parry +30 focus). Existing effects, no new hooks. Vesper has lines for each. Deeds for each boss; all four join the Boss Rush (15 bosses now).
 - Tests: test_four_parts (levels, links, placement, registration), test_minibosses extended to every boss.
 - Not done: new enemy types for these regions (they reuse existing ones), NPCs, real art.
+
+## Step: Animated main menu
+- ui/menu/menu_anim.gd (MenuAnim), added by main_menu.gd `_build_backdrop`: twinkling stars, breathing moon halo, two drifting mist bands, a flickering candle, rising embers, a lone lantern-bearer pacing the ledge, slow parallax sway of the three ruin layers. On launch the screen fades up from black and the title column fades in piece by piece (`_intro`). Purely visual, no state.
+- tests/capture_menu.tscn saves three title-screen frames (needs a display). Checked: frames at 8 / 100 / 160 show the fade, the walker and mist moving (software GL under Xvfb). Not checked: on a real Windows display, motion smoothness, or with a controller.
+- Temporary art: the figure and mist are simple procedural shapes.
