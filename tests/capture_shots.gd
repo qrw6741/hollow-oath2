@@ -41,6 +41,8 @@ func _run() -> void:
 			GameFeel.rise(at + Vector2(-50, -6), Palette.EMBER, 16, 12.0)
 			GameFeel.dust(at, 8)
 			await frames(9)
+		if OS.get_environment("WAITF") != "":
+			await frames(int(OS.get_environment("WAITF")))
 		if OS.get_environment("TEXTSHOT") != "":
 			Events.banner_requested.emit("The Drowned Cathedral of the Last Unbroken Vow and Sorrow")
 			Events.tip_requested.emit(&"focus")

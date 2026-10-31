@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -4034,6 +4034,35 @@ func test_qol() -> void:
 	GameFeel.damage_number(Vector2(10, 10), 5.0)
 	settings.damage_numbers = true
 	check(Progress.text() != "", "goal line has text for the map")
+
+
+func test_boss_lines() -> void:
+	var ids: Array[StringName] = []
+	var d := DirAccess.open("res://actors/bosses")
+	for f in d.get_files():
+		if f.ends_with(".tscn"):
+			var sc: PackedScene = load("res://actors/bosses/" + f)
+			var inst := sc.instantiate()
+			ids.append(inst.boss_id)
+			inst.free()
+	check(ids.size() >= 45, "found the boss scenes (%d)" % ids.size())
+	var missing := []
+	for id in ids:
+		if not BossLines.LINES.has(id):
+			missing.append(id)
+		else:
+			var l: Array = BossLines.LINES[id]
+			if l.size() != 5 or String(l[0]) == "":
+				missing.append(String(id) + "(bad)")
+	check(missing.is_empty(), "every boss has 5 voice lines: missing %s" % [missing])
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(RELIQUARY, &"")
+	var sp: BossSpeech = null
+	for c in main.hud.get_children():
+		if c is BossSpeech:
+			sp = c
+	check(sp != null, "the HUD has the boss speech layer")
 
 
 func test_levels_reachable() -> void:

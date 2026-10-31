@@ -451,3 +451,8 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 ## Pop-up text sizing
 - User report: centre pop-ups too large, some off-screen. HUD gets `_fit()` (shrinks font until word-wrapped text fits a box, min 6 px); used for the area banner (16 px base, max 300 px wide), tutorial tips (own dark backing, sits above the interact prompt so they no longer overlap), message panels (max 120 px tall, clamped on screen), boss intro name/lore. Dialogue box shrinks very long lines (max 96 px tall).
 - Verified by screenshot with deliberately over-long banner/tip/message (all inside the screen). Not checked: every real string in the game, other resolutions.
+
+## Boss voice lines
+- `systems/boss_lines.gd` (data): 5 lines for each of the 49 bosses: two on entering the fight, one at the phase change, one on defeat, one when you fall. Unknown ids fall back to a generic set. `ui/hud/boss_speech.gd` shows them as non-blocking subtitles (speaker name + line, queued, fits the screen) with a low-pitched 'talk' blip as a stand-in voice.
+- Verified: `test_boss_lines` (every boss scene has 5 non-empty lines, HUD has the layer; suite 143/143) and a screenshot of the Salt Abbot's intro line. Not verified: the other bosses' lines in-game, and phase/death/fell lines were not seen on screen (only covered by code, not by a fight).
+- **No recorded voice acting**: lines are text. Real voices would need audio assets (or an actor); the system could play them per line with little change.

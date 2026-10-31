@@ -44,6 +44,7 @@ var _status_row: Control
 func _ready() -> void:
 	layer = 10
 	_build()
+	add_child(BossSpeech.new())
 	Events.session_started.connect(_on_session_started)
 	Events.game_saved.connect(_on_game_saved)
 	Events.player_spawned.connect(_bind_player)
