@@ -330,7 +330,7 @@ func _describe(id: StringName) -> void:
 	_d_name.text = "Ember Vials" if id == &"vials" else _name_of(id)
 	var owned := id == &"vials" or Forge.owns(tab, id)
 	var lv := GameState.flask_level if id == &"vials" else (Forge.level_of(tab, id) if owned else 0)
-	_d_sub.text = ("Level +%d of +%d" % [lv, Forge.MAX_LEVEL]) if owned else "You do not own this - it cannot be upgraded until it is forged or found"
+	_d_sub.text = ("Level +%d of +%d" % [lv, Forge.MAX_LEVEL if id == &"vials" else Forge.max_level(tab)]) if owned else "You do not own this - it cannot be upgraded until it is forged or found"
 	var sc := _short_cost(id)
 	_d_cost.text = "At its finest" if sc == "MAX" else ("Upgrade: " if owned else "Forge: ") + sc.replace(" + ", " embers + ") + (" resin" if id == &"vials" else " scrap")
 
@@ -351,7 +351,7 @@ func describe(id: StringName) -> String:
 		var str_bonus := (1.0 + int(GameState.stats.get("strength", 0)) * GameState.STRENGTH_DAMAGE) * w.damage_mult
 		var now := WeaponStats.summary(w, str_bonus * Weapons.level_mult(lv2))
 		var t := w.description + "\n"
-		if Forge.owns("weapon", id) and lv2 < Forge.MAX_LEVEL:
+		if Forge.owns("weapon", id) and lv2 < Forge.MAX_WEAPON:
 			var nxt := WeaponStats.summary(w, str_bonus * Weapons.level_mult(lv2 + 1))
 			t += "Light combo %d -> %d   Heavy %d -> %d" % [now.light_total, nxt.light_total, now.heavy, nxt.heavy]
 		else:
@@ -366,7 +366,7 @@ func describe(id: StringName) -> String:
 	var lv3 := Forge.level_of("armor", id)
 	var d_now := roundi(Armors.damage_mult(id, lv3) * 100.0)
 	var t2 := a.description + "\n"
-	if Forge.owns("armor", id) and lv3 < Forge.MAX_LEVEL:
+	if Forge.owns("armor", id) and lv3 < Forge.MAX_ARMOR:
 		t2 += "Damage taken %d%% -> %d%%   Speed %d%%" % [d_now, roundi(Armors.damage_mult(id, lv3 + 1) * 100.0), roundi(a.run_speed_mult * 100.0)]
 	else:
 		t2 += "Damage taken %d%%   Speed %d%%" % [d_now, roundi(a.run_speed_mult * 100.0)]

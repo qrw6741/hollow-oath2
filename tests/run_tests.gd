@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_ninth_hell_content, test_twin_lords, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -2118,6 +2118,25 @@ func test_difficulty_options() -> void:
 	settings.parry_assist = false
 
 
+func test_fps_cap_default() -> void:
+	var keep_cap: int = settings.fps_cap
+	var cfg := ConfigFile.new()
+	cfg.set_value("video", "fps_cap", 0)
+	cfg.save(settings.PATH)
+	settings.load_settings()
+	check(settings.fps_cap == 60, "an old 'unlimited' config migrates to 60 (%d)" % settings.fps_cap)
+	cfg.set_value("video", "fps_cap_version", 2)
+	cfg.save(settings.PATH)
+	settings.load_settings()
+	check(settings.fps_cap == 0, "unlimited chosen on purpose is kept (%d)" % settings.fps_cap)
+	cfg.set_value("video", "fps_cap", 77)
+	cfg.save(settings.PATH)
+	settings.load_settings()
+	check(settings.fps_cap == 60, "an invalid cap falls back to 60 (%d)" % settings.fps_cap)
+	settings.fps_cap = keep_cap
+	settings.save_settings()
+
+
 func test_settings_tabs() -> void:
 	await fresh_game()
 	var panel := SettingsPanel.new()
@@ -2928,9 +2947,16 @@ func test_forge_rules() -> void:
 	r = Forge.upgrade("weapon", &"oathblade")
 	check(r.ok and game_state.weapon_level(&"oathblade") == 1 and game_state.embers == 9850 and game_state.item_count(&"forge_scrap") == 29, "upgrade spends embers + 1 scrap")
 	check(is_equal_approx(player.attack_runner.damage_bonus, 1.1), "the player gets the stronger blade at once (%.2f)" % player.attack_runner.damage_bonus)
-	for i in 6:
+	for i in 4:
 		Forge.upgrade("weapon", &"oathblade")
-	check(game_state.weapon_level(&"oathblade") == 5 and Forge.upgrade_cost("weapon", &"oathblade").is_empty(), "stops at +5")
+	check(game_state.weapon_level(&"oathblade") == 5 and not Forge.upgrade_cost("weapon", &"oathblade").is_empty(), "+5 is no longer the end of the road")
+	# the old +1..+5 prices are unchanged and +6.. continue upward
+	check(Forge.cost_at("weapon", 0).embers == 150 and Forge.cost_at("weapon", 4).embers == 1200 and Forge.cost_at("weapon", 5).embers > 1200, "old prices kept, +6 onward costs more")
+	game_state.embers = 500000
+	for i in 30:
+		game_state.add_item(&"forge_scrap", 20)   # stacks are capped, so top up as we go
+		Forge.upgrade("weapon", &"oathblade")
+	check(game_state.weapon_level(&"oathblade") == 24 and Forge.upgrade_cost("weapon", &"oathblade").is_empty(), "weapons stop at +24")
 	var e: int = game_state.embers
 	check(not Forge.upgrade("weapon", &"oathblade").ok and game_state.embers == e, "no charge at the maximum")
 	check(not Forge.upgrade("weapon", &"toll_hammer").ok, "cannot upgrade what you do not own")
@@ -2998,7 +3024,7 @@ func test_gear_save() -> void:
 	# Hostile values are cleaned.
 	var bad: Dictionary = saves._normalize({"version": 1, "saved_at": 1, "weapons": {"oathblade": 99, "ghost": 3, "fists": "x"}, "weapon_id": "ghost",
 		"armors": {"duelist": -4, "nope": 1}, "armor_id": "marshal_plate", "flask_level": 77})
-	check(bad.weapons.size() == 1 and bad.weapons.oathblade == 5 and bad.weapon_id == "", "bad weapons dropped / clamped")
+	check(bad.weapons.size() == 1 and bad.weapons.oathblade == Forge.MAX_WEAPON and bad.weapon_id == "", "bad weapons dropped / clamped")
 	check(bad.armors.size() == 1 and bad.armors.duelist == 0 and bad.armor_id == "" and bad.flask_level == 5, "bad armours dropped, bad worn armour reset, vials clamped")
 	game_state.apply_dict(bad, 1)
 	check(game_state.weapon_id == &"oathblade" and game_state.armor_id == &"duelist", "a broken loadout repairs itself")
@@ -4066,6 +4092,12 @@ func test_boss_lines() -> void:
 		if c is BossSpeech:
 			sp = c
 	check(sp != null, "the HUD has the boss speech layer")
+	# subtitles are small and low: no panel, near the bottom, above the boss bars
+	var box := sp.get_node("Box") as Control
+	Events.boss_say.emit("Test", "A short line.", &"")
+	await frames(40)
+	check(box is VBoxContainer and sp._line.get_theme_font_size(&"font_size") <= 7, "boss subtitles are small, movie-style (%d)" % sp._line.get_theme_font_size(&"font_size"))
+	check(box.position.y + box.size.y <= 207.0 and box.position.y > 120.0, "the subtitle sits low, above the boss bars (y %.0f..%.0f)" % [box.position.y, box.position.y + box.size.y])
 
 
 func test_boss_gimmicks() -> void:
@@ -4795,3 +4827,41 @@ func test_travel_scrolls() -> void:
 	await frames(3)
 	check(sc.scroll_vertical >= int(sc.get_v_scroll_bar().max_value) - int(sc.size.y) - 2, "End jumps to the bottom (%d)" % sc.scroll_vertical)
 	cm.close()
+
+
+func test_upgrade_caps() -> void:
+	check(Forge.MAX_WEAPON == 24 and Forge.MAX_ARMOR == 12 and Forge.MAX_LEVEL == 5, "caps: weapons +24, armour +12, vials +5")
+	# strength grows steadily, never falls, and +5 matches the old value
+	var prev := 0.0
+	for l in 25:
+		var m := Weapons.level_mult(l)
+		check(m >= prev, "weapon level %d is at least as strong as the one before" % l)
+		prev = m
+	check(is_equal_approx(Weapons.level_mult(5), 1.5), "weapon +5 is still +50%")
+	check(Weapons.level_mult(24) > Weapons.level_mult(5) + 1.0 and Weapons.level_mult(30) == Weapons.level_mult(24), "weapon +24 is far stronger; levels clamp at 24")
+	var base := Armors.damage_mult(&"sworn_knight", 0)
+	check(is_equal_approx(Armors.damage_mult(&"sworn_knight", 5), base * 0.85), "armour +5 is still 15% less damage")
+	check(Armors.damage_mult(&"sworn_knight", 12) < Armors.damage_mult(&"sworn_knight", 5) and Armors.damage_mult(&"sworn_knight", 99) == Armors.damage_mult(&"sworn_knight", 12), "armour keeps improving to +12 and clamps there")
+	check(Armors.damage_mult(&"sworn_knight", 12) > 0.4 * base, "armour +12 does not make you invulnerable")
+	# costs strictly rise, and the totals are sane
+	var we := 0
+	var ws := 0
+	for l in 24:
+		var c := Forge.cost_at("weapon", l)
+		check(not c.is_empty() and (l == 0 or c.embers > Forge.cost_at("weapon", l - 1).embers), "weapon step %d costs more than the last" % l)
+		we += int(c.embers)
+		ws += int(c.mat)
+	check(Forge.cost_at("weapon", 24).is_empty() and Forge.cost_at("armor", 12).is_empty(), "no cost past the cap")
+	check(we > 50000 and ws > 100, "a +24 weapon is a big investment (%d embers, %d scrap)" % [we, ws])
+	# saving and loading keeps levels above +5, and old saves still load
+	await fresh_game()
+	game_state.grant_gear("weapon", &"oathblade")
+	game_state.grant_gear("armor", &"sworn_knight")
+	game_state.set_gear_level("weapon", &"oathblade", 99)
+	game_state.set_gear_level("armor", &"sworn_knight", 99)
+	check(game_state.weapon_level(&"oathblade") == 24 and game_state.armor_level(&"sworn_knight") == 12, "set_gear_level clamps at 24 / 12")
+	game_state.set_gear_level("weapon", &"oathblade", 17)
+	game_state.set_gear_level("armor", &"sworn_knight", 9)
+	var save_sys := get_tree().root.get_node("SaveSystem")
+	var d: Dictionary = save_sys._normalize(game_state.to_dict())
+	check(int(d["weapons"]["oathblade"]) == 17 and int(d["armors"]["sworn_knight"]) == 9, "levels above +5 survive a save round-trip (%s)" % [d.get("weapons")])

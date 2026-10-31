@@ -492,6 +492,8 @@ func _on_quest(id: StringName, st: String) -> void:
 
 ## Shows a one-time tutorial tip near the bottom of the screen for a few seconds.
 func show_tip(id: StringName) -> void:
+	if _boss_box.visible:
+		return   # no tutorial tips over a boss fight (the tip is not used up: it can show later)
 	if not Tutorial.take(id):
 		return
 	var t: Dictionary = Tutorial.TIPS[id]

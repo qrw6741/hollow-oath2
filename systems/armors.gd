@@ -12,7 +12,8 @@ const NONE: StringName = &"none"
 const NAKED_DAMAGE := 1.35
 const NAKED_SPEED := 1.12
 ## Each upgrade level reduces damage taken by this fraction of the base multiplier.
-const LEVEL_REDUCTION := 0.03
+const LEVEL_REDUCTION := 0.03       ## per level up to +5
+const LEVEL_REDUCTION_LATE := 0.02  ## per level from +6 to +12
 
 static var _cache := {}
 
@@ -46,7 +47,8 @@ static func damage_mult(id: StringName, level: int) -> float:
 	var a := get_armor(id)
 	if a == null:
 		return NAKED_DAMAGE
-	return a.damage_taken_mult * (1.0 - LEVEL_REDUCTION * clampi(level, 0, Forge.MAX_LEVEL))
+	var l := clampi(level, 0, Forge.MAX_ARMOR)
+	return a.damage_taken_mult * (1.0 - LEVEL_REDUCTION * mini(l, 5) - LEVEL_REDUCTION_LATE * maxi(l - 5, 0))
 
 
 static func speed_mult(id: StringName) -> float:

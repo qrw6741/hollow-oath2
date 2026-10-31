@@ -38,7 +38,10 @@ var resolution_index := 2        ## 1920x1080 when windowed.
 var damage_numbers := true       ## Floating damage numbers.
 var glow := true                 ## Bloom / colour grade / grain finishing pass.
 var hires := true                ## true: render at native resolution; false: chunky 480x270 pixels.
-var fps_cap := 0
+## Default 60: an unlimited default made the game render thousands of frames a second whenever vsync was
+## not honoured by the driver/window mode, which can max out the GPU and make the whole PC stutter.
+var fps_cap := 60
+const FPS_BG := 20   ## frame cap while the window is not focused (game is paused-ish anyway)
 var vsync := true
 
 
@@ -71,8 +74,11 @@ func load_settings() -> void:
 	hires = bool(cfg.get_value("video", "hires", hires))
 	glow = bool(cfg.get_value("video", "glow", glow))
 	damage_numbers = bool(cfg.get_value("accessibility", "damage_numbers", damage_numbers))
+	# Config v2: before it, "unlimited" (0) was the untouched default, so an old 0 is not a choice: use 60.
 	var cap := int(cfg.get_value("video", "fps_cap", fps_cap))
-	fps_cap = cap if FPS_CAPS.has(cap) else 0
+	if int(cfg.get_value("video", "fps_cap_version", 1)) < 2 and cap == 0:
+		cap = 60
+	fps_cap = cap if FPS_CAPS.has(cap) else 60
 	vsync = bool(cfg.get_value("video", "vsync", vsync))
 	apply_audio()
 	apply_video()
@@ -99,6 +105,7 @@ func save_settings() -> void:
 	cfg.set_value("video", "glow", glow)
 	cfg.set_value("accessibility", "damage_numbers", damage_numbers)
 	cfg.set_value("video", "fps_cap", fps_cap)
+	cfg.set_value("video", "fps_cap_version", 2)
 	cfg.set_value("video", "vsync", vsync)
 	cfg.save(PATH)
 	apply_audio()
@@ -118,7 +125,7 @@ func apply_audio() -> void:
 ## Applies window mode, resolution, render mode, frame cap and vsync. Safe to call
 ## repeatedly; does nothing to the window when running headless (tests).
 func apply_video() -> void:
-	Engine.max_fps = fps_cap
+	Engine.max_fps = fps_cap if get_window() == null or get_window().has_focus() or DisplayServer.get_name() == "headless" else FPS_BG
 	if DisplayServer.get_name() == "headless":
 		return
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if vsync else DisplayServer.VSYNC_DISABLED)
@@ -143,3 +150,14 @@ func apply_video() -> void:
 			size = Vector2i(int(size.x * fit), int(size.y * fit))
 		w.size = size
 		w.position = screen.position + (screen.size - size) / 2
+
+
+## Window focus: drop to a low frame cap while another window is in front (so alt-tabbing out of the game
+## never leaves a GPU-hungry loop running behind your other programs), restore it when focus returns.
+func _notification(what: int) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		Engine.max_fps = FPS_BG
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN or what == NOTIFICATION_WM_WINDOW_FOCUS_IN:
+		Engine.max_fps = fps_cap

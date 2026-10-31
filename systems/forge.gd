@@ -1,7 +1,7 @@
 class_name Forge
 extends RefCounted
 ## What the Blacksmith and the Vial-Keeper do, as pure rules (the menu only shows them).
-##   - Upgrade a weapon (+1..+5: more damage) or an armour (+1..+5: less damage taken):
+##   - Upgrade a weapon (+1..+24: more damage) or an armour (+1..+12: less damage taken):
 ##     embers + Forge Scrap.
 ##   - Forge a new weapon / armour: embers, and for the great ones a relic you must be
 ##     carrying (it is shown to the smith, not consumed).
@@ -9,9 +9,14 @@ extends RefCounted
 ##     embers + Hollow Resin.
 ## Every function that changes anything spends only on success.
 
+## Upgrade caps. Weapons go to +24, armour to +12; the Ember Vials keep their own +5 (MAX_LEVEL).
+const MAX_WEAPON := 24
+const MAX_ARMOR := 12
 const MAX_LEVEL := 5
 const SCRAP := &"forge_scrap"
 const RESIN := &"hollow_resin"
+## +1..+5 are fixed (older saves paid these); +6 and up are generated: embers climb by a fixed step
+## each level and the scrap bill grows by one every few levels.
 const WEAPON_UPGRADES := [
 	{"embers": 150, "mat": 1}, {"embers": 300, "mat": 2}, {"embers": 500, "mat": 3},
 	{"embers": 800, "mat": 4}, {"embers": 1200, "mat": 6}]
@@ -52,6 +57,23 @@ static func owns(kind: String, id: StringName) -> bool:
 	return GameState.owns_weapon(id) if kind == "weapon" else GameState.owns_armor(id)
 
 
+static func max_level(kind: String) -> int:
+	return MAX_WEAPON if kind == "weapon" else MAX_ARMOR
+
+
+## Cost to go from level `lv` to `lv + 1` ({} past the cap).
+static func cost_at(kind: String, lv: int) -> Dictionary:
+	if lv >= max_level(kind):
+		return {}
+	var table: Array = WEAPON_UPGRADES if kind == "weapon" else ARMOR_UPGRADES
+	if lv < table.size():
+		return table[lv]
+	var k := lv - 4   # 1 for the +5 -> +6 step
+	if kind == "weapon":
+		return {"embers": 1200 + 300 * k, "mat": 6 + k / 3}
+	return {"embers": 960 + 240 * k, "mat": 6 + k / 2}
+
+
 static func level_of(kind: String, id: StringName) -> int:
 	return GameState.weapon_level(id) if kind == "weapon" else GameState.armor_level(id)
 
@@ -71,10 +93,7 @@ static func entries(kind: String) -> Array[StringName]:
 
 ## Cost of the next upgrade: {"embers", "mat"} or {} at the maximum level.
 static func upgrade_cost(kind: String, id: StringName) -> Dictionary:
-	var lv := level_of(kind, id)
-	if lv >= MAX_LEVEL:
-		return {}
-	return (WEAPON_UPGRADES if kind == "weapon" else ARMOR_UPGRADES)[lv]
+	return cost_at(kind, level_of(kind, id))
 
 
 static func vial_cost() -> Dictionary:

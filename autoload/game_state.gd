@@ -324,7 +324,7 @@ func grant_gear(kind: String, id: StringName) -> void:
 func set_gear_level(kind: String, id: StringName, level: int) -> void:
 	var d: Dictionary = weapons if kind == "weapon" else armors
 	if d.has(String(id)):
-		d[String(id)] = clampi(level, 0, Forge.MAX_LEVEL)
+		d[String(id)] = clampi(level, 0, Forge.max_level(kind))
 
 
 # ------------------------------------------------------------------ flags

@@ -189,3 +189,5 @@
 - Ashen Chapel's Reliquary exit is now an interact door; the Ashfall crypt behind the secret wall was only reached up to the wall by the bot, not fought.
 - Morvane is an invented placeholder (name, lore, look): the user has not described their own boss yet. Twin Lords and Nightreaper numbers are guesses; the Nightreaper displays as an axe in hand; voice lines are robotic TTS; the status tip can overlap the two boss bars on first burn.
 - The Twin Lords' hand intro takes about 15 s in real time and cannot be skipped.
+- PC lag report: the FPS-cap default was changed to 60 as the most likely cause, but real-hardware performance is unmeasured. The soak test shows no leak in 2 min of headless play on one map; other maps and boss fights were not soaked. soak.gd ends with a "previously freed" error when the bot leaves the level (believed test artefact).
+- The status tip no longer overlaps boss bars (tips are suppressed during boss fights).

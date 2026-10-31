@@ -228,7 +228,7 @@ func _normalize(d: Dictionary) -> Dictionary:
 	if typeof(d.get("weapons")) == TYPE_DICTIONARY:
 		for k in d["weapons"]:
 			if Weapons.is_valid_id(str(k)) and typeof(d["weapons"][k]) in [TYPE_INT, TYPE_FLOAT]:
-				wp[str(k)] = clampi(int(d["weapons"][k]), 0, Forge.MAX_LEVEL)
+				wp[str(k)] = clampi(int(d["weapons"][k]), 0, Forge.MAX_WEAPON)
 	out["weapons"] = wp
 	var wid := _str(d.get("weapon_id"), "")
 	out["weapon_id"] = wid if wp.has(wid) else ""
@@ -236,7 +236,7 @@ func _normalize(d: Dictionary) -> Dictionary:
 	if typeof(d.get("armors")) == TYPE_DICTIONARY:
 		for k in d["armors"]:
 			if Armors.is_valid_id(str(k)) and typeof(d["armors"][k]) in [TYPE_INT, TYPE_FLOAT]:
-				ar[str(k)] = clampi(int(d["armors"][k]), 0, Forge.MAX_LEVEL)
+				ar[str(k)] = clampi(int(d["armors"][k]), 0, Forge.MAX_ARMOR)
 	out["armors"] = ar
 	var aid := _str(d.get("armor_id"), "")
 	out["armor_id"] = aid if (ar.has(aid) or aid == "none") else ""

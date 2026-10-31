@@ -32,7 +32,8 @@ const HINTS := {
 	&"unkept_blade": "A hidden chest in the Wakeless Court, past the Unkept Promise.",
 }
 ## Each upgrade level adds this fraction of the weapon's base damage.
-const LEVEL_BONUS := 0.10
+const LEVEL_BONUS := 0.10          ## per level up to +5
+const LEVEL_BONUS_LATE := 0.06     ## per level from +6 to +24
 
 static var _cache := {}
 
@@ -51,4 +52,5 @@ static func is_valid_id(id: String) -> bool:
 
 ## Damage multiplier of a weapon at an upgrade level.
 static func level_mult(level: int) -> float:
-	return 1.0 + LEVEL_BONUS * clampi(level, 0, Forge.MAX_LEVEL)
+	var l := clampi(level, 0, Forge.MAX_WEAPON)
+	return 1.0 + LEVEL_BONUS * mini(l, 5) + LEVEL_BONUS_LATE * maxi(l - 5, 0)
