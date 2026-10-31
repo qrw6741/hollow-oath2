@@ -35,6 +35,15 @@ G.enemy("hollow_regent", "The Hollow Regent", "The last king the Keep crowned, a
         ["reg_cut", "reg_thrust", "reg_volley"], 1400, 150, 66, 5000, "relic_regent", "ember_shard")
 G.boss("HollowRegent", "hollow_regent", "hollow_regent", ["reg_cut", "reg_thrust", "reg_volley", "reg_break"], 7, hurt=(26, 54), music_pitch=0.75)
 
+# --- Verger Tolland, the Last Ringer (Drowned Belfry)
+G.attack("ring_toll", "Ringer - Great Toll", "smash", 34, 6, 36, 34, (190, -120), True, (62, 46), (30, -24), amin=0, amax=68, lunge=45, lstart=30, lframes=5, shake=9.0)
+G.attack("ring_clapper", "Ringer - Clapper Sweep", "sweep", 26, 7, 30, 28, (200, -60), False, (88, 30), (36, -20), amin=0, amax=78, w=0.9)
+G.attack("ring_peal", "Ringer - Peal", "throw", 26, 2, 28, 16, (80, -40), True, (4, 4), (0, -34), proj=230.0, amin=90, amax=360, w=1.2, hs=0.05, shake=2.0)
+G.attack("ring_deluge", "Ringer - Falling Bell", "leap", 48, 6, 38, 38, (220, -160), False, (120, 34), (0, -14), track=False, amin=100, amax=320, w=1.0, shake=10.0)
+G.enemy("last_ringer", "Verger Tolland, the Last Ringer", "He rang the Belfry at every vow, then at every funeral, then only for himself. The bell has no clapper now. He is the clapper.",
+        ["ring_toll", "ring_clapper", "ring_peal"], 1200, 120, 56, 4200, "relic_clapper", "ember_shard")
+G.boss("LastRinger", "last_ringer", "last_ringer", ["ring_toll", "ring_clapper", "ring_peal", "ring_deluge"], 8, hurt=(28, 54), music_pitch=0.78)
+
 # --- relic items
 def item(id_, name, desc, col):
     open(f"{R}/data/items/{id_}.tres", "w").write(f'''[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
@@ -55,4 +64,5 @@ icon_color = {col}
 item("relic_shackle", "Gaoler's Shackle", "An iron cuff with a long chain. Resist 30% of every status buildup.", "Color(0.62, 0.64, 0.7, 1)")
 item("relic_slag", "Foundry Ladle", "A ladle fused to its last pour. Ember Vials heal 40% more.", "Color(1.0, 0.55, 0.2, 1)")
 item("relic_regent", "Hollow Crown", "A circlet with no head to wear it. A parry gives 20 extra focus.", "Color(0.85, 0.72, 0.3, 1)")
+item("relic_clapper", "Bell Clapper", "The tongue of a bell that rang itself dumb. Foes pay 35% more embers.", "Color(0.88, 0.7, 0.35, 1)")
 print("keep ok")

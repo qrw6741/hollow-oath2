@@ -100,6 +100,15 @@ const DEFS := {
 		"complete": ["Three. And you walked back dry. Here - the divers would have wanted you to have their share."],
 		"reward": {"embers": 450, "items": {&"hollow_resin": 2, &"ember_shard": 1}},
 	},
+	&"hesk_shackle": {
+		"giver": &"hesk", "after_talks": 1, "title": "The Last Link", "kind": "have",
+		"item": &"relic_shackle", "count": 1,
+		"summary": "Hesk wants to see Vess's shackle, once the Gaoler is down.",
+		"offer": ["Vess wore a shackle on her own wrist. Eleven years and I never saw her take it off. If you are the kind who can take it from her, show it to me. I would like to believe it comes off."],
+		"remind": "Vess's shackle. Show me, if you take it from her.",
+		"complete": ["It came off. I did not think it could. Thank you. I think I can walk through the door now."],
+		"reward": {"embers": 1100, "items": {&"ember_shard": 2, &"stamina_tonic": 2}},
+	},
 	&"pell_signet": {
 		"giver": &"pell", "needs": &"pell_lurkers", "after_talks": 2, "title": "The Abbot's Seal", "kind": "have",
 		"item": &"abbots_signet", "count": 1,
@@ -110,7 +119,7 @@ const DEFS := {
 		"reward": {"embers": 1000, "items": {&"ember_shard": 2, &"stamina_tonic": 3}},
 	},
 }
-const ORDER: Array[StringName] = [&"hobb_scrap", &"wenna_crows", &"ilse_resin", &"ommen_cantors", &"aldous_gallery", &"hobb_sergeants", &"wenna_moths", &"ilse_lantern", &"ommen_draft", &"pell_lurkers", &"pell_signet"]
+const ORDER: Array[StringName] = [&"hobb_scrap", &"wenna_crows", &"ilse_resin", &"ommen_cantors", &"aldous_gallery", &"hobb_sergeants", &"wenna_moths", &"ilse_lantern", &"ommen_draft", &"pell_lurkers", &"pell_signet", &"hesk_shackle"]
 
 
 static func def(id: StringName) -> Dictionary:

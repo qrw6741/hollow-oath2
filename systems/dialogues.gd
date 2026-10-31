@@ -57,6 +57,16 @@ const PELL_GREETINGS := [
 	"If you hear singing from the wall, do not answer it. It likes to be answered.",
 ]
 
+const HESK_FIRST := [
+	"Quiet. Please. Vess counted us every hour for eleven years, and I am not sure she has stopped, even now.",
+	"I was a mason. They put me in a cell I had built myself. I knew which stone was loose and I never touched it. Do not ask me why.",
+]
+const HESK_GREETINGS := [
+	"The cell door is open. I keep checking that it is still open.",
+	"Brand cast the chains but he never asked who they were for. I think that was kindness, of a sort.",
+	"The Regent's court is full. Do not look at them for long. They look back.",
+]
+
 const LANTERN_FIRST := [
 	"Evening. Or morning, if you are being generous. I walk the road when the sun is off it. Someone should.",
 	"I sell what the dark leaves lying about. The prices are lower at night. Nobody is looking, you see.",
@@ -162,6 +172,7 @@ const ARCHIVE := {
 	&"relic_riposte": "A Duellist's Glove. Whoever left this in my Gallery taught fencing, I suspect, to people who would not use it politely.",
 	&"relic_shackle": "Vess's shackle. Every cell in the Keep had a ledger; hers had one entry, repeated. I would not wear it for comfort. It is, however, very good at not being moved.",
 	&"relic_slag": "A foundry ladle. Brand poured the Keep's chains, bells and crowns from it. It still holds the warmth of the last one.",
+	&"relic_clapper": "A bell clapper. Tolland rang every vow in Vaelmoor with this, and then every funeral. It pays well, the way grief does, to those who can bear the weight.",
 	&"relic_regent": "The Hollow Crown. I had hoped it was a legend. Hold it carefully: it rewards those who strike the moment someone else strikes first.",
 	&"sextons_lantern": "The Sexton's lantern. It lit every burial in the Pilgrim's Graveyard for a hundred years. It will light yours too, if you let it - and I would rather you did not.",
 }
@@ -262,6 +273,8 @@ static func conversation(npc: StringName) -> Dictionary:
 			return {"speaker": "Sister Ilse", "lines": ILSE_FIRST if n == 0 else _greeting(npc, ILSE_GREETINGS, n - 1)}
 		&"pell":
 			return {"speaker": "Pell", "lines": PELL_FIRST if n == 0 else [PELL_GREETINGS[(n - 1) % PELL_GREETINGS.size()]]}
+		&"hesk":
+			return {"speaker": "Hesk", "lines": HESK_FIRST if n == 0 else [HESK_GREETINGS[(n - 1) % HESK_GREETINGS.size()]]}
 		&"lantern_man":
 			return {"speaker": "The Lantern-Man", "lines": LANTERN_FIRST if n == 0 else [LANTERN_GREETINGS[(n - 1) % LANTERN_GREETINGS.size()]]}
 		&"aldous":
@@ -277,7 +290,7 @@ static func conversation(npc: StringName) -> Dictionary:
 
 
 static func _speaker_for(npc: StringName) -> String:
-	return {&"ommen": "Ommen", &"wenna": "Wenna", &"hobb": "Hobb", &"ilse": "Sister Ilse", &"aldous": "Aldous Vane", &"lantern_man": "The Lantern-Man", &"pell": "Pell"}.get(npc, "...")
+	return {&"ommen": "Ommen", &"wenna": "Wenna", &"hobb": "Hobb", &"ilse": "Sister Ilse", &"aldous": "Aldous Vane", &"lantern_man": "The Lantern-Man", &"pell": "Pell", &"hesk": "Hesk"}.get(npc, "...")
 
 
 ## Records that the conversation happened (advances the story).

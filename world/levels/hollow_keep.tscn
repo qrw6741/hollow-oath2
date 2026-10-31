@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3]
+[gd_scene load_steps=25 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" path="res://actors/bosses/gaoler_vess.tscn" id="vess"]
 [ext_resource type="PackedScene" path="res://actors/bosses/foundrymaster_brand.tscn" id="brand"]
 [ext_resource type="PackedScene" path="res://actors/bosses/hollow_regent.tscn" id="regent"]
+[ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
 
 [node name="HollowKeep" type="Node2D"]
 script = ExtResource("level")
@@ -309,3 +310,23 @@ gate_height = 96.0
 trigger_offset = 36.0
 trigger_width = 560.0
 victory_text = "THE COURT IS DISMISSED"
+
+[node name="ToBelfry" type="Area2D" parent="."]
+position = Vector2(5880, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/drowned_belfry.tscn"
+target_entry = &"from_keep"
+size = Vector2(12, 80)
+
+[node name="FromBelfry" type="Marker2D" parent="."]
+position = Vector2(5800, 480)
+script = ExtResource("entry")
+entry_id = &"from_belfry"
+
+[node name="Hesk" type="Area2D" parent="."]
+position = Vector2(2010, 480)
+script = ExtResource("npc")
+npc_id = &"hesk"
+display_name = "Hesk"
+look = 1
+start_facing = -1

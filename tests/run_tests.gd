@@ -83,7 +83,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -3757,7 +3757,7 @@ func test_gallery_gate_and_key() -> void:
 func test_minibosses() -> void:
 	await fresh_game()
 	game_state.in_game = true
-	for spec in [["res://actors/bosses/cellarer_grume.tscn", &"gallery_key", &"cellarer"], ["res://actors/bosses/sexton_hale.tscn", &"sextons_lantern", &"gravewarden"], ["res://actors/bosses/mother_cinder.tscn", &"cinder_heart", &"mother_cinder"], ["res://actors/bosses/ser_ashfall.tscn", &"ashfall_seal", &"ser_ashfall"], ["res://actors/bosses/gaoler_vess.tscn", &"relic_shackle", &"gaoler_vess"], ["res://actors/bosses/foundrymaster_brand.tscn", &"relic_slag", &"foundrymaster_brand"], ["res://actors/bosses/hollow_regent.tscn", &"relic_regent", &"hollow_regent"]]:
+	for spec in [["res://actors/bosses/cellarer_grume.tscn", &"gallery_key", &"cellarer"], ["res://actors/bosses/sexton_hale.tscn", &"sextons_lantern", &"gravewarden"], ["res://actors/bosses/mother_cinder.tscn", &"cinder_heart", &"mother_cinder"], ["res://actors/bosses/ser_ashfall.tscn", &"ashfall_seal", &"ser_ashfall"], ["res://actors/bosses/gaoler_vess.tscn", &"relic_shackle", &"gaoler_vess"], ["res://actors/bosses/foundrymaster_brand.tscn", &"relic_slag", &"foundrymaster_brand"], ["res://actors/bosses/hollow_regent.tscn", &"relic_regent", &"hollow_regent"], ["res://actors/bosses/last_ringer.tscn", &"relic_clapper", &"last_ringer"]]:
 		await fresh_game()
 		game_state.in_game = true
 		await place_player(300.0, 480.0, 1)
@@ -3890,6 +3890,39 @@ func test_keep_region() -> void:
 	check(Trials.RUSH_BOSSES.size() >= 10, "the boss rush includes the keep's bosses")
 	for d in [&"gaoler_down", &"brand_down", &"regent_down"]:
 		check(Deeds.DEFS.has(d) and Deeds.ORDER.has(d), "deed %s exists" % d)
+
+
+const BELFRY := "res://world/levels/drowned_belfry.tscn"
+
+
+func test_belfry_and_crown() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(BELFRY, &"")
+	check(level.scene_file_path == BELFRY and WorldMap.LEVELS.has(BELFRY), "the Drowned Belfry loads and is on the map")
+	for n in ["FromKeep", "ToKeep", "BelfryGateCandle", "BellChamberCandle", "RingerArena", "BelfryChest", "LoftChest", "BelfryCache"]:
+		check(level.get_node_or_null(n) != null, "the belfry has %s" % n)
+	var bad := placement_problems()
+	check(bad.is_empty(), "the belfry: everything stands on something %s" % [bad])
+	await go_to_level(KEEP, &"from_belfry")
+	check(level.find_entry(&"from_belfry") != null and level.get_node_or_null("ToBelfry") != null, "the keep links on to the belfry")
+	var hesk := level.get_node_or_null("Hesk")
+	check(hesk != null and Dialogues.conversation(&"hesk").speaker == "Hesk", "Hesk waits in the keep and speaks")
+	check(Quests.DEFS.has(&"hesk_shackle") and Quests.ORDER.has(&"hesk_shackle"), "Hesk has an errand")
+	game_state.set_flag(&"talks_hesk", 1)
+	Quests.start(&"hesk_shackle")
+	game_state.add_item(&"relic_shackle", 1)
+	check(Quests.is_ready(&"hesk_shackle") and Quests.complete(&"hesk_shackle"), "showing the shackle finishes Hesk's errand")
+	check(Bestiary.data(&"last_ringer") != null and Bestiary.data(&"last_ringer").drop_item.id == &"relic_clapper", "the Ringer is in the bestiary and drops the Bell Clapper")
+	check(Relics.DEFS.has(&"relic_clapper"), "the Bell Clapper is a relic")
+	# The fourth ending
+	check(Endings.ORDER.has(&"crown") and not Endings.available(&"crown"), "the Crown ending is locked at first")
+	check(Endings.reason(&"crown") != "", "and says what it needs")
+	game_state.set_flag(&"boss_defeated_hollow_marshal", true)
+	check(not Endings.available(&"crown"), "the Marshal alone does not unlock it")
+	game_state.set_flag(&"boss_defeated_hollow_regent", true)
+	check(Endings.available(&"crown") and Endings.choose(&"crown") and Endings.chosen() == &"crown", "defeating the Regent unlocks the Crown ending")
+	check(Endings.DEFS[&"crown"].pages.size() >= 3, "the Crown ending has an epilogue")
 
 
 func test_lurker_ambush() -> void:

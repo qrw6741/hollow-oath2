@@ -147,3 +147,8 @@
 - Boss balance (HP, damage, timings) is untested by a human. Only automated tests ran: they check the bosses attack, hurt, change phase and drop their relic, not that the fights are fun or fair.
 - The three relics reuse existing effects (status resist, flask heal, parry focus), so they stack in a similar way to the older relics.
 - Windows build still not launched on Windows.
+
+## Drowned Belfry / Crown ending
+- Last Ringer is another brute recolour (placeholder, bell prop); its balance is a first guess and untested by a human.
+- The Crown ending's epilogue text and tint are first drafts; the ending menu now has four buttons and was not checked visually.
+- The "Mend" ending now needs Hesk's errand, so it needs Vess killed in the Keep. Intentional, but worth knowing.

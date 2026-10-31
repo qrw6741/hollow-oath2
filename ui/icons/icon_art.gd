@@ -50,7 +50,7 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"ashfall_seal", &"lurker_fang", &"cantors_wick", &"abbots_signet": _relic(ci, id, t)
 		&"hollow_resin": _resin(ci)
 		&"vial": _vial(ci)
-		&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte", &"relic_shackle", &"relic_slag", &"relic_regent": _relic(ci, id, t)
+		&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte", &"relic_shackle", &"relic_slag", &"relic_regent", &"relic_clapper": _relic(ci, id, t)
 		&"wayfarers_rapier": _rapier(ci)
 		&"kingsfall_greatsword", &"cinderbrand": _greatsword(ci)
 		&"toll_hammer": _hammer(ci)

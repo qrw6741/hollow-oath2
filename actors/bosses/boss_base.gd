@@ -182,6 +182,11 @@ func _on_died() -> void:
 	roaring = false
 	leaping = false
 	GameState.set_flag(defeat_flag(), true)
+	# A boss dying is an event: a long freeze, a heavy shake and a burst of sparks.
+	GameFeel.hit_stop(0.3)
+	GameFeel.shake(12.0, 0.7)
+	for i in 3:
+		GameFeel.spark(global_position + Vector2(randf_range(-14, 14), -26 + randf_range(-14, 14)), Palette.EMBER, 14)
 	Events.boss_defeated.emit(boss_id)
 
 

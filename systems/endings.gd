@@ -8,7 +8,8 @@ extends RefCounted
 ##   mend - rewrite the last line, as Ommen once did.   needs every errand done + the Gallery opened
 
 const MARSHAL_FLAG := &"boss_defeated_hollow_marshal"
-const ORDER: Array[StringName] = [&"keep", &"break", &"mend"]
+const REGENT_FLAG := &"boss_defeated_hollow_regent"
+const ORDER: Array[StringName] = [&"keep", &"break", &"mend", &"crown"]
 const DEFS := {
 	&"keep": {
 		"title": "Keep the Oath",
@@ -28,6 +29,17 @@ const DEFS := {
 			"It does not shatter. It simply stops being carried. All along the road, something unclenches.",
 			"The sworn sit down where they stand. The candles gutter, and for the first time in years the dark is only dark.",
 			"It is a cold dawn. It is also a real one.",
+		],
+	},
+	&"crown": {
+		"title": "Take the Crown",
+		"blurb": "Wear the Hollow Crown. Rule what is left.",
+		"requires": "Defeat the Hollow Regent in the Hollow Keep.",
+		"pages": [
+			"You carry the Hollow Crown to the gate and set it on your own head. It is lighter than a vow, and hungrier.",
+			"The gate bows. Not in worship: in recognition, the way a lock knows a key that has been cut to fit it.",
+			"The sworn rise in their rows and turn to face you. They do not ask what you will command. They only wait.",
+			"You have a court now. It will be a long time before you learn whether it is a kindness to rule the dead.",
 		],
 	},
 	&"mend": {
@@ -53,6 +65,8 @@ static func gate_open() -> bool:
 
 
 static func available(id: StringName) -> bool:
+	if id == &"crown":
+		return bool(GameState.get_flag(REGENT_FLAG, false))
 	if id != &"mend":
 		return DEFS.has(id)
 	for q in Quests.ORDER:

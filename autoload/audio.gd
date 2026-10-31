@@ -25,7 +25,7 @@ const VOICES := {
 	&"oathguard_captain": &"voice_growl", &"pike_sergeant": &"voice_growl", &"gilded_penitent": &"voice_growl",
 	&"ember_acolyte": &"voice_hiss", &"candle_cantor": &"voice_chant", &"hollow_archer": &"archer_twang",
 	&"mother_cinder": &"voice_hiss", &"ser_ashfall": &"voice_growl",
-	&"gaoler_vess": &"voice_growl", &"foundrymaster_brand": &"voice_growl", &"hollow_regent": &"voice_hiss",
+	&"gaoler_vess": &"voice_growl", &"foundrymaster_brand": &"voice_growl", &"hollow_regent": &"voice_hiss", &"last_ringer": &"voice_growl",
 }
 var _last_step := -1
 

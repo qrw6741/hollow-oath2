@@ -4,7 +4,7 @@ extends Node2D
 ## style SEXTON: wide hat, long black coat, a grave-spade, a cold blue lantern on the belt.
 ## Telegraphs: overhead (smash) glints = parryable; sweep glows red where it can't be parried.
 
-enum Style { CELLARER, SEXTON, CINDER, ASHFALL, SALT, GAOLER, FOUNDRY, REGENT }
+enum Style { CELLARER, SEXTON, CINDER, ASHFALL, SALT, GAOLER, FOUNDRY, REGENT, RINGER }
 @export var style := Style.CELLARER
 
 var enemy: EnemyBase
@@ -109,7 +109,8 @@ func _draw() -> void:
 	var gaoler := style == Style.GAOLER
 	var foundry := style == Style.FOUNDRY
 	var regent := style == Style.REGENT
-	var sexton := style == Style.SEXTON or ashfall or salt or regent   # long-coat silhouette with a blade
+	var ringer := style == Style.RINGER
+	var sexton := style == Style.SEXTON or ashfall or salt or regent or ringer   # long-coat silhouette with a blade
 	var coat := Color("2a2530") if sexton else Color("5a4a3a")
 	var trim := Color("4a4258") if sexton else Color("8a7a60")
 	if cinder:
@@ -127,6 +128,9 @@ func _draw() -> void:
 	elif foundry:
 		coat = Color("4a2a1e")
 		trim = Color("ff9a3c")
+	elif ringer:
+		coat = Color("5a4630")
+		trim = Color("e0b060")
 	elif regent:
 		coat = Color("24202e")
 		trim = Color("d8b44c")
@@ -156,6 +160,11 @@ func _draw() -> void:
 	if foundry:
 		for i in 4:
 			draw_circle(hip + Vector2(-9 + i * 6, 6 - absf(sin(_t * 4.0 + i)) * 4.0), 1.2, Color(1.0, 0.6, 0.2, 0.8 * alpha))
+	if ringer:
+		# A bronze bell hung at the hip, swinging with the stride.
+		var bp := hip + Vector2(-10, 4 + sin(_t * 2.5) * 1.5)
+		draw_colored_polygon(PackedVector2Array([bp + Vector2(-3, -4), bp + Vector2(3, -4), bp + Vector2(5, 4), bp + Vector2(-5, 4)]), _c(Color("c89a48"), flash, alpha))
+		draw_circle(bp + Vector2(0, 5), 1.2, _c(Palette.INK, flash, alpha))
 	if gaoler:
 		for i in 5:
 			var cx := -10.0 + i * 5.0

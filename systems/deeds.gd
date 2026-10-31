@@ -17,6 +17,7 @@ const DEFS := {
 	&"gaoler_down": {"title": "Unchained", "desc": "Defeat Gaoler Vess."},
 	&"brand_down": {"title": "Furnace Out", "desc": "Defeat Foundrymaster Brand."},
 	&"regent_down": {"title": "Long Live Nobody", "desc": "Defeat the Hollow Regent."},
+	&"ringer_down": {"title": "Silence in the Tower", "desc": "Defeat the Last Ringer."},
 	&"secrets": {"title": "Seeker", "desc": "Find 4 hidden places."},
 	&"all_arts": {"title": "Every Art", "desc": "Learn every art."},
 	&"elite_ten": {"title": "Giant Slayer", "desc": "Slay 10 elite foes."},
@@ -30,7 +31,7 @@ const DEFS := {
 	&"survive_night": {"title": "Night Walker", "desc": "Reach dawn after a night on the road."},
 }
 const ORDER: Array[StringName] = [
-	&"first_blood", &"hundred_dead", &"warden_down", &"marshal_down", &"cellarer_down", &"sexton_down", &"cinder_down", &"ashfall_down", &"abbot_down", &"gaoler_down", &"brand_down", &"regent_down", &"secrets", &"all_arts", &"elite_ten",
+	&"first_blood", &"hundred_dead", &"warden_down", &"marshal_down", &"cellarer_down", &"sexton_down", &"cinder_down", &"ashfall_down", &"abbot_down", &"gaoler_down", &"brand_down", &"regent_down", &"ringer_down", &"secrets", &"all_arts", &"elite_ten",
 	&"errands", &"bestiary_half", &"bestiary_full", &"level_10", &"all_status", &"gallery", &"survive_night", &"ending",
 ]
 
@@ -65,6 +66,7 @@ static func _met(id: StringName) -> bool:
 		&"gaoler_down": return _boss("gaoler_vess")
 		&"brand_down": return _boss("foundrymaster_brand")
 		&"regent_down": return _boss("hollow_regent")
+		&"ringer_down": return _boss("last_ringer")
 		&"secrets": return Secrets.count() >= Secrets.NEEDED_FOR_DEED
 		&"all_arts": return Arts.learned_count() >= Arts.ORDER.size()
 		&"elite_ten": return Bestiary.kills(&"gilded_penitent") + Bestiary.kills(&"oathguard_captain") + Bestiary.kills(&"pike_sergeant") >= 10

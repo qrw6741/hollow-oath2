@@ -355,3 +355,11 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Registered in: Bestiary, Deeds (Unchained, Furnace Out, Long Live Nobody), Audio voices, Boss Rush (now 10 bosses), World map, item icons.
 - Tests: test_minibosses covers the three bosses (two-phase, attacks, hurts the player, drop, archive line); new test_keep_region (level, placement, links, registration).
 - Balance numbers are first guesses; none of the three bosses has been fought by a person.
+
+## Step: Drowned Belfry, Crown ending, Hesk, boss-death feel
+- **The Drowned Belfry** (world/levels/drowned_belfry.tscn, `belfry()` in gen_side_levels.py): entered from the east end of the Hollow Keep (`ToBelfry` / `from_belfry`). Reuses bell bearers, moths, elites, cantor, pilgrim; fire jets and spikes. Boss **Verger Tolland, the Last Ringer** (tools/gen_keep.py, brute_visual style RINGER, 1200 HP) drops the **Bell Clapper** relic (foes pay 35% more embers). Deed "Silence in the Tower"; in the Boss Rush (now 11 bosses).
+- **Fourth ending, "Take the Crown"** (systems/endings.gd): unlocked by defeating the Hollow Regent (flag boss_defeated_hollow_regent); tint and banner added. No save-format change.
+- **Hesk**, a freed prisoner in the Keep, with one errand ("The Last Link": show him Vess's Shackle). Note: Quests.ORDER grew by one, so the "Mend" ending and the "Good Neighbour" deed now also need this errand, which needs the Gaoler dead.
+- **Boss death feel**: a 0.3 s freeze, a heavy shake and a spark burst when any boss dies (honours the hit-stop and screen-shake settings).
+- Not done: shortcut gates (candles already work as fast travel, the new levels are linear), real art, audio rework, GitHub.
+- Tests: new test_belfry_and_crown; test_minibosses covers the Ringer.

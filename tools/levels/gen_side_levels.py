@@ -53,6 +53,9 @@ EXT = {
     "abbot": ("PackedScene", "res://actors/bosses/salt_abbot.tscn"),
     "vess": ("PackedScene", "res://actors/bosses/gaoler_vess.tscn"),
     "brand": ("PackedScene", "res://actors/bosses/foundrymaster_brand.tscn"),
+    "ringer": ("PackedScene", "res://actors/bosses/last_ringer.tscn"),
+    "bearer": ("PackedScene", "res://actors/enemies/bell_bearer.tscn"),
+    "moth": ("PackedScene", "res://actors/enemies/gloam_moth.tscn"),
     "regent": ("PackedScene", "res://actors/bosses/hollow_regent.tscn"),
     "it_wick": ("Resource", "res://data/items/cantors_wick.tres"),
     "it_knot": ("Resource", "res://data/items/relic_knot.tres"),
@@ -246,6 +249,7 @@ GRAVE = "res://world/levels/pilgrims_graveyard.tscn"
 CHAPEL = "res://world/levels/ashen_chapel.tscn"
 RELIQUARY = "res://world/levels/sunken_reliquary.tscn"
 KEEP = "res://world/levels/hollow_keep.tscn"
+BELFRY = "res://world/levels/drowned_belfry.tscn"
 
 
 # ------------------------------------------------------------------ the cellar
@@ -777,6 +781,74 @@ color = Color(0.7, 0.56, 0.5, 1)
     L.arena("VessArena", 1300, 480, "vess", "THE CHAIN IS SLACK", 420, 620)
     L.arena("BrandArena", 3250, 480, "brand", "THE FURNACE GOES COLD", 420, 620)
     L.arena("RegentArena", 5000, 480, "regent", "THE COURT IS DISMISSED", 420, 560)
+    L.walk_exit("ToBelfry", 5880, 480, BELFRY, "from_keep")
+    L.entry("FromBelfry", 5800, 480, "from_belfry")
+    L.npc("Hesk", 2010, "hesk", "Hesk", 1, -1)
+    L.write()
+
+
+def belfry():
+    W = 4800
+    L = Level("drowned_belfry.tscn")
+    L.use("hall")
+    L.node(f'''
+[node name="DrownedBelfry" type="Node2D"]
+script = ExtResource("level")
+level_id = &"drowned_belfry"
+display_name = "The Drowned Belfry"
+bounds = Rect2(0, 0, {W}, 540)
+music = &"catacombs"
+music_pitch = 0.68
+map_origin = Vector2(10400, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("hall")
+width = {W}.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 133
+ghosts = 6
+style = 1
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.66, 0.62, 0.78, 1)
+
+[node name="Geometry" type="Node2D" parent="."]''')
+    L.block("CliffLeft", 0, 0, 16, 480)
+    L.block("Ground", 16, 480, W - 16, 60, style=3)
+    L.block("CliffRight", W - 60, 0, 60, 540)
+    L.block("Ceiling", 0, 40, W, 56)
+    L.block("StairA", 600, 452, 200, 28, style=1)
+    L.plank("LoftA", 1000, 400, 150)
+    L.plank("LoftB", 1300, 392, 130)
+    L.block("StairB", 1750, 450, 200, 30, style=1)
+    L.entry("FromKeep", 130, 480, "from_keep")
+    L.walk_exit("ToKeep", 34, 480, KEEP, "from_belfry")
+    L.candle("BelfryGateCandle", 300, 480, "belfry_gate_candle", "Belfry Gate Candle")
+    L.candle("BellChamberCandle", 2050, 480, "belfry_mid_candle", "Bell Chamber Candle")
+    L.tablet("RingersBoard", 420, 480, "The Ringers' Board",
+             "A board of names, each with a number of strokes. Tolland's has no number. It says: 'Until relieved.' No one relieved him.")
+    L.tablet("CrackedBell", 4000, 480, "The Cracked Bell",
+             "The great bell lies on its side, its tongue gone. The stone around it is worn smooth by hands that came to listen to nothing.")
+    L.enemy("BearerA", "bearer", 520, 480, 40)
+    L.enemy("MothA", "moth", 700, 452, 40)
+    L.enemy("GildedA", "gilded", 780, 452, 40)
+    L.enemy("ArcherLoft", "archer", 1040, 400, 20, -1)
+    L.enemy("CaptainA", "captain", 1180, 480, 40)
+    L.enemy("BearerB", "bearer", 1500, 480, 40)
+    L.enemy("MothB", "moth", 1800, 450, 40)
+    L.enemy("SergeantA", "sergeant", 1910, 450, 40)
+    L.enemy("CantorA", "cantor", 2200, 480, 30)
+    L.enemy("PilgrimA", "pilgrim", 2400, 480, 40)
+    L.jet("BelfryJetA", 1450, 480, 0.0)
+    L.jet("BelfryJetB", 1480, 480, 1.5)
+    L.spikes("BelfrySpikes", 2300, 480, 48)
+    L.chest("BelfryChest", 880, 480, "belfry_chest", count=2, embers=800, item="it_draught")
+    L.chest("LoftChest", 1360, 392, "belfry_chest_2", count=1, embers=900, item="it_shard")
+    L.arena("RingerArena", 2600, 480, "ringer", "THE BELL RINGS NO MORE", 420, 620)
+    L.chest("BelfryCache", 4300, 480, "belfry_cache", count=3, embers=1500, item="it_shard")
     L.write()
 
 
@@ -784,6 +856,7 @@ if __name__ == "__main__":
     trial()
     reliquary()
     keep()
+    belfry()
     cellar()
     gallery()
     graveyard()
