@@ -253,6 +253,37 @@ func close() -> void:
 	GameState.ui_modal = false
 
 
+## The Travel list is long (one row per lit candle), so besides the ScrollContainer's own handling the
+## wheel, PageUp/PageDown and the right stick scroll it from anywhere on the menu, whatever has focus.
+func _input(event: InputEvent) -> void:
+	if not (is_open and travel_open) or _travel_list == null:
+		return
+	var sc := _travel_list.get_parent() as ScrollContainer
+	if sc == null:
+		return
+	var step := 0
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			step = 1
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			step = -1
+	elif event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_PAGEDOWN:
+			step = 5
+		elif event.keycode == KEY_PAGEUP:
+			step = -5
+		elif event.keycode == KEY_END:
+			step = 1000
+		elif event.keycode == KEY_HOME:
+			step = -1000
+	elif event is InputEventJoypadMotion and event.axis == JOY_AXIS_RIGHT_Y and absf(event.axis_value) > 0.6:
+		step = 1 if event.axis_value > 0.0 else -1
+	if step == 0:
+		return
+	sc.scroll_vertical = clampi(sc.scroll_vertical + step * 32, 0, int(sc.get_v_scroll_bar().max_value))
+	get_viewport().set_input_as_handled()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if is_open and not _inv_open() and (event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"pause")):
 		if travel_open:

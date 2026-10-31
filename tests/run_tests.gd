@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_ninth_hell_content, test_twin_lords, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_ninth_hell_content, test_twin_lords, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -4745,3 +4745,53 @@ func test_twin_lords() -> void:
 	arena.spawn()
 	await frames(4)
 	check(arena.boss == null or not is_instance_valid(arena.boss), "a beaten pair never returns")
+
+
+func test_travel_scrolls() -> void:
+	# With every candle lit (96+ entries) the Travel list must reach its last entry with the keys and the wheel.
+	await fresh_game()
+	for d in WorldMap.all():
+		for cd in d.candles:
+			game_state.set_flag(StringName("candle_lit_" + String(cd.id)), true)
+	var cm: CandleMenu = main.get_node("CandleMenu")
+	cm.open()
+	await frames(10)
+	cm._travel_btn.pressed.emit()
+	await frames(6)
+	var sc: ScrollContainer = cm.find_child("TravelScroll", true, false)
+	var dests := CandleMenu.travel_destinations()
+	var buttons := []
+	for c in cm._travel_list.get_children():
+		if c is Button:
+			buttons.append(c)
+	check(buttons.size() >= dests.size() - 1, "every lit candle has a button (%d of %d)" % [buttons.size(), dests.size()])
+	var last_btn: Button = buttons[buttons.size() - 1]
+	var moved := 0
+	for i in buttons.size() + 6:
+		await tap_action(&"ui_down")
+		moved += 1
+		if get_viewport().gui_get_focus_owner() == last_btn:
+			break
+	check(get_viewport().gui_get_focus_owner() == last_btn, "the down key reaches the last candle (%d presses)" % moved)
+	await frames(8)
+	var in_view := last_btn.get_global_rect().position.y + last_btn.size.y <= sc.get_global_rect().end.y + 1.0
+	check(in_view, "and scrolls it into view (scroll %d of %d)" % [sc.scroll_vertical, int(sc.get_v_scroll_bar().max_value)])
+	# the wheel
+	sc.scroll_vertical = 0
+	await frames(2)
+	var ev := InputEventMouseButton.new()
+	ev.button_index = MOUSE_BUTTON_WHEEL_DOWN
+	ev.pressed = true
+	ev.position = sc.get_global_rect().get_center()
+	ev.global_position = ev.position
+	for i in 6:
+		Input.parse_input_event(ev)
+		await frames(2)
+	check(sc.scroll_vertical > 0, "the mouse wheel scrolls the list (%d)" % sc.scroll_vertical)
+	var kp := InputEventKey.new()
+	kp.keycode = KEY_END
+	kp.pressed = true
+	Input.parse_input_event(kp)
+	await frames(3)
+	check(sc.scroll_vertical >= int(sc.get_v_scroll_bar().max_value) - int(sc.size.y) - 2, "End jumps to the bottom (%d)" % sc.scroll_vertical)
+	cm.close()

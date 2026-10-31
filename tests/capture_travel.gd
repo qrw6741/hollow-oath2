@@ -24,9 +24,9 @@ func _run() -> void:
 	await frames(40)
 	GameState.in_game = true
 	GameState.set_flag(&"candle_lit_village_gate_candle", true)
-	for k in Expansion.MAPS:
-		for i in 4:
-			GameState.set_flag(StringName("candle_lit_%s_candle_%d" % [k, i]), true)
+	for d in WorldMap.all():
+		for cd in d.candles:
+			GameState.set_flag(StringName("candle_lit_" + String(cd.id)), true)
 	var cm: CandleMenu = main.get_node("CandleMenu")
 	cm.open()
 	await frames(30)
@@ -35,7 +35,10 @@ func _run() -> void:
 	await frames(10)
 	await shot("travel_top")
 	var sc: ScrollContainer = cm.find_child("TravelScroll", true, false)
+	var inner: Control = sc.get_child(0)
+	print("TRAVEL dests=", CandleMenu.travel_destinations().size(), " list_h=", inner.size.y, " sc_h=", sc.size.y, " panel_h=", cm._travel_v.size.y, " vp=", get_viewport().get_visible_rect().size, " travel_pos=", cm._travel_v.global_position)
 	sc.scroll_vertical = 100000
 	await frames(10)
+	print("TRAVEL scrolled to ", sc.scroll_vertical, " max=", sc.get_v_scroll_bar().max_value)
 	await shot("travel_bottom")
 	get_tree().quit()
