@@ -464,3 +464,15 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Backdrops reuse existing looks (Forge, Orchard, Vaults, Barrow) with new tints: no new art per map yet.
 - **Verified:** generators ran clean, reachability audit "25 levels, clean", bot walked all four maps to the far end (headless, invulnerable, no script errors), screenshots of two maps, suite 143/143. Bugs hit and fixed: bestiary list comma (generator now handles a trailing comma), a progress test that assumed the Oath Eternal was last.
 - **Not verified:** that the new bosses are fair/winnable by a human, balance of the new gear, any hand playtest, Windows launch.
+
+## Boss signature tricks, perfect parry, two new enemies
+- `world/hazards/boss_zone.gd` (telegraphed BOX/RAIN strike, floor WAVE; environmental, unparryable) and `systems/boss_gimmicks.gd` (per-boss table: mark / wave / rain / adds / enrage by phase). Every boss scene has an entry; the node attaches in `BossBase.start_fight()`.
+- Perfect parry: a parry within the first 3 frames gives +10 focus, a white ring and a short slow-mo (`GameFeel.slowmo`, respects the hit-stop setting).
+- New enemies (`tools/gen_newfoes.py`, cloned data + scenes): **Swollen Pilgrim** (`bloat_enemy.gd`, leaves a poison blast zone when it dies) and **Wick-Mender** (`mender_enemy.gd`, heals the weakest wounded ally within 220 px every 4.5 s, 30% max HP; ignores bosses). Bestiary entries added; placed in 6 ground and 8 loft slots of the expansion maps. Reach audit still "25 levels, clean".
+- Verified: `test_boss_gimmicks`, `test_new_foes`, `test_perfect_parry` in the suite; boss telegraphs by screenshot. A first Mender test failed (it required a target); fixed so it heals without one.
+- Not verified: how any of it feels or balances for a human; the slow-mo and Mender heal were not seen on screen; nobody launched Windows.
+
+## Map check: Ashen Chapel crypt was cut off (fixed) + all-map sweep
+- Bot sweep of all 31 levels (headless, invulnerable): every level reached its far end or exit with no script errors and no falls. The Ashen Chapel stopped at x=3736 because its Reliquary exit was a walk-in trigger mid-road (x=3730), which also made the Cracked Stone, secret wall and Ashfall crypt (x 3800-4600) unreachable. The exit is now an interact DOOR ("the flooded stair"); the bot walks past it (reached x=3880).
+- New `test_no_exit_on_road` (no walk-in exit mid-road in any level scene; confirmed it fails on the old chapel). Suite 147/147. `tests/capture_overview.gd` renders every level whole (used for the all-maps image).
+- Not verified: breaking the chapel's secret wall and fighting Ser Ashfall by a human; the four hand-made maps (Gallery, Manor, Vaelmoor Road/Awake) were reached to within 3% of their width by the bot, with no further audit.

@@ -185,3 +185,5 @@
 - New post-process (bloom, grain) and fog layer are untested for frame rate on real GPUs/Windows; Settings > 'Glow & colour grading' turns the post pass off.
 - Outline pass skipped for 5 enemy visuals + Lurker/Mimic (internal draw_set_transform). Art is still procedural, not hand-made sprites.
 - The 4 new maps reuse existing backdrop looks and the 12 new bosses reuse existing boss visuals with new colours; difficulty is untested by a human. Balance unknown.
+- Boss tricks, perfect-parry window (3 frames) and the new enemies' numbers are guesses; only unit-tested, never hand-played. The Pilgrim's blast and Mender's heal visuals/sfx are reused stand-ins.
+- Ashen Chapel's Reliquary exit is now an interact door; the Ashfall crypt behind the secret wall was only reached up to the wall by the bot, not fought.

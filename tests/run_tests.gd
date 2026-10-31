@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -4068,6 +4068,49 @@ func test_boss_lines() -> void:
 	check(sp != null, "the HUD has the boss speech layer")
 
 
+func test_boss_gimmicks() -> void:
+	# every boss scene has a gimmick entry, and the zones really hurt
+	var missing := []
+	var d := DirAccess.open("res://actors/bosses")
+	for f in d.get_files():
+		if f.ends_with(".tscn"):
+			var inst: Node = (load("res://actors/bosses/" + f) as PackedScene).instantiate()
+			if not BossGimmicks.has_for(inst.boss_id):
+				missing.append(inst.boss_id)
+			inst.free()
+	check(missing.is_empty(), "every boss has a signature trick: missing %s" % [missing])
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(RELIQUARY, &"")
+	var p: Player = level.player
+	var z := BossZone.new().setup(BossZone.Kind.BOX, Vector2(60, 80), 0.2, 30.0, Color.RED)
+	level.add_child(z)
+	z.global_position = Vector2(p.global_position.x, p.global_position.y)
+	var hp0: float = p.health.current
+	await frames(40)
+	check(p.health.current < hp0, "a telegraphed strike hurts a player standing in it")
+	var z2 := BossZone.new().setup(BossZone.Kind.WAVE, Vector2(26, 13), 0.0, 20.0, Color.RED)
+	z2.dir = 1.0
+	level.add_child(z2)
+	z2.global_position = Vector2(p.global_position.x - 60.0, p.global_position.y)
+	p.health.current = p.health.max_health
+	p.global_position.y -= 0.0
+	var hp1: float = p.health.current
+	await frames(70)
+	check(p.health.current < hp1, "a floor wave hurts a grounded player")
+	# a boss with a gimmick spawns zones when its fight runs
+	var boss := (load("res://actors/bosses/salt_abbot.tscn") as PackedScene).instantiate() as BossBase
+	level.add_child(boss)
+	boss.global_position = p.global_position + Vector2(160, 0)
+	boss.start_fight()
+	await frames(5)
+	check(boss.gimmicks != null, "the fight attaches the boss's gimmick node")
+	boss.gimmicks._timers[0] = 0.01
+	await frames(10)
+	check(boss.gimmicks.spawned >= 1, "the Abbot throws a wave")
+	boss.queue_free()
+
+
 func test_levels_reachable() -> void:
 	# Runs tools/audit_reach.py: no wall taller than a jump on any road, nothing placed on an unreachable ledge.
 	var out: Array = []
@@ -4537,3 +4580,76 @@ func test_boss_intro_card() -> void:
 	await frames(5)
 	check(hud.get_child_count() == n, "a retry skips the card")
 	b2.queue_free()
+
+
+func test_new_foes() -> void:
+	for id in [&"swollen_pilgrim", &"wick_mender"]:
+		check(Bestiary.data(id) != null, "%s is in the bestiary" % id)
+		check(load("res://actors/enemies/%s.tscn" % id) != null, "%s scene loads" % id)
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(RELIQUARY, &"")
+	var p: Player = level.player
+	# the Pilgrim bursts when it dies
+	var b := (load("res://actors/enemies/swollen_pilgrim.tscn") as PackedScene).instantiate() as BloatEnemy
+	level.add_child(b)
+	b.global_position = p.global_position + Vector2(300, 0)
+	await frames(3)
+	b._burst()
+	await frames(2)
+	var zones := 0
+	for c in level.get_children():
+		if c is BossZone:
+			zones += 1
+	check(zones >= 1, "a Swollen Pilgrim leaves a blast zone")
+	b.queue_free()
+	# the Mender heals a wounded ally
+	var m := (load("res://actors/enemies/wick_mender.tscn") as PackedScene).instantiate() as MenderEnemy
+	var ally := (load("res://actors/enemies/hollow_penitent.tscn") as PackedScene).instantiate() as EnemyBase
+	level.add_child(m)
+	level.add_child(ally)
+	m.global_position = p.global_position + Vector2(500, 0)
+	ally.global_position = m.global_position + Vector2(40, 0)
+	await frames(3)
+	m.target = p
+	ally.health.current = ally.health.max_health * 0.4
+	var before: float = ally.health.current
+	m._heal_t = 0.01
+	await frames(10)
+	check(ally.health.current > before and m.heals_done >= 1, "a Wick-Mender heals a wounded ally")
+
+
+func test_perfect_parry() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(RELIQUARY, &"")
+	var p: Player = level.player
+	p.state_frame = 1
+	p._on_parry_success(HitData.new())
+	check(p.last_parry_perfect, "a parry in the first frames counts as perfect")
+	p.state_frame = 30
+	p._on_parry_success(HitData.new())
+	check(not p.last_parry_perfect, "a late parry is a normal one")
+
+
+func test_no_exit_on_road() -> void:
+	# A walk-in exit in the middle of a level's road would send the player away before they could pass
+	# it (the Ashen Chapel's crypt was cut off this way). Mid-road exits must be DOORS (mode = 1).
+	var bad := []
+	var d := DirAccess.open("res://world/levels")
+	for f in d.get_files():
+		if not f.ends_with(".tscn"):
+			continue
+		var st := FileAccess.get_file_as_string("res://world/levels/" + f)
+		var rx := RegEx.create_from_string("bounds = Rect2\\(0, 0, (\\d+)")
+		var m := rx.search(st)
+		if m == null:
+			continue
+		var w := float(m.get_string(1))
+		for blk in st.split("\n\n"):
+			if not blk.contains("target_level") or not blk.contains('ExtResource("exit")') or blk.contains("mode = 1"):
+				continue
+			var pm := RegEx.create_from_string("position = Vector2\\(([-\\d.]+),").search(blk)
+			if pm and float(pm.get_string(1)) > 120.0 and float(pm.get_string(1)) < w - 150.0:
+				bad.append("%s@%s" % [f, pm.get_string(1)])
+	check(bad.is_empty(), "no walk-in exit stands mid-road: %s" % [bad])

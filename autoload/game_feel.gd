@@ -29,6 +29,18 @@ func hit_stop(duration: float) -> void:
 		Engine.time_scale = 1.0
 
 
+## A short slow-motion beat (perfect parries). Follows the hit-stop setting; a newer request wins.
+func slowmo(duration: float, time_scale := 0.3) -> void:
+	if not Settings.hit_stop or duration <= 0.0:
+		return
+	_hit_stop_token += 1
+	var token := _hit_stop_token
+	Engine.time_scale = time_scale
+	await get_tree().create_timer(duration, true, false, true).timeout
+	if token == _hit_stop_token:
+		Engine.time_scale = 1.0
+
+
 func shake(strength: float, duration := 0.18) -> void:
 	InputPrompts.rumble(strength * 0.12, strength * 0.2, duration)
 	if Settings.screen_shake <= 0.0:

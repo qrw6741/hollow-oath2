@@ -55,6 +55,8 @@ EXT = {
     "vess": ("PackedScene", "res://actors/bosses/gaoler_vess.tscn"),
     "brand": ("PackedScene", "res://actors/bosses/foundrymaster_brand.tscn"),
     "ringer": ("PackedScene", "res://actors/bosses/last_ringer.tscn"),
+    "bloat": ("PackedScene", "res://actors/enemies/swollen_pilgrim.tscn"),
+    "mender": ("PackedScene", "res://actors/enemies/wick_mender.tscn"),
     "bearer": ("PackedScene", "res://actors/enemies/bell_bearer.tscn"),
     "moth": ("PackedScene", "res://actors/enemies/gloam_moth.tscn"),
     "thornmother": ("PackedScene", "res://actors/bosses/thornmother.tscn"),
@@ -611,7 +613,18 @@ wall_id = &"ashfall_crypt"
 hits_needed = 3''')
     L.arena("AshfallArena", 4150, 480, "ashfall", "THE UNBURIED REST", 330, 440)
     L.entry("FromReliquary", 3700, 480, "from_reliquary")
-    L.walk_exit("ToReliquary", 3730, 480, RELIQUARY, "from_chapel")
+    # A DOOR (interact to use), not a walk-in trigger: the road continues east to the Ashfall crypt,
+    # and a walk-in exit on the road would send the player away before they could pass it.
+    L.use("exit")
+    L.node(f'''
+[node name="ToReliquary" type="Area2D" parent="."]
+position = Vector2(3730, 480)
+script = ExtResource("exit")
+target_level = "{RELIQUARY}"
+target_entry = &"from_chapel"
+mode = 1
+display_name = "the flooded stair"
+size = Vector2(28, 60)''')
     L.tablet("FloodedStair", 3660, 480, "A Flooded Stair",
              "A stair runs down behind the vestry, and the bottom steps are underwater. Someone has chalked on the wall: 'THE RELIQUARY. WE BLESSED THE WATER. IT BLESSED US BACK.'")
     L.write()

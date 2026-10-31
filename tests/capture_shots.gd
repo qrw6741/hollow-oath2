@@ -43,6 +43,13 @@ func _run() -> void:
 			await frames(9)
 		if OS.get_environment("WAITF") != "":
 			await frames(int(OS.get_environment("WAITF")))
+		if OS.get_environment("ZONES") != "":
+			var pp: Vector2 = lv.player.global_position
+			for zs in [[BossZone.Kind.BOX, Vector2(46, 72), 0.9, Vector2(60, 0)], [BossZone.Kind.RAIN, Vector2(30, 90), 0.9, Vector2(-70, 0)], [BossZone.Kind.WAVE, Vector2(26, 13), 0.0, Vector2(-30, 0)]]:
+				var z := BossZone.new().setup(zs[0], zs[1], zs[2], 1.0, Color(0.9, 0.35, 0.25))
+				lv.add_child(z)
+				z.global_position = pp + zs[3]
+			await frames(40)
 		if OS.get_environment("TEXTSHOT") != "":
 			Events.banner_requested.emit("The Drowned Cathedral of the Last Unbroken Vow and Sorrow")
 			Events.tip_requested.emit(&"focus")

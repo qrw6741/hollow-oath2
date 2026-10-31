@@ -11,7 +11,7 @@
 [ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
 [ext_resource type="PackedScene" path="res://actors/enemies/pike_sergeant.tscn" id="sergeant"]
 [ext_resource type="PackedScene" path="res://actors/enemies/oathguard_captain.tscn" id="captain"]
-[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
+[ext_resource type="PackedScene" path="res://actors/enemies/wick_mender.tscn" id="mender"]
 [ext_resource type="Script" path="res://world/hazards/fire_jet.gd" id="jet"]
 [ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
 [ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
@@ -183,7 +183,7 @@ start_facing = -1
 [node name="Archer0" type="Marker2D" parent="."]
 position = Vector2(1040, 400)
 script = ExtResource("spawner")
-enemy_scene = ExtResource("archer")
+enemy_scene = ExtResource("mender")
 patrol_distance = 20
 start_facing = -1
 
@@ -329,7 +329,7 @@ start_facing = -1
 [node name="Archer2" type="Marker2D" parent="."]
 position = Vector2(5640, 400)
 script = ExtResource("spawner")
-enemy_scene = ExtResource("archer")
+enemy_scene = ExtResource("mender")
 patrol_distance = 20
 start_facing = -1
 

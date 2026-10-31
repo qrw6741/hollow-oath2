@@ -18,7 +18,7 @@
 [ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
 [ext_resource type="Resource" path="res://data/items/relic_knot.tres" id="it_knot"]
 [ext_resource type="PackedScene" path="res://actors/enemies/bell_bearer.tscn" id="bearer"]
-[ext_resource type="PackedScene" path="res://actors/enemies/hollow_penitent.tscn" id="penitent"]
+[ext_resource type="PackedScene" path="res://actors/enemies/swollen_pilgrim.tscn" id="bloat"]
 [ext_resource type="PackedScene" path="res://actors/enemies/candle_cantor.tscn" id="cantor"]
 [ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
 [ext_resource type="Resource" path="res://data/items/forge_scrap.tres" id="it_scrap"]
@@ -243,7 +243,7 @@ start_facing = -1
 [node name="GroundB1" type="Marker2D" parent="."]
 position = Vector2(3550, 480)
 script = ExtResource("spawner")
-enemy_scene = ExtResource("penitent")
+enemy_scene = ExtResource("bloat")
 patrol_distance = 40
 start_facing = -1
 

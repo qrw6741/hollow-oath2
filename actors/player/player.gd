@@ -675,7 +675,13 @@ func _faces(source: Node2D) -> bool:
 	return absf(dx) < 6.0 or signf(dx) == float(facing)
 
 
+## A parry landed in the first frames of the window is PERFECT: bigger focus, a slow-motion beat, bigger flash.
+const PERFECT_PARRY_FRAMES := 3
+var last_parry_perfect := false
+
+
 func _on_parry_success(hit: HitData) -> void:
+	last_parry_perfect = state_frame <= PERFECT_PARRY_FRAMES
 	_parried = true
 	add_focus(FOCUS_PER_PARRY + Relics.mult("parry_focus") + Boosts.add("parry_focus"))
 	state_frame = 0
@@ -690,6 +696,11 @@ func _on_parry_success(hit: HitData) -> void:
 		at = (global_position + src.global_position) * 0.5 + Vector2(0, -16)
 	GameFeel.spark(at, Palette.GOLD_BRIGHT, 18)
 	GameFeel.ring(at, Palette.GOLD_BRIGHT, 30.0)
+	if last_parry_perfect:
+		add_focus(10.0)
+		GameFeel.ring(at, Color(1, 1, 1), 46.0)
+		GameFeel.spark(at, Color(1, 1, 1), 16)
+		GameFeel.slowmo(0.35, 0.3)
 
 
 func _on_attack_hit(_target: Hurtbox, result: int, hit: HitData) -> void:

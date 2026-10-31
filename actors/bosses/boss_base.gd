@@ -30,6 +30,7 @@ signal phase_changed(phase: int)
 @export var corpse_frames := 220
 
 var active := false
+var gimmicks: BossGimmicks
 var phase := 1
 var roaring := false
 var leaping := false
@@ -57,6 +58,9 @@ func start_fight() -> void:
 	target = get_tree().get_first_node_in_group(&"player") as Node2D
 	_cooldown = 50   # a beat to read the boss before the first swing
 	_set_state(State.CHASE)
+	if gimmicks == null and BossGimmicks.has_for(boss_id):
+		gimmicks = BossGimmicks.new().setup(self)
+		add_child(gimmicks)
 	Events.boss_fight_started.emit(self)
 
 

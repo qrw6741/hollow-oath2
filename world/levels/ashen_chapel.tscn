@@ -297,7 +297,9 @@ position = Vector2(3730, 480)
 script = ExtResource("exit")
 target_level = "res://world/levels/sunken_reliquary.tscn"
 target_entry = &"from_chapel"
-size = Vector2(12, 80)
+mode = 1
+display_name = "the flooded stair"
+size = Vector2(28, 60)
 
 [node name="FloodedStair" type="Area2D" parent="."]
 position = Vector2(3660, 480)

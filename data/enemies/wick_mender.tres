@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://actors/enemies/enemy_data.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/attacks/archer_shot.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/archer_knife.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="d0"]
+[ext_resource type="Resource" path="res://data/items/forge_scrap.tres" id="d1"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = &"wick_mender"
+display_name = "Wick-Mender"
+lore = "She carries a taper and relights whatever the oath has left of the wounded. She is very kind about it."
+max_health = 48.0
+max_poise = 14.0
+poise_regen_delay_frames = 90
+poise_regen_per_second = 30.0
+patrol_speed = 22.0
+chase_speed = 52.0
+detection_range = 300.0
+vertical_detection = 110.0
+leash_range = 380.0
+attacks = [ExtResource("a0"), ExtResource("a1")]
+attack_cooldown_min = 50
+attack_cooldown_max = 90
+recover_frames = 18
+backstep_speed = 60.0
+stagger_frames = 36
+parry_stagger_frames = 90
+ember_reward = 70
+drop_item = ExtResource("d0")
+drop_chance = 0.2
+drop_count = 1
+bonus_drop_item = ExtResource("d1")
+bonus_drop_chance = 0.25
+bonus_drop_count = 1
+status_resist = {"bleed": 0.2, "poison": 0.3}
