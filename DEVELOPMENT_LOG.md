@@ -407,3 +407,8 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 ## Step: Progressive, simple path
 - **Where next?** systems/progress.gd (Progress): the 19 main-story bosses in order (Bell-Warden to the Oath Eternal); the first one not yet defeated is the goal, shown in gold at the top of the rest-candle menu ("Onward: defeat X in Y."). Optional areas and mini-bosses are never required. World flags only.
 - **Difficulty ramp**: the Descent started easier than the Citadel's boss (760 hp vs 2,200). Re-tuned: Descent mini-bosses 1,500 to 2,790 hp and main bosses 2,600 to 5,400 hp rising map by map; Oath Eternal 9,000. test_progress_goal asserts the main bosses rise and start above the Citadel's.
+
+## Step: Sunken Reliquary fixes (frame rate + blocked road)
+- **FPS**: measured draw calls per map in Xvfb (tests/capture_perf.tscn; relative numbers only). ManorHall (the backdrop of the old maps) redrew its whole width every frame: Sunken Reliquary 8,970, Hollow Keep 10,010, Cellar 7,710 draw calls. It now draws only the part on screen (positions hash to the same look everywhere; brick outlines dropped): Reliquary 1,231, Keep 1,333, Cellar 4,982 (before the last brick trim). The Descent backdrops were already about 370.
+- **Blocked**: the only road on to the Hollow Keep was a cracked wall that needed 3 hits with no hint. BreakableWall has a new `opens_when_boss` export; the Reliquary's wall (VaultWallBreak) now gives way by itself when the Salt Abbot falls (banner "THE WAY ON IS OPEN", remembered). It can still be hit open earlier. test_reliquary_opens.
+- Not verified: real frame rate on Windows (Xvfb has no GPU), and the cellar/hall look at every x position (checked at x=3000 on four maps).

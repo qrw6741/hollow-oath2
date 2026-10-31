@@ -83,7 +83,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_reliquary_opens, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -3971,6 +3971,19 @@ func test_progress_goal() -> void:
 		check(hp > prev, "%s has more health than the previous main boss (%d)" % [main, hp])
 		prev = hp
 	check(Bestiary.data(&"crownless_king").max_health < Bestiary.data(&"ossuary_king_veyl").max_health, "the Descent starts above the Citadel's boss")
+
+
+func test_reliquary_opens() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level(RELIQUARY, &"")
+	var wall := level.get_node_or_null("VaultWallBreak") as BreakableWall
+	check(wall != null and wall.opens_when_boss == &"salt_abbot", "the way on to the Keep is a wall that opens with the Abbot")
+	events.boss_defeated.emit(&"salt_abbot")
+	await frames(3)
+	check(level.get_node_or_null("VaultWallBreak") == null, "it gives way by itself when the Abbot falls")
+	await go_to_level(RELIQUARY, &"")
+	check(level.get_node_or_null("VaultWallBreak") == null, "and stays open when you come back")
 
 
 func test_wayfarers() -> void:

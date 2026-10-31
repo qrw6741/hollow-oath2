@@ -8,6 +8,9 @@ extends StaticBody2D
 	set(v): size = v; queue_redraw()
 @export var wall_id: StringName = &"wall"
 @export var hits_needed := 3
+## If set, the wall also gives way by itself when this boss falls (so the main road is never hidden
+## behind a secret): e.g. &"salt_abbot".
+@export var opens_when_boss: StringName = &""
 
 var hits := 0
 var _shape: CollisionShape2D
@@ -21,6 +24,11 @@ func _ready() -> void:
 	if GameState.get_flag(_flag(), false):
 		queue_free()
 		return
+	if opens_when_boss != &"":
+		if GameState.get_flag(StringName("boss_defeated_" + String(opens_when_boss)), false):
+			queue_free()
+			return
+		Events.boss_defeated.connect(_on_boss_defeated)
 	collision_layer = 1
 	collision_mask = 0
 	_shape = CollisionShape2D.new()
@@ -40,6 +48,17 @@ func _ready() -> void:
 	hs.position = size / 2.0
 	_hurtbox.add_child(hs)
 	add_child(_hurtbox)
+
+
+func _on_boss_defeated(id: StringName) -> void:
+	if id != opens_when_boss:
+		return
+	GameState.set_flag(_flag(), true)
+	GameFeel.spark(global_position + size / 2.0, Palette.DUST, 26)
+	GameFeel.shake(3.0, 0.3)
+	Audio.sfx_at(&"gate_open", global_position + size / 2.0, -2.0, 1.3)
+	Events.banner_requested.emit("THE WAY ON IS OPEN")
+	queue_free()
 
 
 func _flag() -> StringName:

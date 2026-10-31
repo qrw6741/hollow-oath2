@@ -396,6 +396,7 @@ script = ExtResource("wall")
 size = Vector2(16, 200)
 wall_id = &"reliquary_vault"
 hits_needed = 3
+opens_when_boss = &"salt_abbot"
 
 [node name="FromKeep" type="Marker2D" parent="."]
 position = Vector2(5200, 480)

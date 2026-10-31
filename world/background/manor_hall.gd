@@ -67,7 +67,32 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
+## First and last map x that are on screen (plus a margin). Everything below only draws this range:
+## the old version drew the whole 5,000+ px hall every frame (about 9,000 draw calls).
+var _vx0 := 0.0
+var _vx1 := 960.0
+
+
+func _update_view() -> void:
+	if Engine.is_editor_hint() or not is_inside_tree():
+		_vx0 = 0.0
+		_vx1 = width
+		return
+	var vr := get_viewport_rect()
+	var inv := get_canvas_transform().affine_inverse()
+	_vx0 = maxf(0.0, (inv * vr.position).x - 60.0)
+	_vx1 = minf(width, (inv * vr.end).x + 60.0)
+
+
+## A random generator that depends only on a position, so culled drawing looks the same everywhere.
+func _rng_at(x: float, salt := 0) -> RandomNumberGenerator:
+	var r := RandomNumberGenerator.new()
+	r.seed = (int(x) * 7919 + salt * 104729 + seed_value * 31) & 0x7fffffff
+	return r
+
+
 func _draw() -> void:
+	_update_view()
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	if style == Style.CELLAR:
@@ -76,19 +101,20 @@ func _draw() -> void:
 		return
 	_draw_walls()
 	# Windows every 260 px, portraits between them.
-	var x := 130.0
-	var i := 0
-	while x < width:
+	var i := maxi(0, int((_vx0 - 130.0) / 130.0) - 1)
+	var x := 130.0 + 130.0 * i
+	while x < _vx1 + 130.0 and x < width:
+		var r := _rng_at(x)
 		if i % 2 == 0 and style == Style.HALL:
-			_draw_window(x, rng)
+			_draw_window(x, r)
 		elif i % 2 == 0:
 			_draw_case(x)
 		else:
-			_draw_portrait(x, rng)
+			_draw_portrait(x, r)
 		x += 130.0
 		i += 1
-	_draw_furniture(rng)
-	for k in range(0, int(width / 520.0) + 1):
+	_draw_furniture()
+	for k in range(maxi(0, int((_vx0 - 330.0) / 520.0)), mini(int(width / 520.0), int((_vx1 + 330.0) / 520.0)) + 1):
 		if style == Style.GALLERY and k % 2 == 1:
 			continue
 		_draw_chandelier(300.0 + k * 520.0 + 30.0 * sin(float(k)))
@@ -97,28 +123,30 @@ func _draw() -> void:
 
 
 func _draw_walls() -> void:
-	draw_rect(Rect2(-40, ceiling_y - 70, width + 80, floor_y - ceiling_y + 70), Color("2b2535"))
+	var x0 := _vx0 - 40.0
+	var w := _vx1 - _vx0 + 80.0
+	draw_rect(Rect2(x0, ceiling_y - 70, w, floor_y - ceiling_y + 70), Color("2b2535"))
 	# Faint vertical wallpaper stripes
-	var x := 0.0
-	while x < width:
+	var x := floorf(_vx0 / 44.0) * 44.0
+	while x < _vx1:
 		draw_rect(Rect2(x, ceiling_y, 22, floor_y - ceiling_y), Color(0.17, 0.14, 0.22, 0.45))
 		x += 44.0
 	# Wainscot (lower panelled wall)
 	var top := floor_y - 96.0
-	draw_rect(Rect2(-40, top, width + 80, 96), Color("33271f"))
-	draw_rect(Rect2(-40, top, width + 80, 4), Color("4a382b"))
-	x = 20.0
-	while x < width:
+	draw_rect(Rect2(x0, top, w, 96), Color("33271f"))
+	draw_rect(Rect2(x0, top, w, 4), Color("4a382b"))
+	x = 20.0 + floorf(maxf(0.0, _vx0 - 20.0) / 96.0) * 96.0
+	while x < _vx1:
 		draw_rect(Rect2(x, top + 12, 70, 72), Color("2b2019"))
 		draw_rect(Rect2(x + 3, top + 15, 64, 66), Color("372a21"), false, 1.0)
 		x += 96.0
 	# Crown moulding and a dark ceiling
-	draw_rect(Rect2(-40, ceiling_y - 70, width + 80, 62), Color("15121b"))
-	draw_rect(Rect2(-40, ceiling_y - 10, width + 80, 10), Color("3b3046"))
-	draw_rect(Rect2(-40, ceiling_y, width + 80, 3), Color("55466a"))
+	draw_rect(Rect2(x0, ceiling_y - 70, w, 62), Color("15121b"))
+	draw_rect(Rect2(x0, ceiling_y - 10, w, 10), Color("3b3046"))
+	draw_rect(Rect2(x0, ceiling_y, w, 3), Color("55466a"))
 	# Ceiling beams
-	x = 60.0
-	while x < width:
+	x = 60.0 + floorf(maxf(0.0, _vx0 - 60.0) / 260.0) * 260.0
+	while x < _vx1:
 		draw_rect(Rect2(x, ceiling_y - 62, 12, 54), Color("241d2d"))
 		x += 260.0
 
@@ -170,19 +198,20 @@ func _draw_portrait(cx: float, rng: RandomNumberGenerator) -> void:
 	draw_circle(Vector2(cx + 3, y + 21), 0.9, Color(1.0, 0.95, 0.7, glint))
 
 
-func _draw_furniture(rng: RandomNumberGenerator) -> void:
+func _draw_furniture() -> void:
 	# Suits of armour on plinths every 620 px
-	var x := 60.0
-	while x < width:
+	var x := 60.0 + floorf(maxf(0.0, _vx0 - 80.0) / 620.0) * 620.0
+	while x < _vx1:
 		_draw_armour(x + 20.0)
 		x += 620.0
 	# Bookshelves
-	var bx := 760.0
-	while bx < width - 200.0:
-		_draw_bookshelf(bx, rng)
+	var bx := 760.0 + floorf(maxf(0.0, _vx0 - 880.0) / 940.0) * 940.0
+	while bx < width - 200.0 and bx < _vx1:
+		_draw_bookshelf(bx, _rng_at(bx, 3))
 		bx += 940.0
 	# Grandfather clock
-	_draw_clock(1180.0)
+	if 1180.0 > _vx0 - 40.0 and 1180.0 < _vx1 + 40.0:
+		_draw_clock(1180.0)
 
 
 func _draw_armour(x: float) -> void:
@@ -262,6 +291,8 @@ func _draw_ghosts() -> void:
 
 func _draw_cobwebs() -> void:
 	for cx in [0.0, width]:
+		if cx < _vx0 - 100.0 or cx > _vx1 + 100.0:
+			continue
 		var dir := 1.0 if cx == 0.0 else -1.0
 		for k in 4:
 			var r := 30.0 + k * 14.0
@@ -283,49 +314,59 @@ func _draw_case(cx: float) -> void:
 	draw_circle(Vector2(cx, top + 40), 14.0, Color(0.9, 0.9, 1.0, 0.05 + 0.02 * sin(_t * 1.2 + cx)))
 
 
-func _draw_cellar(rng: RandomNumberGenerator) -> void:
-	draw_rect(Rect2(-40, ceiling_y - 70, width + 80, floor_y - ceiling_y + 70), Color("1e1a1c"))
-	# Brick courses
+func _draw_cellar(_rng: RandomNumberGenerator) -> void:
+	var x0 := _vx0 - 40.0
+	var w := _vx1 - _vx0 + 80.0
+	draw_rect(Rect2(x0, ceiling_y - 70, w, floor_y - ceiling_y + 70), Color(0.04, 0.03, 0.04))   # the mortar
+	# Brick courses (only the ones on screen; each brick's shade comes from its position)
 	var y := ceiling_y - 60.0
 	var row := 0
 	while y < floor_y:
 		var x := -40.0 + (row % 2) * 18.0
-		while x < width + 40.0:
-			var shade := 0.10 + rng.randf() * 0.05
+		x += floorf((x0 - x) / 36.0) * 36.0
+		while x < _vx1 + 40.0:
+			var shade := 0.10 + _hash01(x, y) * 0.05
 			draw_rect(Rect2(x, y, 34, 14), Color(shade + 0.07, shade + 0.03, shade + 0.03))
-			draw_rect(Rect2(x, y, 34, 14), Color(0.04, 0.03, 0.04, 0.7), false, 1.0)
 			x += 36.0
 		y += 16.0
 		row += 1
 	# Vault arches
-	var ax := 0.0
-	while ax < width:
+	var ax := floorf(maxf(0.0, _vx0 - 300.0) / 300.0) * 300.0
+	while ax < _vx1 and ax < width:
 		draw_arc(Vector2(ax + 150, ceiling_y + 30), 140.0, PI, TAU, 18, Color("0d0b0e"), 6.0)
 		draw_rect(Rect2(ax + 4, ceiling_y + 30, 10, floor_y - ceiling_y - 30), Color("0d0b0e"))
 		ax += 300.0
-	# Casks, racks and crates
-	var cx := 120.0
-	while cx < width - 100.0:
-		var kind := rng.randi_range(0, 2)
+	# Casks, racks and crates, one per 170 px slot (kind and offset from the slot's position)
+	var k := maxi(0, int((_vx0 - 60.0) / 170.0) - 1)
+	while 120.0 + k * 170.0 < _vx1 + 60.0 and 120.0 + k * 170.0 < width - 100.0:
+		var cx := 120.0 + k * 170.0
+		var r := _rng_at(cx, 5)
+		cx += r.randf_range(-30.0, 30.0)
+		var kind := r.randi_range(0, 3)
 		if kind == 0:
-			_draw_cask(cx, rng)
+			_draw_cask(cx, r)
 		elif kind == 1:
 			_draw_rack(cx)
-		else:
+		elif kind == 2:
 			draw_rect(Rect2(cx - 14, floor_y - 28, 28, 28), Color("3b2d20"))
 			draw_rect(Rect2(cx - 14, floor_y - 28, 28, 28), Color("1a120c"), false, 1.5)
 			draw_line(Vector2(cx - 14, floor_y - 28), Vector2(cx + 14, floor_y), Color("1a120c"), 1.2)
-		cx += rng.randf_range(110.0, 230.0)
+		k += 1
 	# Hanging lanterns
-	var lx := 220.0
-	while lx < width:
+	var lx := 220.0 + floorf(maxf(0.0, _vx0 - 220.0) / 420.0) * 420.0
+	while lx < _vx1 and lx < width:
 		var sway := sin(_t * 1.1 + lx) * 1.5
 		draw_line(Vector2(lx, ceiling_y - 8), Vector2(lx + sway, ceiling_y + 40), Color("2a2430"), 1.0)
 		draw_rect(Rect2(lx + sway - 4, ceiling_y + 40, 8, 10), Color("6a5a3a"))
 		draw_circle(Vector2(lx + sway, ceiling_y + 45), 3.0 + 0.6 * sin(_t * 9.0 + lx), Color(1.0, 0.75, 0.4, 0.95))
 		draw_circle(Vector2(lx + sway, ceiling_y + 45), 18.0, Color(1.0, 0.7, 0.3, 0.05))
 		lx += 420.0
-	draw_rect(Rect2(-40, ceiling_y - 10, width + 80, 12), Color("0d0b0e"))
+	draw_rect(Rect2(x0, ceiling_y - 10, w, 12), Color("0d0b0e"))
+
+
+func _hash01(x: float, y: float) -> float:
+	var h := int(x * 73.0 + y * 151.0) * 2654435761 + seed_value * 40503
+	return float((h >> 8) & 0xffff) / 65535.0
 
 
 func _draw_cask(x: float, rng: RandomNumberGenerator) -> void:

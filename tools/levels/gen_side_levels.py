@@ -232,7 +232,7 @@ script = ExtResource("illusion")
 size = Vector2({w}, {h})
 secret_id = &"{sid}"''')
 
-    def secret_wall(self, name, x, y, w, h, wid, hits=3):
+    def secret_wall(self, name, x, y, w, h, wid, hits=3, opens_when=None):
         self.use("wall")
         self.node(f'''
 [node name="{name}" type="StaticBody2D" parent="."]
@@ -240,7 +240,7 @@ position = Vector2({x}, {y})
 script = ExtResource("wall")
 size = Vector2({w}, {h})
 wall_id = &"{wid}"
-hits_needed = {hits}''')
+hits_needed = {hits}''' + (f'\nopens_when_boss = &"{opens_when}"' if opens_when else ""))
 
     def write(self):
         ext = [("level",)] + [(k,) for k in self.used if k != "level"]
@@ -716,7 +716,7 @@ color = Color(0.4, 0.62, 0.64, 1)
     # Boss
     L.arena("AbbotArena", 3560, 480, "abbot", "THE BOOK IS CLOSED", 420, 620)
     # Beyond the boss: the Salt Vault
-    L.secret_wall("VaultWallBreak", 5150, 280, 16, 200, "reliquary_vault", 3)
+    L.secret_wall("VaultWallBreak", 5150, 280, 16, 200, "reliquary_vault", 3, opens_when="salt_abbot")
     L.entry("FromKeep", 5200, 480, "from_keep")
     L.walk_exit("ToKeep", 5330, 480, KEEP, "from_reliquary")
     L.chest("VaultCache", 5260, 480, "reliquary_cache", count=2, embers=900, item="it_shard")
