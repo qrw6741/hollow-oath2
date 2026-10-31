@@ -31,7 +31,7 @@ const GAUNTLET_REWARD := 3500
 
 
 static func unlocked() -> bool:
-	return Endings.chosen() != &""
+	return Endings.chosen() != &"" or (not Endings.enabled and bool(GameState.get_flag(Endings.MARSHAL_FLAG, false)))
 
 
 static func best_rush() -> float:

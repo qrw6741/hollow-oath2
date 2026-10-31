@@ -25,6 +25,8 @@ func _ready() -> void:
 
 
 func _prompt() -> String:
+	if not Endings.enabled:
+		return "The gate (the road goes on)" if bool(GameState.get_flag(Endings.MARSHAL_FLAG, false)) else "The gate is sealed"
 	if Endings.gate_open():
 		return "Face the gate"
 	if Endings.chosen() != &"":
@@ -37,6 +39,13 @@ func _physics_process(delta: float) -> void:
 	_confirm = maxf(0.0, _confirm - delta)
 	queue_redraw()
 	if Engine.is_editor_hint() or _player_inside == null:
+		return
+	if Input.is_action_just_pressed(&"interact") and _player_inside.can_interact() and not Endings.enabled:
+		if bool(GameState.get_flag(Endings.MARSHAL_FLAG, false)):
+			Events.banner_requested.emit("THE ROAD GOES ON.  " + Progress.text())
+		else:
+			Audio.sfx(&"door_locked")
+			Events.banner_requested.emit("THE GATE IS SEALED  -  ORREN STILL HOLDS THE ROAD")
 		return
 	if Input.is_action_just_pressed(&"interact") and _player_inside.can_interact():
 		if Endings.chosen() != &"" and not Endings.gate_open():
@@ -57,7 +66,7 @@ func _physics_process(delta: float) -> void:
 
 
 func open_state() -> bool:
-	return Endings.gate_open() if not Engine.is_editor_hint() else false
+	return (Endings.gate_open() or (not Endings.enabled and bool(GameState.get_flag(Endings.MARSHAL_FLAG, false)))) if not Engine.is_editor_hint() else false
 
 
 func _draw() -> void:

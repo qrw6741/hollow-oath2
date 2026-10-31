@@ -179,3 +179,4 @@
 - Keepsakes have no mechanical use (lore only) and use the generic item icon.
 - The Descent difficulty ramp is by health only (attack damage is shared by tier); nobody has played it, so the pacing is a guess.
 - The Oath Gate asks a second time after the Oath Eternal falls (only Go Unsworn is offered then); the earlier choice stays recorded as a deed. Not played through by a human.
+- Endings are switched off (Endings.enabled = false): the "The Oath Decided" deed, New Game+ and the five epilogues cannot be reached in the shipped game until they are switched back on. Old saves that already chose an ending keep that flag (Trials stay open for them).

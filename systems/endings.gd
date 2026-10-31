@@ -7,6 +7,11 @@ extends RefCounted
 ##   break - set the oath down, as Orren did.           always open
 ##   mend - rewrite the last line, as Ommen once did.   needs every errand done + the Gallery opened
 
+## The story is still being written, so for now the Oath Gate does NOT offer an ending: after the
+## Marshal it only points the way on (see Progress). Set to true to bring the endings back; all the
+## ending data, menu and tests stay in place.
+static var enabled := false
+
 const MARSHAL_FLAG := &"boss_defeated_hollow_marshal"
 const REGENT_FLAG := &"boss_defeated_hollow_regent"
 const ETERNAL_FLAG := &"boss_defeated_the_oath_eternal"
@@ -75,6 +80,8 @@ static func chosen() -> StringName:
 ## The gate asks once after the Marshal falls, and once more at the very end of the Descent (only the
 ## last ending is offered the second time) so a player who chose early can still finish the story.
 static func gate_open() -> bool:
+	if not enabled:
+		return false
 	if bool(GameState.get_flag(MARSHAL_FLAG, false)) and chosen() == &"":
 		return true
 	return bool(GameState.get_flag(ETERNAL_FLAG, false)) and chosen() != &"" and chosen() != &"unsworn"

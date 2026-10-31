@@ -39,7 +39,7 @@ const OMMEN_SIGIL_LATE := [
 const OMMEN_AFTER_MARSHAL := [
 	"The crossroads are quiet. I heard the banner fall from here.",
 	"Orren's oath is broken. That is all it takes, I think - one vow, set down by someone who still can. You did that.",
-	"The gate at the end of the road has woken. It will ask you something, I think. Whatever you answer, answer it knowing what you are answering.",
+	"The gate at the end of the road has woken, but it is not ready to ask anything yet. The story is not finished, and neither is the road: there is more of it, down under the chapel and past the Citadel.",
 ]
 const OMMEN_IDLE := [
 	"The candles are still lit. That is something.",
