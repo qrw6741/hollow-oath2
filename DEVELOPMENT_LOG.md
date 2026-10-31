@@ -442,3 +442,8 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - **Effects** (`fx/fx_burst.gd`, via `GameFeel.ring/rise/dust`): additive hit sparks with flash + shock ring; dust on landing/dodge; block ring; parry gold ring; heal rising light + ring; enemy death embers; boss death ring + ember fountain.
 - **Verified:** screenshots (Xvfb, software GL) of Ossuary, Bone Market, Road, Hollow Heart, and an FX test frame; suite 141/141 (new `test_graphics_pass`). Caught a compile error in fx_burst by `--check-only`: the test suite had not flagged it, so run that after adding scripts.
 - **Not verified:** real-GPU frame rate (bloom is 16 taps/pixel; use the Settings toggle if slow), look on Windows, any hand playtest. Art is still procedural, not final sprites.
+
+## QoL + art pass 1
+- **QoL:** pause menu "Stuck? Return to last candle" (respawn flow, no death, enemies reset); map screen shows the "Onward:" goal line; Settings "Damage numbers" toggle (saved). Test `test_qol`.
+- **Art:** 1 px ink outline on the player and on Brute, Drowned Canon, Hollow Marshal, Acolyte, Archer, Penitent, Pikeman, Summoner (the body is drawn four times in ink, shifted, then in colour). Not outlined yet: Bell-Warden, Bearer, Crow, Moth, Oathguard (they use `draw_set_transform` internally), Lurker, Mimic, and the Descent bosses' own visuals.
+- **Honest scope:** this is still procedural art. A CanvasGroup + shader outline was tried first and did nothing visible in the GL Compatibility renderer, so it was dropped. Real hand-made sprite sheets (4 armour looks x 11 weapon looks x many attack poses for the player alone) need an artist or a long dedicated asset pass; the art bible (docs/ART_BIBLE) is the target.

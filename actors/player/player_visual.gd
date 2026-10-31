@@ -49,6 +49,7 @@ var player: Player
 var preset: PresetData
 var preview := false
 var _t := 0.0
+var _ink := false   ## outline pass: every colour comes out as ink
 
 
 func _ready() -> void:
@@ -283,6 +284,13 @@ func _draw() -> void:
 		"dead":
 			_draw_dead(look, player.state_frame)
 			return
+	# 1 px ink outline: the figure drawn four times in ink, shifted, then once in colour on top.
+	_ink = true
+	for o in [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]:
+		draw_set_transform(o, 0.0, Vector2.ONE)
+		_draw_figure(look, p)
+	_ink = false
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	_draw_figure(look, p)
 	if player == null:
 		return
@@ -297,6 +305,8 @@ func _draw() -> void:
 
 
 func _c(col: Color, flash: float, alpha: float) -> Color:
+	if _ink:
+		return Color(Palette.INK, alpha * 0.9)
 	var out := col.lerp(Color.WHITE, flash)
 	out.a = alpha
 	return out

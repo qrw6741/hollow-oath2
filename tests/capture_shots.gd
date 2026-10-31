@@ -41,5 +41,8 @@ func _run() -> void:
 			GameFeel.rise(at + Vector2(-50, -6), Palette.EMBER, 16, 12.0)
 			GameFeel.dust(at, 8)
 			await frames(9)
+		if OS.get_environment("ZOOM") != "":
+			get_viewport().get_camera_2d().zoom = Vector2(3, 3)
+			await frames(10)
 		await shot("%s_%d" % [k, int(px)])
 	get_tree().quit()

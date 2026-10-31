@@ -16,6 +16,7 @@ var _display: Button
 var _res: Button
 var _render: Button
 var _glow: Button
+var _dmgnum: Button
 var _fps: Button
 var _vsync: Button
 var _icons: Button
@@ -73,6 +74,7 @@ func _ready() -> void:
 	_fps = _button(func(): Settings.fps_cap = Settings.FPS_CAPS[(Settings.FPS_CAPS.find(Settings.fps_cap) + 1) % Settings.FPS_CAPS.size()]; _video_changed(), p0)
 	_vsync = _button(func(): Settings.vsync = not Settings.vsync; _video_changed(), p0)
 	var p1 := _pages[1]
+	_dmgnum = _button(func(): Settings.damage_numbers = not Settings.damage_numbers; _refresh(), p1)
 	_dmg = _button(func(): Settings.damage_taken_pct = _cycle(Settings.DAMAGE_STEPS, Settings.damage_taken_pct); _refresh(), p1)
 	_ehp = _button(func(): Settings.enemy_health_pct = _cycle(Settings.ENEMY_HP_STEPS, Settings.enemy_health_pct); _refresh(), p1)
 	_assist = _button(func(): Settings.parry_assist = not Settings.parry_assist; _refresh(), p1)
@@ -163,6 +165,7 @@ func _refresh() -> void:
 	_vsync.text = "VSync: %s" % ("On" if Settings.vsync else "Off")
 	_shake.text = "Screen shake: %s" % ("On" if Settings.screen_shake > 0.0 else "Off")
 	_flashes.text = "Hit flashes: %s" % ("On" if Settings.flashes else "Off")
+	_dmgnum.text = "Damage numbers: %s" % ("On" if Settings.damage_numbers else "Off")
 	_hitstop.text = "Hit-stop: %s" % ("On" if Settings.hit_stop else "Off")
 	_volume_label.text = "%d%%" % roundi(Settings.master_volume * 100.0)
 	_music_label.text = "%d%%" % roundi(Settings.music_volume * 100.0)

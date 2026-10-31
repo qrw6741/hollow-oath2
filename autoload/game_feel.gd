@@ -66,6 +66,8 @@ func _burst(k: int, at: Vector2, color: Color, amount: int, r: float) -> void:
 
 
 func damage_number(at: Vector2, amount: float, critical := false) -> void:
+	if not Settings.damage_numbers:
+		return
 	var n := DamageNumber.new()
 	n.setup(amount, critical)
 	_fx_parent().add_child(n)

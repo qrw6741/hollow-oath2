@@ -183,3 +183,4 @@
 - Reachability is checked by a geometric audit and a bot on two maps (Reliquary, Weeping Ossuary); the other maps are audit-only, not walked. Auto-added steps are plain blocks (temporary look).
 - bot_all sweep shows no script errors but the bot is invulnerable and mashes attack: balance, dialogue and shop flow are still untested by anyone.
 - New post-process (bloom, grain) and fog layer are untested for frame rate on real GPUs/Windows; Settings > 'Glow & colour grading' turns the post pass off.
+- Outline pass skipped for 5 enemy visuals + Lurker/Mimic (internal draw_set_transform). Art is still procedural, not hand-made sprites.

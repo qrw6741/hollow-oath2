@@ -149,7 +149,7 @@ func _process(delta: float) -> void:
 		zoom = clampf(zoom * (1.0 + 1.6 * delta), ZOOM_MIN, ZOOM_MAX)
 	if Input.is_action_pressed(&"parry"):
 		zoom = clampf(zoom / (1.0 + 1.6 * delta), ZOOM_MIN, ZOOM_MAX)
-	_area.text = _area_line()
+	_area.text = _area_line() + "\n" + Progress.text()
 	_canvas.queue_redraw()
 
 

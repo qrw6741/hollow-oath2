@@ -28,7 +28,7 @@ func _physics_process(delta: float) -> void:
 	queue_redraw()
 
 
-func _draw() -> void:
+func _draw_body() -> void:
 	if enemy == null:
 		return
 	var s := enemy.state
@@ -158,6 +158,22 @@ func _draw() -> void:
 
 
 func _c(col: Color, flash: float, alpha: float) -> Color:
+	if _ink:
+		return Color(Palette.INK, alpha * 0.9)
 	var out := col.lerp(Color.WHITE, flash)
 	out.a = alpha
 	return out
+
+
+## 1 px ink outline: the body drawn four times in ink, shifted, then once in colour on top.
+var _ink := false
+
+
+func _draw() -> void:
+	_ink = true
+	for o in [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]:
+		draw_set_transform(o, 0.0, Vector2.ONE)
+		_draw_body()
+	_ink = false
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	_draw_body()

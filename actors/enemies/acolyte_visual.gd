@@ -21,12 +21,14 @@ func _physics_process(delta: float) -> void:
 
 
 func _c(col: Color, flash: float, alpha: float) -> Color:
+	if _ink:
+		return Color(Palette.INK, alpha * 0.9)
 	var o := col.lerp(Color.WHITE, flash)
 	o.a = alpha
 	return o
 
 
-func _draw() -> void:
+func _draw_body() -> void:
 	if enemy == null:
 		return
 	var s := enemy.state
@@ -112,3 +114,17 @@ func _draw() -> void:
 	if enemy.is_riposte_ready():
 		var y := -42.0 + sin(_t * 6.0) * 1.5
 		draw_colored_polygon(PackedVector2Array([Vector2(0, y - 4), Vector2(3, y), Vector2(0, y + 4), Vector2(-3, y)]), Palette.GOLD_BRIGHT)
+
+
+## 1 px ink outline: the body drawn four times in ink, shifted, then once in colour on top.
+var _ink := false
+
+
+func _draw() -> void:
+	_ink = true
+	for o in [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]:
+		draw_set_transform(o, 0.0, Vector2.ONE)
+		_draw_body()
+	_ink = false
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	_draw_body()

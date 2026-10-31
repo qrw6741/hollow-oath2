@@ -55,6 +55,7 @@ func _build() -> void:
 	_button("Inventory", func(): Events.inventory_menu_requested.emit())
 	_button("Map", func(): Events.map_requested.emit())
 	_button("Settings", _open_settings)
+	_button("Stuck? Return to last candle", _unstick)
 	_menu_btn = _button("Quit to Main Menu", _on_quit_to_menu)
 	_button("Quit to Desktop", func(): get_tree().quit())
 
@@ -117,6 +118,13 @@ func _resume() -> void:
 	get_tree().paused = false
 	_panel.visible = false
 	_disarm()
+
+
+## Safety net: puts you back at your last Oath Candle (no death, no lost embers; enemies reset like a rest).
+func _unstick() -> void:
+	_resume()
+	Events.respawn_requested.emit()
+	Events.banner_requested.emit("Back at your last candle")
 
 
 func _open_settings() -> void:
