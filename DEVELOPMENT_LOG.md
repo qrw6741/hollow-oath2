@@ -388,3 +388,4 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 ## Step: Talisman icons
 - ui/icons/talisman_art.gd (TalismanArt): every talisman has its own procedural 16x16 icon (bell, crest, key, nail, flame, post-and-bar, tear, salt crystals, chain links, anvil, crown, bellflower, thorn seed, gear, wafer-cross, four-point star, bead, feather, ember bead, needle and thread, whetstone, knot, pebble). Boss talismans get a gilded rim, four studs, a glowing gem tinted by the item colour and a pulsing aura; elite ones get a plain silver rim. IconArt routes `tal_*` ids to it.
 - tests/capture_icons.tscn renders a contact sheet of all of them (needs a display). Checked visually in Xvfb; not on a Windows display. Still placeholder art, not hand-painted.
+- Size: to stay under the one-file cap the night and chapel music were re-encoded at 8 kbps (was 10); not listened to. Zip 31,433,221 bytes.
