@@ -19,6 +19,10 @@ const LEVELS := [
 	"res://world/levels/sunken_reliquary.tscn",
 	"res://world/levels/hollow_keep.tscn",
 	"res://world/levels/drowned_belfry.tscn",
+	"res://world/levels/crownless_citadel.tscn",
+	"res://world/levels/sunken_basilica.tscn",
+	"res://world/levels/iron_orrery.tscn",
+	"res://world/levels/bleeding_gardens.tscn",
 ]
 const CELL := 64.0
 const REVEAL_RADIUS := 3     # cells around the player revealed as you walk

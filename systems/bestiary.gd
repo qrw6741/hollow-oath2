@@ -8,7 +8,7 @@ const IDS: Array[StringName] = [
 	&"carrion_crow", &"gloam_moth", &"roadside_pikeman", &"hollow_penitent", &"ember_acolyte",
 	&"oathguard", &"mimic", &"hollow_archer", &"candle_cantor", &"gilded_penitent",
 	&"pike_sergeant", &"oathguard_captain", &"bell_bearer", &"drowned_canon",
-	&"cellarer_grume", &"sexton_hale", &"mother_cinder", &"ser_ashfall", &"drowned_pilgrim", &"reliquary_lurker", &"salt_abbot", &"gaoler_vess", &"foundrymaster_brand", &"hollow_regent", &"last_ringer", &"bell_warden", &"hollow_marshal",
+	&"cellarer_grume", &"sexton_hale", &"mother_cinder", &"ser_ashfall", &"drowned_pilgrim", &"reliquary_lurker", &"salt_abbot", &"gaoler_vess", &"foundrymaster_brand", &"hollow_regent", &"last_ringer", &"crownless_king", &"drowned_bishop", &"orrerist", &"thornmother", &"bell_warden", &"hollow_marshal",
 ]
 const LORE_AT := 1
 const WEAK_AT := 3

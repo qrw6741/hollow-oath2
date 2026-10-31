@@ -4,7 +4,7 @@ extends Node2D
 ## style SEXTON: wide hat, long black coat, a grave-spade, a cold blue lantern on the belt.
 ## Telegraphs: overhead (smash) glints = parryable; sweep glows red where it can't be parried.
 
-enum Style { CELLARER, SEXTON, CINDER, ASHFALL, SALT, GAOLER, FOUNDRY, REGENT, RINGER }
+enum Style { CELLARER, SEXTON, CINDER, ASHFALL, SALT, GAOLER, FOUNDRY, REGENT, RINGER, THORN, IRON, BASILICA, CROWNLESS }
 @export var style := Style.CELLARER
 
 var enemy: EnemyBase
@@ -110,7 +110,11 @@ func _draw() -> void:
 	var foundry := style == Style.FOUNDRY
 	var regent := style == Style.REGENT
 	var ringer := style == Style.RINGER
-	var sexton := style == Style.SEXTON or ashfall or salt or regent or ringer   # long-coat silhouette with a blade
+	var thorn := style == Style.THORN
+	var iron := style == Style.IRON
+	var basilica := style == Style.BASILICA
+	var crownless := style == Style.CROWNLESS
+	var sexton := style == Style.SEXTON or ashfall or salt or regent or ringer or thorn or basilica or crownless   # long-coat silhouette with a blade
 	var coat := Color("2a2530") if sexton else Color("5a4a3a")
 	var trim := Color("4a4258") if sexton else Color("8a7a60")
 	if cinder:
@@ -128,6 +132,18 @@ func _draw() -> void:
 	elif foundry:
 		coat = Color("4a2a1e")
 		trim = Color("ff9a3c")
+	elif thorn:
+		coat = Color("3a2a34")
+		trim = Color("c04060")
+	elif iron:
+		coat = Color("3c3a40")
+		trim = Color("d0a050")
+	elif basilica:
+		coat = Color("2a4048")
+		trim = Color("9ad0d8")
+	elif crownless:
+		coat = Color("2a2430")
+		trim = Color("f0f0f8")
 	elif ringer:
 		coat = Color("5a4630")
 		trim = Color("e0b060")
@@ -160,6 +176,23 @@ func _draw() -> void:
 	if foundry:
 		for i in 4:
 			draw_circle(hip + Vector2(-9 + i * 6, 6 - absf(sin(_t * 4.0 + i)) * 4.0), 1.2, Color(1.0, 0.6, 0.2, 0.8 * alpha))
+	if thorn:
+		for i in 6:
+			var tx := -9.0 + i * 3.6
+			draw_line(shoulder + Vector2(tx, 8), shoulder + Vector2(tx + (3 if i % 2 else -3), 3 - (i % 3)), _c(Color("c04060"), flash, alpha), 1.2)
+	if iron:
+		# A turning gear on the back.
+		var gp := shoulder + Vector2(-8, 4)
+		draw_arc(gp, 6.0, 0.0, TAU, 12, _c(Color("d0a050"), flash, alpha), 1.6)
+		for i in 6:
+			var ga := _t * 1.5 + i * TAU / 6.0
+			draw_line(gp + Vector2(cos(ga), sin(ga)) * 5.0, gp + Vector2(cos(ga), sin(ga)) * 8.0, _c(Color("d0a050"), flash, alpha), 1.6)
+	if basilica:
+		for i in 4:
+			draw_circle(hip + Vector2(-8 + i * 5, 10 + sin(_t * 2.0 + i) * 2.0), 1.3, Color(0.6, 0.85, 0.95, 0.7 * alpha))
+	if crownless:
+		draw_circle(head + Vector2(0, -2), 12.0 + sin(_t * 2.5) * 1.5, Color(0.9, 0.9, 1.0, 0.09 * alpha))
+		draw_arc(head + Vector2(0, -7), 6.0, PI, TAU, 10, Color(0.95, 0.95, 1.0, 0.5 * alpha), 1.0)
 	if ringer:
 		# A bronze bell hung at the hip, swinging with the stride.
 		var bp := hip + Vector2(-10, 4 + sin(_t * 2.5) * 1.5)

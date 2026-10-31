@@ -9,7 +9,7 @@ const RUSH_BOSSES: Array[String] = [
 	"res://actors/bosses/bell_warden.tscn", "res://actors/bosses/cellarer_grume.tscn",
 	"res://actors/bosses/hollow_marshal.tscn", "res://actors/bosses/sexton_hale.tscn",
 	"res://actors/bosses/mother_cinder.tscn", "res://actors/bosses/salt_abbot.tscn",
-	"res://actors/bosses/gaoler_vess.tscn", "res://actors/bosses/foundrymaster_brand.tscn", "res://actors/bosses/hollow_regent.tscn", "res://actors/bosses/last_ringer.tscn",
+	"res://actors/bosses/gaoler_vess.tscn", "res://actors/bosses/foundrymaster_brand.tscn", "res://actors/bosses/hollow_regent.tscn", "res://actors/bosses/last_ringer.tscn", "res://actors/bosses/crownless_king.tscn", "res://actors/bosses/drowned_bishop.tscn", "res://actors/bosses/orrerist.tscn", "res://actors/bosses/thornmother.tscn",
 	"res://actors/bosses/ser_ashfall.tscn",
 ]
 const E := "res://actors/enemies/"

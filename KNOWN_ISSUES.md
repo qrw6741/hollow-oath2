@@ -152,3 +152,9 @@
 - Last Ringer is another brute recolour (placeholder, bell prop); its balance is a first guess and untested by a human.
 - The Crown ending's epilogue text and tint are first drafts; the ending menu now has four buttons and was not checked visually.
 - The "Mend" ending now needs Hesk's errand, so it needs Vess killed in the Keep. Intentional, but worth knowing.
+
+## Four more parts
+- The four new regions share one layout template (different enemies, hazards, tint and lore), so they will feel similar to walk. They have no new enemy types, NPCs or shops.
+- The four bosses are placeholder recolours of the brute with small props; their balance numbers are guesses that no human has tested. The Boss Rush (15 bosses) is very long and its reward was not retuned.
+- The Hall backdrop styles used (0 and 1) were not looked at on screen for these regions.
+- Windows build still not launched on Windows.

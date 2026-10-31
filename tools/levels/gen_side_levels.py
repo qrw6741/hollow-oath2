@@ -56,6 +56,10 @@ EXT = {
     "ringer": ("PackedScene", "res://actors/bosses/last_ringer.tscn"),
     "bearer": ("PackedScene", "res://actors/enemies/bell_bearer.tscn"),
     "moth": ("PackedScene", "res://actors/enemies/gloam_moth.tscn"),
+    "thornmother": ("PackedScene", "res://actors/bosses/thornmother.tscn"),
+    "orrerist": ("PackedScene", "res://actors/bosses/orrerist.tscn"),
+    "bishop": ("PackedScene", "res://actors/bosses/drowned_bishop.tscn"),
+    "crownless": ("PackedScene", "res://actors/bosses/crownless_king.tscn"),
     "regent": ("PackedScene", "res://actors/bosses/hollow_regent.tscn"),
     "it_wick": ("Resource", "res://data/items/cantors_wick.tres"),
     "it_knot": ("Resource", "res://data/items/relic_knot.tres"),
@@ -848,8 +852,113 @@ color = Color(0.66, 0.62, 0.78, 1)
     L.chest("BelfryChest", 880, 480, "belfry_chest", count=2, embers=800, item="it_draught")
     L.chest("LoftChest", 1360, 392, "belfry_chest_2", count=1, embers=900, item="it_shard")
     L.arena("RingerArena", 2600, 480, "ringer", "THE BELL RINGS NO MORE", 420, 620)
+    L.walk_exit("ToGardens", 4710, 480, "res://world/levels/bleeding_gardens.tscn", "from_prev")
+    L.entry("FromGardens", 4620, 480, "from_next")
     L.chest("BelfryCache", 4300, 480, "belfry_cache", count=3, embers=1500, item="it_shard")
     L.write()
+
+
+PART_SPECS = [
+    dict(level="bleeding_gardens", name="The Bleeding Gardens", node="BleedingGardens", prev=("drowned_belfry", BELFRY), nxt="iron_orrery",
+         tint="(0.82, 0.62, 0.7, 1)", pitch=0.7, origin=12000, seed=151, style=0, boss="thornmother", text="THE GARDEN GOES TO SEED",
+         ground=["moth", "penitent", "cantor", "moth", "gilded", "penitent"], step=["bearer", "captain"], loft=["archer", "archer"],
+         hazard="spikes", tabs=("Gardener's Tag", "A wooden tag on a rose stem: 'ELSBET. PLEASE WATER.' The water was never the problem.", "The Last Bloom", "One rose, black at the edges, grown through a fence of ribs. It is the only thing in the garden that is not moving."),
+         cands=("Garden Gate Candle", "Bower Candle")),
+    dict(level="iron_orrery", name="The Iron Orrery", node="IronOrrery", prev=("bleeding_gardens", None), nxt="sunken_basilica",
+         tint="(0.78, 0.7, 0.55, 1)", pitch=0.68, origin=13600, seed=173, style=1, boss="orrerist", text="THE CLOCK STOPS",
+         ground=["sergeant", "gilded", "captain", "bearer", "sergeant", "cantor"], step=["captain", "gilded"], loft=["archer", "archer"],
+         hazard="jet", tabs=("Calloway's Note", "A card pinned to a brass arm: 'The Crown returns on the 1,461st day. I have recounted. It was the 1,461st yesterday.'", "The Stopped Face", "A great dial with no hands. Someone has scratched a face where the hands should be."),
+         cands=("Orrery Gate Candle", "Escapement Candle")),
+    dict(level="sunken_basilica", name="The Sunken Basilica", node="SunkenBasilica", prev=("iron_orrery", None), nxt="crownless_citadel",
+         tint="(0.5, 0.68, 0.76, 1)", pitch=0.64, origin=15200, seed=191, style=1, boss="bishop", text="THE SERMON ENDS",
+         ground=["pilgrim", "lurker", "pilgrim", "cantor", "lurker", "pilgrim"], step=["pilgrim", "gilded"], loft=["archer", "archer"],
+         hazard="water", tabs=("The Pulpit Scrawl", "Scratched under the water line: 'HE IS STILL PREACHING. WE ARE STILL KNEELING. THE WATER HAS REACHED THE SECOND PEW.'", "The Flooded Nave", "The pews are in rows. The rows are under water. The hymn board reads, in drowned numerals: ONE HUNDRED AND FOUR."),
+         cands=("Basilica Gate Candle", "Nave Candle")),
+    dict(level="crownless_citadel", name="The Crownless Citadel", node="CrownlessCitadel", prev=("sunken_basilica", None), nxt=None,
+         tint="(0.7, 0.66, 0.78, 1)", pitch=0.6, origin=16800, seed=211, style=1, boss="crownless", text="THE THRONE IS EMPTY",
+         ground=["captain", "gilded", "sergeant", "captain", "cantor", "gilded"], step=["captain", "gilded"], loft=["archer", "archer"],
+         hazard="jet", tabs=("The Roll of Kings", "A scroll of names, each crossed out. The last has no name, only a crown drawn in ink and left unfinished.", "The Empty Hall", "A long hall of chairs, all facing a throne. On the throne sits nothing, very carefully."),
+         cands=("Citadel Gate Candle", "Hall of Chairs Candle")),
+]
+
+
+def parts():
+    for sp in PART_SPECS:
+        W = 5000
+        L = Level(sp["level"] + ".tscn")
+        L.use("hall")
+        lvl = sp["level"]
+        L.node(f'''
+[node name="{sp["node"]}" type="Node2D"]
+script = ExtResource("level")
+level_id = &"{lvl}"
+display_name = "{sp["name"]}"
+bounds = Rect2(0, 0, {W}, 540)
+music = &"catacombs"
+music_pitch = {sp["pitch"]}
+map_origin = Vector2({sp["origin"]}, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("hall")
+width = {W}.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = {sp["seed"]}
+ghosts = 5
+style = {sp["style"]}
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color{sp["tint"]}
+
+[node name="Geometry" type="Node2D" parent="."]''')
+        L.block("CliffLeft", 0, 0, 16, 480)
+        L.block("Ground", 16, 480, W - 16, 60, style=3)
+        L.block("CliffRight", W - 60, 0, 60, 540)
+        L.block("Ceiling", 0, 40, W, 56)
+        L.block("StepA", 600, 452, 200, 28, style=1)
+        L.plank("LoftA", 1000, 400, 150)
+        L.plank("LoftB", 1300, 392, 130)
+        L.block("StepB", 1750, 450, 200, 30, style=1)
+        L.block("StepC", 3500, 452, 200, 28, style=1)
+        L.plank("LoftC", 3900, 398, 150)
+        prev_level, prev_path = sp["prev"]
+        prev_path = prev_path or f"res://world/levels/{prev_level}.tscn"
+        L.entry("FromPrev", 130, 480, "from_prev")
+        L.walk_exit("ToPrev", 34, 480, prev_path, "from_next")
+        L.entry("FromNext", W - 140, 480, "from_next")
+        if sp["nxt"]:
+            L.walk_exit("ToNext", W - 90, 480, f"res://world/levels/{sp['nxt']}.tscn", "from_prev")
+        L.candle("GateCandle", 300, 480, lvl + "_gate_candle", sp["cands"][0])
+        L.candle("MidCandle", 2050, 480, lvl + "_mid_candle", sp["cands"][1])
+        L.tablet("TabletA", 420, 480, sp["tabs"][0], sp["tabs"][1])
+        L.tablet("TabletB", 4000, 480, sp["tabs"][2], sp["tabs"][3])
+        gx = [520, 880, 1180, 1500, 2250, 2400]
+        for i, sc in enumerate(sp["ground"]):
+            L.enemy(f"Ground{i}", sc, gx[i], 480, 40 if sc not in ("lurker", "moth") else (0 if sc == "lurker" else 40))
+        L.enemy("StepFoeA", sp["step"][0], 780, 452, 40)
+        L.enemy("StepFoeB", sp["step"][1], 1910, 450, 40)
+        L.enemy("LoftArcherA", sp["loft"][0], 1040, 400, 20, -1)
+        L.enemy("LoftArcherB", sp["loft"][1], 1360, 392, 20, -1)
+        L.enemy("RearGuard", "captain", 3600, 452, 40)
+        if sp["hazard"] == "spikes":
+            L.spikes("Spikes", 1560, 480, 48)
+            L.spikes("SpikesB", 2300, 480, 48)
+        elif sp["hazard"] == "jet":
+            L.jet("JetA", 1450, 480, 0.0)
+            L.jet("JetB", 1480, 480, 1.5)
+            L.jet("JetC", 2300, 480, 0.8, 2.6)
+        else:
+            L.water("FloodA", 1000, 466, 700, 14)
+            L.water("FloodB", 2200, 466, 500, 14)
+            L.spikes("Spikes", 1560, 480, 48)
+        L.chest("ChestA", 900, 480, lvl + "_chest", count=2, embers=900, item="it_draught")
+        L.chest("ChestB", 1360, 392, lvl + "_chest_2", count=1, embers=1000, item="it_shard")
+        L.chest("ChestC", 3960, 398, lvl + "_chest_3", count=1, embers=1100, item="it_knot")
+        L.chest("Cache", 4400, 480, lvl + "_cache", count=3, embers=1800, item="it_shard")
+        L.arena("BossArena", 2600, 480, sp["boss"], sp["text"], 420, 620)
+        L.write()
 
 
 if __name__ == "__main__":
@@ -857,6 +966,7 @@ if __name__ == "__main__":
     reliquary()
     keep()
     belfry()
+    parts()
     cellar()
     gallery()
     graveyard()

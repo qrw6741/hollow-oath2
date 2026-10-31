@@ -257,6 +257,18 @@ trigger_offset = 36.0
 trigger_width = 620.0
 victory_text = "THE BELL RINGS NO MORE"
 
+[node name="ToGardens" type="Area2D" parent="."]
+position = Vector2(4710, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/bleeding_gardens.tscn"
+target_entry = &"from_prev"
+size = Vector2(12, 80)
+
+[node name="FromGardens" type="Marker2D" parent="."]
+position = Vector2(4620, 480)
+script = ExtResource("entry")
+entry_id = &"from_next"
+
 [node name="BelfryCache" type="Area2D" parent="."]
 position = Vector2(4300, 480)
 script = ExtResource("chest")

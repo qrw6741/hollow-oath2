@@ -23,9 +23,13 @@ const DEFS := {
 	&"relic_shackle": {"title": "Gaoler's Shackle", "desc": "Resist 30% of every status buildup.", "effect": "status_resist", "value": 0.3},
 	&"relic_slag": {"title": "Foundry Ladle", "desc": "Ember Vials heal 40% more.", "effect": "flask_heal", "value": 1.4},
 	&"relic_clapper": {"title": "Bell Clapper", "desc": "Foes pay 35% more embers.", "effect": "ember_gain", "value": 1.35},
+	&"relic_briar": {"title": "Briar Locket", "desc": "Focus builds 40% faster.", "effect": "focus_gain", "value": 1.4},
+	&"relic_gear": {"title": "Orrery Gear", "desc": "Your weapon's status builds 50% faster.", "effect": "weapon_status", "value": 1.5},
+	&"relic_chalice": {"title": "Drowned Chalice", "desc": "Ember Vials heal 60% more.", "effect": "flask_heal", "value": 1.6},
+	&"relic_oathbreaker": {"title": "Oathbreaker's Ring", "desc": "A parry gives 30 extra focus.", "effect": "parry_focus", "value": 30.0},
 	&"relic_regent": {"title": "Hollow Crown", "desc": "A parry gives 20 extra focus.", "effect": "parry_focus", "value": 20.0},
 }
-const IDS: Array[StringName] = [&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte", &"relic_shackle", &"relic_slag", &"relic_regent", &"relic_clapper"]
+const IDS: Array[StringName] = [&"relic_locket", &"relic_thorn", &"relic_knot", &"relic_coin", &"relic_candle", &"relic_riposte", &"relic_shackle", &"relic_slag", &"relic_regent", &"relic_clapper", &"relic_briar", &"relic_gear", &"relic_chalice", &"relic_oathbreaker"]
 
 
 static func owned(id: StringName) -> bool:

@@ -18,6 +18,10 @@ const DEFS := {
 	&"brand_down": {"title": "Furnace Out", "desc": "Defeat Foundrymaster Brand."},
 	&"regent_down": {"title": "Long Live Nobody", "desc": "Defeat the Hollow Regent."},
 	&"ringer_down": {"title": "Silence in the Tower", "desc": "Defeat the Last Ringer."},
+	&"gardens_down": {"title": "Thorns Cut", "desc": "Defeat Elsbet, the Thornmother."},
+	&"orrery_down": {"title": "Time Called", "desc": "Defeat Calloway, the Orrerist."},
+	&"basilica_down": {"title": "Amen", "desc": "Defeat Bishop Anselm."},
+	&"king_down": {"title": "Long Live No One", "desc": "Defeat the Crownless King."},
 	&"secrets": {"title": "Seeker", "desc": "Find 4 hidden places."},
 	&"all_arts": {"title": "Every Art", "desc": "Learn every art."},
 	&"elite_ten": {"title": "Giant Slayer", "desc": "Slay 10 elite foes."},
@@ -31,7 +35,7 @@ const DEFS := {
 	&"survive_night": {"title": "Night Walker", "desc": "Reach dawn after a night on the road."},
 }
 const ORDER: Array[StringName] = [
-	&"first_blood", &"hundred_dead", &"warden_down", &"marshal_down", &"cellarer_down", &"sexton_down", &"cinder_down", &"ashfall_down", &"abbot_down", &"gaoler_down", &"brand_down", &"regent_down", &"ringer_down", &"secrets", &"all_arts", &"elite_ten",
+	&"first_blood", &"hundred_dead", &"warden_down", &"marshal_down", &"cellarer_down", &"sexton_down", &"cinder_down", &"ashfall_down", &"abbot_down", &"gaoler_down", &"brand_down", &"regent_down", &"ringer_down", &"gardens_down", &"orrery_down", &"basilica_down", &"king_down", &"secrets", &"all_arts", &"elite_ten",
 	&"errands", &"bestiary_half", &"bestiary_full", &"level_10", &"all_status", &"gallery", &"survive_night", &"ending",
 ]
 
@@ -67,6 +71,10 @@ static func _met(id: StringName) -> bool:
 		&"brand_down": return _boss("foundrymaster_brand")
 		&"regent_down": return _boss("hollow_regent")
 		&"ringer_down": return _boss("last_ringer")
+		&"gardens_down": return _boss("thornmother")
+		&"orrery_down": return _boss("orrerist")
+		&"basilica_down": return _boss("drowned_bishop")
+		&"king_down": return _boss("crownless_king")
 		&"secrets": return Secrets.count() >= Secrets.NEEDED_FOR_DEED
 		&"all_arts": return Arts.learned_count() >= Arts.ORDER.size()
 		&"elite_ten": return Bestiary.kills(&"gilded_penitent") + Bestiary.kills(&"oathguard_captain") + Bestiary.kills(&"pike_sergeant") >= 10

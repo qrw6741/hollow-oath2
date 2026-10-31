@@ -1,0 +1,299 @@
+[gd_scene load_steps=23 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gloam_moth.tscn" id="moth"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_penitent.tscn" id="penitent"]
+[ext_resource type="PackedScene" path="res://actors/enemies/candle_cantor.tscn" id="cantor"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gilded_penitent.tscn" id="gilded"]
+[ext_resource type="PackedScene" path="res://actors/enemies/bell_bearer.tscn" id="bearer"]
+[ext_resource type="PackedScene" path="res://actors/enemies/oathguard_captain.tscn" id="captain"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
+[ext_resource type="Script" path="res://world/hazards/spike_pit.gd" id="spikes"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Resource" path="res://data/items/relic_knot.tres" id="it_knot"]
+[ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
+[ext_resource type="PackedScene" path="res://actors/bosses/thornmother.tscn" id="thornmother"]
+
+[node name="BleedingGardens" type="Node2D"]
+script = ExtResource("level")
+level_id = &"bleeding_gardens"
+display_name = "The Bleeding Gardens"
+bounds = Rect2(0, 0, 5000, 540)
+music = &"catacombs"
+music_pitch = 0.7
+map_origin = Vector2(12000, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("hall")
+width = 5000.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 151
+ghosts = 5
+style = 0
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.82, 0.62, 0.7, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(4984, 60)
+style = 3
+seed_value = 902
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(4940, 0)
+script = ExtResource("block")
+size = Vector2(60, 540)
+style = 1
+seed_value = 903
+
+[node name="Ceiling" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 40)
+script = ExtResource("block")
+size = Vector2(5000, 56)
+style = 1
+seed_value = 904
+
+[node name="StepA" type="StaticBody2D" parent="Geometry"]
+position = Vector2(600, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 905
+
+[node name="LoftA" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1000, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 906
+one_way = true
+
+[node name="LoftB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1300, 392)
+script = ExtResource("block")
+size = Vector2(130, 6)
+style = 2
+seed_value = 907
+one_way = true
+
+[node name="StepB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1750, 450)
+script = ExtResource("block")
+size = Vector2(200, 30)
+style = 1
+seed_value = 908
+
+[node name="StepC" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3500, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 909
+
+[node name="LoftC" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3900, 398)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 910
+one_way = true
+
+[node name="FromPrev" type="Marker2D" parent="."]
+position = Vector2(130, 480)
+script = ExtResource("entry")
+entry_id = &"from_prev"
+
+[node name="ToPrev" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/drowned_belfry.tscn"
+target_entry = &"from_next"
+size = Vector2(12, 80)
+
+[node name="FromNext" type="Marker2D" parent="."]
+position = Vector2(4860, 480)
+script = ExtResource("entry")
+entry_id = &"from_next"
+
+[node name="ToNext" type="Area2D" parent="."]
+position = Vector2(4910, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/iron_orrery.tscn"
+target_entry = &"from_prev"
+size = Vector2(12, 80)
+
+[node name="GateCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(300, 480)
+checkpoint_id = &"bleeding_gardens_gate_candle"
+display_name = "Garden Gate Candle"
+
+[node name="MidCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(2050, 480)
+checkpoint_id = &"bleeding_gardens_mid_candle"
+display_name = "Bower Candle"
+
+[node name="TabletA" type="Area2D" parent="."]
+position = Vector2(420, 480)
+script = ExtResource("tablet")
+title = "Gardener's Tag"
+text = "A wooden tag on a rose stem: 'ELSBET. PLEASE WATER.' The water was never the problem."
+
+[node name="TabletB" type="Area2D" parent="."]
+position = Vector2(4000, 480)
+script = ExtResource("tablet")
+title = "The Last Bloom"
+text = "One rose, black at the edges, grown through a fence of ribs. It is the only thing in the garden that is not moving."
+
+[node name="Ground0" type="Marker2D" parent="."]
+position = Vector2(520, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Ground1" type="Marker2D" parent="."]
+position = Vector2(880, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Ground2" type="Marker2D" parent="."]
+position = Vector2(1180, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Ground3" type="Marker2D" parent="."]
+position = Vector2(1500, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Ground4" type="Marker2D" parent="."]
+position = Vector2(2250, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Ground5" type="Marker2D" parent="."]
+position = Vector2(2400, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoeA" type="Marker2D" parent="."]
+position = Vector2(780, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("bearer")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoeB" type="Marker2D" parent="."]
+position = Vector2(1910, 450)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="LoftArcherA" type="Marker2D" parent="."]
+position = Vector2(1040, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="LoftArcherB" type="Marker2D" parent="."]
+position = Vector2(1360, 392)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="RearGuard" type="Marker2D" parent="."]
+position = Vector2(3600, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Spikes" type="Area2D" parent="."]
+position = Vector2(1560, 480)
+script = ExtResource("spikes")
+width = 48.0
+damage = 20.0
+
+[node name="SpikesB" type="Area2D" parent="."]
+position = Vector2(2300, 480)
+script = ExtResource("spikes")
+width = 48.0
+damage = 20.0
+
+[node name="ChestA" type="Area2D" parent="."]
+position = Vector2(900, 480)
+script = ExtResource("chest")
+chest_id = &"bleeding_gardens_chest"
+count = 2
+embers = 900
+item = ExtResource("it_draught")
+
+[node name="ChestB" type="Area2D" parent="."]
+position = Vector2(1360, 392)
+script = ExtResource("chest")
+chest_id = &"bleeding_gardens_chest_2"
+count = 1
+embers = 1000
+item = ExtResource("it_shard")
+
+[node name="ChestC" type="Area2D" parent="."]
+position = Vector2(3960, 398)
+script = ExtResource("chest")
+chest_id = &"bleeding_gardens_chest_3"
+count = 1
+embers = 1100
+item = ExtResource("it_knot")
+
+[node name="Cache" type="Area2D" parent="."]
+position = Vector2(4400, 480)
+script = ExtResource("chest")
+chest_id = &"bleeding_gardens_cache"
+count = 3
+embers = 1800
+item = ExtResource("it_shard")
+
+[node name="BossArena" type="Node2D" parent="."]
+position = Vector2(2600, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("thornmother")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "THE GARDEN GOES TO SEED"

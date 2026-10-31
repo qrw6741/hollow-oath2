@@ -363,3 +363,10 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - **Boss death feel**: a 0.3 s freeze, a heavy shake and a spark burst when any boss dies (honours the hit-stop and screen-shake settings).
 - Not done: shortcut gates (candles already work as fast travel, the new levels are linear), real art, audio rework, GitHub.
 - Tests: new test_belfry_and_crown; test_minibosses covers the Ringer.
+
+## Step: Four more parts (Bleeding Gardens, Iron Orrery, Sunken Basilica, Crownless Citadel)
+- Four regions chained after the Drowned Belfry (Belfry `ToGardens` → Gardens → Orrery → Basilica → Citadel; each has `ToPrev`/`ToNext`, entries `from_prev`/`from_next`). Generated from `PART_SPECS` / `parts()` in tools/levels/gen_side_levels.py: 5000 wide, two candles, two lore tablets, ~11 enemies (existing types, themed per region), three chests and a cache, one hazard type (spikes / fire jets / water), one boss arena. Map origins continue along the world map.
+- Bosses (tools/gen_parts.py, brute_visual styles THORN / IRON / BASILICA / CROWNLESS): Elsbet the Thornmother (1300 HP, poison), Calloway the Orrerist (1450, bleed), Bishop Anselm the Drowned (1650, frost), the Crownless King (2200, burn). Four attacks each (three plus a phase-2 leap), first-guess numbers.
+- Relics: Briar Locket (focus +40%), Orrery Gear (weapon status +50%), Drowned Chalice (vial heal +60%), Oathbreaker's Ring (parry +30 focus). Existing effects, no new hooks. Vesper has lines for each. Deeds for each boss; all four join the Boss Rush (15 bosses now).
+- Tests: test_four_parts (levels, links, placement, registration), test_minibosses extended to every boss.
+- Not done: new enemy types for these regions (they reuse existing ones), NPCs, real art.

@@ -173,6 +173,10 @@ const ARCHIVE := {
 	&"relic_shackle": "Vess's shackle. Every cell in the Keep had a ledger; hers had one entry, repeated. I would not wear it for comfort. It is, however, very good at not being moved.",
 	&"relic_slag": "A foundry ladle. Brand poured the Keep's chains, bells and crowns from it. It still holds the warmth of the last one.",
 	&"relic_clapper": "A bell clapper. Tolland rang every vow in Vaelmoor with this, and then every funeral. It pays well, the way grief does, to those who can bear the weight.",
+	&"relic_briar": "The Briar Locket. Elsbet pressed a rose into every one of these for the dead. The rose grew through it. I would not wear it near a window.",
+	&"relic_gear": "A gear from the Orrery. Calloway swore it counted the days until the Crown's return. It counts something. I would rather not know what.",
+	&"relic_chalice": "The Drowned Chalice. It was used for the last blessing before the nave flooded. It has never been empty since. I hope you do not drink from it.",
+	&"relic_oathbreaker": "A ring broken and bound again. Whoever wore it chose the oath and unchose it, repeatedly. It has a kind of wisdom in it. It is not a comfortable one.",
 	&"relic_regent": "The Hollow Crown. I had hoped it was a legend. Hold it carefully: it rewards those who strike the moment someone else strikes first.",
 	&"sextons_lantern": "The Sexton's lantern. It lit every burial in the Pilgrim's Graveyard for a hundred years. It will light yours too, if you let it - and I would rather you did not.",
 }
