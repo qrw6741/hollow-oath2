@@ -62,7 +62,7 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"armor_pilgrim_coat", &"armor_penitent_shroud", &"armor_canons_mail", &"armor_marshal_plate", &"armor_ghostlight_raiment": _armor_generic(ci, id)
 		_:
 			if String(id).begins_with("tal_"):
-				_relic(ci, id, t)
+				TalismanArt.draw(ci, id, t)
 			elif String(id).begins_with("potion_"):
 				_vial(ci)
 			else:
