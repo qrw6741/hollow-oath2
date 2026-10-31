@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=27 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -25,8 +25,6 @@
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
 [ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
-[ext_resource type="PackedScene" path="res://actors/bosses/sister_quiet.tscn" id="x_sister_quiet"]
-[ext_resource type="PackedScene" path="res://actors/bosses/brother_lull.tscn" id="x_brother_lull"]
 [ext_resource type="PackedScene" path="res://actors/bosses/prioress_silence.tscn" id="x_prioress_silence"]
 
 [node name="HushCloister" type="Node2D"]
@@ -362,26 +360,6 @@ chest_id = &"hush_cloister_cache"
 count = 3
 embers = 4900
 item = ExtResource("it_shard")
-
-[node name="Arena0" type="Node2D" parent="."]
-position = Vector2(1700, 480)
-script = ExtResource("bossarena")
-boss_scene = ExtResource("x_sister_quiet")
-boss_offset = Vector2(420, 0)
-gate_height = 96.0
-trigger_offset = 36.0
-trigger_width = 620.0
-victory_text = "QUIET FALLS"
-
-[node name="Arena1" type="Node2D" parent="."]
-position = Vector2(4000, 480)
-script = ExtResource("bossarena")
-boss_scene = ExtResource("x_brother_lull")
-boss_offset = Vector2(420, 0)
-gate_height = 96.0
-trigger_offset = 36.0
-trigger_width = 620.0
-victory_text = "LULL FALLS"
 
 [node name="Arena2" type="Node2D" parent="."]
 position = Vector2(6300, 480)

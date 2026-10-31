@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=27 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -25,8 +25,6 @@
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
 [ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
-[ext_resource type="PackedScene" path="res://actors/bosses/skarn_bone_counter.tscn" id="x_skarn_bone_counter"]
-[ext_resource type="PackedScene" path="res://actors/bosses/marrow_mother_ide.tscn" id="x_marrow_mother_ide"]
 [ext_resource type="PackedScene" path="res://actors/bosses/ossuary_king_veyl.tscn" id="x_ossuary_king_veyl"]
 
 [node name="WeepingOssuary" type="Node2D"]
@@ -371,26 +369,6 @@ count = 0
 embers = 0
 gear_kind = "weapon"
 gear_id = &"bone_cleaver"
-
-[node name="Arena0" type="Node2D" parent="."]
-position = Vector2(1700, 480)
-script = ExtResource("bossarena")
-boss_scene = ExtResource("x_skarn_bone_counter")
-boss_offset = Vector2(420, 0)
-gate_height = 96.0
-trigger_offset = 36.0
-trigger_width = 620.0
-victory_text = "SKARN FALLS"
-
-[node name="Arena1" type="Node2D" parent="."]
-position = Vector2(4000, 480)
-script = ExtResource("bossarena")
-boss_scene = ExtResource("x_marrow_mother_ide")
-boss_offset = Vector2(420, 0)
-gate_height = 96.0
-trigger_offset = 36.0
-trigger_width = 620.0
-victory_text = "IDE FALLS"
 
 [node name="Arena2" type="Node2D" parent="."]
 position = Vector2(6300, 480)

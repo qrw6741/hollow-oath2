@@ -71,6 +71,8 @@ func dust(at: Vector2, amount := 6, color := Color(0.62, 0.58, 0.52)) -> void:
 
 
 func _burst(k: int, at: Vector2, color: Color, amount: int, r: float) -> void:
+	if Settings.classic_gfx:
+		return
 	var fx := Burst.new()
 	fx.setup(k, color, amount, r)
 	_fx_parent().add_child(fx)

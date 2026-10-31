@@ -43,6 +43,15 @@ static func record_kill(d: EnemyData) -> void:
 	Events.bestiary_changed.emit(d.id)
 
 
+## Entries a player can actually meet (the cut Descent mini-bosses are not placed anywhere).
+static func obtainable() -> int:
+	var n := 0
+	for id in IDS:
+		if not Expansion.unplaced_ids().has(id):
+			n += 1
+	return n
+
+
 static func total_seen() -> int:
 	var n := 0
 	for id in IDS:
@@ -86,7 +95,7 @@ static func entry_text(id: StringName) -> String:
 
 
 static func text() -> String:
-	var out := PackedStringArray(["BESTIARY    met %d / %d" % [total_seen(), IDS.size()]])
+	var out := PackedStringArray(["BESTIARY    met %d / %d" % [total_seen(), obtainable()]])
 	var unknown := 0
 	for id in IDS:
 		if not seen(id):

@@ -286,7 +286,7 @@ func _draw() -> void:
 			return
 	# 1 px ink outline: the figure drawn four times in ink, shifted, then once in colour on top.
 	_ink = true
-	for o in [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]:
+	for o in Settings.outline_offsets():
 		draw_set_transform(o, 0.0, Vector2.ONE)
 		_draw_figure(look, p)
 	_ink = false

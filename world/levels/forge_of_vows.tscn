@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -26,7 +26,6 @@
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
 [ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
-[ext_resource type="PackedScene" path="res://actors/bosses/smelter_brask.tscn" id="x_smelter_brask"]
 [ext_resource type="PackedScene" path="res://actors/bosses/cinderpriest_imre.tscn" id="x_cinderpriest_imre"]
 [ext_resource type="PackedScene" path="res://actors/bosses/vowsmith_anaxe.tscn" id="x_vowsmith_anaxe"]
 
@@ -388,16 +387,6 @@ chest_id = &"forge_of_vows_cache"
 count = 3
 embers = 4600
 item = ExtResource("it_shard")
-
-[node name="Arena0" type="Node2D" parent="."]
-position = Vector2(1700, 480)
-script = ExtResource("bossarena")
-boss_scene = ExtResource("x_smelter_brask")
-boss_offset = Vector2(420, 0)
-gate_height = 96.0
-trigger_offset = 36.0
-trigger_width = 620.0
-victory_text = "BRASK FALLS"
 
 [node name="Arena1" type="Node2D" parent="."]
 position = Vector2(4000, 480)

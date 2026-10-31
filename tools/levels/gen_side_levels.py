@@ -1050,6 +1050,10 @@ GRAND_WEAPONS = {0: "bone_cleaver", 1: "chandlers_maul", 2: "archivists_needle",
                  6: "glasswrights_shards", 10: "vowbreaker", 11: "choirmasters_baton", 12: "lantern_hook", 13: "namebreaker", 14: "unkept_blade"}
 
 
+## Descent maps that keep one mini-boss: {map index: arena slot}. 7 of the original 30 stay; the other 23 are not placed.
+KEEP_MINIS = {1: 0, 3: 1, 5: 0, 7: 1, 9: 0, 11: 1, 13: 0}
+
+
 def grand():
     """The Descent: eleven long maps (W=7400), each with three boss arenas (mini, mini, main/final)."""
     n = len(XD.MAPS)
@@ -1127,6 +1131,8 @@ color = Color{mp["tint"]}
             L.chest("WeaponChest", 7100, 480, key + "_weapon_chest", gear=("weapon", GRAND_WEAPONS[i]))
         for s_i, b in enumerate((0, 2300, 4600)):
             bs = XD.BOSSES[i][s_i]
+            if bs["role"] == "mini" and KEEP_MINIS.get(i) != s_i:
+                continue   # most mini-bosses were cut (too repetitive): 7 of 30 stay, the main boss always does
             word = bs["short"].upper()
             text = word + (" IS NO MORE" if bs["role"] != "mini" else " FALLS")
             L.arena("Arena%d" % s_i, b + 1700, 480, "x_" + bs["id"], text, 420, 620)

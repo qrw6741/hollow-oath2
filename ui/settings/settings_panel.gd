@@ -16,6 +16,7 @@ var _display: Button
 var _res: Button
 var _render: Button
 var _glow: Button
+var _classic: Button
 var _dmgnum: Button
 var _fps: Button
 var _vsync: Button
@@ -70,6 +71,7 @@ func _ready() -> void:
 	_display = _button(func(): Settings.fullscreen = not Settings.fullscreen; _video_changed(), p0)
 	_res = _button(func(): Settings.resolution_index = (Settings.resolution_index + 1) % Settings.RESOLUTIONS.size(); _video_changed(), p0)
 	_render = _button(func(): Settings.hires = not Settings.hires; _video_changed(), p0)
+	_classic = _button(func(): Settings.classic_gfx = not Settings.classic_gfx; _video_changed(), p0)
 	_glow = _button(func(): Settings.glow = not Settings.glow; _video_changed(), p0)
 	_fps = _button(func(): Settings.fps_cap = Settings.FPS_CAPS[(Settings.FPS_CAPS.find(Settings.fps_cap) + 1) % Settings.FPS_CAPS.size()]; _video_changed(), p0)
 	_vsync = _button(func(): Settings.vsync = not Settings.vsync; _video_changed(), p0)
@@ -160,6 +162,7 @@ func _refresh() -> void:
 	_res.text = "Window size: %dx%d" % [r.x, r.y]
 	_res.disabled = Settings.fullscreen
 	_render.text = "Graphics: %s" % ("High-res (smooth)" if Settings.hires else "Pixel (480x270)")
+	_classic.text = "Visuals: %s" % ("Classic (light)" if Settings.classic_gfx else "Enhanced")
 	_glow.text = "Glow & colour grading: %s" % ("On" if Settings.glow else "Off")
 	_fps.text = "Frame rate limit: %s" % ("Unlimited" if Settings.fps_cap == 0 else str(Settings.fps_cap))
 	_vsync.text = "VSync: %s" % ("On" if Settings.vsync else "Off")

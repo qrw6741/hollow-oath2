@@ -40,6 +40,7 @@ var glow := true                 ## Bloom / colour grade / grain finishing pass.
 var hires := true                ## true: render at native resolution; false: chunky 480x270 pixels.
 ## Default 60: an unlimited default made the game render thousands of frames a second whenever vsync was
 ## not honoured by the driver/window mode, which can max out the GPU and make the whole PC stutter.
+var classic_gfx := false          ## Classic visuals: no glow pass, outlines, mist or extra burst effects (lighter on weak GPUs).
 var fps_cap := 60
 const FPS_BG := 20   ## frame cap while the window is not focused (game is paused-ish anyway)
 var vsync := true
@@ -75,6 +76,7 @@ func load_settings() -> void:
 	glow = bool(cfg.get_value("video", "glow", glow))
 	damage_numbers = bool(cfg.get_value("accessibility", "damage_numbers", damage_numbers))
 	# Config v2: before it, "unlimited" (0) was the untouched default, so an old 0 is not a choice: use 60.
+	classic_gfx = bool(cfg.get_value("video", "classic_gfx", classic_gfx))
 	var cap := int(cfg.get_value("video", "fps_cap", fps_cap))
 	if int(cfg.get_value("video", "fps_cap_version", 1)) < 2 and cap == 0:
 		cap = 60
@@ -82,6 +84,16 @@ func load_settings() -> void:
 	vsync = bool(cfg.get_value("video", "vsync", vsync))
 	apply_audio()
 	apply_video()
+
+
+## Offsets of the 1 px ink outline passes; none in Classic visuals.
+func outline_offsets() -> Array:
+	return [] if classic_gfx else [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]
+
+
+## Glow/grade pass really on: the option AND not Classic visuals.
+func glow_active() -> bool:
+	return glow and not classic_gfx
 
 
 func save_settings() -> void:
@@ -106,6 +118,7 @@ func save_settings() -> void:
 	cfg.set_value("accessibility", "damage_numbers", damage_numbers)
 	cfg.set_value("video", "fps_cap", fps_cap)
 	cfg.set_value("video", "fps_cap_version", 2)
+	cfg.set_value("video", "classic_gfx", classic_gfx)
 	cfg.set_value("video", "vsync", vsync)
 	cfg.save(PATH)
 	apply_audio()

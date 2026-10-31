@@ -107,8 +107,8 @@ static func _met(id: StringName) -> bool:
 				if Quests.state(q) != "done":
 					return false
 			return true
-		&"bestiary_half": return Bestiary.total_seen() * 2 >= Bestiary.IDS.size()
-		&"bestiary_full": return Bestiary.total_seen() >= Bestiary.IDS.size()
+		&"bestiary_half": return Bestiary.total_seen() * 2 >= Bestiary.obtainable()
+		&"bestiary_full": return Bestiary.total_seen() >= Bestiary.obtainable()
 		&"level_10": return GameState.level() >= 10
 		&"all_status":
 			for k in StatusFx.KINDS:

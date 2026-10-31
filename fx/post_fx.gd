@@ -1,7 +1,7 @@
 class_name PostFx
 extends CanvasLayer
 ## Full-screen finishing pass (bloom, colour grade, grain). Sits above the world and below the vignette
-## and HUD. Switched by Settings.glow ("Glow & grading"); costs one full-screen draw.
+## and HUD. Switched by Settings.glow_active() ("Glow & grading"); costs one full-screen draw.
 
 var _rect: ColorRect
 
@@ -20,9 +20,9 @@ func _ready() -> void:
 
 func refresh() -> void:
 	if _rect:
-		_rect.visible = Settings.glow
+		_rect.visible = Settings.glow_active()
 
 
 func _process(_dt: float) -> void:
-	if _rect and _rect.visible != Settings.glow:
+	if _rect and _rect.visible != Settings.glow_active():
 		refresh()

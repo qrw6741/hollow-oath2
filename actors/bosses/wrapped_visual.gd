@@ -249,7 +249,7 @@ func _draw_body() -> void:
 
 func _draw() -> void:
 	_ink = true
-	for o in [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]:
+	for o in Settings.outline_offsets():
 		draw_set_transform(o, 0.0, Vector2.ONE)
 		_draw_body()
 	_ink = false

@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -27,7 +27,6 @@
 [ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
 [ext_resource type="Script" path="res://world/npcs/npc.gd" id="npc"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
-[ext_resource type="PackedScene" path="res://actors/bosses/gardener_hobthorne.tscn" id="x_gardener_hobthorne"]
 [ext_resource type="PackedScene" path="res://actors/bosses/windfall_twins.tscn" id="x_windfall_twins"]
 [ext_resource type="PackedScene" path="res://actors/bosses/mother_sylve.tscn" id="x_mother_sylve"]
 
@@ -373,16 +372,6 @@ count = 0
 embers = 0
 gear_kind = "weapon"
 gear_id = &"thornwood_sabre"
-
-[node name="Arena0" type="Node2D" parent="."]
-position = Vector2(1700, 480)
-script = ExtResource("bossarena")
-boss_scene = ExtResource("x_gardener_hobthorne")
-boss_offset = Vector2(420, 0)
-gate_height = 96.0
-trigger_offset = 36.0
-trigger_width = 620.0
-victory_text = "HOB-THORNE FALLS"
 
 [node name="Arena1" type="Node2D" parent="."]
 position = Vector2(4000, 480)

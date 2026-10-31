@@ -54,6 +54,19 @@ const MAPS: Array[StringName] = [&"weeping_ossuary", &"tallow_mines", &"gilded_a
 const WEAPONS := {&"bone_cleaver": &"weeping_ossuary", &"chandlers_maul": &"tallow_mines", &"archivists_needle": &"gilded_archive", &"thornwood_sabre": &"sunless_orchard", &"glasswrights_shards": &"shattered_gallery", &"vowbreaker": &"hollow_heart", &"choirmasters_baton": &"cinder_choir", &"lantern_hook": &"lantern_marsh", &"namebreaker": &"undercrypt_of_names", &"unkept_blade": &"wakeless_court"}
 
 
+## The seven Descent mini-bosses still placed in the maps (mirrors KEEP_MINIS in tools/levels/gen_side_levels.py).
+const KEPT_MINIS: Array[StringName] = [&"wickmaster_dorr", &"windfall_twins", &"brineknight_calder", &"cinderpriest_imre", &"hollow_houndking", &"ash_deacon_ruth", &"namekeeper_ish"]
+
+
+## Bosses that exist as data but no longer appear in any map (the cut mini-bosses).
+static func unplaced_ids() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for k in BOSSES:
+		if BOSSES[k].role == &"mini" and not KEPT_MINIS.has(k):
+			out.append(k)
+	return out
+
+
 static func boss_ids() -> Array:
 	return BOSSES.keys()
 

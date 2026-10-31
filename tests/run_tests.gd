@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -2137,6 +2137,51 @@ func test_fps_cap_default() -> void:
 	settings.save_settings()
 
 
+func test_classic_visuals() -> void:
+	await fresh_game()
+	var keep: bool = settings.classic_gfx
+	settings.classic_gfx = false
+	check(settings.outline_offsets().size() == 4 and settings.glow_active() == settings.glow, "enhanced: outlines on, glow follows its option")
+	settings.classic_gfx = true
+	check(settings.outline_offsets().is_empty() and not settings.glow_active(), "classic: no outlines, no glow pass")
+	GameFeel.ring(Vector2.ZERO, Color.WHITE)
+	GameFeel.dust(Vector2.ZERO)
+	await frames(6)
+	var mist: Mist = null
+	for c in level.get_children():
+		if c is Mist:
+			mist = c
+	check(mist == null or not mist.visible, "classic: mist hidden (%s %s)" % [mist, settings.classic_gfx])
+	settings.save_settings()
+	settings.classic_gfx = false
+	settings.load_settings()
+	check(settings.classic_gfx, "classic choice is saved and restored")
+	settings.classic_gfx = keep
+	settings.save_settings()
+
+
+func test_cut_minibosses() -> void:
+	await fresh_game()
+	check(Expansion.unplaced_ids().size() == 23 and Expansion.KEPT_MINIS.size() == 7, "7 Descent mini-bosses stay, 23 are cut (%d)" % Expansion.unplaced_ids().size())
+	# no level scene still holds an arena for a cut boss; every kept one and every main boss is placed
+	var placed := {}
+	for k in Expansion.MAPS:
+		var txt := FileAccess.get_file_as_string("res://world/levels/%s.tscn" % k)
+		for id in Expansion.boss_ids():
+			if ("\"x_%s\"" % id) in txt:
+				placed[id] = k
+	for id in Expansion.unplaced_ids():
+		check(not placed.has(id), "%s is not placed in any map" % id)
+	for id in Expansion.boss_ids():
+		if not Expansion.unplaced_ids().has(id):
+			check(placed.has(id), "%s is placed in %s" % [id, placed.get(id, "nowhere")])
+	# the Naturalist deed only asks for what can be met
+	for id in Bestiary.IDS:
+		if not Expansion.unplaced_ids().has(id):
+			game_state.set_flag(StringName("bs_" + String(id)), true)
+	check(Bestiary.total_seen() >= Bestiary.obtainable() and Bestiary.obtainable() == Bestiary.IDS.size() - 23, "every meetable entry seen counts as complete (%d/%d)" % [Bestiary.total_seen(), Bestiary.obtainable()])
+
+
 func test_settings_tabs() -> void:
 	await fresh_game()
 	var panel := SettingsPanel.new()
@@ -3973,8 +4018,14 @@ func test_descent() -> void:
 		var path := "res://world/levels/%s.tscn" % keys[i]
 		await go_to_level(path, &"")
 		check(level.scene_file_path == path and WorldMap.LEVELS.has(path), "%s loads and is on the map" % keys[i])
-		for n in ["FromPrev", "ToPrev", "Arena0", "Arena1", "Arena2", "Candle0", "Candle3", "Tablet2", "Cache"]:
+		for n in ["FromPrev", "ToPrev", "Arena2", "Candle0", "Candle3", "Tablet2", "Cache"]:
 			check(level.get_node_or_null(n) != null, "%s has %s" % [keys[i], n])
+		# only the 7 kept mini-bosses have an arena in slot 0/1
+		var minis := 0
+		for n in ["Arena0", "Arena1"]:
+			if level.get_node_or_null(n) != null:
+				minis += 1
+		check(minis == (1 if [1, 3, 5, 7, 9, 11, 13].has(i) else 0), "%s has the right number of mini-boss arenas (%d)" % [keys[i], minis])
 		check((level.get_node_or_null("ToNext") != null) == (i < keys.size() - 1), "%s chains on correctly" % keys[i])
 		var bad := placement_problems()
 		check(bad.is_empty(), "%s: everything stands on something %s" % [keys[i], bad])
@@ -3993,7 +4044,7 @@ func test_progress_goal() -> void:
 		check(Bestiary.IDS.has(g.boss), "%s is a real boss" % g.boss)
 		game_state.set_flag(StringName("boss_defeated_" + String(g.boss)), true)
 	check(Progress.next_goal().is_empty() and Progress.text() != "", "after the last boss there is no goal")
-	for reach in [&"verse_mother_ilse", &"the_lantern_mother", &"the_unnamed_archon", &"the_unkept_promise"]:
+	for reach in [&"verse_mother_ilse", &"the_lantern_mother", &"the_unnamed_archon", &"the_unkept_promise", &"morvane_warden", &"ashkar_reaper"]:
 		game_state.set_flag(StringName("boss_defeated_" + String(reach)), false)
 	check(Progress.next_goal().name == "the Verse-Mother Ilse".replace("the ", "") and "Cinder Choir" in Progress.text(), "after the Hollow Heart the road leads on to the Cinder Choir")
 	game_state.set_flag(&"boss_defeated_the_oath_eternal", false)
@@ -4013,7 +4064,7 @@ func test_progress_goal() -> void:
 	game_state.set_flag(&"boss_defeated_pale_sovereign", false)
 	var prev := 0.0
 	for i in Expansion.MAPS.size():
-		var main: StringName = Progress.GOALS[Progress.GOALS.size() - Expansion.MAPS.size() + i].boss
+		var main: StringName = Progress.GOALS[Progress.GOALS.size() - Expansion.MAPS.size() - 2 + i].boss   # the last 2 goals are the Ninth Door / Twin Lords
 		var hp: float = Bestiary.data(main).max_health
 		check(hp > prev, "%s has more health than the previous main boss (%d)" % [main, hp])
 		prev = hp

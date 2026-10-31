@@ -11,6 +11,7 @@ var _t := 0.0
 
 func _ready() -> void:
 	layer = 2
+	visible = not Settings.classic_gfx
 	var tint := Color(0.55, 0.55, 0.65)
 	var lv := get_parent()
 	if lv:
@@ -50,6 +51,9 @@ func _ready() -> void:
 
 
 func _process(dt: float) -> void:
+	visible = not Settings.classic_gfx
+	if not visible:
+		return
 	_t += dt
 	for i in _fog.size():
 		var r := _fog[i]
