@@ -1093,6 +1093,8 @@ color = Color{mp["tint"]}
         L.entry("FromNext", W - 140, 480, "from_next")
         if i < n - 1:
             L.walk_exit("ToNext", W - 90, 480, "res://world/levels/%s.tscn" % XD.MAPS[i + 1]["key"], "from_prev")
+        else:   # the Wakeless Court is the last of the Descent: its far end leads to the Ninth Door
+            L.walk_exit("ToNinthDoor", W - 90, 480, "res://world/levels/the_ninth_door.tscn", "from_court")
         cands = mp["cands"]
         for ci, cx in enumerate((300, 1450, 3750, 6050)):
             L.candle("Candle%d" % ci, cx, 480, "%s_candle_%d" % (key, ci), cands[ci])
@@ -1142,3 +1144,5 @@ if __name__ == "__main__":
     gallery()
     graveyard()
     chapel()
+    import gen_nether_levels
+    gen_nether_levels.write_all()

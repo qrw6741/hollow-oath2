@@ -62,7 +62,7 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"toll_hammer", &"chandlers_maul": _hammer(ci)
 		&"marshals_lance", &"ashfall_pike": _lance(ci)
 		&"tide_sabre", &"thornwood_sabre", &"lantern_hook": _sabre(ci)
-		&"gravediggers_greataxe", &"bone_cleaver", &"namebreaker": _axe(ci)
+		&"gravediggers_greataxe", &"bone_cleaver", &"namebreaker", &"nightreaper": _axe(ci)
 		&"veil_daggers", &"glasswrights_shards": _daggers(ci)
 		&"candle_catalyst", &"abbots_crozier": _staff(ci, id)
 		&"armor_pilgrim_coat", &"armor_penitent_shroud", &"armor_canons_mail", &"armor_marshal_plate", &"armor_ghostlight_raiment": _armor_generic(ci, id)

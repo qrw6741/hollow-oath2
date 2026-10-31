@@ -4,7 +4,7 @@ extends RefCounted
 
 const IDS: Array[StringName] = [&"oathblade", &"twin_blades", &"sword_and_shield", &"fists",
 	&"wayfarers_rapier", &"kingsfall_greatsword", &"toll_hammer", &"marshals_lance", &"tide_sabre", &"cinderbrand", &"ashfall_pike",
-	&"gravediggers_greataxe", &"veil_daggers", &"candle_catalyst", &"abbots_crozier", &"bone_cleaver", &"chandlers_maul", &"archivists_needle", &"thornwood_sabre", &"glasswrights_shards", &"vowbreaker", &"choirmasters_baton", &"lantern_hook", &"namebreaker", &"unkept_blade"]
+	&"gravediggers_greataxe", &"veil_daggers", &"candle_catalyst", &"abbots_crozier", &"bone_cleaver", &"chandlers_maul", &"archivists_needle", &"thornwood_sabre", &"glasswrights_shards", &"vowbreaker", &"choirmasters_baton", &"lantern_hook", &"namebreaker", &"unkept_blade", &"nightreaper"]
 const DIR := "res://data/weapons/"
 ## Where each weapon can be found, shown on the WEAPONS tab while you do not own it.
 const HINTS := {
@@ -28,6 +28,7 @@ const HINTS := {
 	&"choirmasters_baton": "A hidden chest in the Cinder Choir, past Verse-Mother Ilse.",
 	&"lantern_hook": "A hidden chest in the Lantern Marsh, past the Lantern-Mother.",
 	&"namebreaker": "A hidden chest in the Undercrypt of Names, past the Unnamed Archon.",
+	&"nightreaper": "Dropped by the Twin Lords, Ashkar and Veshti, at the end of the Ninth Hell.",
 	&"unkept_blade": "A hidden chest in the Wakeless Court, past the Unkept Promise.",
 }
 ## Each upgrade level adds this fraction of the weapon's base damage.

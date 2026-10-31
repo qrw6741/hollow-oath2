@@ -11,6 +11,7 @@ extends Node
 
 const SFX_DIR := "res://assets/audio/sfx/"
 const MUSIC_DIR := "res://assets/audio/music/"
+const VOICE_DIR := "res://assets/audio/voice/"
 const POOL := 14
 const POOL_2D := 10
 ## Sounds that get a small random pitch change so repeats do not sound mechanical.
@@ -28,6 +29,35 @@ const VOICES := {
 	&"gaoler_vess": &"voice_growl", &"foundrymaster_brand": &"voice_growl", &"hollow_regent": &"voice_hiss", &"last_ringer": &"voice_growl", &"crownless_king": &"voice_growl", &"drowned_bishop": &"voice_chant", &"orrerist": &"voice_growl", &"thornmother": &"voice_hiss",
 }
 var _last_step := -1
+var _voice_player: AudioStreamPlayer
+
+
+## Length in seconds of a voice line (0.0 if there is none), without playing it.
+func voice_length(vname: StringName) -> float:
+	if vname == &"" or not ResourceLoader.exists(VOICE_DIR + String(vname) + ".ogg"):
+		return 0.0
+	var s := _stream(VOICE_DIR, vname)
+	return s.get_length() if s else 0.0
+
+
+## Speaks a boss line from assets/audio/voice/<name>.ogg (synthesised speech, see tools/audio/gen_voices.py).
+## Returns its length in seconds, or 0.0 when there is no recording for that line.
+func voice_line(vname: StringName, volume_db := 3.0) -> float:
+	if vname == &"" or not ResourceLoader.exists(VOICE_DIR + String(vname) + ".ogg"):
+		return 0.0
+	var s := _stream(VOICE_DIR, vname)
+	if s == null:
+		return 0.0
+	if _voice_player == null:
+		_voice_player = AudioStreamPlayer.new()
+		_voice_player.bus = &"SFX"
+		add_child(_voice_player)
+	_voice_player.stream = s
+	_voice_player.volume_db = volume_db
+	_voice_player.play()
+	return s.get_length()
+
+
 
 var current_music: StringName = &""
 var current_pitch := 1.0

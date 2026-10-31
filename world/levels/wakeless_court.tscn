@@ -98,6 +98,13 @@ position = Vector2(7260, 480)
 script = ExtResource("entry")
 entry_id = &"from_next"
 
+[node name="ToNinthDoor" type="Area2D" parent="."]
+position = Vector2(7310, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/the_ninth_door.tscn"
+target_entry = &"from_court"
+size = Vector2(12, 80)
+
 [node name="Candle0" parent="." instance=ExtResource("candle")]
 position = Vector2(300, 480)
 checkpoint_id = &"wakeless_court_candle_0"

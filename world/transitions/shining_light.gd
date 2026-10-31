@@ -12,6 +12,8 @@ var _grow := 0.0
 var _taken := false
 var _arm := 40
 var _glow: PointLight2D
+## Colour of the light (default warm white; the portal to the Ninth Hell is violet-black).
+var tint := Color(1.0, 0.95, 0.8)
 
 
 func _ready() -> void:
@@ -27,7 +29,7 @@ func _ready() -> void:
 	_glow = PointLight2D.new()
 	_glow.texture = LightTex.radial()
 	_glow.texture_scale = 3.5
-	_glow.color = Color(1.0, 0.95, 0.8)
+	_glow.color = tint
 	_glow.energy = 0.0
 	_glow.position = Vector2(0, -50)
 	add_child(_glow)
@@ -72,14 +74,14 @@ func _draw() -> void:
 	for i in 9:
 		var a := -PI / 2.0 + (i - 4) * 0.13 + sin(_t * 0.7 + i) * 0.03
 		var tip := Vector2.from_angle(a) * (h + 30.0 * sin(_t * 2.0 + i))
-		draw_colored_polygon(PackedVector2Array([Vector2(-3, 0), tip + Vector2(-6, 0), tip + Vector2(6, 0), Vector2(3, 0)]), Color(1.0, 0.95, 0.75, 0.10 * g))
+		draw_colored_polygon(PackedVector2Array([Vector2(-3, 0), tip + Vector2(-6, 0), tip + Vector2(6, 0), Vector2(3, 0)]), Color(tint, 0.10 * g))
 	# Core pillar.
 	for k in 4:
 		var w := (18.0 - k * 4.0) * g
-		draw_rect(Rect2(-w / 2.0, -h, w, h), Color(1.0, 0.97, 0.85, (0.12 + k * 0.12) * g))
-	draw_circle(Vector2(0, -50), 22.0 * g, Color(1, 0.98, 0.9, 0.25 * g))
+		draw_rect(Rect2(-w / 2.0, -h, w, h), Color(tint, (0.12 + k * 0.12) * g))
+	draw_circle(Vector2(0, -50), 22.0 * g, Color(tint, 0.25 * g))
 	# Motes rising.
 	for i in 14:
 		var y := -fmod(_t * 40.0 + i * 23.0, h + 1.0)
 		var x := sin(_t * 1.3 + i * 2.1) * 12.0
-		draw_circle(Vector2(x, y), 1.2, Color(1, 0.95, 0.75, 0.8 * g))
+		draw_circle(Vector2(x, y), 1.2, Color(tint, 0.8 * g))

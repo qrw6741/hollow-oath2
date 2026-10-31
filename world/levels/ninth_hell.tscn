@@ -1,0 +1,408 @@
+[gd_scene load_steps=29 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
+[ext_resource type="Script" path="res://world/background/descent_backdrop.gd" id="backdrop"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gilded_penitent.tscn" id="gilded"]
+[ext_resource type="PackedScene" path="res://actors/enemies/swollen_pilgrim.tscn" id="bloat"]
+[ext_resource type="PackedScene" path="res://actors/enemies/oathguard_captain.tscn" id="captain"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
+[ext_resource type="PackedScene" path="res://actors/enemies/wick_mender.tscn" id="mender"]
+[ext_resource type="Script" path="res://world/hazards/fire_jet.gd" id="jet"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
+[ext_resource type="Resource" path="res://data/items/relic_knot.tres" id="it_knot"]
+[ext_resource type="PackedScene" path="res://actors/enemies/candle_cantor.tscn" id="cantor"]
+[ext_resource type="Script" path="res://world/hazards/spike_pit.gd" id="spikes"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Resource" path="res://data/items/forge_scrap.tres" id="it_scrap"]
+[ext_resource type="PackedScene" path="res://actors/enemies/pike_sergeant.tscn" id="sergeant"]
+[ext_resource type="Resource" path="res://data/items/hollow_resin.tres" id="it_resin"]
+[ext_resource type="Resource" path="res://data/items/ash_bandage.tres" id="it_band"]
+[ext_resource type="Script" path="res://world/boss/duo_arena.gd" id="duo"]
+[ext_resource type="PackedScene" path="res://actors/bosses/ashkar_reaper.tscn" id="ashkar"]
+[ext_resource type="PackedScene" path="res://actors/bosses/veshti_gunner.tscn" id="veshti"]
+
+[node name="NinthHell" type="Node2D"]
+script = ExtResource("level")
+level_id = &"ninth_hell"
+display_name = "The Ninth Hell"
+bounds = Rect2(0, 0, 6000, 540)
+music = &"catacombs"
+music_pitch = 0.46
+map_origin = Vector2(45600, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("backdrop")
+theme = 11
+width = 6000.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 787
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(1.0, 0.52, 0.42, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(5984, 60)
+style = 4
+seed_value = 902
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(5940, 0)
+script = ExtResource("block")
+size = Vector2(60, 540)
+style = 1
+seed_value = 903
+
+[node name="Ceiling" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 40)
+script = ExtResource("block")
+size = Vector2(6000, 56)
+style = 1
+seed_value = 904
+
+[node name="FromDoor" type="Marker2D" parent="."]
+position = Vector2(130, 480)
+script = ExtResource("entry")
+entry_id = &"from_door"
+
+[node name="ToDoor" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/the_ninth_door.tscn"
+target_entry = &"from_hell"
+size = Vector2(12, 80)
+
+[node name="Candle0" parent="." instance=ExtResource("candle")]
+position = Vector2(300, 480)
+checkpoint_id = &"ninth_hell_candle_0"
+display_name = "Hell Gate Candle"
+
+[node name="Candle1" parent="." instance=ExtResource("candle")]
+position = Vector2(1750, 480)
+checkpoint_id = &"ninth_hell_candle_1"
+display_name = "Brimstone Candle"
+
+[node name="Candle2" parent="." instance=ExtResource("candle")]
+position = Vector2(3200, 480)
+checkpoint_id = &"ninth_hell_candle_2"
+display_name = "Chain Hall Candle"
+
+[node name="Candle3" parent="." instance=ExtResource("candle")]
+position = Vector2(4350, 480)
+checkpoint_id = &"ninth_hell_candle_3"
+display_name = "Twin Gate Candle"
+
+[node name="Tablet0" type="Area2D" parent="."]
+position = Vector2(420, 480)
+script = ExtResource("tablet")
+title = "Burnt Verse"
+text = "Not a punishment. A debt. Whatever is owed down here is owed to someone, and they are patient."
+
+[node name="Tablet1" type="Area2D" parent="."]
+position = Vector2(2350, 480)
+script = ExtResource("tablet")
+title = "Wrapped in Black"
+text = "The first dead were wrapped in white. These were wrapped in what burns without light. They do not seem to mind."
+
+[node name="Tablet2" type="Area2D" parent="."]
+position = Vector2(4100, 480)
+script = ExtResource("tablet")
+title = "The Hand That Signs"
+text = "Every oath is signed by a hand. This is the hand. It has been waiting so long to be asked what it signed."
+
+[node name="Step0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(600, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 905
+
+[node name="Loft0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(1000, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 906
+one_way = true
+
+[node name="GroundA0" type="Marker2D" parent="."]
+position = Vector2(450, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="GroundB0" type="Marker2D" parent="."]
+position = Vector2(1250, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("bloat")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoe0" type="Marker2D" parent="."]
+position = Vector2(780, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Archer0" type="Marker2D" parent="."]
+position = Vector2(1040, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="LoftFoe0" type="Marker2D" parent="."]
+position = Vector2(1100, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("mender")
+patrol_distance = 20
+start_facing = -1
+
+[node name="JetA0" type="Area2D" parent="."]
+position = Vector2(1400, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="JetB0" type="Area2D" parent="."]
+position = Vector2(1440, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.5
+
+[node name="Chest0" type="Area2D" parent="."]
+position = Vector2(900, 480)
+script = ExtResource("chest")
+chest_id = &"ninth_hell_chest_0"
+count = 2
+embers = 3000
+item = ExtResource("it_draught")
+
+[node name="LoftChest0" type="Area2D" parent="."]
+position = Vector2(1100, 400)
+script = ExtResource("chest")
+chest_id = &"ninth_hell_loft_chest_0"
+count = 1
+embers = 2500
+item = ExtResource("it_knot")
+
+[node name="Step1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2100, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 907
+
+[node name="Loft1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2500, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 908
+one_way = true
+
+[node name="GroundA1" type="Marker2D" parent="."]
+position = Vector2(1950, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="GroundB1" type="Marker2D" parent="."]
+position = Vector2(2750, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("bloat")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoe1" type="Marker2D" parent="."]
+position = Vector2(2280, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Archer1" type="Marker2D" parent="."]
+position = Vector2(2540, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("mender")
+patrol_distance = 20
+start_facing = -1
+
+[node name="LoftFoe1" type="Marker2D" parent="."]
+position = Vector2(2600, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 20
+start_facing = -1
+
+[node name="Spikes1" type="Area2D" parent="."]
+position = Vector2(2900, 480)
+script = ExtResource("spikes")
+width = 48.0
+damage = 20.0
+
+[node name="Chest1" type="Area2D" parent="."]
+position = Vector2(2400, 480)
+script = ExtResource("chest")
+chest_id = &"ninth_hell_chest_1"
+count = 3
+embers = 3800
+item = ExtResource("it_shard")
+
+[node name="LoftChest1" type="Area2D" parent="."]
+position = Vector2(2600, 400)
+script = ExtResource("chest")
+chest_id = &"ninth_hell_loft_chest_1"
+count = 1
+embers = 2500
+item = ExtResource("it_scrap")
+
+[node name="Step2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3600, 452)
+script = ExtResource("block")
+size = Vector2(200, 28)
+style = 1
+seed_value = 909
+
+[node name="Loft2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(4000, 400)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 910
+one_way = true
+
+[node name="GroundA2" type="Marker2D" parent="."]
+position = Vector2(3450, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 40
+start_facing = -1
+
+[node name="GroundB2" type="Marker2D" parent="."]
+position = Vector2(4250, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 40
+start_facing = -1
+
+[node name="StepFoe2" type="Marker2D" parent="."]
+position = Vector2(3780, 452)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 40
+start_facing = -1
+
+[node name="Archer2" type="Marker2D" parent="."]
+position = Vector2(4040, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="LoftFoe2" type="Marker2D" parent="."]
+position = Vector2(4100, 400)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("mender")
+patrol_distance = 20
+start_facing = -1
+
+[node name="JetA2" type="Area2D" parent="."]
+position = Vector2(4330, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="JetB2" type="Area2D" parent="."]
+position = Vector2(4370, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.5
+
+[node name="Chest2" type="Area2D" parent="."]
+position = Vector2(3900, 480)
+script = ExtResource("chest")
+chest_id = &"ninth_hell_chest_2"
+count = 4
+embers = 4600
+item = ExtResource("it_resin")
+
+[node name="LoftChest2" type="Area2D" parent="."]
+position = Vector2(4100, 400)
+script = ExtResource("chest")
+chest_id = &"ninth_hell_loft_chest_2"
+count = 1
+embers = 2500
+item = ExtResource("it_band")
+
+[node name="Cache" type="Area2D" parent="."]
+position = Vector2(5700, 480)
+script = ExtResource("chest")
+chest_id = &"ninth_hell_cache"
+count = 4
+embers = 15000
+item = ExtResource("it_shard")
+
+[node name="TwinLordsArena" type="Node2D" parent="."]
+position = Vector2(4500, 480)
+script = ExtResource("duo")
+boss_scene = ExtResource("ashkar")
+second_scene = ExtResource("veshti")
+boss_offset = Vector2(430, 0)
+second_offset = Vector2(510, 0)
+hand_offset = Vector2(470, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 760.0
+victory_text = "THE TWO HANDS ARE STILL"
+reward_weapon = &"nightreaper"
+reward_chest_id = &"twin_lords_reward"
+
+[node name="Loft0Step" type="StaticBody2D" parent="Geometry"]
+position = Vector2(956.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 911
+
+[node name="Loft1Step" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2456.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 912
+
+[node name="Loft2Step" type="StaticBody2D" parent="Geometry"]
+position = Vector2(3956.0, 444.0)
+script = ExtResource("block")
+size = Vector2(44.0, 36.0)
+style = 1
+seed_value = 913

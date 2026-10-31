@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"nx_gun_butt"
+display_name = "Veshti - Stock Strike"
+animation = &"butt"
+startup_frames = 20
+active_frames = 5
+recovery_frames = 28
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 40.0
+poise_damage = 0.0
+stamina_cost = 0.0
+knockback = Vector2(200, -90)
+parryable = true
+hitbox_size = Vector2(56, 44)
+hitbox_offset = Vector2(30, -30)
+lunge_speed = 40.0
+lunge_start_frame = 14
+lunge_frames = 5
+track_during_startup = true
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -34)
+hit_stop = 0.08
+shake = 5.0
+ai_min_range = 0
+ai_max_range = 70
+ai_weight = 1.6
+ai_chain_chance = 1.0
+status = &"burn"
+status_amount = 30.0

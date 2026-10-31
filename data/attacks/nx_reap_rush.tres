@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"nx_reap_rush"
+display_name = "Ashkar - Fury Reap"
+animation = &"sweep"
+startup_frames = 20
+active_frames = 8
+recovery_frames = 26
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 46.0
+poise_damage = 0.0
+stamina_cost = 0.0
+knockback = Vector2(230, -80)
+parryable = false
+hitbox_size = Vector2(136, 40)
+hitbox_offset = Vector2(60, -28)
+lunge_speed = 0.0
+lunge_start_frame = 0
+lunge_frames = 0
+track_during_startup = true
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -34)
+hit_stop = 0.08
+shake = 6.0
+ai_min_range = 0
+ai_max_range = 140
+ai_weight = 1.4
+ai_chain_chance = 1.0
+status = &"burn"
+status_amount = 40.0

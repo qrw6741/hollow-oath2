@@ -6,7 +6,7 @@ extends Node2D
 ## for the part of the map on screen, from a per-slot seed so it is identical every time.
 ## Replaces the manor hall in the eleven Descent maps.
 
-enum Look { OSSUARY, TALLOW, ARCHIVE, ORCHARD, MARKET, VAULTS, GALLERY, FORGE, CLOISTER, BARROW, HEART }
+enum Look { OSSUARY, TALLOW, ARCHIVE, ORCHARD, MARKET, VAULTS, GALLERY, FORGE, CLOISTER, BARROW, HEART, NETHER }
 
 @export var theme: Look = Look.OSSUARY:
 	set(v): theme = v; queue_redraw()
@@ -28,6 +28,7 @@ const PAL := [
 	[Color("10161c"), Color("243440"), Color("1a2630"), Color("2c4050"), Color("e8f4ff"), Color("ffffff")],  # cloister
 	[Color("12101a"), Color("26223a"), Color("1c182c"), Color("2e2842"), Color("e0c860"), Color("c8c0e8")],  # barrow
 	[Color("1c0810"), Color("4a1424"), Color("340c18"), Color("5a1a2c"), Color("ff5070"), Color("ff8090")],  # heart
+	[Color("070104"), Color("2c0606"), Color("1a0508"), Color("3a0a0a"), Color("ff3a14"), Color("ff7a30")],  # nether
 ]
 
 var _t := 0.0
@@ -204,6 +205,15 @@ func _shape(o: Vector2, rng: RandomNumberGenerator, sc: float, col: Color, pal: 
 			draw_circle(Vector2(o.x + kw * 0.5, o.y - kh + 40.0 * sc), 9.0 * sc, f)
 			_poly([Vector2(o.x + kw * 0.5 - 14.0 * sc, o.y - kh + 52.0 * sc), Vector2(o.x + kw * 0.5 + 14.0 * sc, o.y - kh + 52.0 * sc), Vector2(o.x + kw * 0.5 + 18.0 * sc, o.y - 24.0), Vector2(o.x + kw * 0.5 - 18.0 * sc, o.y - 24.0)], f)
 			draw_rect(Rect2(o.x + kw * 0.5 - 12.0 * sc, o.y - kh + 28.0 * sc, 24.0 * sc, 5.0 * sc), Color(glow, 0.55))
+		Look.NETHER:  # jagged basalt spires over a lava glow, with hanging chains
+			var sw := (40.0 + 50.0 * h) * sc
+			var sh := (120.0 + 190.0 * h) * sc
+			_poly([Vector2(o.x, o.y), Vector2(o.x + sw * 0.35, o.y - sh), Vector2(o.x + sw * 0.55, o.y - sh * 0.7), Vector2(o.x + sw, o.y)], col)
+			draw_line(Vector2(o.x + sw * 0.35, o.y - sh), Vector2(o.x + sw * 0.55, o.y - sh * 0.7), Color(glow, 0.25 + 0.15 * flick), 1.0)
+			draw_rect(Rect2(o.x - 20.0, o.y - 14.0 * sc, sw + 40.0, 14.0 * sc), Color(glow, 0.10 + 0.08 * flick))
+			if rng.randf() < 0.35:
+				var cx := o.x + sw * 0.5
+				draw_line(Vector2(cx, ceiling_y), Vector2(cx, ceiling_y + (60.0 + 80.0 * h) * sc), Color(col.lightened(0.15), 0.8), 1.5)
 		Look.HEART:  # great ribs and pulsing veins
 			var beat := pow(maxf(0.0, sin(_t * 2.2)), 6.0)
 			var rh := (220.0 + 80.0 * h) * sc
@@ -255,7 +265,7 @@ func _particles(v: Rect2, pal: Array) -> void:
 		var r := rng.randf_range(0.8, 1.8)
 		var a := rng.randf_range(0.25, 0.7)
 		match theme:
-			Look.TALLOW, Look.FORGE, Look.HEART:  # rise like embers
+			Look.TALLOW, Look.FORGE, Look.HEART, Look.NETHER:  # rise like embers
 				y = floor_y - fposmod(by + _t * sp * 1.6, vh)
 				a *= 1.0 - (floor_y - y) / vh
 			Look.VAULTS:  # bubbles

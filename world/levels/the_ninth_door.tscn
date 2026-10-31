@@ -1,0 +1,123 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
+[ext_resource type="Script" path="res://world/background/descent_backdrop.gd" id="backdrop"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
+[ext_resource type="PackedScene" path="res://actors/bosses/morvane_warden.tscn" id="morvane"]
+
+[node name="TheNinthDoor" type="Node2D"]
+script = ExtResource("level")
+level_id = &"the_ninth_door"
+display_name = "The Ninth Door"
+bounds = Rect2(0, 0, 2600, 540)
+music = &"catacombs"
+music_pitch = 0.5
+map_origin = Vector2(43900, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("backdrop")
+theme = 9
+width = 2600.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 833
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.78, 0.52, 0.58, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(2584, 60)
+style = 4
+seed_value = 902
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2540, 0)
+script = ExtResource("block")
+size = Vector2(60, 540)
+style = 1
+seed_value = 903
+
+[node name="Ceiling" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 40)
+script = ExtResource("block")
+size = Vector2(2600, 56)
+style = 1
+seed_value = 904
+
+[node name="FromCourt" type="Marker2D" parent="."]
+position = Vector2(130, 480)
+script = ExtResource("entry")
+entry_id = &"from_court"
+
+[node name="ToCourt" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/wakeless_court.tscn"
+target_entry = &"from_next"
+size = Vector2(12, 80)
+
+[node name="FromHell" type="Marker2D" parent="."]
+position = Vector2(1500, 480)
+script = ExtResource("entry")
+entry_id = &"from_hell"
+
+[node name="DoorCandle" parent="." instance=ExtResource("candle")]
+position = Vector2(330, 480)
+checkpoint_id = &"ninth_door_candle"
+display_name = "Ninth Door Candle"
+
+[node name="DoorTablet" type="Area2D" parent="."]
+position = Vector2(520, 480)
+script = ExtResource("tablet")
+title = "The Ninth Door"
+text = "EIGHT DOORS WERE OPENED FOR THE OATH. THE NINTH WAS NEVER OPENED. IT WAS NEVER MEANT TO BE. Beneath, scratched deep: 'It is warm on the other side.'"
+
+[node name="WardenTablet" type="Area2D" parent="."]
+position = Vector2(1900, 480)
+script = ExtResource("tablet")
+title = "A Warden's Rule"
+text = "KEEP IT SHUT. If any pilgrim reaches this far, they have already done what no vow allows. Do not open it for them. Do not open it for yourself."
+
+[node name="DoorCache" type="Area2D" parent="."]
+position = Vector2(2300, 480)
+script = ExtResource("chest")
+chest_id = &"ninth_door_cache"
+count = 3
+embers = 8000
+item = ExtResource("it_shard")
+
+[node name="MorvaneArena" type="Node2D" parent="."]
+position = Vector2(700, 480)
+script = ExtResource("bossarena")
+boss_scene = ExtResource("morvane")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 620.0
+victory_text = "THE WARDEN YIELDS"
+light_target_level = "res://world/levels/ninth_hell.tscn"
+light_target_entry = &"from_door"
+light_tint = Color(0.75, 0.3, 1, 1)
+light_offset = Vector2(900, 0)
+light_delay = 3.0

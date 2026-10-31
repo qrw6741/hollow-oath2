@@ -6,9 +6,11 @@ extends Control
 
 var _name: Label
 var _line: Label
-var _queue: Array[String] = []
+var _queue: Array[Dictionary] = []
 var _busy := false
 var _speaker := ""
+## boss id -> speaker name, filled as fights start (so two bosses can both speak).
+var _names := {}
 var _boss: Node
 var _id: StringName = &""
 var _over := false
@@ -40,6 +42,7 @@ func _ready() -> void:
 	Events.boss_phase_changed.connect(_on_phase)
 	Events.boss_defeated.connect(_on_defeated)
 	Events.player_died.connect(_on_player_died)
+	Events.boss_say.connect(_on_scripted)
 
 
 func _on_started(b: Node) -> void:
@@ -50,34 +53,46 @@ func _on_started(b: Node) -> void:
 	_over = false
 	_id = boss.boss_id
 	_speaker = String(boss.data.display_name)
+	_names[_id] = _speaker
+	if boss.scripted_intro:
+		return   # the arena plays its own spoken intro
 	_queue.clear()
-	for t in BossLines.intro(_id):
-		_queue.append(t)
+	var intro := BossLines.intro(_id)
+	for i in intro.size():
+		_queue.append({"t": intro[i], "who": _speaker, "voice": "%s_%d" % [_id, i]})
 	_run()
 
 
 func _on_phase(b: Node, _phase: int) -> void:
-	if b == _boss and _id != &"":
-		_say(BossLines.half(_id), true)
+	var boss := b as BossBase
+	if boss and _names.has(boss.boss_id):
+		_say(BossLines.half(boss.boss_id), _names[boss.boss_id], "%s_2" % boss.boss_id, true)
 
 
 func _on_defeated(id: StringName) -> void:
-	if id == _id and _id != &"":
-		_over = true
-		_say(BossLines.defeated(id), true)
+	if _names.has(id):
+		if id == _id:
+			_over = true
+		_say(BossLines.defeated(id), _names[id], "%s_3" % id, true)
 
 
 func _on_player_died() -> void:
 	if not _over and _boss and is_instance_valid(_boss) and _id != &"" and _boss.health.current > 0.0:
-		_say(BossLines.fallen(_id), true)
+		_say(BossLines.fallen(_id), _speaker, "%s_4" % _id, true)
+
+
+## A line the arena scripts itself (the Twin Lords' hand-arena dialogue).
+func _on_scripted(speaker: String, text: String, voice: StringName) -> void:
+	_say(text, speaker, String(voice), false)
 
 
 ## Queues one line; urgent lines jump the queue.
-func _say(text: String, urgent := false) -> void:
+func _say(text: String, who: String, voice: String, urgent := false) -> void:
+	var item := {"t": text, "who": who, "voice": voice}
 	if urgent:
-		_queue.push_front(text)
+		_queue.push_front(item)
 	else:
-		_queue.append(text)
+		_queue.append(item)
 	_run()
 
 
@@ -87,16 +102,19 @@ func _run() -> void:
 	_busy = true
 	var box := get_node("Box") as Control
 	while not _queue.is_empty():
-		var t: String = _queue.pop_front()
-		_name.text = _speaker
+		var item: Dictionary = _queue.pop_front()
+		var t: String = item["t"]
+		_name.text = item["who"]
 		_fit(t)
 		box.reset_size()
 		box.position = Vector2(240.0 - box.size.x / 2.0, 150.0)
-		Audio.sfx(&"talk", -10.0, randf_range(0.55, 0.7))
+		var vlen := Audio.voice_line(StringName(item["voice"]))
+		if vlen <= 0.0:
+			Audio.sfx(&"talk", -10.0, randf_range(0.55, 0.7))
 		var tw := create_tween()
 		tw.tween_property(box, "modulate:a", 1.0, 0.25)
 		await tw.finished
-		await get_tree().create_timer(clampf(1.6 + t.length() * 0.045, 2.0, 4.5)).timeout
+		await get_tree().create_timer(maxf(clampf(1.6 + t.length() * 0.045, 2.0, 4.5), vlen + 0.3)).timeout
 		var tw2 := create_tween()
 		tw2.tween_property(box, "modulate:a", 0.0, 0.3)
 		await tw2.finished

@@ -18,6 +18,7 @@ aerial = ExtResource("4_a")
 riposte = ExtResource("5_a")
 riposte_multiplier = 1.1
 look = 8
+damage_mult = 1.14
 two_handed = false
 status = &"poison"
 status_amount = 28.0

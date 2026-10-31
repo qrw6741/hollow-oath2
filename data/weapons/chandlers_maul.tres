@@ -18,6 +18,7 @@ aerial = ExtResource("4_a")
 riposte = ExtResource("5_a")
 riposte_multiplier = 1.2
 look = 6
+damage_mult = 1.12
 two_handed = true
 status = &"burn"
 status_amount = 26.0

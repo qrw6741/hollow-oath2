@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_ninth_hell_content, test_twin_lords, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -4653,3 +4653,95 @@ func test_no_exit_on_road() -> void:
 			if pm and float(pm.get_string(1)) > 120.0 and float(pm.get_string(1)) < w - 150.0:
 				bad.append("%s@%s" % [f, pm.get_string(1)])
 	check(bad.is_empty(), "no walk-in exit stands mid-road: %s" % [bad])
+
+
+func test_ninth_hell_content() -> void:
+	# voices exist for every spoken line, and the lines are in the data
+	var ids := [&"morvane_warden", &"ashkar_reaper", &"veshti_gunner"]
+	var missing := []
+	for id in ids:
+		check(BossLines.LINES.has(id) and BossLines.LINES[id].size() == 5, "%s has 5 spoken lines" % id)
+		for i in 5:
+			if Audio.voice_length(StringName("%s_%d" % [id, i])) <= 0.0:
+				missing.append("%s_%d" % [id, i])
+	for i in BossLines.TWINS_INTRO.size():
+		if Audio.voice_length(StringName("twins_intro_%d" % i)) <= 0.0:
+			missing.append("twins_intro_%d" % i)
+	for i in 2:
+		if Audio.voice_length(StringName("twins_enrage_%d" % i)) <= 0.0:
+			missing.append("twins_enrage_%d" % i)
+	check(missing.is_empty(), "every spoken line has a voice file: missing %s" % [missing])
+	# the weapon is the strongest in the game, and the older clones now really carry their multipliers
+	var best := 0.0
+	var best_id := &""
+	for wid in Weapons.IDS:
+		var w := Weapons.get_weapon(wid)
+		if w.damage_mult > best:
+			best = w.damage_mult
+			best_id = wid
+	check(best_id == &"nightreaper" and best >= 1.9, "the Nightreaper out-damages every other weapon (%s %.2f)" % [best_id, best])
+	for wid in [&"unkept_blade", &"vowbreaker", &"choirmasters_baton"]:
+		check(Weapons.get_weapon(wid).damage_mult > 1.05, "%s carries its damage multiplier" % wid)
+	# levels: the Court leads to the Door, the Door to the Hell, and back
+	for pair in [["wakeless_court", "the_ninth_door"], ["the_ninth_door", "wakeless_court"], ["the_ninth_door", "ninth_hell"], ["ninth_hell", "the_ninth_door"]]:
+		var st := FileAccess.get_file_as_string("res://world/levels/%s.tscn" % pair[0])
+		check(st.contains("res://world/levels/%s.tscn" % pair[1]), "%s links to %s" % pair)
+	var ps := load("res://actors/bosses/veshti_gunner.tscn") as PackedScene
+	var g := ps.instantiate()
+	check(g is GunnerLord, "Veshti is a GunnerLord (keeps her distance)")
+	var shoots := 0
+	for a in g.data.attacks:
+		if a.animation == &"shoot":
+			shoots += 1
+			check(a.projectile_speed > 0.0, "%s fires a projectile" % a.id)
+	check(shoots >= 2, "the Gunner has several shots")
+	g.free()
+	# the Door's portal leads to the Hell
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level("res://world/levels/the_ninth_door.tscn", &"")
+	var arena := level.get_node("MorvaneArena") as BossArena
+	check(arena.light_target_level == "res://world/levels/ninth_hell.tscn", "Morvane's portal leads to the Ninth Hell")
+	game_state.set_flag(&"boss_defeated_morvane_warden", true)
+	arena.spawn()
+	await frames(4)
+	check(get_tree().get_nodes_in_group(&"shining_light").size() >= 1, "the portal stands once Morvane is beaten")
+
+
+func test_twin_lords() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level("res://world/levels/ninth_hell.tscn", &"")
+	var arena := level.get_node("TwinLordsArena") as DuoArena
+	await frames(6)
+	check(is_instance_valid(arena.boss) and is_instance_valid(arena.boss2), "both lords exist")
+	check(not arena.boss.visible and not arena.boss2.visible, "the lords stay hidden until the hand opens")
+	check(arena.boss.scripted_intro and arena.boss2.scripted_intro, "the arena scripts their intro")
+	await frames(90)
+	check(absf(arena.boss.global_position.y - arena.global_position.y) < 24.0 and absf(arena.boss2.global_position.y - arena.global_position.y) < 24.0, "the hidden lords stand on the floor (they do not fall: y %.0f / %.0f)" % [arena.boss.global_position.y, arena.boss2.global_position.y])
+	# skip the cutscene: open the fight directly
+	for b in [arena.boss, arena.boss2]:
+		arena._hide(b, false)
+	arena._begin_fight()
+	await frames(4)
+	check(arena.boss.active and arena.boss2.active and arena.fight_active, "both lords fight at once")
+	await frames(30)   # run both AIs and both visuals for a while without errors
+	arena.boss.health.take_damage(arena.boss.health.max_health * 2.0)
+	await frames(6)
+	check(arena.boss.is_dead() and arena.boss2.enraged, "when one lord falls the other is enraged")
+	check(arena.fight_active, "the fight goes on until both are dead")
+	arena.boss2.health.take_damage(arena.boss2.health.max_health * 2.0)
+	await frames(10)
+	check(not arena.fight_active and arena._defeated, "the fight ends when both lords are dead")
+	check(game_state.get_flag(&"boss_defeated_ashkar_reaper", false) and game_state.get_flag(&"boss_defeated_veshti_gunner", false), "both defeats are saved")
+	arena._spawn_reward()
+	await frames(4)
+	var chest: TreasureChest = null
+	for c in level.get_children():
+		if c is TreasureChest and c.chest_id == &"twin_lords_reward":
+			chest = c
+	check(chest != null and chest.gear_id == &"nightreaper", "the Nightreaper waits in a chest")
+	# after a respawn of the arena the pair does not return
+	arena.spawn()
+	await frames(4)
+	check(arena.boss == null or not is_instance_valid(arena.boss), "a beaten pair never returns")

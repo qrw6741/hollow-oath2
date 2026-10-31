@@ -29,6 +29,8 @@ const GOALS := [
 	{"boss": &"the_lantern_mother", "name": "the Lantern-Mother", "area": "The Lantern Marsh"},
 	{"boss": &"the_unnamed_archon", "name": "the Unnamed Archon", "area": "The Undercrypt of Names"},
 	{"boss": &"the_unkept_promise", "name": "the Unkept Promise", "area": "The Wakeless Court"},
+	{"boss": &"morvane_warden", "name": "Morvane, Warden of the Ninth Door", "area": "The Ninth Door"},
+	{"boss": &"ashkar_reaper", "name": "the Twin Lords", "area": "The Ninth Hell"},
 ]
 
 

@@ -104,7 +104,10 @@ for nid, base, name, desc, st, amt, dm, _ in CLONES:
     s = re.sub(r'id = &"[a-z_]+"', f'id = &"{nid}"', s, count=1)
     s = re.sub(r'display_name = ".*"', f'display_name = "{name}"', s, count=1)
     s = re.sub(r'description = ".*"', f'description = "{desc}"', s, count=1)
-    s = re.sub(r'damage_mult = [0-9.]+', f'damage_mult = {dm}', s, count=1)
+    if "damage_mult = " in s:
+        s = re.sub(r'damage_mult = [0-9.]+', f'damage_mult = {dm}', s, count=1)
+    else:   # most base weapons omit it (default 1.0): add it, or the clone's stat is silently ignored
+        s = s.replace('\ntwo_handed', f'\ndamage_mult = {dm}\ntwo_handed', 1) if "\ntwo_handed" in s else s.replace('\nstatus = &', f'\ndamage_mult = {dm}\nstatus = &', 1)
     s = re.sub(r'status = &"[a-z]*"', f'status = &"{st}"', s, count=1)
     s = re.sub(r'status_amount = [0-9.]+', f'status_amount = {amt}', s, count=1)
     open(f"{R}/data/weapons/{nid}.tres", "w").write(s)

@@ -31,6 +31,9 @@ signal phase_changed(phase: int)
 
 var active := false
 var gimmicks: BossGimmicks
+## True for bosses whose arena plays its own spoken intro (the Twin Lords); BossSpeech then stays quiet.
+var scripted_intro := false
+var enraged := false
 var phase := 1
 var roaring := false
 var leaping := false
@@ -168,6 +171,20 @@ func _enter_phase2() -> void:
 	phase_changed.emit(phase)
 	Events.boss_phase_changed.emit(self, phase)
 	on_phase_changed(phase)
+
+
+## A partner's death (the Twin Lords): faster, shorter pauses, more flame. Once only.
+func enrage() -> void:
+	if enraged or is_dead():
+		return
+	enraged = true
+	data.chase_speed *= 1.3
+	data.attack_cooldown_min = int(data.attack_cooldown_min * 0.6)
+	data.attack_cooldown_max = int(data.attack_cooldown_max * 0.6)
+	GameFeel.ring(global_position + Vector2(0, -34), Color(0.55, 0.3, 0.9), 70.0)
+	GameFeel.rise(global_position + Vector2(0, -10), Color(0.4, 0.2, 0.7), 24, 24.0)
+	GameFeel.shake(6.0, 0.4)
+	Audio.sfx_at(&"boss_roar", global_position, -2.0, 0.8)
 
 
 ## The roar pushes a nearby player away (no damage) so phase 2 starts with space.

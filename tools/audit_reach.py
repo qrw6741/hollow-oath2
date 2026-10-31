@@ -42,6 +42,9 @@ G.Level = Rec
 with contextlib.redirect_stdout(io.StringIO()) as buf:
     for fn in ("trial", "reliquary", "keep", "belfry", "parts", "grand", "cellar", "gallery", "graveyard", "chapel"):
         getattr(G, fn)()
+    import gen_nether_levels as N
+    N.door()
+    N.hell()
 for line in buf.getvalue().splitlines():
     if "!!" in line:
         out.append(line)

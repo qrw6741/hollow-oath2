@@ -81,3 +81,7 @@ To reset everything, delete that folder. A damaged save is set aside as `slot_N.
 - `docs/TESTING_CHECKLIST.md` — repeatable manual test pass
 - `docs/ADDING_CONTENT.md` — adding attacks, weapons, enemies, levels
 - `docs/ARCHITECTURE.md`, `docs/ART_BIBLE.md`, `docs/WORLD_BIBLE.md`
+
+
+## Antivirus / SmartScreen warning
+The Windows build is unsigned, so Defender or SmartScreen may flag it (a common false positive for Godot exports). See [docs/WINDOWS_SECURITY_WARNING.md](docs/WINDOWS_SECURITY_WARNING.md) for how to verify the hashes, scan it, report it to Microsoft, or build it yourself.

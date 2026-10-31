@@ -65,7 +65,20 @@ const LINES := {
 	&"jessamy_court_fool": ["Ha! A guest! Do mind the knives. They are for the jokes.", "Do you know the one about the king and the oath? Nobody does. That is the joke.", "Oh, I am serious now. Look. See my face.", "Ha. Ha. The jest is over. How very strange.", "That was the punchline. You missed it. You were it."],
 	&"chamberlain_hollin": ["Announcing the pilgrim. Who has kept no promise at all.", "The Court notes the entry. The Court notes it with regret.", "I shall read the list louder. The list does not end.", "The list... I... have reached the end. How odd.", "Entry made. Regret recorded. The Court will proceed."],
 	&"the_unkept_promise": ["I am what was meant, and not done. I am very large. I am so sorry.", "Do not look away. I have waited so long to be looked at.", "Forgive me! Forgive me! I am only a promise!", "Seen. At last. That was all. That was... all.", "Forgive me. Forgive me. Forgive me."],
+	&"morvane_warden": ["The Court is silent. The Ninth Door is not. I keep it.", "Below the oath there is a deeper one. I swore to keep you from it.", "The door is breaking! Hold! I swore to hold!", "Take the Door, then. Tell them Morvane did not open it gladly.", "Go back up, pilgrim. The way down is not for you."],
+	&"ashkar_reaper": ["Another harvest.", "Hold still. The blade is hungry.", "The black flame climbs. Good. Let it.", "Cut... and cut... and at last, cut.", "Another sheaf. You were thin."],
+	&"veshti_gunner": ["Closer, little ember.", "Closer is so much easier.", "I never miss. I only wait.", "Brother... I missed. I never miss.", "One shot. I only ever needed one."],
 }
+
+## The Twin Lords' spoken intro while the hand opens: [speaker, line]. Voice files twins_intro_<n>.
+const TWINS_INTRO := [
+	["Veshti, the Far Hand", "Do you hear that, brother? Something is still walking."],
+	["Ashkar, the Black Reaper", "The Court slept. The Door slept. And still it walks."],
+	["Veshti, the Far Hand", "Little ember. You carried your oath so far."],
+	["Ashkar, the Black Reaper", "We are what it was written upon. The hand that signs. The hand that takes."],
+	["Veshti, the Far Hand", "Lay the weapon down, and we will make it quick."],
+	["Ashkar, the Black Reaper", "No? Good. We were so very bored."],
+]
 
 const GENERIC := ["You should not have come.", "The oath binds us both.", "Enough. I will end this.", "It... ends.", "Rise and try again."]
 

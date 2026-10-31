@@ -34,6 +34,10 @@ var _msg_text: Label
 var _boss_name: Label
 var _boss_bar: StatBar
 var _boss: BossBase
+## A second boss bar for two-boss fights (the Twin Lords).
+var _boss2: BossBase
+var _boss_bar2: StatBar
+var _boss_name2: Label
 var _quick_label: Label
 var _quick_icon: Control
 var _saved_tween: Tween
@@ -200,6 +204,17 @@ func _build() -> void:
 	_boss_bar.size = Vector2(240, 6)
 	_boss_bar.fill_color = Palette.CRIMSON
 	_boss_box.add_child(_boss_bar)
+	_boss_name2 = _label(_boss_box, "", 10, HORIZONTAL_ALIGNMENT_LEFT)
+	UITheme.title(_boss_name2, 10, Palette.BONE)
+	_boss_name2.position = Vector2(0, 26)
+	_boss_name2.size = Vector2(240, 13)
+	_boss_name2.visible = false
+	_boss_bar2 = StatBar.new()
+	_boss_bar2.position = Vector2(0, 41)
+	_boss_bar2.size = Vector2(240, 6)
+	_boss_bar2.fill_color = Palette.CRIMSON
+	_boss_bar2.visible = false
+	_boss_box.add_child(_boss_bar2)
 
 	_prompt = _label(root, "", 8, HORIZONTAL_ALIGNMENT_CENTER)
 	_prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
@@ -345,8 +360,23 @@ func _on_boss_fight_started(b: Node) -> void:
 	var boss := b as BossBase
 	if boss == null:
 		return
+	if boss.scripted_intro and is_instance_valid(_boss) and _boss != boss and not _boss.is_dead() and _boss.scripted_intro:
+		# two-boss fight: the second boss gets its own bar under the first
+		_boss2 = boss
+		_boss_name2.text = boss.data.display_name
+		_boss_name2.visible = true
+		_boss_bar2.visible = true
+		_boss_bar2.px_per_point = 236.0 / maxf(1.0, boss.health.max_health)
+		_boss_bar2.set_values(boss.health.current, boss.health.max_health)
+		if not boss.health.changed.is_connected(_boss_bar2.set_values):
+			boss.health.changed.connect(_boss_bar2.set_values)
+		_boss_box.position.y = 214.0
+		return
 	if is_instance_valid(_boss) and _boss.health.changed.is_connected(_boss_bar.set_values):
 		_boss.health.changed.disconnect(_boss_bar.set_values)
+	_boss_name2.visible = false
+	_boss_bar2.visible = false
+	_boss_box.position.y = 232.0
 	_boss = boss
 	_boss_name.text = boss.data.display_name
 	_boss_bar.px_per_point = 236.0 / maxf(1.0, boss.health.max_health)
@@ -357,7 +387,8 @@ func _on_boss_fight_started(b: Node) -> void:
 	_boss_box.visible = true
 	create_tween().tween_property(_boss_box, "modulate:a", 1.0, 0.6)
 	_prompt.visible = false
-	_boss_intro(boss)
+	if not boss.scripted_intro:
+		_boss_intro(boss)
 
 
 ## First meeting with a boss: letterbox bars close in and a line of its story is shown. Once per

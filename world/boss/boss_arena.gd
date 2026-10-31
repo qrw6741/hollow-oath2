@@ -26,6 +26,7 @@ extends Node2D
 ## Optional: a ShiningLight appears here after victory (and stays on later visits).
 @export_file("*.tscn") var light_target_level := ""
 @export var light_target_entry: StringName = &"arrival"
+@export var light_tint := Color(1.0, 0.95, 0.8)
 @export var light_offset := Vector2(320, 0)
 @export var light_delay := 3.0
 
@@ -196,5 +197,6 @@ func _spawn_light() -> void:
 	var l := ShiningLight.new()
 	l.target_level = light_target_level
 	l.target_entry = light_target_entry
+	l.tint = light_tint
 	l.position = position + light_offset
 	get_parent().add_child.call_deferred(l)

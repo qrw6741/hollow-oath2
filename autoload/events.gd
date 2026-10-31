@@ -35,6 +35,8 @@ signal boss_phase_changed(boss: Node, phase: int)
 ## victory = false when the player died or the fight was reset.
 signal boss_fight_ended(victory: bool)
 signal boss_defeated(boss_id: StringName)
+## A scripted spoken line (speaker name, subtitle text, voice-file name under assets/audio/voice).
+signal boss_say(speaker: String, text: String, voice: StringName)
 
 # --- Economy / inventory ---
 signal embers_changed(total: int)
