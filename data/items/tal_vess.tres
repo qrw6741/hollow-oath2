@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"tal_vess"
+display_name = "Vess's Last Link"
+description = "One link of chain, polished by a hand that counted it every hour."
+kind = 1
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(0.62, 0.64, 0.7, 1)

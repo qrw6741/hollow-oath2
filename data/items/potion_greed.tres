@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"potion_greed"
+display_name = "Embergreed Draught"
+description = "Foes pay 50% more embers for five minutes."
+kind = 0
+effect = 5
+effect_amount = 300.0
+max_stack = 9
+icon_color = Color(0.95, 0.7, 0.25, 1)

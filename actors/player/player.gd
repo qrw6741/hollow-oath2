@@ -133,18 +133,22 @@ func apply_loadout() -> void:
 		return
 	var w := Loadout.weapon()
 	weapon = w if w else preset.weapon
-	damage_taken_mult = Loadout.damage_taken_mult()
+	damage_taken_mult = Loadout.damage_taken_mult() * Boosts.mult("damage_taken")
 	if status:
 		status.resist = Armors.resist_of(GameState.armor_id, GameState.armor_level(GameState.armor_id))
-		status.extra_resist = Relics.mult("status_resist")
+		status.extra_resist = Relics.mult("status_resist") + Boosts.add("status_resist")
 	var fx := Forge.effective_status(weapon)
 	attack_runner.weapon_status = fx.kind
-	attack_runner.weapon_status_amount = float(fx.amount) * Relics.mult("weapon_status")
-	run_speed = _base_run_speed * Armors.speed_mult(GameState.armor_id)
+	attack_runner.weapon_status_amount = float(fx.amount) * Relics.mult("weapon_status") * Boosts.mult("weapon_status")
+	run_speed = _base_run_speed * Armors.speed_mult(GameState.armor_id) * Boosts.mult("run_speed")
+	stamina.regen_per_second = preset.stamina_regen * Boosts.mult("stamina_regen")
+	var want_max := _max_health_value()
+	if not is_equal_approx(want_max, health.max_health):
+		health.set_max(want_max, false)
 	dodge_stamina = preset.dodge_stamina + Armors.dodge_add(GameState.armor_id)
 	var old_max := max_flasks
 	max_flasks = preset.flasks + Forge.vial_extra(GameState.flask_level)
-	flask_heal = (preset.flask_heal + Forge.vial_heal_bonus(GameState.flask_level)) * Relics.mult("flask_heal")
+	flask_heal = (preset.flask_heal + Forge.vial_heal_bonus(GameState.flask_level)) * Relics.mult("flask_heal") * Boosts.mult("flask_heal")
 	if max_flasks > old_max:
 		flasks += max_flasks - old_max
 	flasks = mini(flasks, max_flasks)
@@ -155,7 +159,13 @@ func apply_loadout() -> void:
 
 func _refresh_damage_bonus() -> void:
 	var stre := int(GameState.stats.get("strength", 0))
-	attack_runner.damage_bonus = (1.0 + stre * GameState.STRENGTH_DAMAGE) * Loadout.weapon_mult()
+	attack_runner.damage_bonus = (1.0 + stre * GameState.STRENGTH_DAMAGE) * Loadout.weapon_mult() * Boosts.mult("damage")
+
+
+## Preset + Vigor, times talisman / potion max-health boosts.
+func _max_health_value() -> float:
+	var vig := int(GameState.stats.get("vigor", 0))
+	return (preset.max_health + vig * GameState.VIGOR_HEALTH) * Boosts.mult("max_health")
 
 
 ## Applies Vigor / Endurance / Strength on top of the preset. With [param heal_gain],
@@ -164,10 +174,9 @@ func apply_stats(heal_gain := true) -> void:
 	if preset == null:
 		return
 	var old_max := health.max_health
-	var vig := int(GameState.stats.get("vigor", 0))
 	var end := int(GameState.stats.get("endurance", 0))
 	var stre := int(GameState.stats.get("strength", 0))
-	health.set_max(preset.max_health + vig * GameState.VIGOR_HEALTH, false)
+	health.set_max(_max_health_value(), false)
 	if heal_gain and health.max_health > old_max:
 		health.heal(health.max_health - old_max)
 	stamina.max_stamina = preset.max_stamina + end * GameState.ENDURANCE_STAMINA
@@ -199,6 +208,7 @@ func _emit_spawned() -> void:
 # ------------------------------------------------------------------ main loop
 
 func _physics_process(delta: float) -> void:
+	Buffs.tick(delta)
 	_read_input()
 	if is_on_floor() and state != State.DEAD and not _on_hazard():
 		last_safe_position = global_position
@@ -565,7 +575,7 @@ var blocking := false
 
 
 func add_focus(amount: float) -> void:
-	set_focus(focus + (amount * Relics.mult("focus_gain") if amount > 0.0 else amount))
+	set_focus(focus + (amount * Relics.mult("focus_gain") * Boosts.mult("focus_gain") if amount > 0.0 else amount))
 
 
 func set_focus(v: float) -> void:
@@ -659,7 +669,7 @@ func _faces(source: Node2D) -> bool:
 
 func _on_parry_success(hit: HitData) -> void:
 	_parried = true
-	add_focus(FOCUS_PER_PARRY + Relics.mult("parry_focus"))
+	add_focus(FOCUS_PER_PARRY + Relics.mult("parry_focus") + Boosts.add("parry_focus"))
 	state_frame = 0
 	parry_flash = 18
 	_iframes = maxi(_iframes, 20)
@@ -713,6 +723,7 @@ func _on_hazard() -> bool:
 
 func _on_died() -> void:
 	_set_state(State.DEAD)
+	Buffs.clear()
 	_iframes = 0
 	_buffer.clear()
 	Events.player_died.emit()

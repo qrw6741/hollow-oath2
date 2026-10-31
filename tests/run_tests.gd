@@ -83,7 +83,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -3954,6 +3954,121 @@ func test_four_parts() -> void:
 	check(Trials.RUSH_BOSSES.size() >= 15, "the boss rush includes every part")
 	for p in Trials.RUSH_BOSSES:
 		check(ResourceLoader.exists(p), "rush boss %s exists" % p)
+
+
+func test_talismans() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(300.0, 480.0, 1)
+	for id in TalismanData.IDS:
+		check(Items.IDS.has(id) and Items.get_item(id) != null and Items.get_item(id).validate().is_empty(), "%s is a valid item" % id)
+	check(TalismanData.ELITE_POOL.size() >= 5 and TalismanData.IDS.size() >= 20, "there are boss talismans and an elite pool")
+	# Bosses always drop theirs, once
+	var b: BossBase = load("res://actors/bosses/bell_warden.tscn").instantiate()
+	level.add_child(b)
+	await frames(2)
+	Talismans.roll_drop(b, b.data)
+	check(Talismans.owned(&"tal_warden"), "the Bell-Warden drops its talisman")
+	Talismans.roll_drop(b, b.data)
+	check(game_state.item_count(&"tal_warden") == 1, "a boss talisman is unique")
+	b.queue_free()
+	# Elites sometimes drop one from the pool
+	var e: EnemyBase = load("res://actors/enemies/gilded_penitent.tscn").instantiate()
+	level.add_child(e)
+	await frames(2)
+	for i in 300:
+		Talismans.roll_drop(e, e.data)
+	var pool_owned := 0
+	for id in TalismanData.ELITE_POOL:
+		if Talismans.owned(id):
+			pool_owned += 1
+	check(pool_owned >= 1 and pool_owned <= TalismanData.ELITE_POOL.size(), "elite enemies drop talismans from the pool (%d found)" % pool_owned)
+	e.queue_free()
+	# Ordinary enemies never do
+	var before: int = game_state.inventory.size()
+	var h: EnemyBase = load("res://actors/enemies/hollow_penitent.tscn").instantiate()
+	level.add_child(h)
+	await frames(2)
+	for i in 100:
+		Talismans.roll_drop(h, h.data)
+	check(game_state.inventory.size() == before, "ordinary foes drop no talismans")
+	h.queue_free()
+	# Wearing: three slots, effects apply
+	for id in [&"tal_king", &"tal_brand", &"tal_ashfall", &"tal_vess"]:
+		game_state.add_item(id, 1)
+	var dmg0 := player.attack_runner.damage_bonus
+	var hp0 := player.health.max_health
+	check(Talismans.toggle(&"tal_king").ok and Talismans.toggle(&"tal_brand").ok and Talismans.toggle(&"tal_ashfall").ok, "three talismans can be worn")
+	check(not Talismans.toggle(&"tal_vess").ok and Talismans.equipped().size() == 3, "the fourth is refused")
+	await frames(2)
+	check(is_equal_approx(Boosts.mult("damage"), 1.15 * 1.12 * 1.1), "damage boosts multiply")
+	check(is_equal_approx(Boosts.mult("damage_taken"), 0.92 * 0.95), "damage taken boosts multiply")
+	check(player.attack_runner.damage_bonus > dmg0 * 1.4, "the player hits harder with them")
+	check(player.health.max_health > hp0 * 1.1, "maximum health rises")
+	check(is_equal_approx(player.damage_taken_mult, Loadout.damage_taken_mult() * 0.92 * 0.95), "the player takes less damage")
+	check(Talismans.toggle(&"tal_king").ok and is_equal_approx(player.health.max_health, hp0 * 1.04), "removing one undoes its effects")
+	check(Talismans.describe({"damage": 1.1, "damage_taken": 0.9, "parry_focus": 6.0}) == "Damage +10%, Damage taken -10%, Focus per parry +6", "effects read clearly")
+	game_state.set_flag(&"tal_eq", [])
+	var inv: InventoryMenu = main.get_node("InventoryMenu")
+	inv.open(InventoryMenu.Tab.TALISMANS)
+	await frames(3)
+	check(inv.tab == InventoryMenu.Tab.TALISMANS and inv._tal_btns.size() >= 7, "the talismans tab lists what you carry (%d)" % inv._tal_btns.size())
+	inv._tal_btns[0].pressed.emit()
+	await frames(2)
+	check(Talismans.equipped().size() == 1, "pressing a row wears it")
+	inv.close()
+
+
+func test_potions_and_alchemy() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(300.0, 480.0, 1)
+	for id in Alchemy.ORDER:
+		check(Items.IDS.has(id) and Items.get_item(id).effect == ItemData.Effect.BUFF and Buffs.DEFS.has(id) and Items.get_item(id).validate().is_empty(), "%s is a valid potion" % id)
+	check(not Alchemy.can_craft(&"potion_might") and not Alchemy.craft(&"potion_might").ok, "you cannot brew without materials")
+	game_state.add_item(&"hollow_resin", 2)
+	game_state.add_item(&"ember_shard", 1)
+	game_state.add_embers(500)
+	check(Alchemy.can_craft(&"potion_might"), "with the materials it can be brewed")
+	var r := Alchemy.craft(&"potion_might")
+	check(r.ok and game_state.item_count(&"potion_might") == 1 and game_state.item_count(&"hollow_resin") == 0 and game_state.embers == 400, "brewing spends materials and embers and gives a potion")
+	# Drinking
+	var dmg0 := player.attack_runner.damage_bonus
+	check(Items.use(&"potion_might", player), "the potion can be drunk")
+	await frames(2)
+	check(Buffs.is_active(&"potion_might") and game_state.item_count(&"potion_might") == 0, "it starts a buff and is consumed")
+	check(player.attack_runner.damage_bonus > dmg0 * 1.15, "the buff raises damage")
+	check(Buffs.remaining(&"potion_might") > 230.0, "it lasts about four minutes")
+	Buffs.tick(100.0)
+	check(Buffs.is_active(&"potion_might") and Buffs.remaining(&"potion_might") < 141.0, "it runs down")
+	Buffs.tick(200.0)
+	await frames(2)
+	check(not Buffs.is_active(&"potion_might") and is_equal_approx(player.attack_runner.damage_bonus, dmg0), "it wears off and the effect ends")
+	# Stacking different potions, additive effects, max health
+	var hp0 := player.health.max_health
+	Buffs.start(&"potion_vigor")
+	Buffs.start(&"potion_resolve")
+	await frames(2)
+	check(is_equal_approx(player.health.max_health, hp0 * 1.25), "vigor raises maximum health")
+	check(is_equal_approx(Boosts.add("status_resist"), 0.5), "resolve adds status resist")
+	Buffs.clear()
+	await frames(2)
+	check(is_equal_approx(player.health.max_health, hp0) and Boosts.add("status_resist") == 0.0, "clearing buffs restores everything")
+	# Death clears them
+	Buffs.start(&"potion_ward")
+	player.health.take_damage(99999.0)
+	await frames(10)
+	check(not Buffs.is_active(&"potion_ward"), "buffs end when you die")
+	# Tab
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(300.0, 480.0, 1)
+	var inv: InventoryMenu = main.get_node("InventoryMenu")
+	inv.open(InventoryMenu.Tab.ALCHEMY)
+	await frames(3)
+	check(inv.tab == InventoryMenu.Tab.ALCHEMY and inv._alc_btns.size() == Alchemy.ORDER.size(), "the alchemy tab lists every recipe")
+	inv.close()
+	check(Buffs.active.is_empty(), "a new game starts with no buffs")
 
 
 func test_lurker_ambush() -> void:

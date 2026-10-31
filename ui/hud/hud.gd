@@ -110,6 +110,10 @@ func _build() -> void:
 	_status_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_status_row.draw.connect(_draw_status)
 	root.add_child(_status_row)
+	var buff_bar := BuffBar.new()
+	buff_bar.name = &"BuffBar"
+	buff_bar.position = Vector2(12, 62)
+	root.add_child(buff_bar)
 
 	# Embers (currency), top right.
 	var ember_icon := Control.new()

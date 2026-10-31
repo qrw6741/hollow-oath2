@@ -158,3 +158,10 @@
 - The four bosses are placeholder recolours of the brute with small props; their balance numbers are guesses that no human has tested. The Boss Rush (15 bosses) is very long and its reward was not retuned.
 - The Hall backdrop styles used (0 and 1) were not looked at on screen for these regions.
 - Windows build still not launched on Windows.
+
+## Talismans and alchemy
+- All talisman and potion numbers are first guesses; stacking three boss talismans plus potions can make the late game much easier. Nobody has played it.
+- Potion buffs are not saved: quitting or loading drops them. Dying also ends them.
+- Potion icons all use one vial picture (colour not varied); talismans use the relic icon style. Placeholder art.
+- Talisman and potion text, drop chances (12% for elites) and recipe costs are untested by a human. The elite pool only drops talismans you do not own yet.
+- Boss Rush grants boss talismans (as it does arts).

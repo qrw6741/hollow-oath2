@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"tal_cinder"
+display_name = "Cinder Ash-Mark"
+description = "A thumbprint in warm ash. Press it to your blade and it remembers burning."
+kind = 1
+effect = 0
+effect_amount = 0.0
+max_stack = 1
+icon_color = Color(0.9, 0.5, 0.25, 1)

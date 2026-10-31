@@ -5,7 +5,7 @@ extends Resource
 ## is handled by whatever checks for the item.
 
 enum Kind { CONSUMABLE, KEY, LORE }
-enum Effect { NONE, HEAL, STAMINA, EMBERS, TRAVEL }
+enum Effect { NONE, HEAL, STAMINA, EMBERS, TRAVEL, BUFF }
 
 @export var id: StringName = &""
 @export var display_name := ""

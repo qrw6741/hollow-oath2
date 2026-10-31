@@ -68,7 +68,7 @@ Rebind any action in **Settings → Controls**: pick the keyboard or controller 
 
 
 ## Menus added later
-- **Inventory (Tab)**: six tabs, switch with Parry / Heal: Equipment, Items, Journal, Bestiary, Deeds, Relics. In Relics, press a row to wear or remove (two slots).
+- **Inventory (Tab)**: ten tabs, switch with Parry / Heal: Gear, Items, Weapons, Journal, Bestiary, Deeds, Relics, Arts, Talismans, Alchemy. In Relics, press a row to wear or remove (two slots). In Talismans, press a row to wear or remove (three slots); bosses always leave one and elite foes sometimes do. In Alchemy, press a recipe to brew a potion from carried materials; drink potions from the Items tab (or set one as the quick item) for a timed buff shown at the top left.
 - **Shop**: BUY / SELL tabs, switch with Parry / Heal. Confirm trades one.
 - **Forge**: WEAPONS / ARMOUR tabs (Parry / Heal); the Infusion button under the description cycles the weapon's status.
 - **Oath Gate** (end of the Vaelmoor Road, after the Marshal): Interact to choose an ending. After an ending, Interact twice to begin New Game+.

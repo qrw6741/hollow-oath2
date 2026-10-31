@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/items/item_data.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"potion_ward"
+display_name = "Ward Tonic"
+description = "You take 20% less damage for four minutes."
+kind = 0
+effect = 5
+effect_amount = 240.0
+max_stack = 9
+icon_color = Color(0.5, 0.6, 0.85, 1)

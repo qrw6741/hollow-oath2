@@ -10,7 +10,7 @@ extends CanvasLayer
 ## A JOURNAL tab lists open errands (see Quests).
 ## Switch tabs with Parry / Heal (L1 / R1) or by clicking. Keyboard, mouse and gamepad.
 
-enum Tab { EQUIPMENT, ITEMS, WEAPONS, JOURNAL, BESTIARY, DEEDS, RELICS, ARTS }
+enum Tab { EQUIPMENT, ITEMS, WEAPONS, JOURNAL, BESTIARY, DEEDS, RELICS, ARTS, TALISMANS, ALCHEMY }
 
 var is_open := false
 var tab := Tab.EQUIPMENT
@@ -27,6 +27,13 @@ var _w_text: Label
 var _relic_list: VBoxContainer
 var _relic_head: Label
 var _relic_btns: Array[Button] = []
+var _tal_list: VBoxContainer
+var _tal_head: Label
+var _tal_btns: Array[Button] = []
+var _alc_list: VBoxContainer
+var _alc_head: Label
+var _alc_buffs: Label
+var _alc_btns: Array[Button] = []
 var _bestiary_label: Label
 var _deeds_label: Label
 var _pages: Array[Control] = []
@@ -88,14 +95,14 @@ func _build() -> void:
 	# Tabs
 	var tabs := HBoxContainer.new()
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
-	tabs.add_theme_constant_override(&"separation", 4)
+	tabs.add_theme_constant_override(&"separation", 2)
 	v.add_child(tabs)
-	for i in 8:
+	for i in 10:
 		var b := FancyButton.new()
-		b.text = ["EQUIPMENT", "ITEMS", "WEAPONS", "JOURNAL", "BESTIARY", "DEEDS", "RELICS", "ARTS"][i]
-		b.custom_minimum_size = Vector2(54, 18)
+		b.text = ["GEAR", "ITEMS", "WEAPONS", "JOURNAL", "BESTIARY", "DEEDS", "RELICS", "ARTS", "TALISMANS", "ALCHEMY"][i]
+		b.custom_minimum_size = Vector2(36, 18)
 		b.add_theme_font_override(&"font", UITheme.title_font())
-		b.add_theme_font_size_override(&"font_size", 8)
+		b.add_theme_font_size_override(&"font_size", 6)
 		b.focus_mode = Control.FOCUS_NONE
 		b.pressed.connect(show_tab.bind(i))
 		tabs.add_child(b)
@@ -112,6 +119,8 @@ func _build() -> void:
 	_pages.append(_build_scroll_text(stack, "_deeds_label"))
 	_pages.append(_build_relics(stack))
 	_pages.append(_build_arts(stack))
+	_pages.append(_build_talismans(stack))
+	_pages.append(_build_alchemy(stack))
 	_close_btn = FancyButton.new()
 	_close_btn.text = "Close"
 	_close_btn.custom_minimum_size = Vector2(110, 15)
@@ -393,6 +402,135 @@ func _weapon_pressed(id: StringName) -> void:
 		_show_weapon(id)
 
 
+## A vertical list inside a scroll area (focus scrolls it), for tabs that can grow long.
+func _scroll_list(parent: Control) -> VBoxContainer:
+	var sc := ScrollContainer.new()
+	sc.custom_minimum_size = Vector2(430, 150)
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sc.follow_focus = true
+	parent.add_child(sc)
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override(&"separation", 2)
+	sc.add_child(list)
+	return list
+
+
+func _build_talismans(stack: Control) -> Control:
+	var p := _framed(stack, Vector2(460, 194))
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 3)
+	p.add_child(v)
+	_tal_head = Label.new()
+	UITheme.title(_tal_head, 10, Palette.GOLD_BRIGHT)
+	_tal_head.add_theme_font_override(&"font", UITheme.body_font())
+	v.add_child(_tal_head)
+	_tal_list = _scroll_list(v)
+	return p
+
+
+## Every talisman you carry, [x] when worn. Press to wear / remove (up to Talismans.SLOTS).
+func _refresh_talismans() -> void:
+	for c in _tal_list.get_children():
+		_tal_list.remove_child(c)
+		c.queue_free()
+	_tal_btns.clear()
+	_tal_head.text = "TALISMANS    worn %d / %d    %d found" % [Talismans.equipped().size(), Talismans.SLOTS, _talisman_count()]
+	for id in TalismanData.IDS:
+		if not Talismans.owned(id):
+			continue
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", 4)
+		var slot := IconSlot.new()
+		slot.custom_minimum_size = Vector2(22, 22)
+		slot.focus_mode = Control.FOCUS_NONE
+		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.icon_id = id
+		row.add_child(slot)
+		var b := FancyButton.new()
+		b.custom_minimum_size = Vector2(396, 22)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.text = "%s  %s    %s" % ["[x]" if Talismans.is_worn(id) else "[ ]", Talismans.title(id), Talismans.describe(Talismans.effects_of(id))]
+		UITheme.compact(b)
+		b.pressed.connect(func():
+			var r := Talismans.toggle(id)
+			_msg.text = r.msg
+			_refresh_talismans())
+		row.add_child(b)
+		_tal_list.add_child(row)
+		_tal_btns.append(b)
+	if _tal_btns.is_empty():
+		var l := Label.new()
+		l.text = "No talismans yet. Bosses always leave one; elite foes sometimes do."
+		l.add_theme_color_override(&"font_color", Palette.STONE_LIGHT)
+		_tal_list.add_child(l)
+	else:
+		_tal_btns[0].grab_focus.call_deferred()
+
+
+func _talisman_count() -> int:
+	var n := 0
+	for id in TalismanData.IDS:
+		if Talismans.owned(id):
+			n += 1
+	return n
+
+
+func _build_alchemy(stack: Control) -> Control:
+	var p := _framed(stack, Vector2(460, 194))
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 3)
+	p.add_child(v)
+	_alc_head = Label.new()
+	UITheme.title(_alc_head, 10, Palette.GOLD_BRIGHT)
+	_alc_head.add_theme_font_override(&"font", UITheme.body_font())
+	v.add_child(_alc_head)
+	_alc_list = _scroll_list(v)
+	_alc_buffs = Label.new()
+	_alc_buffs.add_theme_color_override(&"font_color", Palette.BONE_DIM)
+	v.add_child(_alc_buffs)
+	return p
+
+
+## Potion recipes: press to brew when you have the materials. Drink potions from the Items tab.
+func _refresh_alchemy() -> void:
+	for c in _alc_list.get_children():
+		_alc_list.remove_child(c)
+		c.queue_free()
+	_alc_btns.clear()
+	_alc_head.text = "ALCHEMY    brew potions for timed buffs    %d embers" % GameState.embers
+	for id in Alchemy.ORDER:
+		var item := Items.get_item(id)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", 4)
+		var slot := IconSlot.new()
+		slot.custom_minimum_size = Vector2(22, 22)
+		slot.focus_mode = Control.FOCUS_NONE
+		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.icon_id = id
+		row.add_child(slot)
+		var b := FancyButton.new()
+		b.custom_minimum_size = Vector2(396, 22)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		var can := Alchemy.can_craft(id)
+		b.text = "%s  (have %d)    %s" % [item.display_name, GameState.item_count(id), Alchemy.ingredients_text(id)]
+		b.tooltip_text = item.description
+		b.modulate.a = 1.0 if can else 0.55
+		UITheme.compact(b)
+		b.pressed.connect(func():
+			var r := Alchemy.craft(id)
+			_msg.text = r.msg
+			_refresh_alchemy())
+		row.add_child(b)
+		_alc_list.add_child(row)
+		_alc_btns.append(b)
+	var lines := PackedStringArray()
+	for id in Buffs.active:
+		lines.append("%s %s" % [Buffs.DEFS[id].title, Buffs.clock(Buffs.remaining(id))])
+	_alc_buffs.text = "Active: " + (", ".join(lines) if not lines.is_empty() else "none") + "    (drink potions from the ITEMS tab)"
+	if not _alc_btns.is_empty():
+		_alc_btns[0].grab_focus.call_deferred()
+
+
 func _build_relics(stack: Control) -> Control:
 	var p := _framed(stack, Vector2(460, 194))
 	var v := VBoxContainer.new()
@@ -402,9 +540,7 @@ func _build_relics(stack: Control) -> Control:
 	UITheme.title(_relic_head, 10, Palette.GOLD_BRIGHT)
 	_relic_head.add_theme_font_override(&"font", UITheme.body_font())
 	v.add_child(_relic_head)
-	_relic_list = VBoxContainer.new()
-	_relic_list.add_theme_constant_override(&"separation", 2)
-	v.add_child(_relic_list)
+	_relic_list = _scroll_list(v)
 	return p
 
 
@@ -621,6 +757,10 @@ func show_tab(t: int) -> void:
 		_refresh_relics()
 	elif tab == Tab.ARTS:
 		_refresh_arts()
+	elif tab == Tab.TALISMANS:
+		_refresh_talismans()
+	elif tab == Tab.ALCHEMY:
+		_refresh_alchemy()
 	else:
 		_rebuild()
 	Audio.sfx(&"ui_move", -4.0)
