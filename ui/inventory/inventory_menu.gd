@@ -53,6 +53,7 @@ var _d_sub: Label
 var _d_grid: GridContainer
 var _d_desc: Label
 var _picker: VBoxContainer
+var _picker_scroll: ScrollContainer
 var _picking := ""            # "" | "weapon" | "armour"
 var picker_buttons: Array = []   # [{"id": StringName, "button": Button}]
 # Items tab (names kept for tests and other menus)
@@ -231,10 +232,18 @@ func _build_equipment(stack: Control) -> Control:
 	_d_desc.add_theme_font_size_override(&"font_size", 7)
 	_d_desc.add_theme_color_override(&"font_color", Palette.BONE_DIM)
 	cv.add_child(_d_desc)
+	# the chooser: a scrolling list of icon rows (wheel, keys and pad all scroll it)
+	_picker_scroll = ScrollContainer.new()
+	_picker_scroll.name = "PickerScroll"
+	_picker_scroll.custom_minimum_size = Vector2(200, 142)
+	_picker_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_picker_scroll.follow_focus = true
+	_picker_scroll.visible = false
+	cv.add_child(_picker_scroll)
 	_picker = VBoxContainer.new()
-	_picker.add_theme_constant_override(&"separation", 1)
-	_picker.visible = false
-	cv.add_child(_picker)
+	_picker.add_theme_constant_override(&"separation", 2)
+	_picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_picker_scroll.add_child(_picker)
 	return h
 
 
@@ -313,11 +322,17 @@ func _build_weapons(stack: Control) -> Control:
 	UITheme.title(_w_head, 10, Palette.GOLD_BRIGHT)
 	_w_head.add_theme_font_override(&"font", UITheme.body_font())
 	lv.add_child(_w_head)
+	var wscroll := ScrollContainer.new()
+	wscroll.name = "WeaponScroll"
+	wscroll.custom_minimum_size = Vector2(0, 166)
+	wscroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	wscroll.follow_focus = true
+	lv.add_child(wscroll)
 	var grid := GridContainer.new()
 	grid.columns = 5
 	grid.add_theme_constant_override(&"h_separation", 4)
 	grid.add_theme_constant_override(&"v_separation", 4)
-	lv.add_child(grid)
+	wscroll.add_child(grid)
 	for id in Weapons.IDS:
 		var s := IconSlot.new()
 		s.custom_minimum_size = Vector2(38, 38)
@@ -906,31 +921,34 @@ func open_picker(key: String) -> void:
 	picker_buttons.clear()
 	_d_grid.visible = false
 	_d_desc.visible = false
-	_picker.visible = true
+	_picker_scroll.visible = true
 	_d_icon_id = _weapon_id() if key == "weapon" else _armor_icon()
 	_d_icon.queue_redraw()
 	_d_title.text = "Choose a weapon" if key == "weapon" else "Choose armour"
 	_d_sub.text = "Confirm to equip   -   Cancel to go back"
 	var bonus := 1.0 + int(GameState.stats.get("strength", 0)) * GameState.STRENGTH_DAMAGE
 	if key == "weapon":
+		var best := 1
+		for id in Weapons.IDS:
+			if GameState.owns_weapon(id):
+				best = maxi(best, int(WeaponStats.summary(Weapons.get_weapon(id), bonus * Weapons.level_mult(GameState.weapon_level(id))).light_total))
 		for id in Weapons.IDS:
 			if not GameState.owns_weapon(id):
 				continue
 			var w := Weapons.get_weapon(id)
 			var lv := GameState.weapon_level(id)
 			var total: int = WeaponStats.summary(w, bonus * Weapons.level_mult(lv)).light_total
-			var tag := "   (equipped)" if id == GameState.weapon_id else ""
-			_picker_row(id, "%s +%d    combo %d%s" % [w.display_name, lv, total, tag], id == GameState.weapon_id)
+			_picker_row(id, id, "%s  +%d" % [w.display_name, lv], "Light combo %d damage" % total, float(total) / float(best), id == GameState.weapon_id, Color(0.9, 0.55, 0.3))
 	else:
 		var bare := GameState.armor_id == Armors.NONE
-		_picker_row(Armors.NONE, "Take off all armour" + ("   (nothing worn)" if bare else "") + "    taken %d%%" % roundi(Armors.NAKED_DAMAGE * 100.0), bare)
+		_picker_row(Armors.NONE, &"", "Take off all armour", "Damage taken %d%%" % roundi(Armors.NAKED_DAMAGE * 100.0), 0.0, bare, Color(0.5, 0.6, 0.9))
 		for id in Armors.IDS:
 			if not GameState.owns_armor(id):
 				continue
 			var ar := Armors.get_armor(id)
 			var lvl := GameState.armor_level(id)
-			var tag2 := "   (worn)" if id == GameState.armor_id else ""
-			_picker_row(id, "%s +%d    taken %d%%%s" % [ar.display_name, lvl, roundi(Armors.damage_mult(id, lvl) * 100.0), tag2], id == GameState.armor_id)
+			var taken := Armors.damage_mult(id, lvl)
+			_picker_row(id, StringName("armor_" + String(id)), "%s  +%d" % [ar.display_name, lvl], "Damage taken %d%%" % roundi(taken * 100.0), clampf(1.0 - taken, 0.0, 1.0), id == GameState.armor_id, Color(0.5, 0.6, 0.9))
 	var focus: Button = picker_buttons[0].button
 	for r in picker_buttons:
 		if r.current:
@@ -938,12 +956,61 @@ func open_picker(key: String) -> void:
 	focus.grab_focus()
 
 
-func _picker_row(id: StringName, text: String, current: bool) -> void:
+## One chooser row: icon, name, a stat line, a small strength bar and an EQUIPPED badge.
+func _picker_row(id: StringName, icon_id: StringName, title: String, stat: String, bar: float, current: bool, bar_col: Color) -> void:
 	var b := FancyButton.new()
-	b.text = text
-	b.custom_minimum_size = Vector2(190, 14)
+	b.custom_minimum_size = Vector2(190, 28)
+	b.clip_contents = true
 	UITheme.compact(b)
 	b.pressed.connect(choose.bind(id))
+	var row := HBoxContainer.new()
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	row.offset_left = 7.0
+	row.offset_right = -7.0
+	row.add_theme_constant_override(&"separation", 5)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(row)
+	var ic := Control.new()
+	ic.custom_minimum_size = Vector2(22, 22)
+	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ic.draw.connect(func():
+		ic.draw_rect(Rect2(Vector2.ZERO, ic.size), Color(0, 0, 0, 0.35))
+		if icon_id != &"":
+			IconArt.draw(ic, icon_id, Rect2(Vector2(1, 1), ic.size - Vector2(2, 2))))
+	row.add_child(ic)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 0)
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(col)
+	var nm := Label.new()
+	nm.text = title
+	nm.add_theme_font_size_override(&"font_size", 8)
+	nm.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT if current else Palette.BONE)
+	nm.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(nm)
+	var st := Label.new()
+	st.text = stat
+	st.add_theme_font_size_override(&"font_size", 6)
+	st.add_theme_color_override(&"font_color", Palette.BONE_DIM)
+	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(st)
+	var barc := Control.new()
+	barc.custom_minimum_size = Vector2(0, 3)
+	barc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	barc.draw.connect(func():
+		barc.draw_rect(Rect2(Vector2.ZERO, barc.size), Color(0, 0, 0, 0.5))
+		barc.draw_rect(Rect2(Vector2.ZERO, Vector2(barc.size.x * clampf(bar, 0.0, 1.0), barc.size.y)), bar_col))
+	col.add_child(barc)
+	if current:
+		var badge := Label.new()
+		badge.text = "EQUIPPED"
+		badge.add_theme_font_size_override(&"font_size", 6)
+		badge.add_theme_color_override(&"font_color", Palette.GOLD_BRIGHT)
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(badge)
 	_picker.add_child(b)
 	picker_buttons.append({"id": id, "button": b, "current": current})
 
@@ -963,7 +1030,7 @@ func close_picker() -> void:
 		return
 	var slot := _picking
 	_picking = ""
-	_picker.visible = false
+	_picker_scroll.visible = false
 	_d_grid.visible = true
 	_d_desc.visible = true
 	_slot_sel = slot

@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_cutscene_lock, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_cutscene_lock, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -4876,6 +4876,59 @@ func test_cutscene_lock() -> void:
 		cam.cine_end(0.2)
 		await frames(60)
 		check(is_equal_approx(cam.zoom.x, 1.0) and cam.global_position.distance_to(player.global_position) < 80.0, "the camera returns to the player")
+
+
+func test_dev_one_hit_and_pickers() -> void:
+	await fresh_game()
+	# Dev hub: one-hit kills (only hits that come from the player)
+	var keep: bool = settings.dev_one_hit
+	var panel := SettingsPanel.new()
+	get_tree().root.add_child(panel)
+	await frames(2)
+	check(panel._tab_btns.size() == 4 and panel._pages.size() == 4, "settings has a fourth tab, the Dev hub")
+	panel.show_page(3)
+	check(panel._pages[3].visible and not settings.dev_one_hit, "the Dev tab shows and one-hit kills start off")
+	panel._onehit.pressed.emit()
+	check(settings.dev_one_hit and "On" in panel._onehit.text, "the toggle turns one-hit kills on")
+	panel.queue_free()
+	var e := await spawn_enemy(600.0)
+	e.receive_hit(HitData.make(1.0, player, Vector2.ZERO))
+	await frames(2)
+	check(e.is_dead(), "a 1-damage hit from the player kills when one-hit is on")
+	settings.dev_one_hit = false
+	var e2 := await spawn_enemy(700.0)
+	e2.receive_hit(HitData.make(1.0, player, Vector2.ZERO))
+	await frames(2)
+	check(not e2.is_dead(), "and does not when it is off")
+	settings.dev_one_hit = keep
+	# the weapon / armour chooser scrolls and the Weapons tab scrolls
+	for id in Weapons.IDS:
+		game_state.grant_gear("weapon", id)
+	for id in Armors.IDS:
+		game_state.grant_gear("armor", id)
+	var im: InventoryMenu = main.get_node("InventoryMenu")
+	im.open()
+	await frames(3)
+	im.open_picker("weapon")
+	await frames(4)
+	var sc: ScrollContainer = im._picker_scroll
+	check(sc.visible and im.picker_buttons.size() >= 10, "the chooser lists every owned weapon (%d)" % im.picker_buttons.size())
+	check(sc.get_v_scroll_bar().max_value > sc.size.y + 4.0, "and it is taller than its box, so it scrolls (%.0f > %.0f)" % [sc.get_v_scroll_bar().max_value, sc.size.y])
+	(im.picker_buttons[im.picker_buttons.size() - 1].button as Button).grab_focus()
+	await frames(6)
+	check(sc.scroll_vertical > 0, "focusing the last weapon scrolls the list (%d)" % sc.scroll_vertical)
+	var first_row: Button = im.picker_buttons[0].button
+	check(first_row.get_child_count() > 0 and first_row.text == "", "rows are icon + stats rows, not plain text")
+	im.close_picker()
+	im.open_picker("armour")
+	await frames(4)
+	check(im.picker_buttons.size() >= 5, "the armour chooser lists the armour (%d)" % im.picker_buttons.size())
+	im.close_picker()
+	im.show_tab(InventoryMenu.Tab.WEAPONS)
+	await frames(4)
+	var ws := im.find_child("WeaponScroll", true, false) as ScrollContainer
+	check(ws != null and ws.get_v_scroll_bar().max_value > ws.size.y + 4.0, "the Weapons tab grid scrolls")
+	im.close()
 
 
 func test_travel_scrolls() -> void:

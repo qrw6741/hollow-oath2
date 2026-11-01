@@ -328,7 +328,10 @@ func receive_hit(hit: HitData) -> int:
 	if state == State.DEAD:
 		return HitData.Result.IGNORED
 	var was_parried := state == State.PARRIED
-	var applied := health.take_damage(hit.damage * damage_taken_scale)
+	var dmg := hit.damage * damage_taken_scale
+	if Settings.dev_one_hit and not hit.environmental and hit.source != null and hit.source.is_in_group(&"player"):
+		dmg = health.max_health * 10.0   # Dev hub: one hit kills
+	var applied := health.take_damage(dmg)
 	hit_flash = 6
 	if status and hit.status != &"":
 		status.apply(hit.status, hit.status_amount)

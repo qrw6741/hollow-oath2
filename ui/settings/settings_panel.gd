@@ -15,6 +15,7 @@ var _hitstop: Button
 var _display: Button
 var _res: Button
 var _render: Button
+var _onehit: Button
 var _glow: Button
 var _classic: Button
 var _dmgnum: Button
@@ -52,9 +53,9 @@ func _ready() -> void:
 	tabs.alignment = BoxContainer.ALIGNMENT_CENTER
 	tabs.add_theme_constant_override(&"separation", 10)
 	add_child(tabs)
-	for i in 3:
+	for i in 4:
 		var t := FancyButton.new()
-		t.text = ["Display", "Game", "Controls"][i]
+		t.text = ["Display", "Game", "Controls", "Dev"][i]
 		t.custom_minimum_size = Vector2(64, 14)
 		t.focus_mode = Control.FOCUS_NONE
 		t.add_theme_font_override(&"font", UITheme.title_font())
@@ -62,7 +63,7 @@ func _ready() -> void:
 		t.pressed.connect(show_page.bind(i))
 		tabs.add_child(t)
 		_tab_btns.append(t)
-	for i in 3:
+	for i in 4:
 		var pg := VBoxContainer.new()
 		pg.add_theme_constant_override(&"separation", 2)
 		add_child(pg)
@@ -97,6 +98,15 @@ func _ready() -> void:
 	_sfx_label = _volume_group(vol, "Effects", "sfx_volume", &"SfxDown", &"SfxUp")
 	_controls = ControlsPanel.new()
 	_pages[2].add_child(_controls)
+
+	# Dev hub: testing tools. Off by default, saved with the other settings.
+	var note := Label.new()
+	note.text = "DEV HUB  -  testing tools, not part of the normal game"
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	note.add_theme_font_size_override(&"font_size", 7)
+	note.add_theme_color_override(&"font_color", Palette.DUST)
+	_pages[3].add_child(note)
+	_onehit = _button(func(): Settings.dev_one_hit = not Settings.dev_one_hit; _refresh(), _pages[3])
 
 	_back = _button(_on_back)
 	_back.text = "Back"
@@ -142,6 +152,7 @@ func focus_first() -> void:
 		0: _display.grab_focus()
 		1: _dmg.grab_focus()
 		2: _controls.focus_first()
+		3: _onehit.grab_focus()
 
 
 func _video_changed() -> void:
@@ -150,6 +161,7 @@ func _video_changed() -> void:
 
 
 func _refresh() -> void:
+	_onehit.text = "One-hit kills (every hit kills): %s" % ("On" if Settings.dev_one_hit else "Off")
 	_dmg.text = "Damage you take: %d%%" % Settings.damage_taken_pct
 	_ehp.text = "Enemy health: %d%%" % Settings.enemy_health_pct
 	_assist.text = "Parry assist (wider window): %s" % ("On" if Settings.parry_assist else "Off")
