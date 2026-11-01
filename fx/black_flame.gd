@@ -9,6 +9,8 @@ var shooter: Node
 var life := 7.0
 var tick := 0.35
 var delay := 0.0
+## Orange fire (the Fire Meteor's embers) instead of black flame.
+var fire := false
 var width := 26.0
 var height := 46.0
 var _t := 0.0
@@ -65,6 +67,7 @@ func _physics_process(delta: float) -> void:
 				hit.knockback = Vector2.ZERO
 				hit.parryable = false
 				hit.environmental = false
+				hit.jutsu = true
 				hit.source = shooter as Node2D
 				hit.attack_id = hit_template.attack_id
 				hit.hit_stop = 0.0
@@ -85,7 +88,7 @@ func _draw() -> void:
 		var sway := sin(_t * 7.0 + _seed + i * 1.7) * 3.0
 		var tip := Vector2(x + sway, -h * (0.55 + 0.45 * sin(_t * 5.0 + _seed * 2.0 + i * 2.3) * 0.5 + 0.2) * (1.0 - absf(k - 0.5) * 0.7))
 		var w := width * 0.3
-		draw_colored_polygon(PackedVector2Array([Vector2(x - w, 0), tip, Vector2(x + w, 0)]), Color(0.02, 0.0, 0.04, 0.97 * fade))
-		draw_line(Vector2(x - w, 0), tip, Color(0.4, 0.15, 0.7, 0.45 * fade), 1.0)
-		draw_line(Vector2(x + w, 0), tip, Color(0.4, 0.15, 0.7, 0.45 * fade), 1.0)
+		draw_colored_polygon(PackedVector2Array([Vector2(x - w, 0), tip, Vector2(x + w, 0)]), (Color(0.9, 0.3, 0.05, 0.9 * fade) if fire else Color(0.02, 0.0, 0.04, 0.97 * fade)))
+		draw_line(Vector2(x - w, 0), tip, (Color(1.0, 0.8, 0.3, 0.6 * fade) if fire else Color(0.4, 0.15, 0.7, 0.45 * fade)), 1.0)
+		draw_line(Vector2(x + w, 0), tip, (Color(1.0, 0.8, 0.3, 0.6 * fade) if fire else Color(0.4, 0.15, 0.7, 0.45 * fade)), 1.0)
 	draw_circle(Vector2(0, -2), width * 0.45, Color(0.2, 0.05, 0.35, 0.18 * fade * grow))

@@ -18,7 +18,7 @@ const EXTRA_ITEMS := {&"salt_of_the_dead": &"pilgrims_draught", &"kings_wine": &
 
 
 static func has_icon(id: StringName) -> bool:
-	return id in [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard",
+	return id in [&"ash_bandage", &"ember_shard", &"stamina_tonic", &"rusted_key", &"warden_bell_shard", &"fox_tooth",
 		&"penitents_tear", &"candlewright_note", &"canon_seal", &"pilgrims_draught", &"marshals_crest", &"oathblade", &"twin_blades",
 		&"sword_and_shield", &"fists", &"armor_sworn_knight", &"armor_duelist", &"armor_bulwark",
 		&"armor_unsworn", &"status", &"forge_scrap", &"hollow_resin", &"vial", &"hollow_sigil", &"gallery_key", &"sextons_lantern", &"cinder_heart", &"ashfall_seal", &"lurker_fang", &"cantors_wick", &"abbots_signet"] \
@@ -33,6 +33,7 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"ember_shard": _shard(ci, t)
 		&"stamina_tonic": _tonic(ci)
 		&"rusted_key": _key(ci)
+		&"fox_tooth": _tooth(ci)
 		&"warden_bell_shard": _bell_shard(ci)
 		&"penitents_tear": _tear(ci, t)
 		&"candlewright_note": _note(ci)
@@ -283,6 +284,12 @@ static func _scythe(ci: CanvasItem) -> void:
 		pts.append(Vector2(10, 2) + Vector2(sin(f * 1.9) * 5.5, (1.0 - cos(f * 1.9)) * 4.5 + f * 0.5))
 	ci.draw_polyline(pts, Color("c3c7d0"), 2.0)
 	ci.draw_polyline(pts, Color("a070ff"), 0.8)
+
+
+static func _tooth(ci: CanvasItem) -> void:
+	_poly(ci, [Vector2(5, 2), Vector2(11, 2), Vector2(12, 8), Vector2(9, 15), Vector2(8, 11), Vector2(7, 15), Vector2(4, 8)], Color("efe6d2"))
+	ci.draw_line(Vector2(6, 4), Vector2(10, 4), Color("c9b98e"), 1.0)
+	ci.draw_line(Vector2(8, 5), Vector2(8, 11), Color("c9b98e"), 0.8)
 
 
 static func _axe(ci: CanvasItem) -> void:

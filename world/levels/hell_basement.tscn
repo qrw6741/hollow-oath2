@@ -1,0 +1,113 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
+[ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
+[ext_resource type="Script" path="res://world/background/descent_backdrop.gd" id="backdrop"]
+[ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
+[ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
+[ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
+[ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
+[ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
+[ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Script" path="res://world/boss/elder_arena.gd" id="elderarena"]
+[ext_resource type="PackedScene" path="res://actors/bosses/ember_elder.tscn" id="elderboss"]
+
+[node name="HellBasement" type="Node2D"]
+script = ExtResource("level")
+level_id = &"hell_basement"
+display_name = "The Grass Cellar"
+bounds = Rect2(0, 0, 2400, 540)
+music = &"catacombs"
+music_pitch = 0.8
+map_origin = Vector2(53200, -1750)
+default_spawn = Vector2(130, 480)
+
+[node name="Hall" type="Node2D" parent="."]
+z_index = -10
+script = ExtResource("backdrop")
+theme = 3
+width = 2400.0
+floor_y = 480.0
+ceiling_y = 96.0
+seed_value = 821
+
+[node name="Light" type="CanvasModulate" parent="."]
+color = Color(0.85, 1.0, 0.78, 1)
+
+[node name="Geometry" type="Node2D" parent="."]
+
+[node name="CliffLeft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 0)
+script = ExtResource("block")
+size = Vector2(16, 480)
+style = 1
+seed_value = 901
+
+[node name="Ground" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16, 480)
+script = ExtResource("block")
+size = Vector2(2384, 60)
+style = 3
+seed_value = 902
+
+[node name="CliffRight" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2340, 0)
+script = ExtResource("block")
+size = Vector2(60, 540)
+style = 1
+seed_value = 903
+
+[node name="Ceiling" type="StaticBody2D" parent="Geometry"]
+position = Vector2(0, 40)
+script = ExtResource("block")
+size = Vector2(2400, 56)
+style = 1
+seed_value = 904
+
+[node name="FromGate" type="Marker2D" parent="."]
+position = Vector2(150, 480)
+script = ExtResource("entry")
+entry_id = &"from_gate"
+
+[node name="ToLower" type="Area2D" parent="."]
+position = Vector2(34, 480)
+script = ExtResource("exit")
+target_level = "res://world/levels/lower_hell.tscn"
+target_entry = &"from_basement"
+size = Vector2(12, 80)
+
+[node name="Candle0" parent="." instance=ExtResource("candle")]
+position = Vector2(360, 480)
+checkpoint_id = &"hell_basement_candle"
+display_name = "Grass Cellar Candle"
+
+[node name="Tablet0" type="Area2D" parent="."]
+position = Vector2(560, 480)
+script = ExtResource("tablet")
+title = "Green"
+text = "Grass. Down here. Someone carried the seeds in on their boots, or someone down here is still dreaming of a field."
+
+[node name="Tablet1" type="Area2D" parent="."]
+position = Vector2(820, 480)
+script = ExtResource("tablet")
+title = "Before the Chains"
+text = "He kept the fire for them. That was the oath. Not to fight it, only to be the one it burned in, so it would not burn anyone else."
+
+[node name="Chest0" type="Area2D" parent="."]
+position = Vector2(1850, 480)
+script = ExtResource("chest")
+chest_id = &"hell_basement_chest"
+count = 3
+embers = 12000
+item = ExtResource("it_shard")
+
+[node name="ElderArena" type="Node2D" parent="."]
+position = Vector2(1000, 480)
+script = ExtResource("elderarena")
+boss_scene = ExtResource("elderboss")
+boss_offset = Vector2(420, 0)
+gate_height = 96.0
+trigger_offset = 36.0
+trigger_width = 700.0
+victory_text = "THE FIRE GOES OUT"

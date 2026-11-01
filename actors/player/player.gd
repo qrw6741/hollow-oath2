@@ -86,7 +86,7 @@ const WATER_JUMP := 0.88
 ## Last standing spot that was not a hazard; lost embers fall here.
 var last_safe_position := Vector2.ZERO
 
-const BUFFERED: Array[StringName] = [&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal", &"skill", &"art"]
+const BUFFERED: Array[StringName] = [&"jump", &"attack_light", &"attack_heavy", &"dodge", &"parry", &"heal", &"skill", &"art", &"art_alt"]
 
 
 func _ready() -> void:
@@ -334,6 +334,11 @@ func _try_actions() -> bool:
 		_consume(&"art")
 		if can_use_art():
 			_cast_art()
+			return true
+	if _buffered(&"art_alt"):
+		_consume(&"art_alt")
+		if can_use_equipped_art():
+			_cast_art(true)
 			return true
 	if _buffered(&"attack_light") and stamina.can_spend() and weapon:
 		_consume(&"attack_light")
@@ -613,13 +618,19 @@ func has_jutsu() -> bool:
 func can_use_art() -> bool:
 	if has_jutsu():
 		return focus >= weapon.jutsu_cost and stamina.can_spend() and is_on_floor()
+	return can_use_equipped_art()
+
+
+## The equipped Art (ignores the weapon's jutsu): the Art button when the weapon has none, the second
+## technique button (art_alt) always.
+func can_use_equipped_art() -> bool:
 	var id := Arts.equipped()
 	return id != &"" and focus >= Arts.cost(id) and stamina.can_spend() and is_on_floor()
 
 
 ## Spends focus and performs the equipped art (a short attack move, or a heal).
-func _cast_art() -> void:
-	if has_jutsu():
+func _cast_art(force_art := false) -> void:
+	if has_jutsu() and not force_art:
 		_cast_jutsu()
 		return
 	var id := Arts.equipped()
@@ -632,8 +643,28 @@ func _cast_art() -> void:
 		GameFeel.spark(global_position + Vector2(0, -20), Color(1.0, 0.9, 0.5), 18)
 		GameFeel.rise(global_position + Vector2(0, -6), Color(1.0, 0.85, 0.45), 16, 12.0)
 		GameFeel.ring(global_position + Vector2(0, -16), Color(1.0, 0.85, 0.45), 26.0)
+	if d.get("kind", "attack") == "meteor":
+		_start_attack(Arts.attack(id))
+		_launch_meteor()
+		Events.art_cast.emit(id)
+		return
 	_start_attack(Arts.attack(id))
 	Events.art_cast.emit(id)
+
+
+## Fire Meteor: breathe a blazing ball that arcs ahead and bursts where it lands.
+func _launch_meteor() -> void:
+	var from := global_position + Vector2(12.0 * facing, -30.0)
+	var hit := HitData.new()
+	hit.damage = 70.0 * attack_runner.damage_bonus
+	hit.poise_damage = 60.0
+	hit.attack_id = &"fire_meteor"
+	hit.status = &"burn"
+	hit.status_amount = 55.0
+	hit.jutsu = true
+	FireMeteor.spawn(get_parent(), from, Vector2(facing * 250.0, -70.0), hit, self)
+	Audio.sfx_at(&"boss_roar", global_position, -6.0, 0.9)
+	GameFeel.shake(2.0, 0.3)
 
 
 ## The equipped weapon's jutsu. Amaterasu: black flames burst from the floor on both sides of you,
@@ -650,6 +681,7 @@ func _cast_jutsu() -> void:
 	hit.attack_id = id
 	hit.status = &"burn"
 	hit.status_amount = 12.0
+	hit.jutsu = true
 	var parent := get_parent()
 	for i in 5:
 		for side in [-1, 1]:

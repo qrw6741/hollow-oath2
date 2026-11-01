@@ -331,6 +331,8 @@ func receive_hit(hit: HitData) -> int:
 	var dmg := hit.damage * damage_taken_scale
 	if Settings.dev_one_hit and not hit.environmental and hit.source != null and hit.source.is_in_group(&"player"):
 		dmg = health.max_health * 10.0   # Dev hub: one hit kills
+	elif not hit.environmental and hit.source != null and hit.source.is_in_group(&"player"):
+		dmg *= Settings.dev_jutsu_mult if hit.jutsu else Settings.dev_weapon_mult   # Dev hub sliders
 	var applied := health.take_damage(dmg)
 	hit_flash = 6
 	if status and hit.status != &"":

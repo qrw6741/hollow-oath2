@@ -15,6 +15,8 @@ var critical := false                ## Ripostes / executions.
 var environmental := false           ## Hazards: not parryable, ignore dodge i-frames.
 var status: StringName = &""       ## Status kind applied as buildup (see Status).
 var status_amount := 0.0
+## Jutsu hits (Amaterasu, Fire Meteor): scaled by the dev jutsu damage setting.
+var jutsu := false
 var hit_stop := 0.0
 var shake := 0.0
 

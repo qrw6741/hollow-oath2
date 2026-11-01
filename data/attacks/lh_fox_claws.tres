@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"lh_fox_claws"
+display_name = "Fox - Raking Claws"
+animation = &"sweep"
+startup_frames = 14
+active_frames = 6
+recovery_frames = 24
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 26.0
+poise_damage = 0.0
+stamina_cost = 0.0
+knockback = Vector2(170, -50)
+parryable = false
+hitbox_size = Vector2(78, 30)
+hitbox_offset = Vector2(34, -18)
+lunge_speed = 40.0
+lunge_start_frame = 10
+lunge_frames = 5
+track_during_startup = true
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -34)
+hit_stop = 0.06
+shake = 4.0
+ai_min_range = 0
+ai_max_range = 90
+ai_weight = 1.0
+ai_chain_chance = 1.0
+status = &"bleed"
+status_amount = 25.0

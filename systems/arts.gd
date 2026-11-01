@@ -16,10 +16,12 @@ const DEFS := {
 		"desc": "A bolt of the censer's fire that burns what it touches. Learned from Mother Cinder."},
 	&"mending_glow": {"title": "Mending Glow", "cost": 45.0, "boss": &"drowned_canon", "kind": "heal", "heal": 0.3,
 		"desc": "The light that carried you out of the catacombs: restores 30% of your health. Learned from the Drowned Canon."},
+	&"fire_meteor": {"title": "Fire Meteor", "cost": 55.0, "boss": &"ember_elder", "kind": "meteor",
+		"desc": "Breathe a blazing meteor that arcs ahead of you and bursts in a wide fire. Learned from the Burning Elder."},
 	&"tidecall": {"title": "Tidecall", "cost": 40.0, "boss": &"salt_abbot", "kind": "attack",
 		"desc": "Calls a low wave along the floor that frosts and floods. Learned from the Salt Abbot."},
 }
-const ORDER: Array[StringName] = [&"toll_of_mercy", &"veil_step", &"gravebind", &"ember_lance", &"mending_glow", &"tidecall"]
+const ORDER: Array[StringName] = [&"toll_of_mercy", &"veil_step", &"gravebind", &"ember_lance", &"mending_glow", &"tidecall", &"fire_meteor"]
 
 
 static func def(id: StringName) -> Dictionary:

@@ -40,6 +40,10 @@ var glow := true                 ## Bloom / colour grade / grain finishing pass.
 var hires := true                ## true: render at native resolution; false: chunky 480x270 pixels.
 ## Default 60: an unlimited default made the game render thousands of frames a second whenever vsync was
 ## not honoured by the driver/window mode, which can max out the GPU and make the whole PC stutter.
+## Dev hub: multipliers on the damage the player's weapons / jutsu deal. Saved, 1.0 = normal.
+const DEV_MULTS: Array[float] = [0.1, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0, 25.0, 100.0]
+var dev_weapon_mult := 1.0
+var dev_jutsu_mult := 1.0
 var dev_one_hit := false          ## Dev hub: every player hit kills (bosses included). Saved, off by default.
 var classic_gfx := false          ## Classic visuals: no glow pass, outlines, mist or extra burst effects (lighter on weak GPUs).
 var fps_cap := 60
@@ -79,6 +83,8 @@ func load_settings() -> void:
 	# Config v2: before it, "unlimited" (0) was the untouched default, so an old 0 is not a choice: use 60.
 	classic_gfx = bool(cfg.get_value("video", "classic_gfx", classic_gfx))
 	dev_one_hit = bool(cfg.get_value("dev", "one_hit", dev_one_hit))
+	dev_weapon_mult = float(cfg.get_value("dev", "weapon_mult", dev_weapon_mult))
+	dev_jutsu_mult = float(cfg.get_value("dev", "jutsu_mult", dev_jutsu_mult))
 	var cap := int(cfg.get_value("video", "fps_cap", fps_cap))
 	if int(cfg.get_value("video", "fps_cap_version", 1)) < 2 and cap == 0:
 		cap = 60
@@ -122,6 +128,8 @@ func save_settings() -> void:
 	cfg.set_value("video", "fps_cap_version", 2)
 	cfg.set_value("video", "classic_gfx", classic_gfx)
 	cfg.set_value("dev", "one_hit", dev_one_hit)
+	cfg.set_value("dev", "weapon_mult", dev_weapon_mult)
+	cfg.set_value("dev", "jutsu_mult", dev_jutsu_mult)
 	cfg.set_value("video", "vsync", vsync)
 	cfg.save(PATH)
 	apply_audio()
@@ -177,3 +185,11 @@ func _notification(what: int) -> void:
 		Engine.max_fps = FPS_BG
 	elif what == NOTIFICATION_APPLICATION_FOCUS_IN or what == NOTIFICATION_WM_WINDOW_FOCUS_IN:
 		Engine.max_fps = fps_cap
+
+
+## Next step up in [constant DEV_MULTS] (wraps around).
+static func next_dev_mult(cur: float) -> float:
+	for m in DEV_MULTS:
+		if m > cur + 0.0001:
+			return m
+	return DEV_MULTS[0]

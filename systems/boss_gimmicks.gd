@@ -14,6 +14,8 @@ const FOR := {
 	&"drowned_canon": [{"kind": "mark", "every": 5.5, "phase": 1}, {"kind": "rain", "every": 9.0, "phase": 2}],
 	&"morvane_warden": [{"kind": "wave", "every": 5.5, "phase": 1}, {"kind": "mark", "every": 5.0, "phase": 2}, {"kind": "enrage"}],
 	&"ashkar_reaper": [{"kind": "mark", "every": 4.5, "phase": 1}, {"kind": "rain", "every": 7.0, "phase": 2}],
+	&"tooth_fox": [{"kind": "wave", "every": 6.0, "phase": 2}, {"kind": "enrage"}],
+	&"ember_elder": [{"kind": "mark", "every": 4.0, "phase": 1}, {"kind": "rain", "every": 7.5, "phase": 2}, {"kind": "enrage"}],
 	&"veshti_gunner": [{"kind": "rain", "every": 5.5, "phase": 1}, {"kind": "mark", "every": 5.0, "phase": 2}],
 	&"hollow_marshal": [{"kind": "wave", "every": 6.5, "phase": 1}, {"kind": "enrage"}],
 	&"gravewarden": [{"kind": "mark", "every": 6.0, "phase": 2}],

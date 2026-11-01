@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_jutsu_and_camera, test_cutscene_lock, test_travel_order, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_jutsu_and_camera, test_lower_hell, test_elder_and_meteor, test_dev_damage_mults, test_cutscene_lock, test_travel_order, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -2032,7 +2032,7 @@ func test_remapping() -> void:
 	var cp := ControlsPanel.new()
 	get_tree().root.add_child(cp)
 	await frames(2)
-	check(cp._kb.size() == 18 and cp._pad[&"move_left"].disabled, "a row per action; pad movement is fixed")
+	check(cp._kb.size() == 19 and cp._pad[&"move_left"].disabled, "a row per action; pad movement is fixed")
 	check((cp._kb[&"jump"] as Button).text == "Space", "jump shows Space (%s)" % cp._kb[&"jump"].text)
 	# Rebind jump to G via the listening flow.
 	cp.start_listening(&"jump", false)
@@ -5131,3 +5131,167 @@ func test_jutsu_and_camera() -> void:
 	check(cam._cine and cam.zoom.x > 1.5, "the camera is in a cutscene shot")
 	events.player_spawned.emit(player)
 	check(not cam._cine and cam.zoom.is_equal_approx(Vector2.ONE), "a new player resets the camera")
+
+
+func test_lower_hell() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	Puzzle.reset_session()
+	await go_to_level("res://world/levels/lower_hell.tscn", &"")
+	var arenas := 0
+	for c in level.get_children():
+		if c is BossArena:
+			arenas += 1
+	check(arenas == 1, "the Lower Hell has exactly one boss arena (the fox), no other mini-bosses (%d)" % arenas)
+	for n in ["Gate1", "Gate2", "Gate3", "LeverA", "LeverB", "LeverC", "RuneMoon", "RuneFlame", "RuneEye", "RuneHand", "RunLeverA", "RunLeverB", "ToothGate", "FoxArena", "Candle0", "Candle3"]:
+		check(level.get_node_or_null(n) != null, "%s exists" % n)
+	var g1: PuzzleGate = level.get_node("Gate1")
+	check(not g1.is_open() and not g1.solved(), "the first gate starts shut")
+	Puzzle.set_on(&"lh_lever_a")
+	Puzzle.set_on(&"lh_lever_b")
+	await frames(30)
+	check(not g1.is_open(), "two of three levers do not open it")
+	Puzzle.set_on(&"lh_lever_c")
+	await frames(30)
+	check(g1.is_open(), "all three levers open the gate")
+	await frames(90)
+	check(g1._shape.disabled, "an open gate no longer blocks")
+	# the rune order: a wrong stone resets, the right order solves
+	var runes := {}
+	for n in ["RuneMoon", "RuneFlame", "RuneEye", "RuneHand"]:
+		runes[n] = level.get_node(n)
+	runes["RuneFlame"].touch()
+	check(Puzzle.progress(&"lh_runes") == 0 and not Puzzle.is_on(&"lh_runes"), "a wrong first stone lights nothing")
+	runes["RuneMoon"].touch()
+	runes["RuneFlame"].touch()
+	check(Puzzle.progress(&"lh_runes") == 2, "the right stones light in order")
+	runes["RuneHand"].touch()
+	check(Puzzle.progress(&"lh_runes") == 0, "a wrong stone puts every stone out")
+	for n in ["RuneMoon", "RuneFlame", "RuneEye", "RuneHand"]:
+		runes[n].touch()
+	check(Puzzle.is_on(&"lh_runes"), "the four stones in order solve the puzzle")
+	await frames(30)
+	check((level.get_node("Gate2") as PuzzleGate).is_open(), "the rune gate opens")
+	# timed levers: both on at once opens the last gate; one alone expires
+	Puzzle.set_on(&"lh_run_a", 0.3)
+	await frames(40)
+	check(not Puzzle.is_on(&"lh_run_a"), "a timed lever springs back")
+	Puzzle.set_on(&"lh_run_a", 5.0)
+	Puzzle.set_on(&"lh_run_b", 5.0)
+	await frames(30)
+	check((level.get_node("Gate3") as PuzzleGate).is_open(), "both timed levers held at once open the last gate")
+	# the fox
+	var fox := (load("res://actors/bosses/tooth_fox.tscn") as PackedScene).instantiate() as BossBase
+	var leaps := 0
+	for a in fox.data.attacks:
+		if a.animation == &"leap":
+			leaps += 1
+	for a in fox.phase2_attacks:
+		if a.animation == &"leap":
+			leaps += 1
+	check(leaps >= 2, "the fox jumps and hits the ground (leap attacks: %d)" % leaps)
+	check(fox.data.drop_item != null and fox.data.drop_item.id == &"fox_tooth" and fox.data.drop_chance >= 1.0, "the fox drops the tooth")
+	fox.free()
+	check(Items.IDS.has(&"fox_tooth") and IconArt.has_icon(&"fox_tooth") and Items.get_item(&"fox_tooth").kind == ItemData.Kind.KEY, "the tooth is a key item with an icon")
+	# the tooth gate: shut without the tooth, opens with it, leads to the basement
+	var tg: LevelExit = level.get_node("ToothGate")
+	check(not tg.try_open(), "the tooth gate stays shut without the tooth")
+	game_state.add_item(&"fox_tooth", 1)
+	check(tg.try_open(), "the tooth opens the gate")
+	await frames(120)
+	var cur: Level = main.current_level()
+	check(cur != null and cur.name == &"HellBasement", "the gate leads to the basement")
+	level = cur
+	player = cur.player
+
+
+func test_elder_and_meteor() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level("res://world/levels/hell_basement.tscn", &"")
+	var arena := level.get_node("ElderArena") as ElderArena
+	await frames(10)
+	check(is_instance_valid(arena.elder) and arena.boss == null, "an old man lies chained, no boss yet")
+	check(level.get_node("Geometry/Ground").style == StoneBlock.Style.GRASS, "the basement floor is grass")
+	await place_player(arena.global_position.x + 400.0, 480.0, 1)
+	arena._skip = true
+	arena._wake()
+	var saw := false
+	for i in 900:
+		await get_tree().physics_frame
+		if player.cutscene_lock:
+			saw = true
+			arena._skip = true
+		if saw and is_instance_valid(arena.boss) and arena.boss.active and not player.cutscene_lock:
+			break
+	check(saw, "waking him plays a cutscene")
+	check(is_instance_valid(arena.boss) and arena.boss.boss_id == &"ember_elder" and arena.boss.active, "he transforms into the fire-monster boss and the fight starts")
+	check(game_state.get_flag(&"ember_elder_awake", false), "the awakening is remembered")
+	var leaps := 0
+	for a in arena.boss.data.attacks:
+		if a.animation == &"leap" or a.animation == &"smash":
+			leaps += 1
+	check(leaps >= 1, "the fire monster has heavy attacks")
+	arena.boss.health.take_damage(arena.boss.health.max_health * 2.0)
+	await frames(240)
+	check(Arts.unlocked(&"fire_meteor") and Arts.equipped() == &"fire_meteor", "beating him teaches (and equips) the Fire Meteor jutsu")
+	# casting it
+	player.cutscene_lock = false
+	game_state.set_flag(&"art_equipped", "fire_meteor")
+	player.set_focus(100.0)
+	player.health.set_max(9999.0)
+	player.health.restore_full()
+	await place_player(300.0, 480.0, 1)
+	var e := await spawn_enemy(500.0, -1)
+	e.health.set_max(99999.0)
+	e.health.restore_full()
+	var hp0 := e.health.current
+	await press(&"art")
+	await frames(10)
+	check(player.focus < 100.0, "the meteor costs focus")
+	var saw_m := get_tree().get_nodes_in_group(&"fire_meteors").size() > 0
+	for i in 120:
+		await get_tree().physics_frame
+		if get_tree().get_nodes_in_group(&"fire_meteors").size() > 0:
+			saw_m = true
+	check(saw_m, "a fire meteor is launched")
+	check(e.health.current < hp0, "the meteor bursts on the enemy (%.0f -> %.0f)" % [hp0, e.health.current])
+
+
+func test_dev_damage_mults() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await place_player(400.0, 480.0, 1)
+	var e := await spawn_enemy(440.0, -1)
+	e.health.set_max(99999.0)
+	e.health.restore_full()
+	var base := 100.0
+	var h0 := e.health.current
+	var hit := HitData.make(base, player, Vector2.ZERO)
+	e.receive_hit(hit)
+	var d1: float = h0 - e.health.current
+	Settings.dev_weapon_mult = 3.0
+	var h1 := e.health.current
+	e.receive_hit(HitData.make(base, player, Vector2.ZERO))
+	var d2: float = h1 - e.health.current
+	check(absf(d2 / d1 - 3.0) < 0.05, "weapon damage x3 triples weapon hits (%.1f vs %.1f)" % [d1, d2])
+	Settings.dev_weapon_mult = 1.0
+	Settings.dev_jutsu_mult = 5.0
+	var h2 := e.health.current
+	var jh := HitData.make(base, player, Vector2.ZERO)
+	jh.jutsu = true
+	e.receive_hit(jh)
+	var d3: float = h2 - e.health.current
+	check(absf(d3 / d1 - 5.0) < 0.05, "jutsu damage x5 multiplies jutsu hits only (%.1f)" % d3)
+	var h3 := e.health.current
+	e.receive_hit(HitData.make(base, player, Vector2.ZERO))
+	check(absf((h3 - e.health.current) / d1 - 1.0) < 0.05, "weapon hits are unaffected by the jutsu setting")
+	check(Settings.next_dev_mult(1.0) == 1.5 and Settings.next_dev_mult(100.0) == 0.1, "the setting steps up and wraps")
+	Settings.dev_weapon_mult = 1.0
+	Settings.dev_jutsu_mult = 1.0
+	# the Dev tab shows both
+	var sp := SettingsPanel.new()
+	add_child(sp)
+	await frames(4)
+	check(sp._wmult != null and sp._jmult != null and sp._wmult.text.begins_with("Weapon damage") and sp._jmult.text.begins_with("Jutsu damage"), "the Dev tab has weapon and jutsu damage buttons")
+	sp.queue_free()

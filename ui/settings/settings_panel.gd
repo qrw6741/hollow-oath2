@@ -16,6 +16,8 @@ var _display: Button
 var _res: Button
 var _render: Button
 var _onehit: Button
+var _wmult: Button
+var _jmult: Button
 var _glow: Button
 var _classic: Button
 var _dmgnum: Button
@@ -107,6 +109,8 @@ func _ready() -> void:
 	note.add_theme_color_override(&"font_color", Palette.DUST)
 	_pages[3].add_child(note)
 	_onehit = _button(func(): Settings.dev_one_hit = not Settings.dev_one_hit; _refresh(), _pages[3])
+	_wmult = _button(func(): Settings.dev_weapon_mult = Settings.next_dev_mult(Settings.dev_weapon_mult); _refresh(), _pages[3])
+	_jmult = _button(func(): Settings.dev_jutsu_mult = Settings.next_dev_mult(Settings.dev_jutsu_mult); _refresh(), _pages[3])
 
 	_back = _button(_on_back)
 	_back.text = "Back"
@@ -161,6 +165,8 @@ func _video_changed() -> void:
 
 
 func _refresh() -> void:
+	_wmult.text = "Weapon damage: x%s" % String.num(Settings.dev_weapon_mult, 2).trim_suffix("0").trim_suffix(".0").trim_suffix(".")
+	_jmult.text = "Jutsu damage: x%s" % String.num(Settings.dev_jutsu_mult, 2).trim_suffix("0").trim_suffix(".0").trim_suffix(".")
 	_onehit.text = "One-hit kills (every hit kills): %s" % ("On" if Settings.dev_one_hit else "Off")
 	_dmg.text = "Damage you take: %d%%" % Settings.damage_taken_pct
 	_ehp.text = "Enemy health: %d%%" % Settings.enemy_health_pct

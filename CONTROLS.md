@@ -11,7 +11,8 @@
 | Heal (Ember Vial) | R | RB |
 | Interact / Rest at candle | E | D-pad up |
 | Weapon skill (costs focus) | O | Right trigger (RT) |
-| Art (your equipped art, costs focus) | U | Left trigger (LT) |
+| Art (your equipped art, costs focus; a weapon with a jutsu casts that instead) | U | Left trigger (LT) |
+| Equipped Art even while a jutsu weapon is in hand | H | Back paddle (if your pad has one) |
 | Travel to / from Hollowmere | T | Xbox: View-share button (Misc) |
 | Inventory (pack) | Tab | Create / Select |
 | Use quick item | F | R3 (press right stick) |
@@ -79,3 +80,7 @@ Rebind any action in **Settings → Controls**: pick the keyboard or controller 
 - **The Trial Ring**: after you choose an ending, a door in Hollowmere Manor opens it. The left stone starts the Boss Rush, the right one the Gauntlet.
 
 - **Jutsu (weapon technique)**: some special weapons carry their own technique. While one is equipped, the Art button (U / LT) casts it instead of your equipped Art. The Nightreaper's is **Amaterasu** (50 focus): black flames burst from the floor on both sides of you and burn whatever stands in them for about 4 seconds.
+
+- **Lower Hell puzzles**: levers (Interact), rune stones (Interact, in the order a tablet gives; a wrong stone puts all out) and timed levers that spring back. Gates open when their puzzle is solved and stay open.
+- **Fire Meteor** (learned from the Burning Elder): an Art; cast with the Art button, or **H** if your weapon has its own jutsu.
+- **Dev tab**: One-hit kills, **Weapon damage** and **Jutsu damage** multipliers (x0.1 to x100).

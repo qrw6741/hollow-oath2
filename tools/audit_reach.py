@@ -46,6 +46,7 @@ with contextlib.redirect_stdout(io.StringIO()) as buf:
     N.door()
     N.hell()
     N.lower()
+    N.basement()
 for line in buf.getvalue().splitlines():
     if "!!" in line:
         out.append(line)
