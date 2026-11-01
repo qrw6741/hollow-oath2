@@ -606,13 +606,22 @@ func _on_boss_defeated_arts(boss_id: StringName) -> void:
 	Arts.auto_equip()
 
 
+func has_jutsu() -> bool:
+	return weapon != null and weapon.jutsu != &"" and Jutsu.has(weapon.jutsu)
+
+
 func can_use_art() -> bool:
+	if has_jutsu():
+		return focus >= weapon.jutsu_cost and stamina.can_spend() and is_on_floor()
 	var id := Arts.equipped()
 	return id != &"" and focus >= Arts.cost(id) and stamina.can_spend() and is_on_floor()
 
 
 ## Spends focus and performs the equipped art (a short attack move, or a heal).
 func _cast_art() -> void:
+	if has_jutsu():
+		_cast_jutsu()
+		return
 	var id := Arts.equipped()
 	var d := Arts.def(id)
 	set_focus(focus - Arts.cost(id))
@@ -624,6 +633,34 @@ func _cast_art() -> void:
 		GameFeel.rise(global_position + Vector2(0, -6), Color(1.0, 0.85, 0.45), 16, 12.0)
 		GameFeel.ring(global_position + Vector2(0, -16), Color(1.0, 0.85, 0.45), 26.0)
 	_start_attack(Arts.attack(id))
+	Events.art_cast.emit(id)
+
+
+## The equipped weapon's jutsu. Amaterasu: black flames burst from the floor on both sides of you,
+## nearest first, and burn whatever stands in them for several seconds.
+func _cast_jutsu() -> void:
+	var id: StringName = weapon.jutsu
+	set_focus(focus - weapon.jutsu_cost)
+	Audio.sfx(&"skill_cast", -2.0)
+	Audio.sfx_at(&"boss_roar", global_position, -8.0, 0.6)
+	_iframes = maxi(_iframes, 14)
+	var hit := HitData.new()
+	hit.damage = 4.0 * attack_runner.damage_multiplier * attack_runner.damage_bonus
+	hit.poise_damage = 6.0
+	hit.attack_id = id
+	hit.status = &"burn"
+	hit.status_amount = 12.0
+	var parent := get_parent()
+	for i in 5:
+		for side in [-1, 1]:
+			if i == 0 and side == 1:
+				continue
+			var x: float = global_position.x + float(side) * (14.0 + i * 24.0) * (1.0 if i > 0 else 0.0)
+			var f := BlackFlame.spawn(parent, Vector2(x, global_position.y), hit, self, 0.08 * i)
+			f.life = 4.0
+			f.tick = 0.5
+	GameFeel.ring(global_position + Vector2(0, -12), Color(0.55, 0.3, 0.9), 40.0)
+	GameFeel.shake(2.5, 0.3)
 	Events.art_cast.emit(id)
 
 

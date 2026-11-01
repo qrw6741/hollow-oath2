@@ -39,6 +39,11 @@ func apply_bounds(r: Rect2) -> void:
 
 func _on_target(p: Node2D) -> void:
 	_target = p
+	# the camera outlives levels: a cutscene (zoom, steered position) must not follow the player into the next one
+	_cine = false
+	if _cine_tw and _cine_tw.is_valid():
+		_cine_tw.kill()
+	zoom = Vector2.ONE
 	var lvl := get_tree().get_first_node_in_group(&"level") as Level
 	if lvl:
 		apply_bounds(lvl.bounds)

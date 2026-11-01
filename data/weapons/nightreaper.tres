@@ -24,5 +24,7 @@ status = &"burn"
 status_amount = 80.0
 skill = ExtResource("a4")
 skill_cost = 28.0
+jutsu = &"amaterasu"
+jutsu_cost = 50.0
 parry_window_bonus = -1
 parry_recovery_bonus = 3

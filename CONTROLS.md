@@ -77,3 +77,5 @@ Rebind any action in **Settings → Controls**: pick the keyboard or controller 
 - **Arts**: each boss teaches one. Equip one on the ARTS tab of the pack; the Art button (U / LT) casts it for its focus cost. Toll of Mercy (Bell-Warden), Veil Step (Marshal), Gravebind (Sexton), Ember Lance (Mother Cinder), Mending Glow (Drowned Canon), Tidecall (Salt Abbot).
 - **Secrets**: some walls and floors are only paint. Walk into suspicious masonry; cracked walls can be struck.
 - **The Trial Ring**: after you choose an ending, a door in Hollowmere Manor opens it. The left stone starts the Boss Rush, the right one the Gauntlet.
+
+- **Jutsu (weapon technique)**: some special weapons carry their own technique. While one is equipped, the Art button (U / LT) casts it instead of your equipped Art. The Nightreaper's is **Amaterasu** (50 focus): black flames burst from the floor on both sides of you and burn whatever stands in them for about 4 seconds.

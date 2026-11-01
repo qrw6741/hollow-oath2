@@ -36,5 +36,7 @@ s = re.sub(r"riposte_multiplier = [0-9.]+", "riposte_multiplier = 1.5", s, count
 s = re.sub(r"status_amount = [0-9.]+", "status_amount = 80.0", s, count=1)
 s = re.sub(r"skill_cost = [0-9.]+", "skill_cost = 28.0", s, count=1)
 s = re.sub(r'description = ".*"', 'description = "Ashkar\'s scythe, wrapped in the black flame that hunted him. Three fast reaping arcs reach farther than any blade, and every cut burns. It was never meant to be carried by the living. It is by far the strongest weapon in the game."', s, count=1)
+if "jutsu =" not in s:
+    s = s.replace("parry_window_bonus", 'jutsu = &"amaterasu"\njutsu_cost = 50.0\nparry_window_bonus', 1)
 open(W, "w").write(s)
 print("scythe written")

@@ -21,6 +21,10 @@ extends Resource
 ## Flat damage multiplier of this weapon (unique weapons hit harder than forged ones).
 @export var damage_mult := 1.0
 
+@export_group("Jutsu")
+## This weapon's own technique (see Jutsu); used on the Art button in place of the equipped Art.
+@export var jutsu: StringName = &""
+@export var jutsu_cost := 40.0
 @export_group("Skill and guard")
 ## The special move on the Skill button; costs [member skill_cost] focus.
 @export var skill: AttackData
