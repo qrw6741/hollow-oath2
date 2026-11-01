@@ -4854,6 +4854,19 @@ func test_twin_lords() -> void:
 
 func test_cutscene_lock() -> void:
 	await fresh_game()
+	# X skips a cutscene at once
+	var cl := CineLayer.new()
+	get_tree().root.add_child(cl)
+	await frames(2)
+	var skipped := [false]
+	cl.skip_requested.connect(func(): skipped[0] = true)
+	var ev := InputEventKey.new()
+	ev.keycode = KEY_X
+	ev.pressed = true
+	Input.parse_input_event(ev)
+	await frames(3)
+	check(skipped[0], "pressing X skips the cutscene")
+	cl.queue_free()
 	check(not player.cutscene_lock, "the player starts free")
 	player.cutscene_lock = true
 	Input.action_press(&"move_right")

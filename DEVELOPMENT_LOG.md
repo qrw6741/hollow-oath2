@@ -535,3 +535,6 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 
 ## Travel list order
 - The Travel tab now lists candles newest first: the most recently discovered map on top and, inside each map, its newest candle first. The order candles were first lit in is saved (`candle_order_<id>`, `candle_counter` flags, kept across New Game+). Older saves have no order, so their lit candles fall back to world order with later maps counted as newer; new candles go above them. Re-resting at a candle does not move it. Test: `test_travel_order`. Not verified by hand in the real menu.
+
+## Cutscene skip key
+- Pressing **X** (keyboard) now skips a cutscene at once (`CineLayer._input`); on a controller, holding Interact (D-pad up) for 1 s still skips, because the pad's X button is the light attack. Hint text reads "Press X to skip". Test added to `test_cutscene_lock`. Only those two tests plus `test_twin_lords` were re-run after this change (not the whole suite).

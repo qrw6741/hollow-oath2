@@ -1,7 +1,8 @@
 class_name CineLayer
 extends CanvasLayer
 ## Cutscene dressing: letterbox bars, a name plate for a character, a title card and a "hold to skip" hint.
-## Holding Interact (E / D-pad up) for one second emits [signal skip_requested].
+## Pressing X on the keyboard skips at once; on a controller, holding Interact (D-pad up) for one second does.
+## Either emits [signal skip_requested].
 ## TEMPORARY ART: plain bars and text.
 
 signal skip_requested
@@ -37,7 +38,7 @@ func _ready() -> void:
 	_title.offset_bottom = -14.0   # a little above the middle
 	_title_sub.offset_top = 22.0
 	_hint = _label(6, Color(0.7, 0.68, 0.64))
-	_hint.text = "Hold Interact to skip"
+	_hint.text = "Press X to skip"
 	_hint.position = Vector2(380, 246)
 	_hint.modulate.a = 0.0
 
@@ -101,6 +102,15 @@ func title(text: String, sub := "", secs := 2.6) -> void:
 	tw.tween_property(_title, "modulate:a", 0.0, 0.7)
 	tw.parallel().tween_property(_title_sub, "modulate:a", 0.0, 0.7)
 	await tw.finished
+
+
+func _input(event: InputEvent) -> void:
+	if _skipped:
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_X:
+		_skipped = true
+		skip_requested.emit()
+		get_viewport().set_input_as_handled()
 
 
 func _process(dt: float) -> void:

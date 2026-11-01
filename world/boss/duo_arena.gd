@@ -3,7 +3,7 @@ extends BossArena
 ## A boss room for TWO bosses at once (the Twin Lords). Walking past the gate seals the fog and plays
 ## a scripted intro: the floor shakes, a colossal hand rises out of the ground, the palm opens (an eye
 ## in it opens too) and the two lords step out of black flame and speak. Then both fights begin.
-## Three cutscenes (letterbox, camera pans, name plates, title card; hold Interact to skip any of them):
+## Three cutscenes (letterbox, camera pans, name plates, title card; press X to skip any of them (controller: hold Interact)):
 ## the intro, a short scene when the first lord falls, and a death scene with the reward.
 ## - The fight ends only when both are dead; when one falls the other is enraged.
 ## - Both defeats are saved flags (boss_defeated_<id>), so the pair never returns.
