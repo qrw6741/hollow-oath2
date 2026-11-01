@@ -21,7 +21,7 @@ const SWINGS := {
 	&"thrust": [62.0, 0.0],
 }
 ## Weapon looks that use the one-weapon swing poses (sword, shield, and the later additions).
-const SINGLE_LOOKS := [0, 2, 4, 5, 6, 7, 8, 9, 10]
+const SINGLE_LOOKS := [0, 2, 4, 5, 6, 7, 8, 9, 10, 11]
 ## Looks whose thrust / riposte pushes the weapon forward instead of swinging it.
 const THRUSTERS := [5, 7, 10]
 ## Twin blades: [windup, strike_end] for blade A (front) and B (rear).
@@ -132,7 +132,7 @@ func _attack_pose(p: Dictionary, wl: int, r: AttackRunner) -> void:
 	match wl:
 		PresetData.WeaponLook.SWORD, PresetData.WeaponLook.SWORD_SHIELD, PresetData.WeaponLook.GREATSWORD, \
 		PresetData.WeaponLook.RAPIER, PresetData.WeaponLook.HAMMER, PresetData.WeaponLook.SPEAR, PresetData.WeaponLook.SABRE, \
-		PresetData.WeaponLook.AXE, PresetData.WeaponLook.STAFF:
+		PresetData.WeaponLook.AXE, PresetData.WeaponLook.STAFF, PresetData.WeaponLook.SCYTHE:
 			var sw: Array = SWINGS.get(key, SWINGS[&"slash"])
 			if key == &"bash":
 				sw = [62.0, 62.0]
@@ -449,7 +449,8 @@ func _draw_weapon(look: PresetData, p: Dictionary, shoulder: Vector2, flash: flo
 		PresetData.WeaponLook.FISTS:
 			_draw_fists(look, p, shoulder, flash, alpha)
 		PresetData.WeaponLook.GREATSWORD, PresetData.WeaponLook.RAPIER, PresetData.WeaponLook.HAMMER, \
-		PresetData.WeaponLook.SPEAR, PresetData.WeaponLook.SABRE, PresetData.WeaponLook.AXE, PresetData.WeaponLook.STAFF:
+		PresetData.WeaponLook.SPEAR, PresetData.WeaponLook.SABRE, PresetData.WeaponLook.AXE, PresetData.WeaponLook.STAFF, \
+		PresetData.WeaponLook.SCYTHE:
 			_draw_long_weapon(look, p, shoulder, flash, alpha, arm_col)
 
 
@@ -460,7 +461,7 @@ func _draw_long_weapon(look: PresetData, p: Dictionary, shoulder: Vector2, flash
 	var deg: float = p.sa
 	var dir := Vector2.from_angle(deg_to_rad(deg))
 	var ortho := dir.orthogonal()
-	var length: float = {4: 26.0, 5: 22.0, 6: 15.0, 7: 30.0, 8: 18.0, 9: 24.0, 10: 28.0}[wl]
+	var length: float = {4: 26.0, 5: 22.0, 6: 15.0, 7: 30.0, 8: 18.0, 9: 24.0, 10: 28.0, 11: 27.0}[wl]
 	if p.trail != Vector2.ZERO:
 		_draw_trail(hand, p.trail.x, p.trail.y, alpha, length)
 	draw_line(shoulder + Vector2(2, 1), hand, _c(arm_col, flash, alpha), 2.0)
@@ -496,6 +497,24 @@ func _draw_long_weapon(look: PresetData, p: Dictionary, shoulder: Vector2, flash
 			draw_colored_polygon(PackedVector2Array([ah - dir * 3.0, ah + dir * 3.0, ah + ortho * 7.0 + dir * 5.0, ah + ortho * 7.0 - dir * 5.0]), steel)
 			draw_line(ah + ortho * 7.0 + dir * 5.0, ah + ortho * 7.0 - dir * 5.0, _c(Palette.BONE, flash, alpha * 0.8), 0.8)
 			draw_line(ah - dir * 4.0, ah + dir * 4.0, gold, 1.2)
+		PresetData.WeaponLook.SCYTHE:
+			# A long dark snath, a curved blade that sweeps back from the tip, a black flame along the edge.
+			var shaft_col := _c(Color("2a2430"), flash, alpha)
+			draw_line(hand - dir * 7.0, hand + dir * length, shaft_col, 1.8)
+			draw_line(hand + dir * 5.0, hand + dir * 5.0 + ortho * 2.0, gold, 1.2)
+			var tip0: Vector2 = hand + dir * length
+			var edge := PackedVector2Array()
+			for i in 9:
+				var f := float(i) / 8.0
+				var a := f * 1.9
+				edge.append(tip0 + ortho * (sin(a) * 12.0) - dir * (1.0 - cos(a)) * 6.0 + dir * (f * 2.0))
+			for i in 8:
+				var w := lerpf(3.4, 0.7, float(i) / 7.0)
+				draw_line(edge[i], edge[i + 1], steel, w)
+			draw_polyline(edge, _c(Color("e9e1cc"), flash, alpha * 0.9), 0.8)
+			var fl := 0.55 + 0.45 * sin(_t * 11.0)
+			draw_polyline(edge, Color(0.55, 0.2, 0.9, 0.55 * fl * alpha), 2.2)
+			draw_circle(edge[6], 1.6, Color(0.7, 0.35, 1.0, 0.5 * fl * alpha))
 		PresetData.WeaponLook.STAFF:
 			draw_line(hand - dir * 6.0, hand + dir * (length - 4.0), wood, 1.8)
 			var sh: Vector2 = hand + dir * length

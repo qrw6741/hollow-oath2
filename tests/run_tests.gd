@@ -4762,11 +4762,11 @@ func test_ninth_hell_content() -> void:
 		if w.damage_mult > best:
 			best = w.damage_mult
 			best_id = wid
-	check(best_id == &"nightreaper" and best >= 1.9, "the Nightreaper out-damages every other weapon (%s %.2f)" % [best_id, best])
+	check(best_id == &"nightreaper" and best >= 2.9, "the Nightreaper out-damages every other weapon (%s %.2f)" % [best_id, best])
 	for wid in [&"unkept_blade", &"vowbreaker", &"choirmasters_baton"]:
 		check(Weapons.get_weapon(wid).damage_mult > 1.05, "%s carries its damage multiplier" % wid)
 	# levels: the Court leads to the Door, the Door to the Hell, and back
-	for pair in [["wakeless_court", "the_ninth_door"], ["the_ninth_door", "wakeless_court"], ["the_ninth_door", "ninth_hell"], ["ninth_hell", "the_ninth_door"]]:
+	for pair in [["wakeless_court", "the_ninth_door"], ["the_ninth_door", "wakeless_court"], ["the_ninth_door", "ninth_hell"], ["ninth_hell", "the_ninth_door"], ["ninth_hell", "lower_hell"], ["lower_hell", "ninth_hell"]]:
 		var st := FileAccess.get_file_as_string("res://world/levels/%s.tscn" % pair[0])
 		check(st.contains("res://world/levels/%s.tscn" % pair[1]), "%s links to %s" % pair)
 	var ps := load("res://actors/bosses/veshti_gunner.tscn") as PackedScene
@@ -4847,9 +4847,39 @@ func test_twin_lords() -> void:
 			chest = c
 	check(chest != null and chest.gear_id == &"nightreaper", "the Nightreaper waits in a chest")
 	# after a respawn of the arena the pair does not return
+	var portals := get_tree().get_nodes_in_group(&"hand_portal")
+	check(portals.size() == 1 and portals[0].target_level == "res://world/levels/lower_hell.tscn", "the death scene leaves a hand that leads to the Lower Hell")
 	arena.spawn()
 	await frames(4)
 	check(arena.boss == null or not is_instance_valid(arena.boss), "a beaten pair never returns")
+	await frames(4)
+	check(get_tree().get_nodes_in_group(&"hand_portal").size() == 1, "reloading the arena keeps exactly one hand")
+	# the hand: walk in with Interact, the cutscene locks the player, then the Lower Hell loads
+	var hp: HandPortal = get_tree().get_nodes_in_group(&"hand_portal")[0]
+	await frames(60)
+	check(hp.hand.rise >= 0.95 and hp.hand.open > 0.9, "the hand stands with open palms")
+	await place_player(hp.global_position.x - 30.0, 480.0, 1)
+	await frames(10)
+	Input.action_press(&"interact")
+	await frames(3)
+	Input.action_release(&"interact")
+	await frames(4)
+	check(hp.busy and player.cutscene_lock, "interacting starts the teleport cutscene and locks the player")
+	hp._skip = true
+	var arrived := false
+	for i in 600:
+		await get_tree().physics_frame
+		var cur: Level = main.current_level()
+		if cur != null and cur.name == &"LowerHell":
+			arrived = true
+			level = cur
+			player = cur.player
+			break
+	check(arrived, "the hand carries the player to the Lower Hell")
+	if arrived:
+		await frames(30)
+		check(not player.cutscene_lock and player.modulate.a > 0.9, "the player arrives free and visible")
+		check(level.get_node_or_null("Candle0") != null and level.get_node_or_null("ToHell") != null, "the Lower Hell has a candle and a way back")
 
 
 func test_cutscene_lock() -> void:

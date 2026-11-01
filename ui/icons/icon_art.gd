@@ -62,7 +62,8 @@ static func draw(ci: CanvasItem, id: StringName, r: Rect2, t := 0.0) -> void:
 		&"toll_hammer", &"chandlers_maul": _hammer(ci)
 		&"marshals_lance", &"ashfall_pike": _lance(ci)
 		&"tide_sabre", &"thornwood_sabre", &"lantern_hook": _sabre(ci)
-		&"gravediggers_greataxe", &"bone_cleaver", &"namebreaker", &"nightreaper": _axe(ci)
+		&"gravediggers_greataxe", &"bone_cleaver", &"namebreaker": _axe(ci)
+		&"nightreaper": _scythe(ci)
 		&"veil_daggers", &"glasswrights_shards": _daggers(ci)
 		&"candle_catalyst", &"abbots_crozier": _staff(ci, id)
 		&"armor_pilgrim_coat", &"armor_penitent_shroud", &"armor_canons_mail", &"armor_marshal_plate", &"armor_ghostlight_raiment": _armor_generic(ci, id)
@@ -272,6 +273,16 @@ static func _lance(ci: CanvasItem) -> void:
 	ci.draw_line(Vector2(2, 14), Vector2(11, 5), Color("6a4a30"), 1.6)
 	_poly(ci, [Vector2(10, 3.5), Vector2(14.5, 1.5), Vector2(12.5, 6), Vector2(9.5, 6.5)], Color("c3c7d0"))
 	ci.draw_line(Vector2(9.2, 5.0), Vector2(11.8, 7.6), Color("8e1b22"), 1.4)
+
+
+static func _scythe(ci: CanvasItem) -> void:
+	ci.draw_line(Vector2(3, 15), Vector2(10, 2), Color("2a2430"), 1.8)
+	var pts := PackedVector2Array()
+	for i in 8:
+		var f := float(i) / 7.0
+		pts.append(Vector2(10, 2) + Vector2(sin(f * 1.9) * 5.5, (1.0 - cos(f * 1.9)) * 4.5 + f * 0.5))
+	ci.draw_polyline(pts, Color("c3c7d0"), 2.0)
+	ci.draw_polyline(pts, Color("a070ff"), 0.8)
 
 
 static func _axe(ci: CanvasItem) -> void:

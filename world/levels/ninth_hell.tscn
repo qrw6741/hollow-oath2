@@ -86,6 +86,11 @@ position = Vector2(130, 480)
 script = ExtResource("entry")
 entry_id = &"from_door"
 
+[node name="FromLower" type="Marker2D" parent="."]
+position = Vector2(4880, 480)
+script = ExtResource("entry")
+entry_id = &"from_lower"
+
 [node name="ToDoor" type="Area2D" parent="."]
 position = Vector2(34, 480)
 script = ExtResource("exit")
@@ -385,6 +390,8 @@ trigger_width = 760.0
 victory_text = "THE TWO HANDS ARE STILL"
 reward_weapon = &"nightreaper"
 reward_chest_id = &"twin_lords_reward"
+portal_level = "res://world/levels/lower_hell.tscn"
+portal_entry = &"from_hand"
 
 [node name="Loft0Step" type="StaticBody2D" parent="Geometry"]
 position = Vector2(956.0, 444.0)

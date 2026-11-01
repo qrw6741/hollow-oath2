@@ -15,6 +15,7 @@ G.EXT["mender"] = ("PackedScene", "res://actors/enemies/wick_mender.tscn")
 
 DOOR = "res://world/levels/the_ninth_door.tscn"
 HELL = "res://world/levels/ninth_hell.tscn"
+LOWER = "res://world/levels/lower_hell.tscn"
 COURT = "res://world/levels/wakeless_court.tscn"
 
 
@@ -79,6 +80,7 @@ def hell():
     L.block("CliffRight", W - 60, 0, 60, 540)
     L.block("Ceiling", 0, 40, W, 56)
     L.entry("FromDoor", 130, 480, "from_door")
+    L.entry("FromLower", 4880, 480, "from_lower")
     L.walk_exit("ToDoor", 34, 480, DOOR, "from_hell")
     for ci, (cx, cn) in enumerate(((300, "Hell Gate Candle"), (1750, "Brimstone Candle"), (3200, "Chain Hall Candle"), (4350, "Twin Gate Candle"))):
         L.candle("Candle%d" % ci, cx, 480, "ninth_hell_candle_%d" % ci, cn)
@@ -123,13 +125,45 @@ trigger_offset = 36.0
 trigger_width = 760.0
 victory_text = "THE TWO HANDS ARE STILL"
 reward_weapon = &"nightreaper"
-reward_chest_id = &"twin_lords_reward"''')
+reward_chest_id = &"twin_lords_reward"
+portal_level = "''' + LOWER + '''"
+portal_entry = &"from_hand"''')
+    L.write()
+
+
+def lower():
+    """THE LOWER HELL: where the Twin Lords' hand carries you. A short PLACEHOLDER map (candle, tablets, a
+    few foes, a chest) that ends at a sealed door, ready for the creative director's own boss and area."""
+    W = 3200
+    L = G.Level("lower_hell.tscn")
+    _head(L, "lower_hell", "The Lower Hell", "LowerHell", W, "(0.72, 0.38, 0.5, 1)", 11, 51800, 0.42)
+    L.block("CliffLeft", 0, 0, 16, 480)
+    L.block("Ground", 16, 480, W - 16, 60, style=4)
+    L.block("CliffRight", W - 60, 0, 60, 540)
+    L.block("Ceiling", 0, 40, W, 56)
+    L.entry("FromHand", 200, 480, "from_hand")
+    L.walk_exit("ToHell", 34, 480, HELL, "from_lower")
+    L.candle("Candle0", 360, 480, "lower_hell_candle_0", "Hand's Landing Candle")
+    L.candle("Candle1", 2000, 480, "lower_hell_candle_1", "Lower Brink Candle")
+    L.tablet("Tablet0", 520, 480, "Set Down", "The hand did not drop you. It set you down, the way a hand sets down something it means to come back for.")
+    L.tablet("Tablet1", 2700, 480, "Unwritten", "The way down ends here, for now. What waits below has not been written. It will be.")
+    L.block("Step0", 900, 452, 200, 28, style=1)
+    L.plank("Loft0", 1300, 400, 150)
+    L.enemy("GroundA", "captain", 760, 480, 40)
+    L.enemy("StepFoe", "gilded", 980, 452, 40)
+    L.enemy("GroundB", "bloat", 1500, 480, 40)
+    L.enemy("Archer", "archer", 1340, 400, 20, -1)
+    L.enemy("GroundC", "sergeant", 2300, 480, 40)
+    L.enemy("GroundD", "cantor", 2450, 480, 40)
+    L.chest("Chest0", 1750, 480, "lower_hell_chest_0", count=3, embers=6000, item="it_draught")
+    L.chest("Chest1", 2900, 480, "lower_hell_chest_1", count=2, embers=9000, item="it_shard")
     L.write()
 
 
 def write_all():
     door()
     hell()
+    lower()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+[ext_resource type="Resource" path="res://data/attacks/scythe_3.tres" id="2_next"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"scythe_2"
+display_name = "Nightreaper - Backswing"
+animation = &"slash_rev"
+startup_frames = 10
+active_frames = 5
+recovery_frames = 18
+chain_open_frame = 9
+dodge_cancel_frame = -1
+damage = 34.0
+poise_damage = 45.0
+stamina_cost = 14.0
+invulnerable_frames = 0
+knockback = Vector2(140, -30)
+hitbox_size = Vector2(92, 40)
+hitbox_offset = Vector2(38, -16)
+lunge_speed = 0
+lunge_start_frame = 0
+lunge_frames = 0
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -22)
+hit_stop = 0.09
+shake = 3.0
+next_in_combo = ExtResource("2_next")

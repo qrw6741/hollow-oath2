@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+[ext_resource type="Resource" path="res://data/attacks/scythe_2.tres" id="2_next"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"scythe_1"
+display_name = "Nightreaper - Reap"
+animation = &"slash"
+startup_frames = 9
+active_frames = 5
+recovery_frames = 16
+chain_open_frame = 8
+dodge_cancel_frame = -1
+damage = 32.0
+poise_damage = 40.0
+stamina_cost = 14.0
+invulnerable_frames = 0
+knockback = Vector2(130, -25)
+hitbox_size = Vector2(92, 40)
+hitbox_offset = Vector2(38, -16)
+lunge_speed = 80
+lunge_start_frame = 7
+lunge_frames = 3
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -22)
+hit_stop = 0.09
+shake = 3.0
+next_in_combo = ExtResource("2_next")

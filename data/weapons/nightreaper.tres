@@ -1,28 +1,28 @@
 [gd_resource type="Resource" script_class="WeaponData" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://systems/combat/weapon_data.gd" id="1_weapon"]
-[ext_resource type="Resource" path="res://data/attacks/axe_1.tres" id="a0"]
-[ext_resource type="Resource" path="res://data/attacks/axe_heavy.tres" id="a1"]
-[ext_resource type="Resource" path="res://data/attacks/axe_air.tres" id="a2"]
-[ext_resource type="Resource" path="res://data/attacks/axe_riposte.tres" id="a3"]
-[ext_resource type="Resource" path="res://data/attacks/skill_gravediggers_greataxe.tres" id="a4"]
+[ext_resource type="Resource" path="res://data/attacks/scythe_1.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/scythe_heavy.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/attacks/scythe_air.tres" id="a2"]
+[ext_resource type="Resource" path="res://data/attacks/scythe_riposte.tres" id="a3"]
+[ext_resource type="Resource" path="res://data/attacks/skill_nightreaper.tres" id="a4"]
 
 [resource]
 script = ExtResource("1_weapon")
 id = &"nightreaper"
 display_name = "Nightreaper"
-description = "Ashkar's scythe, wrapped in the black flame that hunted him. It was never meant to be carried by the living. It is by far the strongest weapon in the game."
+description = "Ashkar's scythe, wrapped in the black flame that hunted him. Three fast reaping arcs reach farther than any blade, and every cut burns. It was never meant to be carried by the living. It is by far the strongest weapon in the game."
 light_combo_start = ExtResource("a0")
 heavy = ExtResource("a1")
 aerial = ExtResource("a2")
 riposte = ExtResource("a3")
-riposte_multiplier = 1.2
-look = 9
+riposte_multiplier = 1.5
+look = 11
 two_handed = true
-damage_mult = 2.0
+damage_mult = 3.0
 status = &"burn"
-status_amount = 55.0
+status_amount = 80.0
 skill = ExtResource("a4")
-skill_cost = 32.0
+skill_cost = 28.0
 parry_window_bonus = -1
 parry_recovery_bonus = 3

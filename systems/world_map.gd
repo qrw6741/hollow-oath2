@@ -37,6 +37,7 @@ const LEVELS := [
 	"res://world/levels/wakeless_court.tscn",
 	"res://world/levels/the_ninth_door.tscn",
 	"res://world/levels/ninth_hell.tscn",
+	"res://world/levels/lower_hell.tscn",
 	"res://world/levels/sunken_basilica.tscn",
 	"res://world/levels/iron_orrery.tscn",
 	"res://world/levels/bleeding_gardens.tscn",

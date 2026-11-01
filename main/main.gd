@@ -34,6 +34,7 @@ func _ready() -> void:
 	Events.quit_to_menu_requested.connect(return_to_menu)
 	Events.level_change_requested.connect(change_level)
 	Events.teleport_requested.connect(teleport)
+	Events.hand_teleport_requested.connect(hand_teleport)
 
 	if show_menu_on_start:
 		_enter_menu()
@@ -146,6 +147,7 @@ func change_level(path: String, entry_id: StringName, respawn := false, fade_col
 		Events.player_respawned.emit(lvl.player)
 	else:
 		SaveSystem.autosave()
+	get_tree().call_group(&"hud", "set_cinematic", false)   # a cutscene may have hidden the boss bar
 	Events.level_entered.emit(GameState.level_path)
 	await _fade_to(0.0, fade_in)
 	_fade.color = Color(0, 0, 0, 0)
@@ -155,6 +157,11 @@ func change_level(path: String, entry_id: StringName, respawn := false, fade_col
 ## The prologue's ending: a long fade through white into another world.
 func teleport(path: String, entry_id: StringName) -> void:
 	await change_level(path, entry_id, false, Color(1.0, 0.97, 0.88), 1.6, 2.2)
+
+
+## The Twin Lords' hand: a long fade through black-violet into the Lower Hell.
+func hand_teleport(path: String, entry_id: StringName) -> void:
+	await change_level(path, entry_id, false, Color(0.05, 0.0, 0.09), 1.5, 2.4)
 
 
 ## Only levels inside LEVEL_DIR that exist are accepted; anything else (an edited or

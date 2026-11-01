@@ -45,6 +45,7 @@ with contextlib.redirect_stdout(io.StringIO()) as buf:
     import gen_nether_levels as N
     N.door()
     N.hell()
+    N.lower()
 for line in buf.getvalue().splitlines():
     if "!!" in line:
         out.append(line)

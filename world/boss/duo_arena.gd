@@ -15,6 +15,9 @@ extends BossArena
 @export var reward_weapon: StringName = &""
 @export var reward_chest_id: StringName = &"twin_lords_reward"
 @export var hand_offset := Vector2(470, 0)
+## Where the hand left behind by the lords leads ("" = nowhere).
+@export_file("*.tscn") var portal_level := ""
+@export var portal_entry: StringName = &"from_hand"
 
 var boss2: BossBase
 var hand: RisingHand
@@ -67,6 +70,7 @@ func spawn() -> void:
 	_defeated = is_defeated()
 	if _defeated:
 		_spawn_reward()
+		_spawn_portal(false)
 		return
 	boss = _make(boss_scene, boss_offset)
 	boss2 = _make(second_scene, second_offset)
@@ -443,11 +447,49 @@ func _death_scene() -> void:
 	tw3.tween_property(hand, "open", 0.0, 1.2)
 	_cam(mid + Vector2(0, -60), 1.0, 1.4)
 	if not _skip:
-		cine.title(victory_text, "the Nightreaper is yours", 3.0)
+		cine.title(victory_text, "the Nightreaper is yours, and the hand is open", 3.0)
 		await _wait(3.0)
 	hand.fade = 0.0
+	# a second hand, palms open, rises in front of the player: the way down
+	_cam(_player_front() + Vector2(0, -60), 1.3, 1.2)
+	_spawn_portal(true)
+	await _wait(2.2)
+	if cine and is_instance_valid(cine) and not _skip:
+		cine.plate("THE HAND WAITS", "walk into it", 2.6)
+		await _wait(2.6)
 	_cine_end()
 	SaveSystem.autosave()
+
+
+## Where the portal-hand rises: in front of the player, never on top of the reward chest.
+func _player_front() -> Vector2:
+	var p := _player()
+	var x := global_position.x + hand_offset.x - 110.0
+	if p:
+		x = p.global_position.x + 70.0 * float(p.facing)
+		var cx := global_position.x + hand_offset.x
+		if absf(x - cx) < 70.0:
+			x = cx - 110.0
+	return Vector2(x, global_position.y)
+
+
+func _spawn_portal(animated: bool) -> void:
+	if portal_level == "" or get_parent() == null:
+		return
+	for c in get_tree().get_nodes_in_group(&"hand_portal"):
+		if is_instance_valid(c) and not c.is_queued_for_deletion() and get_parent().is_ancestor_of(c):
+			return
+	var h := HandPortal.new()
+	h.target_level = portal_level
+	h.target_entry = portal_entry
+	h.position = _player_front() if animated else Vector2(global_position.x + hand_offset.x - 110.0, global_position.y)
+	if not animated:
+		h.start_risen = true
+		get_parent().add_child.call_deferred(h)
+		return
+	get_parent().add_child(h)
+	h.appear(true)
+	GameFeel.rise(h.position + Vector2(0, -10), Color(0.35, 0.2, 0.6), 24, 16.0)
 
 
 func _spawn_reward() -> void:

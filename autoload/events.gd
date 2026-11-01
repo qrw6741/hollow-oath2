@@ -23,6 +23,8 @@ signal level_change_requested(level_path: String, entry_id: StringName, respawn:
 signal level_entered(level_path: String)
 ## The ending of the prologue: walk into the light -> white fade -> another world.
 signal teleport_requested(level_path: String, entry_id: StringName)
+## The Twin Lords' hand carries the player down: a long fade through black-violet.
+signal hand_teleport_requested(level_path: String, entry_id: StringName)
 ## Readable signs / tablets.
 signal message_requested(title: String, text: String)
 signal message_closed

@@ -187,10 +187,11 @@
 - The 4 new maps reuse existing backdrop looks and the 12 new bosses reuse existing boss visuals with new colours; difficulty is untested by a human. Balance unknown.
 - Boss tricks, perfect-parry window (3 frames) and the new enemies' numbers are guesses; only unit-tested, never hand-played. The Pilgrim's blast and Mender's heal visuals/sfx are reused stand-ins.
 - Ashen Chapel's Reliquary exit is now an interact door; the Ashfall crypt behind the secret wall was only reached up to the wall by the bot, not fought.
-- Morvane is an invented placeholder (name, lore, look): the user has not described their own boss yet. Twin Lords and Nightreaper numbers are guesses; the Nightreaper displays as an axe in hand; voice lines are robotic TTS; the status tip can overlap the two boss bars on first burn.
+- Morvane is an invented placeholder (name, lore, look): the user has not described their own boss yet. Twin Lords and Nightreaper numbers are guesses; voice lines are robotic TTS; the status tip can overlap the two boss bars on first burn.
 - The Twin Lords' hand intro takes about 15 s in real time and cannot be skipped.
 - PC lag report: the FPS-cap default was changed to 60 as the most likely cause, but real-hardware performance is unmeasured. The soak test shows no leak in 2 min of headless play on one map; other maps and boss fights were not soaked. soak.gd ends with a "previously freed" error when the bot leaves the level (believed test artefact).
 - The status tip no longer overlaps boss bars (tips are suppressed during boss fights).
 - 'Classic visuals' reduces GPU work but its effect on a real GPU is unmeasured; it also does not recreate the exact pre-graphics-pass look.
 - GPU freeze on blocks/particles: mitigations applied (chunked stone blocks, capped/shared effect materials, lighter glow shader) but unverified on real hardware. Classic visuals (Settings > Display) is the safest setting.
 - Twin Lords cutscenes: only checked in a software-rendered screenshot run and a held-skip test; never played at real speed by a human. New voice lines are robotic TTS.
+- The Lower Hell is a placeholder map (no boss, ends at a tablet); the hand portal's cutscene was only checked in tests and software-rendered screenshots.
