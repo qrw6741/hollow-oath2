@@ -9,6 +9,9 @@ extends Camera2D
 @export var vertical_offset := -28.0
 
 var _target: Node2D
+var _cine := false          ## cutscene: the camera is steered by cine_to() instead of following the player
+var _cine_pos := Vector2.ZERO
+var _cine_tw: Tween
 var _look := 0.0
 var _shake := 0.0
 var _shake_time := 0.0
@@ -52,7 +55,34 @@ func _desired() -> Vector2:
 	return _target.global_position + Vector2(_look, vertical_offset)
 
 
+## Cutscene camera: glide to world point `pos` and zoom to `z` over `dur` seconds.
+func cine_to(pos: Vector2, z: float, dur: float) -> void:
+	if not _cine:
+		_cine = true
+		_cine_pos = get_screen_center_position()
+	if _cine_tw and _cine_tw.is_valid():
+		_cine_tw.kill()
+	_cine_tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_cine_tw.tween_property(self, "_cine_pos", pos, maxf(dur, 0.01))
+	_cine_tw.tween_property(self, "zoom", Vector2(z, z), maxf(dur, 0.01))
+
+
+## Gives the camera back to the player, easing out of the shot.
+func cine_end(dur := 0.8) -> void:
+	if not _cine:
+		return
+	if _cine_tw and _cine_tw.is_valid():
+		_cine_tw.kill()
+	_cine = false
+	_cine_tw = create_tween()
+	_cine_tw.tween_property(self, "zoom", Vector2.ONE, maxf(dur, 0.01)).set_trans(Tween.TRANS_SINE)
+
+
 func _physics_process(delta: float) -> void:
+	if _cine:
+		global_position = _cine_pos
+		_update_shake(delta)
+		return
 	if not is_instance_valid(_target):
 		return
 	var facing: int = _target.get(&"facing") if _target.get(&"facing") != null else 1

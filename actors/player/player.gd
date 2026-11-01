@@ -58,6 +58,8 @@ enum State { FREE, ATTACK, DODGE, PARRY, HEAL, HURT, REST, DEAD }
 @onready var hurtbox: Hurtbox = $Hurtbox
 @onready var visual: Node2D = $Visual
 
+## True while a cutscene plays: no input is read and nothing can hurt the player.
+var cutscene_lock := false
 var state := State.FREE
 var state_frame := 0
 var facing := 1
@@ -212,13 +214,13 @@ func _physics_process(delta: float) -> void:
 	_read_input()
 	if is_on_floor() and state != State.DEAD and not _on_hazard():
 		last_safe_position = global_position
-	if Input.is_action_just_pressed(&"use_item") and state == State.FREE and not GameState.ui_modal:
+	if Input.is_action_just_pressed(&"use_item") and state == State.FREE and not GameState.ui_modal and not cutscene_lock:
 		Items.use(GameState.quick_item, self)
 	if combat_frames > 0:
 		combat_frames -= 1
 	if state != State.PARRY:
 		blocking = false
-	if Input.is_action_just_pressed(&"travel_manor") and state == State.FREE and not GameState.ui_modal:
+	if Input.is_action_just_pressed(&"travel_manor") and state == State.FREE and not GameState.ui_modal and not cutscene_lock:
 		_try_manor_travel()
 	state_frame += 1
 	if _iframes > 0:
@@ -249,7 +251,7 @@ func _physics_process(delta: float) -> void:
 # ------------------------------------------------------------------ input
 
 func _read_input() -> void:
-	if state == State.DEAD:
+	if state == State.DEAD or cutscene_lock:
 		_buffer.clear()
 		return
 	for a in BUFFERED:
@@ -271,6 +273,8 @@ func _consume(a: StringName) -> bool:
 
 
 func _axis() -> float:
+	if cutscene_lock:
+		return 0.0
 	return Input.get_axis(&"move_left", &"move_right")
 
 
@@ -450,7 +454,7 @@ func _state_parry(delta: float) -> void:
 	var total := parry_success_recovery if _parried else _parry_total()
 	blocking = false
 	if not _parried and weapon and weapon.block_reduction > 0.0 and state_frame > _window_frames() \
-			and Input.is_action_pressed(&"parry") and stamina.current > 0.0:
+			and Input.is_action_pressed(&"parry") and not cutscene_lock and stamina.current > 0.0:
 		blocking = true
 		state_frame = mini(state_frame, total - 1)  # hold the guard while the button is down
 		return
@@ -515,7 +519,7 @@ func _set_state(s: State) -> void:
 # ------------------------------------------------------------------ combat
 
 func is_invulnerable(environmental := false) -> bool:
-	if state == State.DEAD or _iframes > 0:
+	if state == State.DEAD or _iframes > 0 or cutscene_lock:
 		return true
 	if not environmental and state == State.DODGE:
 		return state_frame >= dodge_iframe_start and state_frame <= dodge_iframe_end

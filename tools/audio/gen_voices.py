@@ -38,6 +38,11 @@ e1 = re.search(r'"(Veshti![^"]*)"', duo).group(1)
 jobs["twins_enrage_0"] = (e0, "gunner")   # the Reaper fell: the Gunner answers
 jobs["twins_enrage_1"] = (e1, "reaper")   # the Gunner fell: the Reaper answers
 
+for grp, name in (("TWINS_MID", "twins_mid"), ("TWINS_END", "twins_end")):
+    body = re.search(r"const %s := \[(.*?)\n\]" % grp, src, re.S).group(1)
+    for i, (who, t) in enumerate(re.findall(r'\["([^"]*)", "([^"]*)"\]', body)):
+        jobs[f"{name}_{i}"] = (t, "gunner" if who.startswith("Veshti") else "reaper")
+
 only = set(sys.argv[1:])
 n = 0
 for name, (text, style) in sorted(jobs.items()):

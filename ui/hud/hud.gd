@@ -26,6 +26,12 @@ var _ember_shown := 0.0
 var _ember_tween: Tween
 var _quick_box: PanelContainer
 var _boss_box: Control
+
+
+## Cutscenes hide the boss bars (the subtitles stay).
+func set_cinematic(on: bool) -> void:
+	if _boss_box:
+		_boss_box.modulate.a = 0.0 if on else 1.0
 var _msg_panel: PanelContainer
 var _tip: Label
 var _tip_tween: Tween
@@ -46,6 +52,7 @@ var _status_row: Control
 
 
 func _ready() -> void:
+	add_to_group(&"hud")
 	layer = 10
 	_build()
 	add_child(BossSpeech.new())

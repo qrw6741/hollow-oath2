@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_cutscene_lock, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -4810,12 +4810,34 @@ func test_twin_lords() -> void:
 	check(arena.boss.active and arena.boss2.active and arena.fight_active, "both lords fight at once")
 	await frames(30)   # run both AIs and both visuals for a while without errors
 	arena.boss.health.take_damage(arena.boss.health.max_health * 2.0)
-	await frames(6)
+	# first lord falls: a short scene plays (bars, camera, the survivor speaks), then the other is enraged
+	var saw_scene := false
+	for i in 900:
+		await get_tree().physics_frame
+		if player.cutscene_lock:
+			saw_scene = true
+			arena._skip = true   # the player holds Interact
+		if arena.boss2.enraged and not player.cutscene_lock:
+			break
+	check(saw_scene, "a scene plays when the first lord falls")
 	check(arena.boss.is_dead() and arena.boss2.enraged, "when one lord falls the other is enraged")
-	check(arena.fight_active, "the fight goes on until both are dead")
+	check(not player.cutscene_lock and arena.fight_active, "the scene ends, the player is free and the fight goes on until both are dead")
 	arena.boss2.health.take_damage(arena.boss2.health.max_health * 2.0)
-	await frames(10)
-	check(not arena.fight_active and arena._defeated, "the fight ends when both lords are dead")
+	var saw_death := false
+	var chest0: TreasureChest = null
+	for i in 1500:
+		await get_tree().physics_frame
+		if player.cutscene_lock:
+			saw_death = true
+			arena._skip = true
+		for c in level.get_children():
+			if c is TreasureChest and c.chest_id == &"twin_lords_reward":
+				chest0 = c
+		if saw_death and not player.cutscene_lock and chest0 != null:
+			break
+	check(saw_death, "a death scene plays when both lords are dead")
+	check(not arena.fight_active and arena._defeated and not player.cutscene_lock, "the fight ends when both lords are dead and the player is free")
+	check(chest0 != null, "the death scene leaves the reward chest")
 	check(game_state.get_flag(&"boss_defeated_ashkar_reaper", false) and game_state.get_flag(&"boss_defeated_veshti_gunner", false), "both defeats are saved")
 	arena._spawn_reward()
 	await frames(4)
@@ -4828,6 +4850,32 @@ func test_twin_lords() -> void:
 	arena.spawn()
 	await frames(4)
 	check(arena.boss == null or not is_instance_valid(arena.boss), "a beaten pair never returns")
+
+
+func test_cutscene_lock() -> void:
+	await fresh_game()
+	check(not player.cutscene_lock, "the player starts free")
+	player.cutscene_lock = true
+	Input.action_press(&"move_right")
+	Input.action_press(&"attack_light")
+	var x0 := player.global_position.x
+	await frames(30)
+	Input.action_release(&"move_right")
+	Input.action_release(&"attack_light")
+	check(absf(player.global_position.x - x0) < 2.0 and player.state == Player.State.FREE, "a locked player ignores movement and attacks (dx %.1f)" % (player.global_position.x - x0))
+	check(player.is_invulnerable(true), "nothing can hurt a locked player")
+	player.cutscene_lock = false
+	# the cine camera glides to a point and gives control back
+	var cam := get_viewport().get_camera_2d() as CameraRig
+	check(cam != null, "there is a camera rig")
+	if cam:
+		var target := player.global_position + Vector2(200, -40)
+		cam.cine_to(target, 1.5, 0.3)
+		await frames(40)
+		check(cam.global_position.distance_to(target) < 6.0 and is_equal_approx(cam.zoom.x, 1.5), "the cutscene camera reaches its shot (%s, zoom %.2f)" % [cam.global_position, cam.zoom.x])
+		cam.cine_end(0.2)
+		await frames(60)
+		check(is_equal_approx(cam.zoom.x, 1.0) and cam.global_position.distance_to(player.global_position) < 80.0, "the camera returns to the player")
 
 
 func test_travel_scrolls() -> void:

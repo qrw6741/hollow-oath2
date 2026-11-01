@@ -193,3 +193,4 @@
 - The status tip no longer overlaps boss bars (tips are suppressed during boss fights).
 - 'Classic visuals' reduces GPU work but its effect on a real GPU is unmeasured; it also does not recreate the exact pre-graphics-pass look.
 - GPU freeze on blocks/particles: mitigations applied (chunked stone blocks, capped/shared effect materials, lighter glow shader) but unverified on real hardware. Classic visuals (Settings > Display) is the safest setting.
+- Twin Lords cutscenes: only checked in a software-rendered screenshot run and a held-skip test; never played at real speed by a human. New voice lines are robotic TTS.

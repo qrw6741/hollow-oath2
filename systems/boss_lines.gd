@@ -80,6 +80,20 @@ const TWINS_INTRO := [
 	["Ashkar, the Black Reaper", "No? Good. We were so very bored."],
 ]
 
+## Scene when the FIRST lord falls: [0] = the Reaper fell (the Gunner speaks), [1] = the Gunner fell (the Reaper speaks).
+## Voice files twins_mid_0 / twins_mid_1; the line that follows is the enrage line (twins_enrage_n) in duo_arena.gd.
+const TWINS_MID := [
+	["Veshti, the Far Hand", "Forty centuries, and not one blade ever reached him. Not one."],
+	["Ashkar, the Black Reaper", "Her aim never missed. Not once in forty centuries."],
+]
+
+## Death scene after BOTH have fallen. Voice files twins_end_0..2.
+const TWINS_END := [
+	["Ashkar, the Black Reaper", "So the ember does not gutter. Good. Good."],
+	["Veshti, the Far Hand", "Take what we were. The Reaper's edge. Let it end what we could not."],
+	["Ashkar, the Black Reaper", "The Door is only the first of nine, little flame. Go deeper."],
+]
+
 const GENERIC := ["You should not have come.", "The oath binds us both.", "Enough. I will end this.", "It... ends.", "Rise and try again."]
 
 
