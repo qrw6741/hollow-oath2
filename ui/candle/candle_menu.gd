@@ -153,12 +153,29 @@ func _build_travel() -> void:
 
 
 ## Every lit candle in the game, as {level_path, area, id, name, pos}.
+## Lit candles, newest first: the map discovered most recently comes first, and inside each map its
+## newest candle comes first. Candles lit before the order was recorded (older saves) count as older than
+## every recorded one and are ordered by their place in the world (later maps = newer).
 static func travel_destinations() -> Array:
-	var out := []
+	var maps := []
+	var wi := 0
 	for d in WorldMap.all():
+		var cands := []
 		for cd in d.candles:
+			wi += 1
 			if GameState.get_flag(StringName("candle_lit_" + String(cd.id)), false):
-				out.append({"level": d.path, "area": d.name, "id": cd.id, "name": cd.name, "pos": cd.pos})
+				var stamp := int(GameState.get_flag(StringName("candle_order_" + String(cd.id)), 0))
+				var key := stamp if stamp > 0 else wi - 1000000   # unrecorded = older than any recorded
+				cands.append({"level": d.path, "area": d.name, "id": cd.id, "name": cd.name, "pos": cd.pos, "key": key})
+		if cands.is_empty():
+			continue
+		var first_lit: int = cands.map(func(c): return c.key).min()
+		cands.sort_custom(func(x, y): return x.key > y.key)
+		maps.append({"first": first_lit, "cands": cands})
+	maps.sort_custom(func(x, y): return x.first > y.first)
+	var out := []
+	for m in maps:
+		out.append_array(m.cands)
 	return out
 
 

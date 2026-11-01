@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_cutscene_lock, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_cutscene_lock, test_travel_order, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -4929,6 +4929,42 @@ func test_dev_one_hit_and_pickers() -> void:
 	var ws := im.find_child("WeaponScroll", true, false) as ScrollContainer
 	check(ws != null and ws.get_v_scroll_bar().max_value > ws.size.y + 4.0, "the Weapons tab grid scrolls")
 	im.close()
+
+
+func test_travel_order() -> void:
+	await fresh_game()
+	# light three candles in three different maps in a known order via the real rest handler
+	var picks := []
+	for d in WorldMap.all():
+		if d.candles.size() > 0 and picks.size() < 3:
+			picks.append(d)
+	var ids := []
+	for k in picks.size():
+		var cd = picks[k].candles[0]
+		game_state.level_path = picks[k].path
+		game_state._on_checkpoint_rested(StringName(cd.id), cd.pos)
+		ids.append(String(cd.id))
+	# a second candle in the FIRST map, lit last
+	var extra = picks[0].candles[1] if picks[0].candles.size() > 1 else null
+	if extra:
+		game_state.level_path = picks[0].path
+		game_state._on_checkpoint_rested(StringName(extra.id), extra.pos)
+	var order: Array = CandleMenu.travel_destinations().map(func(x): return String(x.id))
+	check(order.find(ids[2]) < order.find(ids[1]) and order.find(ids[1]) < order.find(ids[0]), "the newest map's candle is first, the oldest map's last (%s)" % [order])
+	if extra:
+		check(order.find(String(extra.id)) < order.find(ids[0]), "inside a map the newest candle comes first")
+		check(order.find(ids[0]) - order.find(String(extra.id)) == 1 and order.find(String(extra.id)) > order.find(ids[1]), "and a map stays grouped where it was discovered, not moved to the top")
+	# resting at the same candle again does not reorder it
+	game_state.level_path = picks[0].path
+	game_state._on_checkpoint_rested(StringName(ids[0]), picks[0].candles[0].pos)
+	var order2: Array = CandleMenu.travel_destinations().map(func(x): return String(x.id))
+	check(order2 == order, "re-resting keeps the order")
+	# old saves (no order recorded): later maps count as newer
+	for key in game_state.flags.keys():
+		if String(key).begins_with("candle_order_") or String(key) == "candle_counter":
+			game_state.flags.erase(key)
+	var old: Array = CandleMenu.travel_destinations().map(func(x): return String(x.id))
+	check(old.find(ids[2]) < old.find(ids[0]), "an old save without order falls back to world order, newest map first")
 
 
 func test_travel_scrolls() -> void:

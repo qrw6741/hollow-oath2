@@ -86,6 +86,12 @@ func _on_checkpoint_rested(id: StringName, pos: Vector2) -> void:
 	checkpoint_id = id
 	respawn_position = pos
 	set_flag(StringName("candle_lit_" + String(id)), true)
+	# remember the order candles were first lit in, so the Travel list can show the newest first
+	var ok := StringName("candle_order_" + String(id))
+	if int(get_flag(ok, 0)) == 0:
+		var n := int(get_flag(&"candle_counter", 0)) + 1
+		set_flag(&"candle_counter", n)
+		set_flag(ok, n)
 	checkpoint_level = level_path
 	level_entry = &""
 
@@ -112,7 +118,7 @@ func _on_player_died() -> void:
 # ------------------------------------------------------------------ New Game+
 ## A cycle restarts the story with everything you built kept. Enemies get tougher each time.
 ## Flags kept across a cycle (prefixes): what the player has *learned or earned for good*.
-const KEEP_FLAG_PREFIXES := ["deed_", "bs_", "bk_", "tip_", "fx_", "infuse_", "relics_eq", "night_survived", "ng_cycle", "ending_", "candle_lit_", "art_", "secret_"]
+const KEEP_FLAG_PREFIXES := ["deed_", "bs_", "bk_", "tip_", "fx_", "infuse_", "relics_eq", "night_survived", "ng_cycle", "ending_", "candle_lit_", "candle_order_", "candle_counter", "art_", "secret_"]
 
 
 func ng_cycle() -> int:

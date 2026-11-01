@@ -532,3 +532,6 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - **Chooser (Gear tab > Weapon/Armour slot):** was a plain text button list that could not scroll. Now a scrolling list (wheel, keys and pad; follows focus) of icon rows: icon, name +level, stat line (light combo damage / damage taken), a strength bar and an EQUIPPED badge. **Weapons tab:** the 5-column icon grid (26 weapons) overflowed its frame; it now sits in a scroll area that follows focus. The Blacksmith list already scrolled.
 - Tests: `test_dev_one_hit_and_pickers` (tab, toggle, kill/no kill, chooser and Weapons tab are taller than their boxes and scroll, focus scrolls, rows are icon rows). Screenshots checked (`tests/capture_inventory.gd`).
 - Not verified: with a real mouse wheel/controller on Windows; balance with one-hit on (it is a testing tool).
+
+## Travel list order
+- The Travel tab now lists candles newest first: the most recently discovered map on top and, inside each map, its newest candle first. The order candles were first lit in is saved (`candle_order_<id>`, `candle_counter` flags, kept across New Game+). Older saves have no order, so their lit candles fall back to world order with later maps counted as newer; new candles go above them. Re-resting at a candle does not move it. Test: `test_travel_order`. Not verified by hand in the real menu.
