@@ -5166,9 +5166,9 @@ func test_siege_and_katana() -> void:
 		if c is StoneBlock and c.one_way:
 			planks += 1
 	check(arenas == 1, "still exactly one boss arena, the fox (%d)" % arenas)
-	check(foes >= 50, "the whole castle is crowded (%d foes)" % foes)
-	check(planks >= 40, "and full of parkour: %d planks" % planks)
-	check(level.bounds.size.x >= 20000.0, "and very long (%d px)" % int(level.bounds.size.x))
+	check(foes >= 90, "the whole castle is crowded (%d foes)" % foes)
+	check(planks >= 70, "and full of parkour: %d planks" % planks)
+	check(level.bounds.size.x >= 30000.0, "and very long (%d px)" % int(level.bounds.size.x))
 	var kc := level.get_node("ChestKatana") as TreasureChest
 	check(kc != null and kc.gear_kind == "weapon" and kc.gear_id == &"long_katana", "a chest holds the Long Katana")
 	check(kc.global_position.y < 260.0 and kc.global_position.x > 15000.0, "and it sits high in the far end of the castle (%d, %d)" % [int(kc.global_position.x), int(kc.global_position.y)])
@@ -5247,7 +5247,7 @@ func test_lower_hell() -> void:
 	for c in level.get_children():
 		if c is Marker2D and c.get("enemy_scene") != null:
 			foes += 1
-	check(foes >= 50, "the Lower Hell is thick with enemies (%d)" % foes)
+	check(foes >= 90, "the Lower Hell is thick with enemies (%d)" % foes)
 	check(level.bounds.size.x >= 22000.0, "the road continues past the fox (%d px)" % int(level.bounds.size.x))
 	var bulwark := level.get_node_or_null("FoxBulwark")
 	check(bulwark != null and bulwark.opens_when_boss == &"tooth_fox" and bulwark.hits_needed >= 999, "a bulwark past the fox only opens when the fox falls")

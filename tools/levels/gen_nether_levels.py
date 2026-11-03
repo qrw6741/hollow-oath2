@@ -221,7 +221,7 @@ def lower():
       3. THE RUN: three timed levers far apart, all alight at once, through fire and spikes;
     then the Gate-Fox (the single custom mini-boss). The fox drops a tooth shaped like a key; the Tooth Gate
     in the Landing takes it and leads down to the Grass Cellar. No other mini-bosses."""
-    W = 23100
+    W = 33200
     L = G.Level("lower_hell.tscn")
     _head(L, "lower_hell", "The Lower Hell", "LowerHell", W, "(0.86, 0.68, 0.78, 1)", 12, 51800, 0.42)
     L.block("CliffLeft", 0, 0, 16, 480)
@@ -492,8 +492,103 @@ opens_when_boss = &"tooth_fox"''')
     _prop(L, "BelfryCage", belfry[3][1] + 30, CAGE)
     c = ex + 80
     L.candle("Candle9", c, 480, "lower_hell_candle_9", "Belfry Candle")
-    L.tablet("EndTablet", c + 90, 480, "The Road Does Not End", "The castle has more rooms than the dark has patience for. This is as far as the road is laid. Rest, then ask the one who laid it where it goes next.")
-    L.end_x = c + 260
+
+    # ---- THE KENNELS: where the castle kept what it did not feed -------------------------------------------------
+    k = c + 140
+    L.tablet("KennelTablet", k, 480, "The Kennels", "Where the castle kept what it did not feed. The doors are gone. The tenants are not. Nobody here has been fed since the lid came down, and they have decided you will do.")
+    _prop(L, "KennelBrazier0", k + 60, BRAZIER)
+    _prop(L, "KennelRack", k + 150, RACK)
+    for i, (kind, dx, pat) in enumerate([("penitent", 260, 70), ("cellarer", 380, 50), ("gravewarden", 500, 60), ("pilgrim", 620, 70), ("cinder", 740, 50),
+                                         ("ashfall", 860, 60), ("lurker", 960, 40), ("penitent", 1060, 70), ("gilded", 1160, 50), ("sergeant", 1260, 60)]):
+        L.enemy(f"KennelFoe{i}", kind, k + dx, 480, pat)
+    L.block("KennelLedgeA", k + 330, 440, 200, 40, style=0)
+    L.enemy("KennelArcherA", "archer", k + 430, 440, 10)
+    L.block("KennelLedgeB", k + 1000, 440, 200, 40, style=0)
+    L.enemy("KennelArcherB", "archer", k + 1100, 440, 10)
+    L.jet("KennelJetA", k + 560, 480, 0.0)
+    L.jet("KennelJetB", k + 620, 480, 1.5)
+    L.spikes("KennelSpikesA", k + 800, 480, 80)
+    L.jet("KennelJetC", k + 1240, 480, 0.5)
+    L.jet("KennelJetD", k + 1300, 480, 2.0)
+    _prop(L, "KennelCage0", k + 480, CAGE)
+    _prop(L, "KennelCage1", k + 1150, CAGE)
+    _prop(L, "KennelGargoyle", k + 700, GARGOYLE)
+    L.chest("Chest5", k + 1180, 440, "lower_hell_chest_5", count=2, embers=14000, item="it_draught")
+    c = k + 1420
+    L.candle("Candle10", c, 480, "lower_hell_candle_10", "Kennel Candle")
+
+    # ---- THE GALLOWS STAIR: up and down a scaffold over teeth, a guard on every rest --------------------------------
+    g = c + 140
+    L.tablet("GallowsTablet", g, 480, "The Gallows Stair", "They hanged people here from a scaffold forty feet up, and the stair to it is the only thing in the castle built without a rail. The teeth below were added later, as a courtesy.")
+    g += 80
+    gal, ex = _chain(L, "Gallows", g, 480, [
+        (0, 100, 440), (80, 70, 398), (82, 70, 356), (80, 60, 314), (84, 120, 314), (80, 60, 356), (82, 60, 398), (80, 60, 440),
+        (84, 70, 400), (82, 60, 360), (84, 60, 320), (82, 60, 280), (84, 130, 280), (82, 60, 322), (84, 60, 364), (82, 60, 406), (84, 100, 448)],
+        solid=(0, 4, 12))
+    L.spikes("GallowsTeeth", g, 480, ex - g)
+    L.enemy("GallowsGuard0", "captain", gal[4][1] + 80, 314, 40)
+    L.enemy("GallowsGuard1", "sergeant", gal[12][1] + 80, 280, 40)
+    L.enemy("GallowsArcher0", "archer", gal[4][1] + 110, 314, 10)
+    L.enemy("GallowsArcher1", "archer", gal[10][1] + 30, 320, 6)
+    L.enemy("GallowsMoth0", "moth", gal[2][1] + 30, 300, 100)
+    L.enemy("GallowsMoth1", "moth", gal[8][1] + 30, 320, 100)
+    L.enemy("GallowsMoth2", "moth", gal[14][1] + 30, 260, 100)
+    n = 0
+    jx = g + 200
+    while jx < ex - 100:
+        L.jet(f"GallowsJet{n}", jx, 480, (n * 1.1) % 3.0)
+        jx += 240
+        n += 1
+    _prop(L, "GallowsCage0", gal[3][1] + 30, CAGE)
+    _prop(L, "GallowsCage1", gal[11][1] + 30, CAGE)
+    c = ex + 80
+    L.candle("Candle11", c, 480, "lower_hell_candle_11", "Gallows Candle")
+
+    # ---- THE LONG CORRIDOR: nothing to climb, everything to fight ------------------------------------------------
+    k = c + 140
+    L.tablet("CorridorTablet", k, 480, "A Straight Road", "After the stair, a straight road. It is the cruellest thing in the castle: no height to climb, no plank to count. Only a long hall, and the people at the end of it who would like very much for you to stop.")
+    for i, (kind, dx, pat) in enumerate([("captain", 220, 60), ("pikeman", 320, 50), ("gilded", 420, 60), ("mender", 520, 40), ("cantor", 600, 50),
+                                         ("sergeant", 760, 60), ("captain", 860, 60), ("bearer", 960, 60), ("gravewarden", 1060, 50), ("cinder", 1160, 50),
+                                         ("ashfall", 1280, 60), ("lurker", 1380, 40), ("captain", 1480, 60), ("sergeant", 1560, 60)]):
+        L.enemy(f"CorrFoe{i}", kind, k + dx, 480, pat)
+    for i, dx in enumerate((300, 680, 1100, 1450)):
+        L.jet(f"CorrJetA{i}", k + dx, 480, (i * 0.8) % 3.0)
+        L.jet(f"CorrJetB{i}", k + dx + 60, 480, (i * 0.8 + 1.5) % 3.0)
+    L.spikes("CorrSpikesA", k + 460, 480, 70)
+    L.spikes("CorrSpikesB", k + 900, 480, 70)
+    L.spikes("CorrSpikesC", k + 1240, 480, 70)
+    L.block("CorrLedge", k + 700, 440, 220, 40, style=0)
+    L.enemy("CorrArcher0", "archer", k + 840, 440, 10)
+    L.enemy("CorrArcher1", "archer", k + 1500, 480, 10)
+    for i, dx in enumerate((120, 560, 1000, 1400)):
+        _prop(L, f"CorrProp{i}", k + dx, BRAZIER if i % 2 == 0 else STATUE)
+    _prop(L, "CorrCarpet", k + 40, CARPET, span=1640)
+    c = k + 1700
+    L.candle("Candle12", c, 480, "lower_hell_candle_12", "Long Corridor Candle")
+
+    # ---- THE CROWN WALK: planks the width of a hand, near the ceiling, with the wind of the dead in them ----------------
+    w = c + 140
+    L.tablet("CrownTablet", w, 480, "The Crown Walk", "Where the kings walked when they wanted the castle to see them. A ledge the width of a hand along the roof-beams, and the whole hall below. Whatever lives up here can fly.")
+    w += 80
+    crown, ex = _chain(L, "Crown", w, 480, [
+        (0, 100, 440), (80, 60, 398), (84, 60, 356), (84, 60, 314), (84, 60, 272), (84, 120, 272), (84, 50, 314), (84, 50, 272), (84, 50, 230),
+        (84, 50, 272), (84, 50, 230), (84, 50, 272), (84, 50, 314), (84, 110, 314), (84, 50, 272), (84, 50, 230), (84, 50, 272), (84, 50, 314),
+        (84, 50, 356), (84, 60, 398), (84, 100, 440)], solid=(0, 5, 13))
+    L.spikes("CrownTeeth", w, 480, ex - w)
+    for i, idx in enumerate((2, 6, 8, 11, 15, 17)):
+        L.enemy(f"CrownMoth{i}", "moth", crown[idx][1] + 20, 260, 100)
+    L.enemy("CrownGuard0", "captain", crown[5][1] + 70, 272, 40)
+    L.enemy("CrownGuard1", "sergeant", crown[13][1] + 60, 314, 40)
+    L.enemy("CrownArcher0", "archer", crown[5][1] + 100, 272, 10)
+    L.enemy("CrownArcher1", "archer", crown[13][1] + 90, 314, 10)
+    L.enemy("CrownArcher2", "archer", crown[10][1] + 25, 230, 6)
+    _prop(L, "CrownCage0", crown[4][1] + 30, CAGE)
+    _prop(L, "CrownCage1", crown[16][1] + 30, CAGE)
+    c = ex + 80
+    L.candle("Candle13", c, 480, "lower_hell_candle_13", "Crown Walk Candle")
+    L.chest("Chest6", c + 120, 480, "lower_hell_chest_6", count=3, embers=30000, item="it_shard")
+    L.tablet("EndTablet", c + 220, 480, "The Road Does Not End", "The castle has more rooms than the dark has patience for. This is as far as the road is laid. Rest, then ask the one who laid it where it goes next.")
+    L.end_x = c + 400
     L.write()
 
 
