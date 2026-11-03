@@ -28,6 +28,12 @@ class Rec(G.Level):
             if y + h >= 478.0 and y < 480.0 - G.Level.RISE - 2.0 and x > 40 and x + w < ground[2] - 20:
                 out.append(f"WALL    {self.fname}: {n} at x={x} is {480 - y:.0f} px tall on the road")
                 bad += 1
+        for (n, x, y, w, h, o) in self.blocks:
+            if n in ("Ground", "CliffLeft", "CliffRight", "Ceiling") or o:
+                continue
+            if 440.0 < y + h < 478.0 and x > 40 and x + w < ground[2] - 20 and y < 440.0:
+                out.append(f"LOWGAP  {self.fname}: {n} at x={x} hangs to {480 - (y + h):.0f} px above the floor: nobody can walk under it")
+                bad += 1
         for (kind, name, x, y) in self.things:
             host = [t for t in surf if abs(t[3] - y) <= 2.0 and t[1] - 2 <= x <= t[2] + 2]
             if not host:

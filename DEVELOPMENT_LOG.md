@@ -590,3 +590,8 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Whole map now: about 97 spawn points and 75 planks/ledges; tests raised to length >= 30000, >= 90 foes, >= 70 planks.
 - **Progression pictures:** `tests/capture_progress.gd` teleports to 19 stops along the road (landing to the end) and screenshots each; sent to the user as three contact sheets. Software-rendered, the player made invulnerable for the shots so enemies in them are mid-fight, not placed for show.
 - Not verified: how hard it plays at real speed (distances, enemy density), whether it is now too long or too punishing, performance with ~100 enemies in one level on a real PC, Windows.
+
+## Four Wards road fix (player report: stuck at the end of the first puzzle)
+- Cause: the hidden-ward alcove had a back wall (`AlcoveBack`) hanging to 10 px above the floor, sealing the ground road between the broken wall and the first gate. After breaking the wall and throwing lever D the player could not reach the gate. My earlier gate test teleported past it, and tools/audit_reach.py only flagged blocks touching the floor.
+- Fix: removed `AlcoveBack` (the alcove is now a lintel over the road). tools/audit_reach.py gained a LOWGAP check (blocks hanging 2-40 px above the floor); it flags the old geometry and the level is clean now. New test `test_four_wards_real` walks on foot from the fire ward to past the gate (old level: stops at x=7455; fixed: x=8091).
+- Saves are unaffected (wall/lever flags persist), so a save stuck in the alcove can simply walk out to the right.

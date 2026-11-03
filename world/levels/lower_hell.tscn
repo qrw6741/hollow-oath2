@@ -529,13 +529,6 @@ size = Vector2(230, 14)
 style = 0
 seed_value = 910
 
-[node name="AlcoveBack" type="StaticBody2D" parent="Geometry"]
-position = Vector2(7460, 394)
-script = ExtResource("block")
-size = Vector2(20, 76)
-style = 0
-seed_value = 911
-
 [node name="LeverD" type="Area2D" parent="."]
 position = Vector2(7370, 480)
 script = ExtResource("lever")
@@ -614,7 +607,7 @@ position = Vector2(8700, 440)
 script = ExtResource("block")
 size = Vector2(130, 40)
 style = 0
-seed_value = 912
+seed_value = 911
 
 [node name="RuneMoon" type="Area2D" parent="."]
 position = Vector2(8770, 440)
@@ -787,14 +780,14 @@ position = Vector2(11440, 452)
 script = ExtResource("block")
 size = Vector2(100, 28)
 style = 1
-seed_value = 913
+seed_value = 912
 
 [node name="RunLoft" type="StaticBody2D" parent="Geometry"]
 position = Vector2(11530, 410)
 script = ExtResource("block")
 size = Vector2(170, 6)
 style = 2
-seed_value = 914
+seed_value = 913
 one_way = true
 
 [node name="RunLeverY" type="Area2D" parent="."]
@@ -895,7 +888,7 @@ position = Vector2(13590, 440)
 script = ExtResource("block")
 size = Vector2(120, 6)
 style = 2
-seed_value = 915
+seed_value = 914
 one_way = true
 
 [node name="StairStep1" type="StaticBody2D" parent="Geometry"]
@@ -903,7 +896,7 @@ position = Vector2(13790, 400)
 script = ExtResource("block")
 size = Vector2(90, 6)
 style = 2
-seed_value = 916
+seed_value = 915
 one_way = true
 
 [node name="StairStep2" type="StaticBody2D" parent="Geometry"]
@@ -911,7 +904,7 @@ position = Vector2(13964, 360)
 script = ExtResource("block")
 size = Vector2(90, 6)
 style = 2
-seed_value = 917
+seed_value = 916
 one_way = true
 
 [node name="StairStep3" type="StaticBody2D" parent="Geometry"]
@@ -919,7 +912,7 @@ position = Vector2(14134, 322)
 script = ExtResource("block")
 size = Vector2(100, 6)
 style = 2
-seed_value = 918
+seed_value = 917
 one_way = true
 
 [node name="StairStep4" type="StaticBody2D" parent="Geometry"]
@@ -927,7 +920,7 @@ position = Vector2(14320, 286)
 script = ExtResource("block")
 size = Vector2(80, 6)
 style = 2
-seed_value = 919
+seed_value = 918
 one_way = true
 
 [node name="StairStep5" type="StaticBody2D" parent="Geometry"]
@@ -935,7 +928,7 @@ position = Vector2(14480, 286)
 script = ExtResource("block")
 size = Vector2(150, 6)
 style = 2
-seed_value = 920
+seed_value = 919
 one_way = true
 
 [node name="StairStep6" type="StaticBody2D" parent="Geometry"]
@@ -943,7 +936,7 @@ position = Vector2(14714, 330)
 script = ExtResource("block")
 size = Vector2(80, 6)
 style = 2
-seed_value = 921
+seed_value = 920
 one_way = true
 
 [node name="StairStep7" type="StaticBody2D" parent="Geometry"]
@@ -951,7 +944,7 @@ position = Vector2(14874, 372)
 script = ExtResource("block")
 size = Vector2(80, 6)
 style = 2
-seed_value = 922
+seed_value = 921
 one_way = true
 
 [node name="StairStep8" type="StaticBody2D" parent="Geometry"]
@@ -959,7 +952,7 @@ position = Vector2(15038, 414)
 script = ExtResource("block")
 size = Vector2(90, 6)
 style = 2
-seed_value = 923
+seed_value = 922
 one_way = true
 
 [node name="StairStep9" type="StaticBody2D" parent="Geometry"]
@@ -967,7 +960,7 @@ position = Vector2(15208, 450)
 script = ExtResource("block")
 size = Vector2(90, 6)
 style = 2
-seed_value = 924
+seed_value = 923
 one_way = true
 
 [node name="StairStep10" type="StaticBody2D" parent="Geometry"]
@@ -975,7 +968,7 @@ position = Vector2(15382, 450)
 script = ExtResource("block")
 size = Vector2(100, 6)
 style = 2
-seed_value = 925
+seed_value = 924
 one_way = true
 
 [node name="StairStep11" type="StaticBody2D" parent="Geometry"]
@@ -983,7 +976,7 @@ position = Vector2(15562, 410)
 script = ExtResource("block")
 size = Vector2(100, 6)
 style = 2
-seed_value = 926
+seed_value = 925
 one_way = true
 
 [node name="StairStep12" type="StaticBody2D" parent="Geometry"]
@@ -991,7 +984,7 @@ position = Vector2(15746, 372)
 script = ExtResource("block")
 size = Vector2(90, 6)
 style = 2
-seed_value = 927
+seed_value = 926
 one_way = true
 
 [node name="StairStep13" type="StaticBody2D" parent="Geometry"]
@@ -999,7 +992,7 @@ position = Vector2(15918, 372)
 script = ExtResource("block")
 size = Vector2(110, 6)
 style = 2
-seed_value = 928
+seed_value = 927
 one_way = true
 
 [node name="StairStep14" type="StaticBody2D" parent="Geometry"]
@@ -1007,7 +1000,7 @@ position = Vector2(16112, 414)
 script = ExtResource("block")
 size = Vector2(90, 6)
 style = 2
-seed_value = 929
+seed_value = 928
 one_way = true
 
 [node name="StairStep15" type="StaticBody2D" parent="Geometry"]
@@ -1015,7 +1008,7 @@ position = Vector2(16282, 450)
 script = ExtResource("block")
 size = Vector2(120, 6)
 style = 2
-seed_value = 930
+seed_value = 929
 one_way = true
 
 [node name="StairTeeth" type="Area2D" parent="."]
@@ -1121,7 +1114,7 @@ position = Vector2(17142, 436)
 script = ExtResource("block")
 size = Vector2(220, 44)
 style = 0
-seed_value = 931
+seed_value = 930
 
 [node name="KeepArcher0" type="Marker2D" parent="."]
 position = Vector2(17282, 436)
@@ -1202,7 +1195,7 @@ position = Vector2(18042, 440)
 script = ExtResource("block")
 size = Vector2(200, 40)
 style = 0
-seed_value = 932
+seed_value = 931
 
 [node name="KeepArcher1" type="Marker2D" parent="."]
 position = Vector2(18162, 440)
@@ -1282,7 +1275,7 @@ position = Vector2(18512, 440)
 script = ExtResource("block")
 size = Vector2(80, 6)
 style = 2
-seed_value = 933
+seed_value = 932
 one_way = true
 
 [node name="Chand1" type="StaticBody2D" parent="Geometry"]
@@ -1290,7 +1283,7 @@ position = Vector2(18676, 404)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 934
+seed_value = 933
 one_way = true
 
 [node name="Chand2" type="StaticBody2D" parent="Geometry"]
@@ -1298,7 +1291,7 @@ position = Vector2(18832, 370)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 935
+seed_value = 934
 one_way = true
 
 [node name="Chand3" type="StaticBody2D" parent="Geometry"]
@@ -1306,7 +1299,7 @@ position = Vector2(18976, 336)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 936
+seed_value = 935
 one_way = true
 
 [node name="Chand4" type="StaticBody2D" parent="Geometry"]
@@ -1314,7 +1307,7 @@ position = Vector2(19132, 370)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 937
+seed_value = 936
 one_way = true
 
 [node name="Chand5" type="StaticBody2D" parent="Geometry"]
@@ -1322,7 +1315,7 @@ position = Vector2(19276, 404)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 938
+seed_value = 937
 one_way = true
 
 [node name="Chand6" type="StaticBody2D" parent="Geometry"]
@@ -1330,7 +1323,7 @@ position = Vector2(19432, 370)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 939
+seed_value = 938
 one_way = true
 
 [node name="Chand7" type="StaticBody2D" parent="Geometry"]
@@ -1338,7 +1331,7 @@ position = Vector2(19576, 330)
 script = ExtResource("block")
 size = Vector2(90, 6)
 style = 2
-seed_value = 940
+seed_value = 939
 one_way = true
 
 [node name="Chand8" type="StaticBody2D" parent="Geometry"]
@@ -1346,7 +1339,7 @@ position = Vector2(19752, 296)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 941
+seed_value = 940
 one_way = true
 
 [node name="Chand9" type="StaticBody2D" parent="Geometry"]
@@ -1354,7 +1347,7 @@ position = Vector2(19896, 330)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 942
+seed_value = 941
 one_way = true
 
 [node name="Chand10" type="StaticBody2D" parent="Geometry"]
@@ -1362,7 +1355,7 @@ position = Vector2(20052, 366)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 943
+seed_value = 942
 one_way = true
 
 [node name="Chand11" type="StaticBody2D" parent="Geometry"]
@@ -1370,7 +1363,7 @@ position = Vector2(20196, 402)
 script = ExtResource("block")
 size = Vector2(80, 6)
 style = 2
-seed_value = 944
+seed_value = 943
 one_way = true
 
 [node name="Chand12" type="StaticBody2D" parent="Geometry"]
@@ -1378,7 +1371,7 @@ position = Vector2(20362, 440)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 945
+seed_value = 944
 one_way = true
 
 [node name="Chand13" type="StaticBody2D" parent="Geometry"]
@@ -1386,7 +1379,7 @@ position = Vector2(20506, 404)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 946
+seed_value = 945
 one_way = true
 
 [node name="Chand14" type="StaticBody2D" parent="Geometry"]
@@ -1394,7 +1387,7 @@ position = Vector2(20662, 440)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 947
+seed_value = 946
 one_way = true
 
 [node name="ChandTeeth" type="Area2D" parent="."]
@@ -1525,14 +1518,14 @@ position = Vector2(20992, 440)
 script = ExtResource("block")
 size = Vector2(110, 20)
 style = 0
-seed_value = 948
+seed_value = 947
 
 [node name="Belfry1" type="StaticBody2D" parent="Geometry"]
 position = Vector2(21182, 400)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 949
+seed_value = 948
 one_way = true
 
 [node name="Belfry2" type="StaticBody2D" parent="Geometry"]
@@ -1540,14 +1533,14 @@ position = Vector2(21332, 366)
 script = ExtResource("block")
 size = Vector2(170, 20)
 style = 0
-seed_value = 950
+seed_value = 949
 
 [node name="Belfry3" type="StaticBody2D" parent="Geometry"]
 position = Vector2(21582, 334)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 951
+seed_value = 950
 one_way = true
 
 [node name="Belfry4" type="StaticBody2D" parent="Geometry"]
@@ -1555,7 +1548,7 @@ position = Vector2(21732, 300)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 952
+seed_value = 951
 one_way = true
 
 [node name="Belfry5" type="StaticBody2D" parent="Geometry"]
@@ -1563,14 +1556,14 @@ position = Vector2(21872, 270)
 script = ExtResource("block")
 size = Vector2(180, 20)
 style = 0
-seed_value = 953
+seed_value = 952
 
 [node name="Belfry6" type="StaticBody2D" parent="Geometry"]
 position = Vector2(22132, 306)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 954
+seed_value = 953
 one_way = true
 
 [node name="Belfry7" type="StaticBody2D" parent="Geometry"]
@@ -1578,7 +1571,7 @@ position = Vector2(22272, 342)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 955
+seed_value = 954
 one_way = true
 
 [node name="Belfry8" type="StaticBody2D" parent="Geometry"]
@@ -1586,7 +1579,7 @@ position = Vector2(22422, 378)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 956
+seed_value = 955
 one_way = true
 
 [node name="Belfry9" type="StaticBody2D" parent="Geometry"]
@@ -1594,7 +1587,7 @@ position = Vector2(22572, 414)
 script = ExtResource("block")
 size = Vector2(120, 6)
 style = 2
-seed_value = 957
+seed_value = 956
 one_way = true
 
 [node name="BelfryTeeth" type="Area2D" parent="."]
@@ -1650,7 +1643,7 @@ position = Vector2(21912, 228)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 958
+seed_value = 957
 one_way = true
 
 [node name="NestB" type="StaticBody2D" parent="Geometry"]
@@ -1658,7 +1651,7 @@ position = Vector2(22012, 186)
 script = ExtResource("block")
 size = Vector2(90, 6)
 style = 2
-seed_value = 959
+seed_value = 958
 one_way = true
 
 [node name="ChestKatana" type="Area2D" parent="."]
@@ -1777,7 +1770,7 @@ position = Vector2(23242, 440)
 script = ExtResource("block")
 size = Vector2(200, 40)
 style = 0
-seed_value = 960
+seed_value = 959
 
 [node name="KennelArcherA" type="Marker2D" parent="."]
 position = Vector2(23342, 440)
@@ -1791,7 +1784,7 @@ position = Vector2(23912, 440)
 script = ExtResource("block")
 size = Vector2(200, 40)
 style = 0
-seed_value = 961
+seed_value = 960
 
 [node name="KennelArcherB" type="Marker2D" parent="."]
 position = Vector2(24012, 440)
@@ -1873,14 +1866,14 @@ position = Vector2(24552, 440)
 script = ExtResource("block")
 size = Vector2(100, 20)
 style = 0
-seed_value = 962
+seed_value = 961
 
 [node name="Gallows1" type="StaticBody2D" parent="Geometry"]
 position = Vector2(24732, 398)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 963
+seed_value = 962
 one_way = true
 
 [node name="Gallows2" type="StaticBody2D" parent="Geometry"]
@@ -1888,7 +1881,7 @@ position = Vector2(24884, 356)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 964
+seed_value = 963
 one_way = true
 
 [node name="Gallows3" type="StaticBody2D" parent="Geometry"]
@@ -1896,7 +1889,7 @@ position = Vector2(25034, 314)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 965
+seed_value = 964
 one_way = true
 
 [node name="Gallows4" type="StaticBody2D" parent="Geometry"]
@@ -1904,14 +1897,14 @@ position = Vector2(25178, 314)
 script = ExtResource("block")
 size = Vector2(120, 20)
 style = 0
-seed_value = 966
+seed_value = 965
 
 [node name="Gallows5" type="StaticBody2D" parent="Geometry"]
 position = Vector2(25378, 356)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 967
+seed_value = 966
 one_way = true
 
 [node name="Gallows6" type="StaticBody2D" parent="Geometry"]
@@ -1919,7 +1912,7 @@ position = Vector2(25520, 398)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 968
+seed_value = 967
 one_way = true
 
 [node name="Gallows7" type="StaticBody2D" parent="Geometry"]
@@ -1927,7 +1920,7 @@ position = Vector2(25660, 440)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 969
+seed_value = 968
 one_way = true
 
 [node name="Gallows8" type="StaticBody2D" parent="Geometry"]
@@ -1935,7 +1928,7 @@ position = Vector2(25804, 400)
 script = ExtResource("block")
 size = Vector2(70, 6)
 style = 2
-seed_value = 970
+seed_value = 969
 one_way = true
 
 [node name="Gallows9" type="StaticBody2D" parent="Geometry"]
@@ -1943,7 +1936,7 @@ position = Vector2(25956, 360)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 971
+seed_value = 970
 one_way = true
 
 [node name="Gallows10" type="StaticBody2D" parent="Geometry"]
@@ -1951,7 +1944,7 @@ position = Vector2(26100, 320)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 972
+seed_value = 971
 one_way = true
 
 [node name="Gallows11" type="StaticBody2D" parent="Geometry"]
@@ -1959,7 +1952,7 @@ position = Vector2(26242, 280)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 973
+seed_value = 972
 one_way = true
 
 [node name="Gallows12" type="StaticBody2D" parent="Geometry"]
@@ -1967,14 +1960,14 @@ position = Vector2(26386, 280)
 script = ExtResource("block")
 size = Vector2(130, 20)
 style = 0
-seed_value = 974
+seed_value = 973
 
 [node name="Gallows13" type="StaticBody2D" parent="Geometry"]
 position = Vector2(26598, 322)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 975
+seed_value = 974
 one_way = true
 
 [node name="Gallows14" type="StaticBody2D" parent="Geometry"]
@@ -1982,7 +1975,7 @@ position = Vector2(26742, 364)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 976
+seed_value = 975
 one_way = true
 
 [node name="Gallows15" type="StaticBody2D" parent="Geometry"]
@@ -1990,7 +1983,7 @@ position = Vector2(26884, 406)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 977
+seed_value = 976
 one_way = true
 
 [node name="Gallows16" type="StaticBody2D" parent="Geometry"]
@@ -1998,7 +1991,7 @@ position = Vector2(27028, 448)
 script = ExtResource("block")
 size = Vector2(100, 6)
 style = 2
-seed_value = 978
+seed_value = 977
 one_way = true
 
 [node name="GallowsTeeth" type="Area2D" parent="."]
@@ -2324,7 +2317,7 @@ position = Vector2(28048, 440)
 script = ExtResource("block")
 size = Vector2(220, 40)
 style = 0
-seed_value = 979
+seed_value = 978
 
 [node name="CorrArcher0" type="Marker2D" parent="."]
 position = Vector2(28188, 440)
@@ -2382,14 +2375,14 @@ position = Vector2(29268, 440)
 script = ExtResource("block")
 size = Vector2(100, 20)
 style = 0
-seed_value = 980
+seed_value = 979
 
 [node name="Crown1" type="StaticBody2D" parent="Geometry"]
 position = Vector2(29448, 398)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 981
+seed_value = 980
 one_way = true
 
 [node name="Crown2" type="StaticBody2D" parent="Geometry"]
@@ -2397,7 +2390,7 @@ position = Vector2(29592, 356)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 982
+seed_value = 981
 one_way = true
 
 [node name="Crown3" type="StaticBody2D" parent="Geometry"]
@@ -2405,7 +2398,7 @@ position = Vector2(29736, 314)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 983
+seed_value = 982
 one_way = true
 
 [node name="Crown4" type="StaticBody2D" parent="Geometry"]
@@ -2413,7 +2406,7 @@ position = Vector2(29880, 272)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 984
+seed_value = 983
 one_way = true
 
 [node name="Crown5" type="StaticBody2D" parent="Geometry"]
@@ -2421,14 +2414,14 @@ position = Vector2(30024, 272)
 script = ExtResource("block")
 size = Vector2(120, 20)
 style = 0
-seed_value = 985
+seed_value = 984
 
 [node name="Crown6" type="StaticBody2D" parent="Geometry"]
 position = Vector2(30228, 314)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 986
+seed_value = 985
 one_way = true
 
 [node name="Crown7" type="StaticBody2D" parent="Geometry"]
@@ -2436,7 +2429,7 @@ position = Vector2(30362, 272)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 987
+seed_value = 986
 one_way = true
 
 [node name="Crown8" type="StaticBody2D" parent="Geometry"]
@@ -2444,7 +2437,7 @@ position = Vector2(30496, 230)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 988
+seed_value = 987
 one_way = true
 
 [node name="Crown9" type="StaticBody2D" parent="Geometry"]
@@ -2452,7 +2445,7 @@ position = Vector2(30630, 272)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 989
+seed_value = 988
 one_way = true
 
 [node name="Crown10" type="StaticBody2D" parent="Geometry"]
@@ -2460,7 +2453,7 @@ position = Vector2(30764, 230)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 990
+seed_value = 989
 one_way = true
 
 [node name="Crown11" type="StaticBody2D" parent="Geometry"]
@@ -2468,7 +2461,7 @@ position = Vector2(30898, 272)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 991
+seed_value = 990
 one_way = true
 
 [node name="Crown12" type="StaticBody2D" parent="Geometry"]
@@ -2476,7 +2469,7 @@ position = Vector2(31032, 314)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 992
+seed_value = 991
 one_way = true
 
 [node name="Crown13" type="StaticBody2D" parent="Geometry"]
@@ -2484,14 +2477,14 @@ position = Vector2(31166, 314)
 script = ExtResource("block")
 size = Vector2(110, 20)
 style = 0
-seed_value = 993
+seed_value = 992
 
 [node name="Crown14" type="StaticBody2D" parent="Geometry"]
 position = Vector2(31360, 272)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 994
+seed_value = 993
 one_way = true
 
 [node name="Crown15" type="StaticBody2D" parent="Geometry"]
@@ -2499,7 +2492,7 @@ position = Vector2(31494, 230)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 995
+seed_value = 994
 one_way = true
 
 [node name="Crown16" type="StaticBody2D" parent="Geometry"]
@@ -2507,7 +2500,7 @@ position = Vector2(31628, 272)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 996
+seed_value = 995
 one_way = true
 
 [node name="Crown17" type="StaticBody2D" parent="Geometry"]
@@ -2515,7 +2508,7 @@ position = Vector2(31762, 314)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 997
+seed_value = 996
 one_way = true
 
 [node name="Crown18" type="StaticBody2D" parent="Geometry"]
@@ -2523,7 +2516,7 @@ position = Vector2(31896, 356)
 script = ExtResource("block")
 size = Vector2(50, 6)
 style = 2
-seed_value = 998
+seed_value = 997
 one_way = true
 
 [node name="Crown19" type="StaticBody2D" parent="Geometry"]
@@ -2531,7 +2524,7 @@ position = Vector2(32030, 398)
 script = ExtResource("block")
 size = Vector2(60, 6)
 style = 2
-seed_value = 999
+seed_value = 998
 one_way = true
 
 [node name="Crown20" type="StaticBody2D" parent="Geometry"]
@@ -2539,7 +2532,7 @@ position = Vector2(32174, 440)
 script = ExtResource("block")
 size = Vector2(100, 6)
 style = 2
-seed_value = 1000
+seed_value = 999
 one_way = true
 
 [node name="CrownTeeth" type="Area2D" parent="."]

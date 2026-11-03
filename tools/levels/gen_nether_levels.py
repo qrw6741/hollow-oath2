@@ -323,7 +323,7 @@ wall_id = &"lh_hollow_wall"
 hits_needed = 3''')
     L.use("wall")
     L.block("AlcoveRoof", 7250, 380, 230, 14, style=0)
-    L.block("AlcoveBack", 7460, 394, 20, 76, style=0)
+    # (no back wall: the alcove is a lintel over the road, so the road to the gate stays open once the wall is broken)
     _lever(L, "LeverD", 7370, 480, "lh_lever_d", 0.0, "hidden ward")
     _gate(L, "Gate1", 7640, "lh_gate_1", ["lh_lever_a", "lh_lever_b", "lh_lever_c", "lh_lever_d"])
     L.candle("Candle4", 7780, 480, "lower_hell_candle_4", "First Portcullis Candle")
