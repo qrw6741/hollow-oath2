@@ -8,8 +8,8 @@ extends Area2D
 @export var seq_id: StringName = &"runes"
 @export var index := 0
 @export var total := 3
-## Glyph: 0 moon, 1 eye, 2 hand, 3 flame.
-@export_range(0, 3) var glyph := 0
+## Glyph: 0 moon, 1 eye, 2 hand, 3 flame, 4 crown, 5 skull.
+@export_range(0, 5) var glyph := 0
 
 var lit := false
 var _player_inside: Player
@@ -94,5 +94,14 @@ func _draw() -> void:
 				draw_line(c + Vector2(0, 6), c + Vector2(-8 + i * 4, -8 - (2 - absf(i - 2)) * 1.5), col, 1.6)
 		3:
 			draw_colored_polygon(PackedVector2Array([c + Vector2(-6, 8), c + Vector2(-3, -2), c + Vector2(0, -10), c + Vector2(3, -2), c + Vector2(6, 8)]), col)
+		4:
+			draw_polyline(PackedVector2Array([c + Vector2(-8, 7), c + Vector2(-8, -4), c + Vector2(-4, 1), c + Vector2(0, -8), c + Vector2(4, 1), c + Vector2(8, -4), c + Vector2(8, 7), c + Vector2(-8, 7)]), col, 1.8)
+		5:
+			draw_arc(c + Vector2(0, -2), 7.0, PI, TAU, 8, col, 1.8)
+			draw_line(c + Vector2(-7, -2), c + Vector2(-5, 6), col, 1.8)
+			draw_line(c + Vector2(7, -2), c + Vector2(5, 6), col, 1.8)
+			draw_line(c + Vector2(-5, 6), c + Vector2(5, 6), col, 1.8)
+			draw_circle(c + Vector2(-3, -1), 1.6, col)
+			draw_circle(c + Vector2(3, -1), 1.6, col)
 	if lit:
 		draw_circle(c, 14.0 + sin(_t * 4.0), Color(0.6, 0.35, 1.0, 0.15))

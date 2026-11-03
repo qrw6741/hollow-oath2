@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_jutsu_and_camera, test_lower_hell, test_elder_and_meteor, test_dev_damage_mults, test_cutscene_lock, test_travel_order, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_jutsu_and_camera, test_lever_interaction, test_lower_hell, test_elder_and_meteor, test_dev_damage_mults, test_cutscene_lock, test_travel_order, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -5133,6 +5133,22 @@ func test_jutsu_and_camera() -> void:
 	check(not cam._cine and cam.zoom.is_equal_approx(Vector2.ONE), "a new player resets the camera")
 
 
+func test_lever_interaction() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	Puzzle.reset_session()
+	await go_to_level("res://world/levels/lower_hell.tscn", &"")
+	var lv: Node = level.get_node("LeverA")
+	player.global_position = lv.global_position + Vector2(0, -2)
+	await frames(30)
+	check(player.is_on_floor(), "player stands on the floor at the lever")
+	check(lv._player_inside == player, "the lever sees the player in its zone")
+	await press(&"interact", 3)
+	await frames(5)
+	check(Puzzle.is_on(&"lh_lever_a"), "pressing Interact at the lever throws it")
+	check((level.get_node("Gate1") as PuzzleGate).lit_count() == 1, "the gate shows one ward lit")
+
+
 func test_lower_hell() -> void:
 	await fresh_game()
 	game_state.in_game = true
@@ -5143,43 +5159,60 @@ func test_lower_hell() -> void:
 		if c is BossArena:
 			arenas += 1
 	check(arenas == 1, "the Lower Hell has exactly one boss arena (the fox), no other mini-bosses (%d)" % arenas)
-	for n in ["Gate1", "Gate2", "Gate3", "LeverA", "LeverB", "LeverC", "RuneMoon", "RuneFlame", "RuneEye", "RuneHand", "RunLeverA", "RunLeverB", "ToothGate", "FoxArena", "Candle0", "Candle3"]:
+	for n in ["Gate1", "Gate2", "Gate3", "LeverA", "LeverB", "LeverC", "LeverD", "HollowWall", "RuneMoon", "RuneFlame", "RuneEye", "RuneHand", "RuneCrown", "RunLeverX", "RunLeverY", "RunLeverZ", "ToothGate", "FoxArena", "Candle0", "Candle3"]:
 		check(level.get_node_or_null(n) != null, "%s exists" % n)
+	check(level.bounds.size.x >= 12000.0, "the Lower Hell is a long castle (%d px)" % int(level.bounds.size.x))
+	check((level.get_node("Hall") as DescentBackdrop).theme == DescentBackdrop.Look.CASTLE, "the Lower Hell has the castle backdrop")
+	var props := 0
+	for c in level.get_children():
+		if c is CastleProp:
+			props += 1
+	check(props >= 30, "the castle is furnished with props (%d)" % props)
 	var g1: PuzzleGate = level.get_node("Gate1")
 	check(not g1.is_open() and not g1.solved(), "the first gate starts shut")
 	Puzzle.set_on(&"lh_lever_a")
 	Puzzle.set_on(&"lh_lever_b")
-	await frames(30)
-	check(not g1.is_open(), "two of three levers do not open it")
 	Puzzle.set_on(&"lh_lever_c")
 	await frames(30)
-	check(g1.is_open(), "all three levers open the gate")
-	await frames(90)
+	check(not g1.is_open() and g1.lit_count() == 3, "three of four wards do not open it")
+	Puzzle.set_on(&"lh_lever_d")
+	await frames(30)
+	check(g1.is_open(), "all four wards open the gate")
+	await frames(150)
 	check(g1._shape.disabled, "an open gate no longer blocks")
-	# the rune order: a wrong stone resets, the right order solves
+	# walk through the open gate for real
+	await place_player(g1.global_position.x - 90.0, 480.0, 1)
+	Input.action_press(&"move_right")
+	await frames(150)
+	Input.action_release(&"move_right")
+	check(player.global_position.x > g1.global_position.x + 40.0, "the player walks through the open gate (x %d)" % int(player.global_position.x))
+	# the rune order (crown, eye, hand, flame, moon): a wrong stone resets, the right order solves
 	var runes := {}
-	for n in ["RuneMoon", "RuneFlame", "RuneEye", "RuneHand"]:
+	for n in ["RuneCrown", "RuneEye", "RuneHand", "RuneFlame", "RuneMoon"]:
 		runes[n] = level.get_node(n)
 	runes["RuneFlame"].touch()
 	check(Puzzle.progress(&"lh_runes") == 0 and not Puzzle.is_on(&"lh_runes"), "a wrong first stone lights nothing")
-	runes["RuneMoon"].touch()
-	runes["RuneFlame"].touch()
+	runes["RuneCrown"].touch()
+	runes["RuneEye"].touch()
 	check(Puzzle.progress(&"lh_runes") == 2, "the right stones light in order")
-	runes["RuneHand"].touch()
+	runes["RuneMoon"].touch()
 	check(Puzzle.progress(&"lh_runes") == 0, "a wrong stone puts every stone out")
-	for n in ["RuneMoon", "RuneFlame", "RuneEye", "RuneHand"]:
+	for n in ["RuneCrown", "RuneEye", "RuneHand", "RuneFlame", "RuneMoon"]:
 		runes[n].touch()
-	check(Puzzle.is_on(&"lh_runes"), "the four stones in order solve the puzzle")
+	check(Puzzle.is_on(&"lh_runes"), "the five stones in order solve the puzzle")
 	await frames(30)
 	check((level.get_node("Gate2") as PuzzleGate).is_open(), "the rune gate opens")
-	# timed levers: both on at once opens the last gate; one alone expires
-	Puzzle.set_on(&"lh_run_a", 0.3)
+	# timed levers: all three on at once opens the last gate; one alone expires
+	Puzzle.set_on(&"lh_run_x", 0.3)
 	await frames(40)
-	check(not Puzzle.is_on(&"lh_run_a"), "a timed lever springs back")
-	Puzzle.set_on(&"lh_run_a", 5.0)
-	Puzzle.set_on(&"lh_run_b", 5.0)
+	check(not Puzzle.is_on(&"lh_run_x"), "a timed lever springs back")
+	Puzzle.set_on(&"lh_run_x", 5.0)
+	Puzzle.set_on(&"lh_run_y", 5.0)
 	await frames(30)
-	check((level.get_node("Gate3") as PuzzleGate).is_open(), "both timed levers held at once open the last gate")
+	check(not (level.get_node("Gate3") as PuzzleGate).is_open(), "two of three timed levers do not open the last gate")
+	Puzzle.set_on(&"lh_run_z", 5.0)
+	await frames(30)
+	check((level.get_node("Gate3") as PuzzleGate).is_open(), "all three timed levers held at once open the last gate")
 	# the fox
 	var fox := (load("res://actors/bosses/tooth_fox.tscn") as PackedScene).instantiate() as BossBase
 	var leaps := 0

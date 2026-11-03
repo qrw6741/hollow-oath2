@@ -82,7 +82,7 @@ func _draw() -> void:
 	var grow := clampf(age / 0.35, 0.0, 1.0)
 	var fade := clampf((life - age) / 1.0, 0.0, 1.0)
 	var h := height * grow
-	for i in 5:
+	for i in (5 if h > 1.5 else 0):
 		var k := float(i) / 4.0
 		var x := (k - 0.5) * width * 0.8
 		var sway := sin(_t * 7.0 + _seed + i * 1.7) * 3.0

@@ -43,6 +43,8 @@ func _draw() -> void:
 
 
 func _flame(base: Vector2, h: float, w: float, seed_: float, col: Color) -> void:
+	if h < 1.5 or w < 0.5:
+		return
 	var sway := sin(_t * 9.0 + seed_) * w * 0.4
 	var top := base + Vector2(sway, -h * (0.8 + 0.2 * sin(_t * 7.0 + seed_ * 1.3)))
 	draw_colored_polygon(PackedVector2Array([base + Vector2(-w, 0), top, base + Vector2(w, 0)]), col)
@@ -104,7 +106,7 @@ func _pose(off: Vector2) -> void:
 	# legs: thick basalt columns with glowing knees and cracked shins
 	for side in [-1, 1]:
 		var ls: float = legs * side * -1.0
-		var hip := Vector2(side * 7.0, -24 + crouch)
+		var hip := Vector2(side * 7.0, minf(-24.0 + crouch, -10.0))   ## a deep crouch must not fold the leg inside out
 		var foot := Vector2(side * 8.0 + ls, 0)
 		draw_colored_polygon(PackedVector2Array([hip + Vector2(-6, 0), hip + Vector2(6, 0), foot + Vector2(5, -4), foot + Vector2(7, 0), foot + Vector2(-7, 0), foot + Vector2(-5, -4)]), rock)
 		draw_line(hip + Vector2(0, 4), foot + Vector2(0, -6), mid if not _ink else rock, 1.2)

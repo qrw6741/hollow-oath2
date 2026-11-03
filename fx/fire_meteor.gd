@@ -109,4 +109,5 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, 9.0 * p, Color(1.0, 0.5, 0.12))
 	draw_circle(Vector2.ZERO, 5.0 * p, Color(1.0, 0.9, 0.5))
 	var back := -velocity.normalized()
-	draw_colored_polygon(PackedVector2Array([back * 10.0 + back.orthogonal() * 8.0, back * 34.0, back * 10.0 - back.orthogonal() * 8.0]), Color(1.0, 0.45, 0.1, 0.6))
+	if velocity.length() > 1.0:
+		draw_colored_polygon(PackedVector2Array([back * 10.0 + back.orthogonal() * 8.0, back * 34.0, back * 10.0 - back.orthogonal() * 8.0]), Color(1.0, 0.45, 0.1, 0.6))

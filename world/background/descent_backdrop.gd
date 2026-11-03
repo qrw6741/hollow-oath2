@@ -6,7 +6,7 @@ extends Node2D
 ## for the part of the map on screen, from a per-slot seed so it is identical every time.
 ## Replaces the manor hall in the eleven Descent maps.
 
-enum Look { OSSUARY, TALLOW, ARCHIVE, ORCHARD, MARKET, VAULTS, GALLERY, FORGE, CLOISTER, BARROW, HEART, NETHER }
+enum Look { OSSUARY, TALLOW, ARCHIVE, ORCHARD, MARKET, VAULTS, GALLERY, FORGE, CLOISTER, BARROW, HEART, NETHER, CASTLE }
 
 @export var theme: Look = Look.OSSUARY:
 	set(v): theme = v; queue_redraw()
@@ -29,6 +29,7 @@ const PAL := [
 	[Color("12101a"), Color("26223a"), Color("1c182c"), Color("2e2842"), Color("e0c860"), Color("c8c0e8")],  # barrow
 	[Color("1c0810"), Color("4a1424"), Color("340c18"), Color("5a1a2c"), Color("ff5070"), Color("ff8090")],  # heart
 	[Color("070104"), Color("2c0606"), Color("1a0508"), Color("3a0a0a"), Color("ff3a14"), Color("ff7a30")],  # nether
+	[Color("0c0712"), Color("2a1722"), Color("1a0e1c"), Color("2e1a2a"), Color("ff8a3c"), Color("ffb070")],  # castle
 ]
 
 var _t := 0.0
@@ -93,6 +94,8 @@ func _draw() -> void:
 	_shafts(v, pal)
 	_layer(v, pal, 0.45, 0.8, pal[2], 1)
 	_layer(v, pal, 0.75, 1.0, pal[3], 2)
+	if theme == Look.CASTLE:
+		_castle_bays(v, pal)
 	_haze(v, pal)
 	_particles(v, pal)
 
@@ -205,6 +208,25 @@ func _shape(o: Vector2, rng: RandomNumberGenerator, sc: float, col: Color, pal: 
 			draw_circle(Vector2(o.x + kw * 0.5, o.y - kh + 40.0 * sc), 9.0 * sc, f)
 			_poly([Vector2(o.x + kw * 0.5 - 14.0 * sc, o.y - kh + 52.0 * sc), Vector2(o.x + kw * 0.5 + 14.0 * sc, o.y - kh + 52.0 * sc), Vector2(o.x + kw * 0.5 + 18.0 * sc, o.y - 24.0), Vector2(o.x + kw * 0.5 - 18.0 * sc, o.y - 24.0)], f)
 			draw_rect(Rect2(o.x + kw * 0.5 - 12.0 * sc, o.y - kh + 28.0 * sc, 24.0 * sc, 5.0 * sc), Color(glow, 0.55))
+		Look.CASTLE:  # far: crenellated towers and spires; near: columns under vault ribs
+			if salt == 1:
+				var tw := (46.0 + 34.0 * h) * sc
+				var th := (150.0 + 170.0 * h) * sc
+				draw_rect(Rect2(o.x, o.y - th, tw, th), col)
+				var n := int(tw / (10.0 * sc))
+				for i in n:
+					if i % 2 == 0:
+						draw_rect(Rect2(o.x + i * 10.0 * sc, o.y - th - 8.0 * sc, 8.0 * sc, 8.0 * sc), col)
+				if rng.randf() < 0.5:
+					_poly([Vector2(o.x - 4.0, o.y - th - 8.0 * sc), Vector2(o.x + tw * 0.5, o.y - th - 74.0 * sc), Vector2(o.x + tw + 4.0, o.y - th - 8.0 * sc)], col)
+				draw_rect(Rect2(o.x + tw * 0.5 - 2.0, o.y - th * 0.62, 4.0 * sc, 15.0 * sc), Color(glow, 0.45 * flick))
+			else:
+				var cw := 24.0 * sc
+				var chh := (270.0 + 60.0 * h) * sc
+				draw_rect(Rect2(o.x, o.y - chh, cw, chh), col)
+				draw_rect(Rect2(o.x - 5.0, o.y - chh, cw + 10.0, 12.0), col.lightened(0.06))
+				draw_rect(Rect2(o.x - 6.0, o.y - 14.0, cw + 12.0, 14.0), col.lightened(0.06))
+				draw_arc(Vector2(o.x + 72.0 * sc, o.y - chh + 8.0), 72.0 * sc, PI, TAU, 16, col, 7.0 * sc)
 		Look.NETHER:  # jagged basalt spires over a lava glow, with hanging chains
 			var sw := (40.0 + 50.0 * h) * sc
 			var sh := (120.0 + 190.0 * h) * sc
@@ -222,6 +244,112 @@ func _shape(o: Vector2, rng: RandomNumberGenerator, sc: float, col: Color, pal: 
 			draw_arc(Vector2(o.x + 40.0, o.y - 30.0), rh * 0.4, -PI * 0.2, -PI * 0.8, 12, vein, 2.5 * sc)
 			if rng.randf() < 0.3:
 				draw_circle(Vector2(o.x, o.y - rh * 0.5), 10.0 * sc * (1.0 + 0.3 * beat), Color(glow, 0.18 + 0.2 * beat))
+
+
+## The castle's world-locked wall bays: a column, then (by bay) a pointed window with a smouldering
+## glow, a tattered banner, a pair of wall torches, a knight in a niche, or a hanging chandelier.
+func _castle_bays(v: Rect2, pal: Array) -> void:
+	var glow: Color = pal[4]
+	var wall: Color = (pal[1] as Color).lightened(0.05)
+	var stone: Color = (pal[3] as Color).lightened(0.12)
+	var bay := 340.0
+	var k0 := int(floorf(maxf(v.position.x, 0.0) / bay)) - 1
+	var k1 := int(ceilf(minf(v.end.x, width) / bay)) + 1
+	var top := ceiling_y
+	var bot := floor_y
+	# mortar courses
+	var x0 := maxf(0.0, v.position.x - 10.0)
+	var x1 := minf(width, v.end.x + 10.0)
+	var cy := top + 24.0
+	var row := 0
+	while cy < bot - 6.0:
+		draw_line(Vector2(x0, cy), Vector2(x1, cy), Color(0, 0, 0, 0.16), 1.0)
+		var jx := floorf(x0 / 64.0) * 64.0 + (32.0 if row % 2 == 0 else 0.0)
+		while jx < x1:
+			draw_line(Vector2(jx, cy), Vector2(jx, cy + 24.0), Color(0, 0, 0, 0.1), 1.0)
+			jx += 64.0
+		cy += 24.0
+		row += 1
+	for k in range(k0, k1 + 1):
+		if k < 0:
+			continue
+		var bx := float(k) * bay
+		var rng := RandomNumberGenerator.new()
+		rng.seed = (k * 6151 + seed_value * 17) & 0x7fffffff
+		var flick := 0.6 + 0.4 * sin(_t * 3.0 + float(k) * 1.9)
+		# the column that opens the bay
+		draw_rect(Rect2(bx, top, 30.0, bot - top), stone)
+		draw_rect(Rect2(bx + 4.0, top, 4.0, bot - top), stone.lightened(0.1))
+		draw_rect(Rect2(bx - 6.0, top, 42.0, 14.0), stone.lightened(0.05))
+		draw_rect(Rect2(bx - 6.0, bot - 16.0, 42.0, 16.0), stone.lightened(0.05))
+		var mx := bx + bay * 0.5 + 15.0
+		match rng.randi_range(0, 4):
+			0:  # pointed window with tracery and an ember sky
+				var ww := 74.0
+				var wt := top + 52.0
+				var wb := bot - 96.0
+				draw_rect(Rect2(mx - ww * 0.5 - 6.0, wt - 6.0, ww + 12.0, wb - wt + 6.0), stone.darkened(0.2))
+				draw_colored_polygon(PackedVector2Array([Vector2(mx - ww * 0.5, wb), Vector2(mx - ww * 0.5, wt + 30.0), Vector2(mx, wt - 26.0), Vector2(mx + ww * 0.5, wt + 30.0), Vector2(mx + ww * 0.5, wb)]), Color(0.16, 0.04, 0.05))
+				draw_colored_polygon(PackedVector2Array([Vector2(mx - ww * 0.5 + 6.0, wb - 4.0), Vector2(mx - ww * 0.5 + 6.0, wt + 32.0), Vector2(mx, wt - 16.0), Vector2(mx + ww * 0.5 - 6.0, wt + 32.0), Vector2(mx + ww * 0.5 - 6.0, wb - 4.0)]), Color(glow, 0.20 + 0.06 * flick))
+				draw_line(Vector2(mx, wt - 20.0), Vector2(mx, wb), stone.darkened(0.3), 3.0)
+				draw_line(Vector2(mx - ww * 0.5, wt + 62.0), Vector2(mx + ww * 0.5, wt + 62.0), stone.darkened(0.3), 3.0)
+				draw_arc(Vector2(mx, wt + 30.0), 16.0, PI, TAU, 8, stone.darkened(0.3), 2.0)
+				_poly([Vector2(mx - 20.0, wb), Vector2(mx + 20.0, wb), Vector2(mx + 90.0, bot), Vector2(mx - 40.0, bot)], Color(glow, 0.05 + 0.02 * flick))
+			1:  # tattered banner with a sigil
+				var bw := 50.0
+				var bh := 168.0 + 30.0 * rng.randf()
+				draw_rect(Rect2(mx - bw * 0.5 - 8.0, top + 14.0, bw + 16.0, 5.0), Color("4a3a2a"))
+				_poly([Vector2(mx - bw * 0.5, top + 19.0), Vector2(mx + bw * 0.5, top + 19.0), Vector2(mx + bw * 0.5, top + bh), Vector2(mx + bw * 0.17, top + bh - 18.0), Vector2(mx - bw * 0.17, top + bh), Vector2(mx - bw * 0.5, top + bh - 12.0)], Color(0.34, 0.07, 0.1))
+				draw_line(Vector2(mx - bw * 0.5 + 4.0, top + 24.0), Vector2(mx - bw * 0.5 + 4.0, top + bh - 14.0), Color(0.5, 0.12, 0.14), 1.0)
+				var sc2 := Vector2(mx, top + bh * 0.42)
+				match rng.randi_range(0, 2):
+					0: draw_arc(sc2, 11.0, 0.9, 5.4, 12, Color(0.85, 0.7, 0.4, 0.8), 2.0)
+					1:
+						draw_arc(sc2, 11.0, PI + 0.4, TAU - 0.4, 8, Color(0.85, 0.7, 0.4, 0.8), 1.8)
+						draw_arc(sc2, 11.0, 0.4, PI - 0.4, 8, Color(0.85, 0.7, 0.4, 0.8), 1.8)
+						draw_circle(sc2, 3.0, Color(0.85, 0.7, 0.4, 0.8))
+					_:
+						for i in 5:
+							draw_line(sc2 + Vector2(0, 9), sc2 + Vector2(-10 + i * 5, -9), Color(0.85, 0.7, 0.4, 0.8), 1.8)
+			2:  # two wall torches
+				for dx in [-62.0, 62.0]:
+					var tx: float = mx + dx
+					var ty: float = bot - 190.0
+					draw_rect(Rect2(tx - 2.0, ty, 4.0, 22.0), Color("3a2a20"))
+					draw_rect(Rect2(tx - 7.0, ty - 4.0, 14.0, 6.0), Color("56463a"))
+					_poly([Vector2(tx - 5.0, ty - 4.0), Vector2(tx, ty - 22.0 * flick - 6.0), Vector2(tx + 5.0, ty - 4.0)], Color(1.0, 0.55, 0.15, 0.9))
+					_poly([Vector2(tx - 2.5, ty - 4.0), Vector2(tx, ty - 12.0 * flick - 4.0), Vector2(tx + 2.5, ty - 4.0)], Color(1.0, 0.9, 0.5, 0.9))
+					draw_circle(Vector2(tx, ty - 10.0), 34.0, Color(glow, 0.07 * flick))
+			3:  # a knight in a niche
+				var nw := 60.0
+				var nt := top + 84.0
+				draw_rect(Rect2(mx - nw * 0.5, nt + 20.0, nw, bot - nt - 20.0 - 30.0), stone.darkened(0.45))
+				draw_arc(Vector2(mx, nt + 20.0), nw * 0.5, PI, TAU, 10, stone.darkened(0.45), 3.0)
+				draw_colored_polygon(PackedVector2Array(_arc_pts(Vector2(mx, nt + 20.0), nw * 0.5)), stone.darkened(0.45))
+				var kc := stone.lightened(0.04)
+				draw_circle(Vector2(mx, nt + 38.0), 8.0, kc)
+				draw_rect(Rect2(mx - 3.0, nt + 36.0, 6.0, 3.0), Color(glow, 0.6))
+				_poly([Vector2(mx - 13.0, nt + 48.0), Vector2(mx + 13.0, nt + 48.0), Vector2(mx + 15.0, bot - 66.0), Vector2(mx - 15.0, bot - 66.0)], kc)
+				draw_line(Vector2(mx + 18.0, nt + 42.0), Vector2(mx + 18.0, bot - 36.0), Color(kc.lightened(0.15)), 3.0)
+				draw_rect(Rect2(mx - 26.0, bot - 36.0, 52.0, 8.0), stone)
+			_:  # a chandelier on a long chain
+				var cx := mx
+				var cyy := top + 120.0 + 14.0 * sin(_t * 0.8 + float(k))
+				draw_line(Vector2(cx, top), Vector2(cx, cyy), Color("4a4038"), 2.0)
+				draw_arc(Vector2(cx, cyy + 4.0), 30.0, 0.15, PI - 0.15, 10, Color("4a4038"), 3.0)
+				for i in 5:
+					var px := cx - 26.0 + i * 13.0
+					draw_rect(Rect2(px - 1.5, cyy + 6.0, 3.0, 9.0), Color("d8ccb0"))
+					draw_circle(Vector2(px, cyy + 3.0), 2.4 * flick + 0.6, Color(1.0, 0.8, 0.4, 0.95))
+				draw_circle(Vector2(cx, cyy + 6.0), 54.0, Color(glow, 0.06 * flick))
+
+
+func _arc_pts(c: Vector2, r: float) -> Array:
+	var pts := []
+	for i in range(0, 11):
+		var a := PI + PI * float(i) / 10.0
+		pts.append(c + Vector2(cos(a), sin(a)) * r)
+	return pts
 
 
 func _shafts(v: Rect2, pal: Array) -> void:

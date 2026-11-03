@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -6,22 +6,27 @@
 [ext_resource type="Script" path="res://world/blocks/stone_block.gd" id="block"]
 [ext_resource type="Script" path="res://world/transitions/level_entry.gd" id="entry"]
 [ext_resource type="Script" path="res://world/transitions/level_exit.gd" id="exit"]
+[ext_resource type="Script" path="res://world/puzzle/castle_prop.gd" id="prop"]
 [ext_resource type="PackedScene" path="res://world/checkpoint/oath_candle.tscn" id="candle"]
 [ext_resource type="Script" path="res://world/story/lore_tablet.gd" id="tablet"]
 [ext_resource type="Resource" path="res://data/items/fox_tooth.tres" id="it_tooth"]
-[ext_resource type="Script" path="res://world/puzzle/lever.gd" id="lever"]
-[ext_resource type="Script" path="res://world/hazards/fire_jet.gd" id="jet"]
 [ext_resource type="Script" path="res://world/spawners/enemy_spawner.gd" id="spawner"]
-[ext_resource type="PackedScene" path="res://actors/enemies/oathguard_captain.tscn" id="captain"]
-[ext_resource type="PackedScene" path="res://actors/enemies/swollen_pilgrim.tscn" id="bloat"]
-[ext_resource type="Script" path="res://world/puzzle/puzzle_gate.gd" id="pgate"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gilded_penitent.tscn" id="gilded"]
+[ext_resource type="PackedScene" path="res://actors/enemies/roadside_pikeman.tscn" id="pikeman"]
+[ext_resource type="Script" path="res://world/hazards/spike_pit.gd" id="spikes"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_archer.tscn" id="archer"]
 [ext_resource type="Script" path="res://world/pickups/treasure_chest.gd" id="chest"]
 [ext_resource type="Resource" path="res://data/items/pilgrims_draught.tres" id="it_draught"]
-[ext_resource type="Script" path="res://world/puzzle/rune_stone.gd" id="rune"]
-[ext_resource type="Script" path="res://world/hazards/spike_pit.gd" id="spikes"]
-[ext_resource type="PackedScene" path="res://actors/enemies/gilded_penitent.tscn" id="gilded"]
 [ext_resource type="PackedScene" path="res://actors/enemies/candle_cantor.tscn" id="cantor"]
+[ext_resource type="PackedScene" path="res://actors/enemies/pike_sergeant.tscn" id="sergeant"]
+[ext_resource type="Script" path="res://world/hazards/fire_jet.gd" id="jet"]
+[ext_resource type="PackedScene" path="res://actors/enemies/oathguard_captain.tscn" id="captain"]
+[ext_resource type="PackedScene" path="res://actors/enemies/wick_mender.tscn" id="mender"]
 [ext_resource type="Resource" path="res://data/items/ember_shard.tres" id="it_shard"]
+[ext_resource type="Script" path="res://world/puzzle/lever.gd" id="lever"]
+[ext_resource type="Script" path="res://world/blocks/breakable_wall.gd" id="wall"]
+[ext_resource type="Script" path="res://world/puzzle/puzzle_gate.gd" id="pgate"]
+[ext_resource type="Script" path="res://world/puzzle/rune_stone.gd" id="rune"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
 [ext_resource type="PackedScene" path="res://actors/bosses/tooth_fox.tscn" id="foxboss"]
 
@@ -29,7 +34,7 @@
 script = ExtResource("level")
 level_id = &"lower_hell"
 display_name = "The Lower Hell"
-bounds = Rect2(0, 0, 7000, 540)
+bounds = Rect2(0, 0, 13400, 540)
 music = &"catacombs"
 music_pitch = 0.42
 map_origin = Vector2(51800, -1750)
@@ -38,14 +43,14 @@ default_spawn = Vector2(130, 480)
 [node name="Hall" type="Node2D" parent="."]
 z_index = -10
 script = ExtResource("backdrop")
-theme = 11
-width = 7000.0
+theme = 12
+width = 13400.0
 floor_y = 480.0
 ceiling_y = 96.0
 seed_value = 779
 
 [node name="Light" type="CanvasModulate" parent="."]
-color = Color(0.72, 0.38, 0.5, 1)
+color = Color(0.86, 0.68, 0.78, 1)
 
 [node name="Geometry" type="Node2D" parent="."]
 
@@ -59,12 +64,12 @@ seed_value = 901
 [node name="Ground" type="StaticBody2D" parent="Geometry"]
 position = Vector2(16, 480)
 script = ExtResource("block")
-size = Vector2(6984, 60)
-style = 4
+size = Vector2(13384, 60)
+style = 0
 seed_value = 902
 
 [node name="CliffRight" type="StaticBody2D" parent="Geometry"]
-position = Vector2(6940, 0)
+position = Vector2(13340, 0)
 script = ExtResource("block")
 size = Vector2(60, 540)
 style = 1
@@ -73,7 +78,7 @@ seed_value = 903
 [node name="Ceiling" type="StaticBody2D" parent="Geometry"]
 position = Vector2(0, 40)
 script = ExtResource("block")
-size = Vector2(7000, 56)
+size = Vector2(13400, 56)
 style = 1
 seed_value = 904
 
@@ -94,16 +99,43 @@ target_level = "res://world/levels/ninth_hell.tscn"
 target_entry = &"from_lower"
 size = Vector2(12, 80)
 
+[node name="LandCarpet" type="Node2D" parent="."]
+position = Vector2(240, 480)
+script = ExtResource("prop")
+kind = 2
+span = 820.0
+
+[node name="LandBrazier0" type="Node2D" parent="."]
+position = Vector2(330, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="LandBrazier1" type="Node2D" parent="."]
+position = Vector2(700, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="LandStatue" type="Node2D" parent="."]
+position = Vector2(1050, 480)
+script = ExtResource("prop")
+kind = 1
+
 [node name="Candle0" parent="." instance=ExtResource("candle")]
-position = Vector2(380, 480)
+position = Vector2(430, 480)
 checkpoint_id = &"lower_hell_candle_0"
 display_name = "Hand's Landing Candle"
 
 [node name="Tablet0" type="Area2D" parent="."]
-position = Vector2(560, 480)
+position = Vector2(580, 480)
 script = ExtResource("tablet")
 title = "Set Down"
-text = "The hand did not drop you. It set you down, the way a hand sets down something it means to come back for."
+text = "The hand did not drop you. It set you down, the way a hand sets down something it means to come back for. Above you there is no sky. There is a ceiling, and it has been swept."
+
+[node name="ToothTablet" type="Area2D" parent="."]
+position = Vector2(790, 480)
+script = ExtResource("tablet")
+title = "The Keyhole"
+text = "A door beneath the stair. No handle, no hinge: only a keyhole the shape of a tooth. Something further in keeps what fits it."
 
 [node name="ToothGate" type="Area2D" parent="."]
 position = Vector2(960, 480)
@@ -118,258 +150,704 @@ display_name = "the Tooth Gate"
 locked_text = "A door with no handle. The keyhole is shaped like a tooth."
 unlock_text = "The tooth fits. The door swings in."
 
-[node name="ToothTablet" type="Area2D" parent="."]
-position = Vector2(780, 480)
+[node name="CastleTablet" type="Area2D" parent="."]
+position = Vector2(1220, 480)
 script = ExtResource("tablet")
-title = "The Keyhole"
-text = "A door beneath the stair. No handle, no hinge: only a keyhole the shape of a tooth. Something up ahead keeps what fits it."
+title = "A Lid"
+text = "A castle. Under hell. Nobody built it: it was lowered, the way a lid is lowered over a pot, and whatever is in the pot has been quiet for a very long time. Walk softly. The guards are still on their rounds."
 
-[node name="LeverTablet" type="Area2D" parent="."]
-position = Vector2(1150, 480)
-script = ExtResource("tablet")
-title = "Three Hands"
-text = "THREE LEVERS HOLD THE FIRST GATE. One stands in the open. One is above, where the dead cannot climb. One is behind the fire. All three must be thrown."
+[node name="WardBrazier0" type="Node2D" parent="."]
+position = Vector2(1330, 480)
+script = ExtResource("prop")
+kind = 0
 
-[node name="LeverA" type="Area2D" parent="."]
-position = Vector2(1450, 480)
-script = ExtResource("lever")
-lever_id = &"lh_lever_a"
-seconds = 0.0
-display_name = "first lever"
+[node name="WardRack" type="Node2D" parent="."]
+position = Vector2(1470, 480)
+script = ExtResource("prop")
+kind = 4
 
-[node name="Step1" type="StaticBody2D" parent="Geometry"]
-position = Vector2(1700, 452)
+[node name="WardStatue0" type="Node2D" parent="."]
+position = Vector2(1640, 480)
+script = ExtResource("prop")
+kind = 1
+
+[node name="WardCage0" type="Node2D" parent="."]
+position = Vector2(1850, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="WardBrazier1" type="Node2D" parent="."]
+position = Vector2(1960, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="WardBarrels" type="Node2D" parent="."]
+position = Vector2(2330, 480)
+script = ExtResource("prop")
+kind = 6
+
+[node name="WardGargoyle" type="Node2D" parent="."]
+position = Vector2(2560, 480)
+script = ExtResource("prop")
+kind = 7
+
+[node name="WardBrazier2" type="Node2D" parent="."]
+position = Vector2(2720, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="WardStatue1" type="Node2D" parent="."]
+position = Vector2(2860, 480)
+script = ExtResource("prop")
+kind = 1
+
+[node name="WardFoe0" type="Marker2D" parent="."]
+position = Vector2(1560, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 50
+start_facing = -1
+
+[node name="WardFoe1" type="Marker2D" parent="."]
+position = Vector2(2050, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 60
+start_facing = -1
+
+[node name="WardSpikesA" type="Area2D" parent="."]
+position = Vector2(1760, 480)
+script = ExtResource("spikes")
+width = 80.0
+damage = 20.0
+
+[node name="Rampart" type="StaticBody2D" parent="Geometry"]
+position = Vector2(2180, 436)
 script = ExtResource("block")
-size = Vector2(140, 28)
-style = 1
+size = Vector2(300, 44)
+style = 0
 seed_value = 905
 
-[node name="Loft1" type="StaticBody2D" parent="Geometry"]
-position = Vector2(1900, 412)
-script = ExtResource("block")
-size = Vector2(150, 6)
-style = 2
-seed_value = 906
-one_way = true
+[node name="WardArcher" type="Marker2D" parent="."]
+position = Vector2(2400, 436)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
 
-[node name="LeverB" type="Area2D" parent="."]
-position = Vector2(1960, 412)
-script = ExtResource("lever")
-lever_id = &"lh_lever_b"
-seconds = 0.0
-display_name = "high lever"
+[node name="Chest0" type="Area2D" parent="."]
+position = Vector2(2260, 436)
+script = ExtResource("chest")
+chest_id = &"lower_hell_chest_0"
+count = 2
+embers = 5000
+item = ExtResource("it_draught")
 
-[node name="JetA" type="Area2D" parent="."]
-position = Vector2(2180, 480)
+[node name="WardFoe2" type="Marker2D" parent="."]
+position = Vector2(2780, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 50
+start_facing = -1
+
+[node name="Candle1" parent="." instance=ExtResource("candle")]
+position = Vector2(3010, 480)
+checkpoint_id = &"lower_hell_candle_1"
+display_name = "Outer Ward Candle"
+
+[node name="HallCarpet" type="Node2D" parent="."]
+position = Vector2(3200, 480)
+script = ExtResource("prop")
+kind = 2
+span = 2300.0
+
+[node name="HallTablet" type="Area2D" parent="."]
+position = Vector2(3260, 480)
+script = ExtResource("tablet")
+title = "The Hall of Oaths"
+text = "The Great Hall. Four hundred knights knelt on this carpet and swore the same oath, and the oath is why the castle was lowered. The carpet is still red. Do not ask what keeps it that way."
+
+[node name="Hall0" type="Node2D" parent="."]
+position = Vector2(3480, 480)
+script = ExtResource("prop")
+kind = 1
+
+[node name="Hall1" type="Node2D" parent="."]
+position = Vector2(3660, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="Hall2" type="Node2D" parent="."]
+position = Vector2(3900, 480)
+script = ExtResource("prop")
+kind = 1
+
+[node name="Hall3" type="Node2D" parent="."]
+position = Vector2(4100, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="Hall4" type="Node2D" parent="."]
+position = Vector2(4320, 480)
+script = ExtResource("prop")
+kind = 1
+
+[node name="Hall5" type="Node2D" parent="."]
+position = Vector2(4560, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="Hall6" type="Node2D" parent="."]
+position = Vector2(4740, 480)
+script = ExtResource("prop")
+kind = 1
+
+[node name="Hall7" type="Node2D" parent="."]
+position = Vector2(4980, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="HallCage0" type="Node2D" parent="."]
+position = Vector2(3790, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="HallCage1" type="Node2D" parent="."]
+position = Vector2(4650, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="HallFoe0" type="Marker2D" parent="."]
+position = Vector2(3560, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 60
+start_facing = -1
+
+[node name="HallFoe1" type="Marker2D" parent="."]
+position = Vector2(3850, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 60
+start_facing = -1
+
+[node name="HallFoe2" type="Marker2D" parent="."]
+position = Vector2(4200, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 50
+start_facing = -1
+
+[node name="HallJetA" type="Area2D" parent="."]
+position = Vector2(4440, 480)
 script = ExtResource("jet")
 column = Vector2(14, 56)
 period = 3.0
 phase = 0.0
 
-[node name="JetB" type="Area2D" parent="."]
-position = Vector2(2230, 480)
+[node name="HallJetB" type="Area2D" parent="."]
+position = Vector2(4500, 480)
 script = ExtResource("jet")
 column = Vector2(14, 56)
 period = 3.0
 phase = 1.5
 
-[node name="LeverC" type="Area2D" parent="."]
-position = Vector2(2330, 480)
-script = ExtResource("lever")
-lever_id = &"lh_lever_c"
-seconds = 0.0
-display_name = "last lever"
-
-[node name="P1Foe0" type="Marker2D" parent="."]
-position = Vector2(1250, 480)
+[node name="HallFoe3" type="Marker2D" parent="."]
+position = Vector2(4700, 480)
 script = ExtResource("spawner")
 enemy_scene = ExtResource("captain")
-patrol_distance = 40
+patrol_distance = 60
 start_facing = -1
 
-[node name="P1Foe1" type="Marker2D" parent="."]
-position = Vector2(2050, 480)
+[node name="HallFoe4" type="Marker2D" parent="."]
+position = Vector2(4900, 480)
 script = ExtResource("spawner")
-enemy_scene = ExtResource("bloat")
+enemy_scene = ExtResource("mender")
 patrol_distance = 40
 start_facing = -1
 
-[node name="Gate1" type="StaticBody2D" parent="."]
-position = Vector2(2560, 480)
-script = ExtResource("pgate")
-gate_id = &"lh_gate_1"
-requires = PackedStringArray("lh_lever_a", "lh_lever_b", "lh_lever_c")
-size = Vector2(20, 130)
-hint = "The gate will not move."
-
-[node name="Candle1" parent="." instance=ExtResource("candle")]
-position = Vector2(2680, 480)
-checkpoint_id = &"lower_hell_candle_1"
-display_name = "First Gate Candle"
-
-[node name="Chest0" type="Area2D" parent="."]
-position = Vector2(2880, 480)
-script = ExtResource("chest")
-chest_id = &"lower_hell_chest_0"
-count = 3
-embers = 6000
-item = ExtResource("it_draught")
-
-[node name="RuneTablet" type="Area2D" parent="."]
-position = Vector2(3050, 480)
-script = ExtResource("tablet")
-title = "The Order of Waking"
-text = "WAKE THEM IN THE ORDER THEY WERE LOST. First the MOON, that watched. Then the FLAME, that warmed. Then the EYE, that saw. Last the HAND, that signed. A wrong touch puts out every stone."
-
-[node name="RuneMoon" type="Area2D" parent="."]
-position = Vector2(3700, 480)
-script = ExtResource("rune")
-seq_id = &"lh_runes"
-index = 0
-total = 4
-glyph = 0
-
-[node name="RuneFlame" type="Area2D" parent="."]
-position = Vector2(3350, 480)
-script = ExtResource("rune")
-seq_id = &"lh_runes"
-index = 1
-total = 4
-glyph = 3
-
-[node name="RuneEye" type="Area2D" parent="."]
-position = Vector2(4150, 480)
-script = ExtResource("rune")
-seq_id = &"lh_runes"
-index = 2
-total = 4
-glyph = 1
-
-[node name="RuneHand" type="Area2D" parent="."]
-position = Vector2(3500, 480)
-script = ExtResource("rune")
-seq_id = &"lh_runes"
-index = 3
-total = 4
-glyph = 2
-
-[node name="RuneSpikes" type="Area2D" parent="."]
-position = Vector2(3880, 480)
-script = ExtResource("spikes")
-width = 120.0
-damage = 20.0
-
-[node name="RuneStep" type="StaticBody2D" parent="Geometry"]
-position = Vector2(3860, 452)
+[node name="Dais" type="StaticBody2D" parent="Geometry"]
+position = Vector2(5080, 452)
 script = ExtResource("block")
-size = Vector2(160, 28)
-style = 1
-seed_value = 907
+size = Vector2(360, 28)
+style = 0
+seed_value = 906
 
-[node name="P2Foe0" type="Marker2D" parent="."]
-position = Vector2(3600, 480)
-script = ExtResource("spawner")
-enemy_scene = ExtResource("gilded")
-patrol_distance = 30
-start_facing = -1
-
-[node name="P2Foe1" type="Marker2D" parent="."]
-position = Vector2(4000, 480)
-script = ExtResource("spawner")
-enemy_scene = ExtResource("cantor")
-patrol_distance = 30
-start_facing = -1
-
-[node name="Gate2" type="StaticBody2D" parent="."]
-position = Vector2(4400, 480)
-script = ExtResource("pgate")
-gate_id = &"lh_gate_2"
-requires = PackedStringArray("lh_runes")
-size = Vector2(20, 130)
-hint = "The gate will not move."
+[node name="HallThrone" type="Node2D" parent="."]
+position = Vector2(5260, 452)
+script = ExtResource("prop")
+kind = 3
 
 [node name="Chest1" type="Area2D" parent="."]
-position = Vector2(4560, 480)
+position = Vector2(5150, 452)
 script = ExtResource("chest")
 chest_id = &"lower_hell_chest_1"
 count = 2
 embers = 9000
 item = ExtResource("it_shard")
 
+[node name="ThroneTablet" type="Area2D" parent="."]
+position = Vector2(5380, 452)
+script = ExtResource("tablet")
+title = "The Empty Seat"
+text = "The throne faces the door, not the hall. Whoever sat here was never watching the knights. He was watching for whatever would come in behind them."
+
 [node name="Candle2" parent="." instance=ExtResource("candle")]
-position = Vector2(4660, 480)
+position = Vector2(5560, 480)
 checkpoint_id = &"lower_hell_candle_2"
-display_name = "Rune Gate Candle"
+display_name = "Great Hall Candle"
+
+[node name="P1Brazier0" type="Node2D" parent="."]
+position = Vector2(5720, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="LeverTablet" type="Area2D" parent="."]
+position = Vector2(5820, 480)
+script = ExtResource("tablet")
+title = "Four Wards"
+text = "FOUR WARDS HOLD THE FIRST GATE, AND EACH WARD IS A LEVER. One stands in the open, guarded. One is up where the dead cannot climb, over the teeth. One is behind the fire, and the fire keeps time. The fourth is not on the road at all: listen for the stone that sounds hollow. All four. Any three is a locked door."
+
+[node name="LeverA" type="Area2D" parent="."]
+position = Vector2(6040, 480)
+script = ExtResource("lever")
+lever_id = &"lh_lever_a"
+seconds = 0.0
+display_name = "first ward"
+
+[node name="P1Foe0" type="Marker2D" parent="."]
+position = Vector2(5930, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 40
+start_facing = -1
+
+[node name="P1Foe1" type="Marker2D" parent="."]
+position = Vector2(6130, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="WardTeeth" type="Area2D" parent="."]
+position = Vector2(6320, 480)
+script = ExtResource("spikes")
+width = 440.0
+damage = 20.0
+
+[node name="WardStep" type="StaticBody2D" parent="Geometry"]
+position = Vector2(6230, 452)
+script = ExtResource("block")
+size = Vector2(100, 28)
+style = 1
+seed_value = 907
+
+[node name="Loft1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(6320, 410)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 908
+one_way = true
+
+[node name="Loft2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(6530, 368)
+script = ExtResource("block")
+size = Vector2(160, 6)
+style = 2
+seed_value = 909
+one_way = true
+
+[node name="LeverB" type="Area2D" parent="."]
+position = Vector2(6640, 368)
+script = ExtResource("lever")
+lever_id = &"lh_lever_b"
+seconds = 0.0
+display_name = "high ward"
+
+[node name="P1Cage" type="Node2D" parent="."]
+position = Vector2(6500, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="JetA" type="Area2D" parent="."]
+position = Vector2(6900, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="JetB" type="Area2D" parent="."]
+position = Vector2(6970, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.0
+
+[node name="JetC" type="Area2D" parent="."]
+position = Vector2(7040, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 2.0
+
+[node name="LeverC" type="Area2D" parent="."]
+position = Vector2(7130, 480)
+script = ExtResource("lever")
+lever_id = &"lh_lever_c"
+seconds = 0.0
+display_name = "fire ward"
+
+[node name="P1Foe2" type="Marker2D" parent="."]
+position = Vector2(7190, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("mender")
+patrol_distance = 30
+start_facing = -1
+
+[node name="HollowWall" type="StaticBody2D" parent="."]
+position = Vector2(7250, 392)
+script = ExtResource("wall")
+size = Vector2(22, 88)
+wall_id = &"lh_hollow_wall"
+hits_needed = 3
+
+[node name="AlcoveRoof" type="StaticBody2D" parent="Geometry"]
+position = Vector2(7250, 380)
+script = ExtResource("block")
+size = Vector2(230, 14)
+style = 0
+seed_value = 910
+
+[node name="AlcoveBack" type="StaticBody2D" parent="Geometry"]
+position = Vector2(7460, 394)
+script = ExtResource("block")
+size = Vector2(20, 76)
+style = 0
+seed_value = 911
+
+[node name="LeverD" type="Area2D" parent="."]
+position = Vector2(7370, 480)
+script = ExtResource("lever")
+lever_id = &"lh_lever_d"
+seconds = 0.0
+display_name = "hidden ward"
+
+[node name="Gate1" type="StaticBody2D" parent="."]
+position = Vector2(7640, 480)
+script = ExtResource("pgate")
+gate_id = &"lh_gate_1"
+requires = PackedStringArray("lh_lever_a", "lh_lever_b", "lh_lever_c", "lh_lever_d")
+size = Vector2(44, 384)
+hint = "The gate will not move."
+
+[node name="Candle4" parent="." instance=ExtResource("candle")]
+position = Vector2(7780, 480)
+checkpoint_id = &"lower_hell_candle_4"
+display_name = "First Portcullis Candle"
+
+[node name="P1Statue" type="Node2D" parent="."]
+position = Vector2(7900, 480)
+script = ExtResource("prop")
+kind = 1
+
+[node name="Chest2" type="Area2D" parent="."]
+position = Vector2(8000, 480)
+script = ExtResource("chest")
+chest_id = &"lower_hell_chest_2"
+count = 3
+embers = 7000
+item = ExtResource("it_draught")
+
+[node name="P2Carpet" type="Node2D" parent="."]
+position = Vector2(8150, 480)
+script = ExtResource("prop")
+kind = 2
+span = 1900.0
+
+[node name="RuneTablet0" type="Area2D" parent="."]
+position = Vector2(8200, 480)
+script = ExtResource("tablet")
+title = "The Order of Waking: I"
+text = "FIVE THINGS WERE LOST, AND THEY MUST BE WOKEN IN THE ORDER THEY WERE LOST. Nobody here will tell you the order. Three tablets each keep a piece of it. Read all three. The CROWN fell first. The MOON went last."
+
+[node name="RuneHand" type="Area2D" parent="."]
+position = Vector2(8420, 480)
+script = ExtResource("rune")
+seq_id = &"lh_runes"
+index = 2
+total = 5
+glyph = 2
+
+[node name="RuneSpikesA" type="Area2D" parent="."]
+position = Vector2(8520, 480)
+script = ExtResource("spikes")
+width = 70.0
+damage = 20.0
+
+[node name="P2Foe0" type="Marker2D" parent="."]
+position = Vector2(8340, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="P2Foe1" type="Marker2D" parent="."]
+position = Vector2(8620, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 40
+start_facing = -1
+
+[node name="MoonDais" type="StaticBody2D" parent="Geometry"]
+position = Vector2(8700, 440)
+script = ExtResource("block")
+size = Vector2(130, 40)
+style = 0
+seed_value = 912
+
+[node name="RuneMoon" type="Area2D" parent="."]
+position = Vector2(8770, 440)
+script = ExtResource("rune")
+seq_id = &"lh_runes"
+index = 4
+total = 5
+glyph = 0
+
+[node name="P2Brazier0" type="Node2D" parent="."]
+position = Vector2(8620, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="RuneTablet1" type="Area2D" parent="."]
+position = Vector2(8930, 480)
+script = ExtResource("tablet")
+title = "The Order of Waking: II"
+text = "THE EYE CLOSED BEFORE THE HAND SIGNED. It had seen what was in the paper, and it closed rather than watch the hand do it."
+
+[node name="RuneEye" type="Area2D" parent="."]
+position = Vector2(9040, 480)
+script = ExtResource("rune")
+seq_id = &"lh_runes"
+index = 1
+total = 5
+glyph = 1
+
+[node name="P2JetA" type="Area2D" parent="."]
+position = Vector2(9140, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="P2JetB" type="Area2D" parent="."]
+position = Vector2(9200, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.5
+
+[node name="P2Foe2" type="Marker2D" parent="."]
+position = Vector2(9060, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 50
+start_facing = -1
+
+[node name="P2Statue" type="Node2D" parent="."]
+position = Vector2(9330, 480)
+script = ExtResource("prop")
+kind = 1
+
+[node name="RuneCrown" type="Area2D" parent="."]
+position = Vector2(9420, 480)
+script = ExtResource("rune")
+seq_id = &"lh_runes"
+index = 0
+total = 5
+glyph = 4
+
+[node name="P2Foe3" type="Marker2D" parent="."]
+position = Vector2(9500, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 50
+start_facing = -1
+
+[node name="RuneTablet2" type="Area2D" parent="."]
+position = Vector2(9620, 480)
+script = ExtResource("tablet")
+title = "The Order of Waking: III"
+text = "THE FLAME WAS LIT AFTER THE HAND SIGNED, AND BEFORE THE MOON LOOKED AWAY. It was lit to burn the paper. It did not burn the paper. That is why you are here."
+
+[node name="RuneSpikesB" type="Area2D" parent="."]
+position = Vector2(9720, 480)
+script = ExtResource("spikes")
+width = 70.0
+damage = 20.0
+
+[node name="RuneFlame" type="Area2D" parent="."]
+position = Vector2(9860, 480)
+script = ExtResource("rune")
+seq_id = &"lh_runes"
+index = 3
+total = 5
+glyph = 3
+
+[node name="P2Foe4" type="Marker2D" parent="."]
+position = Vector2(9780, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 40
+start_facing = -1
+
+[node name="P2Cage" type="Node2D" parent="."]
+position = Vector2(9290, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="Gate2" type="StaticBody2D" parent="."]
+position = Vector2(10080, 480)
+script = ExtResource("pgate")
+gate_id = &"lh_gate_2"
+requires = PackedStringArray("lh_runes")
+size = Vector2(44, 384)
+hint = "The gate will not move."
+
+[node name="Candle5" parent="." instance=ExtResource("candle")]
+position = Vector2(10220, 480)
+checkpoint_id = &"lower_hell_candle_5"
+display_name = "Second Portcullis Candle"
+
+[node name="Chest3" type="Area2D" parent="."]
+position = Vector2(10340, 480)
+script = ExtResource("chest")
+chest_id = &"lower_hell_chest_3"
+count = 2
+embers = 12000
+item = ExtResource("it_shard")
+
+[node name="P3Brazier0" type="Node2D" parent="."]
+position = Vector2(10480, 480)
+script = ExtResource("prop")
+kind = 0
 
 [node name="RunTablet" type="Area2D" parent="."]
-position = Vector2(4800, 480)
+position = Vector2(10560, 480)
 script = ExtResource("tablet")
-title = "Two Doors, One Breath"
-text = "THE LAST GATE OPENS ONLY WHEN BOTH LEVERS ARE HELD AT ONCE. They spring back. The first will wait for you a little while. Do not stop for the fire."
+title = "One Breath"
+text = "THE LAST GATE OPENS ONLY WHEN ALL THREE LEVERS ARE ALIGHT AT ONCE. They spring back: the first will wait the longest, the last hardly at all. Throw them in the order you meet them and do not stop for the fire. If the first goes out before you reach the last, you walk it all again."
 
-[node name="RunLeverA" type="Area2D" parent="."]
-position = Vector2(4950, 480)
+[node name="RunLeverX" type="Area2D" parent="."]
+position = Vector2(10700, 480)
 script = ExtResource("lever")
-lever_id = &"lh_run_a"
-seconds = 22.0
-display_name = "near lever"
+lever_id = &"lh_run_x"
+seconds = 26.0
+display_name = "first lever"
 
 [node name="RunJetA" type="Area2D" parent="."]
-position = Vector2(5200, 480)
+position = Vector2(10960, 480)
 script = ExtResource("jet")
 column = Vector2(14, 56)
 period = 3.0
 phase = 0.0
 
 [node name="RunJetB" type="Area2D" parent="."]
-position = Vector2(5240, 480)
+position = Vector2(11020, 480)
 script = ExtResource("jet")
 column = Vector2(14, 56)
 period = 3.0
-phase = 1.0
+phase = 1.5
 
-[node name="RunSpikes" type="Area2D" parent="."]
-position = Vector2(5400, 480)
+[node name="RunSpikesA" type="Area2D" parent="."]
+position = Vector2(11160, 480)
 script = ExtResource("spikes")
-width = 100.0
+width = 80.0
 damage = 20.0
 
+[node name="P3Foe0" type="Marker2D" parent="."]
+position = Vector2(11330, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
 [node name="RunStep" type="StaticBody2D" parent="Geometry"]
-position = Vector2(5380, 452)
+position = Vector2(11440, 452)
 script = ExtResource("block")
-size = Vector2(140, 28)
+size = Vector2(100, 28)
 style = 1
-seed_value = 908
+seed_value = 913
+
+[node name="RunLoft" type="StaticBody2D" parent="Geometry"]
+position = Vector2(11530, 410)
+script = ExtResource("block")
+size = Vector2(170, 6)
+style = 2
+seed_value = 914
+one_way = true
+
+[node name="RunLeverY" type="Area2D" parent="."]
+position = Vector2(11640, 410)
+script = ExtResource("lever")
+lever_id = &"lh_run_y"
+seconds = 18.0
+display_name = "middle lever"
+
+[node name="RunSpikesB" type="Area2D" parent="."]
+position = Vector2(11780, 480)
+script = ExtResource("spikes")
+width = 80.0
+damage = 20.0
 
 [node name="RunJetC" type="Area2D" parent="."]
-position = Vector2(5640, 480)
+position = Vector2(11900, 480)
 script = ExtResource("jet")
 column = Vector2(14, 56)
 period = 3.0
 phase = 0.5
 
-[node name="RunLeverB" type="Area2D" parent="."]
-position = Vector2(5850, 480)
+[node name="RunJetD" type="Area2D" parent="."]
+position = Vector2(11960, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 2.0
+
+[node name="P3Foe1" type="Marker2D" parent="."]
+position = Vector2(11800, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 40
+start_facing = -1
+
+[node name="RunLeverZ" type="Area2D" parent="."]
+position = Vector2(12120, 480)
 script = ExtResource("lever")
-lever_id = &"lh_run_b"
-seconds = 22.0
-display_name = "far lever"
+lever_id = &"lh_run_z"
+seconds = 8.0
+display_name = "last lever"
 
 [node name="Gate3" type="StaticBody2D" parent="."]
-position = Vector2(6020, 480)
+position = Vector2(12220, 480)
 script = ExtResource("pgate")
 gate_id = &"lh_gate_3"
-requires = PackedStringArray("lh_run_a", "lh_run_b")
-size = Vector2(20, 130)
+requires = PackedStringArray("lh_run_x", "lh_run_y", "lh_run_z")
+size = Vector2(44, 384)
 hint = "The gate will not move."
 
+[node name="P3Gargoyle" type="Node2D" parent="."]
+position = Vector2(12320, 480)
+script = ExtResource("prop")
+kind = 7
+
 [node name="Candle3" parent="." instance=ExtResource("candle")]
-position = Vector2(6120, 480)
+position = Vector2(12380, 480)
 checkpoint_id = &"lower_hell_candle_3"
 display_name = "Fox Stair Candle"
 
 [node name="FoxArena" type="Node2D" parent="."]
-position = Vector2(6200, 480)
+position = Vector2(12460, 480)
 script = ExtResource("bossarena")
 boss_scene = ExtResource("foxboss")
 boss_offset = Vector2(420, 0)

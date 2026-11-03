@@ -81,6 +81,6 @@ Rebind any action in **Settings → Controls**: pick the keyboard or controller 
 
 - **Jutsu (weapon technique)**: some special weapons carry their own technique. While one is equipped, the Art button (U / LT) casts it instead of your equipped Art. The Nightreaper's is **Amaterasu** (50 focus): black flames burst from the floor on both sides of you and burn whatever stands in them for about 4 seconds.
 
-- **Lower Hell puzzles**: levers (Interact), rune stones (Interact, in the order a tablet gives; a wrong stone puts all out) and timed levers that spring back. Gates open when their puzzle is solved and stay open.
+- **Lower Hell puzzles**: levers (Interact), rune stones (Interact; the order is not told outright, three tablets each give a clue; a wrong stone puts all out), a cracked wall to break (attack it) and timed levers that spring back. Each gate shows one gem per switch and an N / M counter; it opens when all are lit and stays open.
 - **Fire Meteor** (learned from the Burning Elder): an Art; cast with the Art button, or **H** if your weapon has its own jutsu.
 - **Dev tab**: One-hit kills, **Weapon damage** and **Jutsu damage** multipliers (x0.1 to x100).
