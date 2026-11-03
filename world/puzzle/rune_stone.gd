@@ -45,7 +45,7 @@ func _on_exit(b: Node) -> void:
 
 func _physics_process(delta: float) -> void:
 	_t += delta
-	queue_redraw()
+	if Near.player(self): queue_redraw()
 	if Puzzle.is_on(seq_id):
 		lit = true
 		return

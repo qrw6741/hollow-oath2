@@ -61,7 +61,7 @@ func _physics_process(delta: float) -> void:
 	if _light:
 		var flicker := 0.06 * sin(_t * 13.0) + 0.04 * sin(_t * 31.0)
 		_light.energy = (1.0 if lit else 0.45) + flicker + _kindle * 1.5
-	queue_redraw()
+	if Near.player(self): queue_redraw()
 	if Engine.is_editor_hint():
 		return
 	if _player_inside and Input.is_action_just_pressed(&"interact") and _player_inside.can_interact():

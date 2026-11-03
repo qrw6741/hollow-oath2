@@ -85,7 +85,7 @@ func _physics_process(delta: float) -> void:
 		if _open > 0.7:
 			_shape.set_deferred(&"disabled", true)
 	_light.energy = 0.55 * (0.5 + 0.5 * sin(_t * 5.0)) * (1.0 - _open) if solved() and not is_open() else 0.0
-	queue_redraw()
+	if Near.player(self): queue_redraw()
 
 
 func _draw() -> void:

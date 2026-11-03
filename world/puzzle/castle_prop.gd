@@ -37,7 +37,7 @@ func _process(delta: float) -> void:
 	if kind == Kind.BRAZIER or kind == Kind.CAGE or kind == Kind.GARGOYLE:
 		if _light:
 			_light.energy = 0.42 + 0.14 * sin(_t * 9.0) + 0.06 * sin(_t * 23.0)
-		queue_redraw()
+		if Near.player(self): queue_redraw()
 
 
 func _draw() -> void:

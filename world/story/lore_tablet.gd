@@ -29,7 +29,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_t += delta
-	queue_redraw()
+	if Near.player(self): queue_redraw()
 	if Engine.is_editor_hint() or _player_inside == null:
 		return
 	if Input.is_action_just_pressed(&"interact") and (_reading or _player_inside.can_interact()):

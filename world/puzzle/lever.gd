@@ -40,7 +40,7 @@ func _on_exit(b: Node) -> void:
 
 func _physics_process(delta: float) -> void:
 	_t += delta
-	queue_redraw()
+	if Near.player(self): queue_redraw()
 	if _player_inside and Input.is_action_just_pressed(&"interact") and _player_inside.can_interact() and not Puzzle.is_on(lever_id):
 		throw()
 
@@ -88,6 +88,6 @@ func _draw() -> void:
 		# a faint pulse tells you the lever is waiting
 		draw_circle(tip, 9.0 + 2.0 * sin(_t * 3.0), Color(0.9, 0.2, 0.2, 0.10))
 	if seconds > 0.0 and on:
-		var left := clampf((float(Puzzle._timed.get(lever_id, 0)) - Time.get_ticks_msec()) / (seconds * 1000.0), 0.0, 1.0)
+		var left := clampf((float(Puzzle._timed.get(lever_id, 0)) - Puzzle.now_ms()) / (seconds * 1000.0), 0.0, 1.0)
 		draw_rect(Rect2(-14, -46, 28, 4), Color(0, 0, 0, 0.6))
 		draw_rect(Rect2(-13, -45, 26.0 * left, 2), Color(0.7, 0.5, 1.0) if left > 0.3 else Color(1.0, 0.4, 0.3))

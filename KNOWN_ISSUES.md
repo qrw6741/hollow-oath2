@@ -200,3 +200,4 @@
 - Long Katana balance (damage x1.18, ~39 light-combo DPS) is derived from the other weapons' data and one test hit; not play-tested. The part of the Lower Hell past the Gate-Fox (23100 px total) was only checked by the reach audit, tests and a few software-rendered screenshots; its difficulty is a guess.
 - Lower Hell is now 33,200 px with ~97 spawn points; difficulty and performance (many enemies in one level) untested on real hardware.
 - Four Wards: the opened gate (and the "N / M" ward counter) is far from lever D; watch for the "A gate grinds open" banner. Not played at real speed by me; only a headless on-foot walk was run.
+- Frame rate: the gains above come from headless physics timings; real GPU cost of ~110 point lights in the Lower Hell is unmeasured. If it still stutters on your PC, tell me where (and your fps in the in-game counter) so I can cut lights/redraws there.

@@ -8,6 +8,12 @@ static var _timed := {}      ## switch id -> time (msec) until which it stays on
 static var _progress := {}   ## rune sequence id -> how many stones are lit
 
 
+## Game time in msec: counted in physics ticks, NOT wall-clock, so a slow frame rate slows the timers exactly as
+## much as it slows the player (a timed lever must never run out while the game crawls).
+static func now_ms() -> int:
+	return int(Engine.get_physics_frames() * 1000.0 / float(Engine.physics_ticks_per_second))
+
+
 static func flag(id: StringName) -> StringName:
 	return StringName("puzzle_" + String(id))
 
@@ -15,12 +21,12 @@ static func flag(id: StringName) -> StringName:
 static func is_on(id: StringName) -> bool:
 	if bool(GameState.get_flag(flag(id), false)):
 		return true
-	return int(_timed.get(id, 0)) > Time.get_ticks_msec()
+	return int(_timed.get(id, 0)) > now_ms()
 
 
 static func set_on(id: StringName, seconds := 0.0) -> void:
 	if seconds > 0.0:
-		_timed[id] = Time.get_ticks_msec() + int(seconds * 1000.0)
+		_timed[id] = now_ms() + int(seconds * 1000.0)
 	else:
 		GameState.set_flag(flag(id), true)
 

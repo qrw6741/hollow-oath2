@@ -126,7 +126,7 @@ position = Vector2({x}, {y})
 script = ExtResource("spawner")
 enemy_scene = ExtResource("{scene}")
 patrol_distance = {patrol}
-start_facing = {facing}''' + (f"\nwhen = {when}" if when else ""))
+start_facing = {facing}''' + (f"\nwhen = {when}" if when else "") + ("\nstream = true" if getattr(self, "stream_enemies", False) else ""))
 
     def candle(self, name, x, y, cid, title):
         self.things.append(("candle", name, x, y))

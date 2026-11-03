@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_jutsu_and_camera, test_lever_interaction, test_four_wards_real, test_lower_hell, test_siege_and_katana, test_elder_and_meteor, test_dev_damage_mults, test_cutscene_lock, test_travel_order, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_jutsu_and_camera, test_lever_interaction, test_four_wards_real, test_fox_defeat_real, test_timed_levers_game_time, test_streaming_foes, test_lower_hell, test_siege_and_katana, test_elder_and_meteor, test_dev_damage_mults, test_cutscene_lock, test_travel_order, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -5180,6 +5180,121 @@ func test_four_wards_real() -> void:
 	Input.action_release(&"move_right")
 	print("WALKED to x=", player.global_position.x)
 	check(player.global_position.x > 7800.0, "walking right from the fire ward gets past the first gate (x=%d)" % int(player.global_position.x))
+
+func test_fox_defeat_real() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	Puzzle.reset_session()
+	for g in ["lh_gate_1", "lh_gate_2", "lh_gate_3"]:
+		GameState.set_flag(StringName("gate_open_" + g), true)
+	await go_to_level("res://world/levels/lower_hell.tscn", &"")
+	var arena := level.get_node("FoxArena") as BossArena
+	check(level.get_node_or_null("FoxBulwark") != null, "bulwark stands before the fight")
+	player.global_position = arena.global_position + Vector2(arena.trigger_offset + 40.0, -2)
+	var t0 := Time.get_ticks_msec()
+	var started := false
+	for i in 240:
+		await get_tree().physics_frame
+		player.health.restore_full()
+		if arena.fight_active:
+			started = true
+			break
+	check(started, "the fox fight starts")
+	var fox: BossBase = arena.boss
+	check(is_instance_valid(fox), "the fox exists")
+	fox.receive_hit(damage(99999))
+	await frames(5)
+	player.health.restore_full()
+	check(fox.is_dead(), "the fox dies")
+	check(GameState.get_flag(&"boss_defeated_tooth_fox", false), "defeat flag set")
+	await frames(90)
+	print("FOX: fight_active=", arena.fight_active, " bulwark_valid=", is_instance_valid(level.get_node_or_null("FoxBulwark")), " tooth=", game_state.item_count(&"fox_tooth"))
+	var drops := get_tree().get_nodes_in_group(&"pickups")
+	print("FOX: pickups in world=", drops.size())
+	check(level.get_node_or_null("FoxBulwark") == null, "the bulwark gave way when the fox fell")
+	player.global_position = arena.global_position + Vector2(300, -2)
+	await frames(20)
+	Input.action_press(&"move_right")
+	for i in 60 * 8:
+		await get_tree().physics_frame
+		player.health.restore_full()
+	Input.action_release(&"move_right")
+	print("FOX: walked to x=", player.global_position.x)
+	check(player.global_position.x > 13500.0, "walking right after the fox gets past the bulwark and reaches the broken stair (x=%d)" % int(player.global_position.x))
+	var d2 := level.get_node("ToothGate2") as LevelExit
+	check(d2.try_open(), "the tooth opens the Fox's Door right after the fight")
+
+func test_perf_probe() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level("res://world/levels/lower_hell.tscn", &"")
+	var hist := {}
+	var stack: Array = [level]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		var k: String = String(n.get_script().get_global_name()) if n.get_script() != null and String(n.get_script().get_global_name()) != "" else n.get_class()
+		var pp := 1 if n.is_physics_processing() else 0
+		var h: Array = hist.get(k, [0, 0])
+		h[0] += 1
+		h[1] += pp
+		hist[k] = h
+		stack.append_array(n.get_children())
+	var keys := hist.keys()
+	keys.sort_custom(func(a, b): return hist[a][0] > hist[b][0])
+	for k in keys.slice(0, 14):
+		print("HIST ", k, " n=", hist[k][0], " physproc=", hist[k][1])
+	for x in [1500.0, 12500.0, 22000.0, 32000.0]:
+		player.global_position = Vector2(x, 470)
+		await frames(120)
+		var tp := 0.0
+		var tq := 0.0
+		for i in 60:
+			await get_tree().physics_frame
+			tp += Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)
+			tq += Performance.get_monitor(Performance.TIME_PROCESS)
+		var foes := 0
+		for sp in get_tree().get_nodes_in_group(&"enemy_spawners"):
+			if sp is EnemySpawner and is_instance_valid(sp.enemy):
+				foes += 1
+		print("PERF x=%d physics=%.2f ms process=%.2f ms nodes=%d foes=%d" % [int(x), tp / 60.0 * 1000.0, tq / 60.0 * 1000.0, int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)), foes])
+
+func test_timed_levers_game_time() -> void:
+	await fresh_game()
+	Puzzle.reset_session()
+	Puzzle.set_on(&"t_probe", 2.0)
+	await frames(100)
+	check(Puzzle.is_on(&"t_probe"), "a 2 s timed lever is still on after 100 physics ticks (game time, not wall clock)")
+	await frames(40)
+	check(not Puzzle.is_on(&"t_probe"), "and springs back after 140 ticks")
+	Puzzle.reset_session()
+
+
+func test_streaming_foes() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	await go_to_level("res://world/levels/lower_hell.tscn", &"")
+	var total := 0
+	var alive := 0
+	for sp in get_tree().get_nodes_in_group(&"enemy_spawners"):
+		if sp is EnemySpawner:
+			total += 1
+			if is_instance_valid(sp.enemy):
+				alive += 1
+	check(total >= 90 and alive <= 12, "only the foes near the player are alive (%d of %d)" % [alive, total])
+	var far: EnemySpawner = level.get_node("KennelFoe3")
+	check(not is_instance_valid(far.enemy), "a far-away foe is asleep")
+	player.global_position = Vector2(far.global_position.x - 300.0, 470)
+	await frames(60)
+	check(is_instance_valid(far.enemy), "and wakes when the player comes near")
+	# a killed foe stays dead when you walk away and back
+	far.enemy.receive_hit(damage(99999))
+	await frames(10)
+	player.global_position = Vector2(far.global_position.x - 5000.0, 470)
+	await frames(80)
+	player.global_position = Vector2(far.global_position.x - 300.0, 470)
+	await frames(80)
+	check(not is_instance_valid(far.enemy) or far.enemy.is_dead(), "a slain foe does not come back until the world resets")
+
 
 func test_siege_and_katana() -> void:
 	await fresh_game()

@@ -48,7 +48,7 @@ func is_warning() -> bool:
 
 func _physics_process(delta: float) -> void:
 	_t += delta
-	queue_redraw()
+	if Near.player(self): queue_redraw()
 	if Engine.is_editor_hint():
 		return
 	for id in _cooldowns.keys():

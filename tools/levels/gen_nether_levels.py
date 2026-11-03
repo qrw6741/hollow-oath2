@@ -223,6 +223,7 @@ def lower():
     in the Landing takes it and leads down to the Grass Cellar. No other mini-bosses."""
     W = 33200
     L = G.Level("lower_hell.tscn")
+    L.stream_enemies = True   # ~100 foes: only the ones near the player are alive (keeps the frame rate up)
     _head(L, "lower_hell", "The Lower Hell", "LowerHell", W, "(0.86, 0.68, 0.78, 1)", 12, 51800, 0.42)
     L.block("CliffLeft", 0, 0, 16, 480)
     L.block("Ground", 16, 480, W - 16, 60, style=0)
@@ -360,19 +361,19 @@ hits_needed = 3''')
     # ---- PUZZLE 3: THE RUN (10500 - 12300): three timed levers, a gate beyond all of them ---------------------
     _prop(L, "P3Brazier0", 10480, BRAZIER)
     L.tablet("RunTablet", 10560, 480, "One Breath", "THE LAST GATE OPENS ONLY WHEN ALL THREE LEVERS ARE ALIGHT AT ONCE. They spring back: the first will wait the longest, the last hardly at all. Throw them in the order you meet them and do not stop for the fire. If the first goes out before you reach the last, you walk it all again.")
-    _lever(L, "RunLeverX", 10700, 480, "lh_run_x", 26.0, "first lever")
+    _lever(L, "RunLeverX", 10700, 480, "lh_run_x", 30.0, "first lever")
     L.jet("RunJetA", 10960, 480, 0.0)
     L.jet("RunJetB", 11020, 480, 1.5)
     L.spikes("RunSpikesA", 11160, 480, 80)
     L.enemy("P3Foe0", "gilded", 11330, 480, 40)
     L.block("RunStep", 11440, 452, 100, 28, style=1)
     L.plank("RunLoft", 11530, 410, 170)
-    _lever(L, "RunLeverY", 11640, 410, "lh_run_y", 18.0, "middle lever")
+    _lever(L, "RunLeverY", 11640, 410, "lh_run_y", 22.0, "middle lever")
     L.spikes("RunSpikesB", 11780, 480, 80)
     L.jet("RunJetC", 11900, 480, 0.5)
     L.jet("RunJetD", 11960, 480, 2.0)
     L.enemy("P3Foe1", "sergeant", 11800, 480, 40)
-    _lever(L, "RunLeverZ", 12120, 480, "lh_run_z", 8.0, "last lever")
+    _lever(L, "RunLeverZ", 12120, 480, "lh_run_z", 12.0, "last lever")
     _gate(L, "Gate3", 12220, "lh_gate_3", ["lh_run_x", "lh_run_y", "lh_run_z"])
     _prop(L, "P3Gargoyle", 12320, GARGOYLE)
     L.candle("Candle3", 12380, 480, "lower_hell_candle_3", "Fox Stair Candle")
@@ -389,6 +390,20 @@ size = Vector2(24, 384)
 wall_id = &"lh_fox_bulwark"
 hits_needed = 9999
 opens_when_boss = &"tooth_fox"''')
+    L.use("exit"); L.use("it_tooth")
+    L.node(f'''
+[node name="ToothGate2" type="Area2D" parent="."]
+position = Vector2(13290, 480)
+script = ExtResource("exit")
+target_level = "{BASEMENT}"
+target_entry = &"from_gate"
+mode = 1
+size = Vector2(30, 70)
+required_item = &"fox_tooth"
+door_id = &"fox_door"
+display_name = "the Fox's Door"
+locked_text = "A door the fox kept for itself. The keyhole is shaped like a tooth."
+unlock_text = "The tooth fits. The door swings in."''')
     L.candle("Candle6", 13360, 480, "lower_hell_candle_6", "After the Fox Candle")
     _prop(L, "AfterBrazier", 13300, BRAZIER)
     L.tablet("StairTablet", 13450, 480, "Where the Stair Was", "The castle goes on past the fox, and upward. The stair that should be here was taken out, step by step, by someone who did not want to be followed. The floor below is teeth. Do not look for a way around.")
