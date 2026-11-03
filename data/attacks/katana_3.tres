@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/attack_data.gd" id="1_attack"]
+
+[resource]
+script = ExtResource("1_attack")
+id = &"katana_3"
+display_name = "Long Katana - Falling Cut"
+animation = &"smash"
+startup_frames = 9
+active_frames = 5
+recovery_frames = 22
+chain_open_frame = -1
+dodge_cancel_frame = -1
+damage = 19.0
+poise_damage = 26.0
+stamina_cost = 14.0
+invulnerable_frames = 0
+knockback = Vector2(110, -40)
+hitbox_size = Vector2(70, 24)
+hitbox_offset = Vector2(42, -15)
+lunge_speed = 130
+lunge_start_frame = 6
+lunge_frames = 5
+projectile_speed = 0.0
+projectile_offset = Vector2(14, -22)
+hit_stop = 0.07
+shake = 2.6

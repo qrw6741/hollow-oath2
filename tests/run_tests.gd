@@ -84,7 +84,7 @@ func _run() -> void:
 		# --- Hollowmere Manor and the sigil ---
 		test_sigil_gift, test_sigil_travel, test_travel_key_combat_lock, test_status_effects, test_status_data_valid, test_weapon_skills_data, test_focus_and_skill, test_weapon_parry_and_guard, test_new_enemy_data_and_scenes, test_archer_and_cantor, test_elite_enemy, test_quests_collect_and_kill, test_quest_gating_and_manor_lines, test_journal_tab, test_side_levels_load, test_gallery_gate_and_key, test_minibosses, test_day_night, test_manor_level, test_npcs_stand_on_ground,
 		# --- expansion: region, weapons, arts, variety, secrets, trials ---
-		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_jutsu_and_camera, test_lever_interaction, test_lower_hell, test_elder_and_meteor, test_dev_damage_mults, test_cutscene_lock, test_travel_order, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
+		test_reliquary_region, test_keep_region, test_belfry_and_crown, test_four_parts, test_descent, test_no_ending_yet, test_reliquary_opens, test_levels_reachable, test_graphics_pass, test_qol, test_boss_lines, test_boss_gimmicks, test_new_foes, test_perfect_parry, test_no_exit_on_road, test_travel_scrolls, test_fps_cap_default, test_classic_visuals, test_cut_minibosses, test_upgrade_caps, test_ninth_hell_content, test_twin_lords, test_jutsu_and_camera, test_lever_interaction, test_lower_hell, test_siege_and_katana, test_elder_and_meteor, test_dev_damage_mults, test_cutscene_lock, test_travel_order, test_dev_one_hit_and_pickers, test_wayfarers, test_progress_goal, test_talismans, test_potions_and_alchemy, test_lurker_ambush, test_elite_modifiers_and_alert, test_arts, test_second_weapon_set, test_secrets_and_hazards, test_trials, test_boss_intro_card,
 	]
 	# TEST_ONLY=test_a,test_b runs just those (quick iteration); default runs everything.
 	var only := OS.get_environment("TEST_ONLY")
@@ -5149,6 +5149,66 @@ func test_lever_interaction() -> void:
 	check((level.get_node("Gate1") as PuzzleGate).lit_count() == 1, "the gate shows one ward lit")
 
 
+func test_siege_and_katana() -> void:
+	await fresh_game()
+	game_state.in_game = true
+	# the continued Lower Hell: past the fox it is a long gauntlet of guards and parkour, no extra boss, and a katana high up
+	await go_to_level("res://world/levels/lower_hell.tscn", &"")
+	var arenas := 0
+	var foes := 0
+	var planks := 0
+	for c in level.get_children():
+		if c is BossArena:
+			arenas += 1
+		elif c is EnemySpawner:
+			foes += 1
+	for c in level.get_node("Geometry").get_children():
+		if c is StoneBlock and c.one_way:
+			planks += 1
+	check(arenas == 1, "still exactly one boss arena, the fox (%d)" % arenas)
+	check(foes >= 50, "the whole castle is crowded (%d foes)" % foes)
+	check(planks >= 40, "and full of parkour: %d planks" % planks)
+	check(level.bounds.size.x >= 20000.0, "and very long (%d px)" % int(level.bounds.size.x))
+	var kc := level.get_node("ChestKatana") as TreasureChest
+	check(kc != null and kc.gear_kind == "weapon" and kc.gear_id == &"long_katana", "a chest holds the Long Katana")
+	check(kc.global_position.y < 260.0 and kc.global_position.x > 15000.0, "and it sits high in the far end of the castle (%d, %d)" % [int(kc.global_position.x), int(kc.global_position.y)])
+	check(level.get_node_or_null("FoxBulwark") != null, "the way on stays shut until the fox falls")
+	# the Long Katana: complete data, balanced numbers, usable in a fight
+	var w := Weapons.get_weapon(&"long_katana")
+	check(w != null and w.look == PresetData.WeaponLook.KATANA and w.two_handed, "the katana is a two-handed katana-look weapon")
+	check(IconArt.has_icon(&"long_katana"), "the katana has an icon")
+	var chain := WeaponStats.light_chain(w)
+	var frames_total := 0
+	var dmg_total := 0.0
+	var stam := 0.0
+	for a in chain:
+		frames_total += a.startup_frames + a.active_frames + a.recovery_frames
+		dmg_total += a.damage
+		stam += a.stamina_cost
+	var dps := dmg_total * w.damage_mult / (float(frames_total) / 60.0)
+	check(chain.size() == 3, "three light cuts")
+	check(dps >= 33.0 and dps <= 45.0, "light-combo damage per second is mid-to-high but under the final weapons (%.1f)" % dps)
+	check(w.damage_mult >= 1.1 and w.damage_mult <= 1.24, "damage multiplier in the findable-weapon band (%.2f)" % w.damage_mult)
+	check(stam <= 40.0, "cheap on stamina (%.0f per combo)" % stam)
+	check(WeaponStats.reach_label(w) == "Long" and WeaponStats.speed_label(w) == "Fast", "long reach, fast first cut")
+	check(w.damage_mult * w.heavy.damage < Weapons.get_weapon(&"unkept_blade").damage_mult * Weapons.get_weapon(&"unkept_blade").heavy.damage, "its heavy is lighter than a greatsword's")
+	check(w.skill.damage > w.heavy.damage * 0.9, "the skill beats the heavy")
+	game_state.grant_gear("weapon", &"long_katana")
+	Loadout.equip_weapon(&"long_katana")
+	await frames(3)
+	await go_to_level("res://world/levels/lower_hell.tscn", &"")
+	await place_player(400.0, 480.0, 1)
+	var e := await spawn_enemy(440.0, -1)
+	e.health.set_max(99999.0)
+	e.health.restore_full()
+	e.set_physics_process(false)
+	var hp := e.health.current
+	await press(&"attack_light")
+	await frames(30)
+	check(e.health.current < hp, "the katana cuts an enemy standing 40 px away")
+	e.queue_free()
+
+
 func test_lower_hell() -> void:
 	await fresh_game()
 	game_state.in_game = true
@@ -5168,6 +5228,15 @@ func test_lower_hell() -> void:
 		if c is CastleProp:
 			props += 1
 	check(props >= 30, "the castle is furnished with props (%d)" % props)
+	var foes := 0
+	for c in level.get_children():
+		if c is Marker2D and c.get("enemy_scene") != null:
+			foes += 1
+	check(foes >= 50, "the Lower Hell is thick with enemies (%d)" % foes)
+	check(level.bounds.size.x >= 22000.0, "the road continues past the fox (%d px)" % int(level.bounds.size.x))
+	var bulwark := level.get_node_or_null("FoxBulwark")
+	check(bulwark != null and bulwark.opens_when_boss == &"tooth_fox" and bulwark.hits_needed >= 999, "a bulwark past the fox only opens when the fox falls")
+	check(level.get_node_or_null("Candle9") != null and level.get_node_or_null("Geometry/StairStep15") != null and level.get_node_or_null("Geometry/Belfry9") != null, "the parkour sections exist")
 	var g1: PuzzleGate = level.get_node("Gate1")
 	check(not g1.is_open() and not g1.solved(), "the first gate starts shut")
 	Puzzle.set_on(&"lh_lever_a")

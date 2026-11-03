@@ -191,6 +191,26 @@ script = ExtResource("prop")
 kind = {kind}''' + (f"\nspan = {span}.0" if span else ""))
 
 
+def _chain(L, prefix, x, prev_y, specs, solid=()):
+    """A run of floating platforms (parkour). specs = [(gap, width, top_y), ...]; every hop is checked against
+    the player's reach (gap <= 86 px, rise <= 46 px) so the route is always possible. Returns the platforms
+    as (name, x, width, y) and the x where the run ends."""
+    out = []
+    for i, (gap, w, y) in enumerate(specs):
+        assert gap <= 86, (prefix, i, "gap", gap)
+        assert prev_y - y <= 46, (prefix, i, "rise", prev_y - y)
+        x += gap
+        name = f"{prefix}{i}"
+        if i in solid:
+            L.block(name, x, y, w, 20, style=0)
+        else:
+            L.plank(name, x, y, w)
+        out.append((name, x, w, y))
+        x += w
+        prev_y = y
+    return out, x
+
+
 def lower():
     """THE LOWER HELL: a castle lowered under the Ninth Hell like a lid. A long road (landing, outer ward,
     the Great Hall), then three HARD puzzle rooms, each shutting the way with a portcullis:
@@ -201,7 +221,7 @@ def lower():
       3. THE RUN: three timed levers far apart, all alight at once, through fire and spikes;
     then the Gate-Fox (the single custom mini-boss). The fox drops a tooth shaped like a key; the Tooth Gate
     in the Landing takes it and leads down to the Grass Cellar. No other mini-bosses."""
-    W = 13400
+    W = 23100
     L = G.Level("lower_hell.tscn")
     _head(L, "lower_hell", "The Lower Hell", "LowerHell", W, "(0.86, 0.68, 0.78, 1)", 12, 51800, 0.42)
     L.block("CliffLeft", 0, 0, 16, 480)
@@ -357,6 +377,123 @@ hits_needed = 3''')
     _prop(L, "P3Gargoyle", 12320, GARGOYLE)
     L.candle("Candle3", 12380, 480, "lower_hell_candle_3", "Fox Stair Candle")
     L.arena("FoxArena", 12460, 480, "foxboss", "THE GATE-FOX YIELDS", 420, 560)
+
+    # ======================= PAST THE FOX: NO MORE BOSSES, ONLY THE ROAD =======================================
+    # a bulwark that only gives way when the fox falls, so the tooth can never be skipped
+    L.use("wall")
+    L.node('''
+[node name="FoxBulwark" type="StaticBody2D" parent="."]
+position = Vector2(13230, 96)
+script = ExtResource("wall")
+size = Vector2(24, 384)
+wall_id = &"lh_fox_bulwark"
+hits_needed = 9999
+opens_when_boss = &"tooth_fox"''')
+    L.candle("Candle6", 13360, 480, "lower_hell_candle_6", "After the Fox Candle")
+    _prop(L, "AfterBrazier", 13300, BRAZIER)
+    L.tablet("StairTablet", 13450, 480, "Where the Stair Was", "The castle goes on past the fox, and upward. The stair that should be here was taken out, step by step, by someone who did not want to be followed. The floor below is teeth. Do not look for a way around.")
+
+    # ---- THE BROKEN STAIR: a staircase with the steps removed, over a field of spikes ------------------------------
+    c = 13520
+    stair, ex = _chain(L, "StairStep", c, 480, [
+        (70, 120, 440), (80, 90, 400), (84, 90, 360), (80, 100, 322), (86, 80, 286), (80, 150, 286),
+        (84, 80, 330), (80, 80, 372), (84, 90, 414), (80, 90, 450), (84, 100, 450), (80, 100, 410),
+        (84, 90, 372), (82, 110, 372), (84, 90, 414), (80, 120, 450)])
+    L.spikes("StairTeeth", c + 20, 480, ex - c)
+    L.enemy("StairArcher", "archer", stair[5][1] + 90, 286, 20)
+    L.enemy("StairMoth0", "moth", stair[2][1] + 40, 330, 90)
+    L.enemy("StairMoth1", "moth", stair[8][1] + 40, 380, 90)
+    L.enemy("StairMoth2", "moth", stair[12][1] + 40, 330, 90)
+    L.enemy("StairGuard", "pikeman", stair[13][1] + 70, 372, 20)
+    _prop(L, "StairCage0", stair[3][1] + 40, CAGE)
+    _prop(L, "StairCage1", stair[10][1] + 40, CAGE)
+    _prop(L, "StairGargoyle", c + (ex - c) // 2, GARGOYLE)
+    c = ex + 60
+    L.candle("Candle7", c, 480, "lower_hell_candle_7", "Broken Stair Candle")
+
+    # ---- THE KEEPERS' WALK: a long hall of guards: no tricks, just more of them than you want --------------------
+    k = c + 120
+    _prop(L, "KeepCarpet", k, CARPET, span=1700)
+    _prop(L, "KeepBrazier0", k + 40, BRAZIER)
+    L.enemy("KeepA0", "gilded", k + 200, 480, 60)
+    L.enemy("KeepA1", "sergeant", k + 280, 480, 50)
+    L.enemy("KeepA2", "cantor", k + 420, 480, 50)
+    _prop(L, "KeepStatue0", k + 480, STATUE)
+    L.block("Parapet0", k + 560, 436, 220, 44, style=0)
+    L.enemy("KeepArcher0", "archer", k + 700, 436, 20)
+    L.enemy("KeepB0", "captain", k + 640, 480, 60)
+    L.jet("KeepJetA", k + 860, 480, 0.0)
+    L.jet("KeepJetB", k + 920, 480, 1.0)
+    L.jet("KeepJetC", k + 980, 480, 2.0)
+    L.enemy("KeepB1", "bearer", k + 1080, 480, 60)
+    L.enemy("KeepB2", "pikeman", k + 1160, 480, 60)
+    _prop(L, "KeepBrazier1", k + 1120, BRAZIER)
+    L.spikes("KeepSpikes", k + 1250, 480, 80)
+    L.enemy("KeepC0", "sergeant", k + 1360, 480, 60)
+    L.enemy("KeepC1", "gilded", k + 1440, 480, 60)
+    L.block("Parapet1", k + 1460, 440, 200, 40, style=0)
+    L.enemy("KeepArcher1", "archer", k + 1580, 440, 20)
+    L.enemy("KeepC2", "bloat", k + 1520, 480, 40)
+    L.enemy("KeepC3", "mender", k + 1660, 480, 30)
+    L.enemy("KeepD0", "penitent", k + 350, 480, 60)
+    L.enemy("KeepD1", "pilgrim", k + 540, 480, 60)
+    L.enemy("KeepD2", "captain", k + 1210, 480, 60)
+    L.enemy("KeepD3", "lurker", k + 1320, 480, 40)
+    _prop(L, "KeepGargoyle", k + 780, GARGOYLE)
+    _prop(L, "KeepCage", k + 1000, CAGE)
+    L.chest("Chest4", k + 1610, 440, "lower_hell_chest_4", count=3, embers=10000, item="it_draught")
+
+    # ---- THE CHANDELIER RUN: small perches over fire jets and spikes, with moths on you -----------------------------
+    c = k + 1800
+    L.tablet("ChandelierTablet", c, 480, "Chandeliers", "The great chandeliers were lowered into the dark and never lit again. Their rings are still there, if you can call that a floor. Nothing here forgives a short jump.")
+    c += 60
+    chand, ex = _chain(L, "Chand", c, 480, [
+        (70, 80, 440), (84, 70, 404), (86, 60, 370), (84, 70, 336), (86, 60, 370), (84, 70, 404),
+        (86, 60, 370), (84, 90, 330), (86, 60, 296), (84, 70, 330), (86, 60, 366), (84, 80, 402),
+        (86, 60, 440), (84, 70, 404), (86, 70, 440)])
+    L.spikes("ChandTeeth", c + 20, 480, ex - c)
+    jx = c + 140
+    n = 0
+    while jx < ex - 100:
+        L.jet(f"ChandJet{n}", jx, 480, (n * 0.9) % 3.0)
+        jx += 260
+        n += 1
+    L.enemy("ChandMoth0", "moth", chand[2][1] + 30, 340, 100)
+    L.enemy("ChandMoth1", "moth", chand[5][1] + 30, 340, 100)
+    L.enemy("ChandMoth2", "moth", chand[8][1] + 30, 260, 100)
+    L.enemy("ChandMoth3", "moth", chand[11][1] + 30, 340, 100)
+    L.enemy("ChandMoth4", "moth", chand[13][1] + 30, 370, 100)
+    _prop(L, "ChandCage0", chand[4][1] + 30, CAGE)
+    _prop(L, "ChandCage1", chand[10][1] + 30, CAGE)
+    c = ex + 60
+    _prop(L, "ChandBrazier", c - 40, BRAZIER)
+    L.candle("Candle8", c, 480, "lower_hell_candle_8", "Chandelier Candle")
+
+    # ---- THE BELFRY CLIMB: up a tower of ledges guarded at every landing, then down the far side --------------------
+    b = c + 120
+    L.tablet("BelfryTablet", b, 480, "The Climb", "A bell tower with the bell gone. Whoever hung the bell is said to have climbed it every night to be sure it would still ring, and it never rang. Take it a ledge at a time. Every ledge has a guard.")
+    b += 80
+    belfry, ex = _chain(L, "Belfry", b, 480, [
+        (0, 110, 440), (80, 70, 400), (80, 170, 366), (80, 70, 334), (80, 60, 300), (80, 180, 270),
+        (80, 60, 306), (80, 70, 342), (80, 70, 378), (80, 120, 414)], solid=(0, 2, 5))
+    L.spikes("BelfryTeeth", b, 480, ex - b)
+    L.enemy("BelfryGuard0", "sergeant", belfry[2][1] + 90, 366, 40)
+    L.enemy("BelfryGuard1", "gilded", belfry[5][1] + 70, 270, 40)
+    L.enemy("BelfryArcher", "archer", belfry[5][1] + 150, 270, 20)
+    L.enemy("BelfryMoth0", "moth", belfry[1][1] + 30, 330, 100)
+    L.enemy("BelfryMoth1", "moth", belfry[4][1] + 30, 250, 100)
+    L.enemy("BelfryMoth2", "moth", belfry[7][1] + 30, 300, 100)
+    # a crow's nest above the top ledge: the Long Katana, for anyone who looks up
+    nx = belfry[5][1] + 40
+    L.plank("NestA", nx, 228, 70)
+    L.plank("NestB", nx + 100, 186, 90)
+    L.chest("ChestKatana", nx + 150, 186, "lower_hell_chest_katana", gear=("weapon", "long_katana"))
+    L.tablet("NestTablet", belfry[5][1] + 20, 270, "Crows", "Crows nest in the high places, and so did the sentries. The best steel in the castle never went into the armoury. Somebody hid it above the bell, where nobody would climb for it. Nobody who was supposed to.")
+    _prop(L, "BelfryCage", belfry[3][1] + 30, CAGE)
+    c = ex + 80
+    L.candle("Candle9", c, 480, "lower_hell_candle_9", "Belfry Candle")
+    L.tablet("EndTablet", c + 90, 480, "The Road Does Not End", "The castle has more rooms than the dark has patience for. This is as far as the road is laid. Rest, then ask the one who laid it where it goes next.")
+    L.end_x = c + 260
     L.write()
 
 

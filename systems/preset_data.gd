@@ -5,7 +5,7 @@ extends Resource
 ## plus an entry in Presets.IDS (see docs/ADDING_CONTENT.md).
 
 enum ArmorLook { BARE, LIGHT, KNIGHT, HEAVY }
-enum WeaponLook { SWORD, TWIN, SWORD_SHIELD, FISTS, GREATSWORD, RAPIER, HAMMER, SPEAR, SABRE, AXE, STAFF, SCYTHE }
+enum WeaponLook { SWORD, TWIN, SWORD_SHIELD, FISTS, GREATSWORD, RAPIER, HAMMER, SPEAR, SABRE, AXE, STAFF, SCYTHE, KATANA }
 
 @export var id: StringName = &""
 @export var display_name := ""

@@ -21,12 +21,29 @@ func _run() -> void:
 	Events.level_change_requested.emit("res://world/levels/lower_hell.tscn", &"", false)
 	await frames(120)
 	var pl: Node = get_tree().get_first_node_in_group(&"player")
-	Puzzle.set_on(&"lh_lever_a")
-	Puzzle.set_on(&"lh_lever_c")
-	var spots := [["g_gate1", 7560], ["k_runegate", 9990], ["l_gate3", 12130]]
-	for sp in spots:
-		pl.global_position = Vector2(sp[1], 470)
-		pl.velocity = Vector2.ZERO
-		await frames(70)
-		await shot(sp[0])
+	GameState.grant_gear("weapon", &"long_katana")
+	Loadout.equip_weapon(&"long_katana")
+	await frames(10)
+	pl.global_position = Vector2(700, 470)
+	pl.velocity = Vector2.ZERO
+	await frames(60)
+	await shot("m_katana_idle")
+	Input.action_press(&"attack_light")
+	await frames(2)
+	Input.action_release(&"attack_light")
+	await frames(6)
+	await shot("n_katana_swing")
+	await frames(40)
+	Input.action_press(&"attack_heavy")
+	await frames(2)
+	Input.action_release(&"attack_heavy")
+	await frames(20)
+	await shot("o_katana_heavy")
+	var chest: Node = main.get_tree().current_scene.find_child("ChestKatana", true, false)
+	if chest == null:
+		chest = get_tree().root.find_child("ChestKatana", true, false)
+	pl.global_position = chest.global_position + Vector2(-40, -4)
+	pl.velocity = Vector2.ZERO
+	await frames(80)
+	await shot("p_nest")
 	get_tree().quit()

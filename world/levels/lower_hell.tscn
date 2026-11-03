@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Script" path="res://world/levels/level.gd" id="level"]
 [ext_resource type="Script" path="res://world/background/manor_hall.gd" id="hall"]
@@ -29,12 +29,18 @@
 [ext_resource type="Script" path="res://world/puzzle/rune_stone.gd" id="rune"]
 [ext_resource type="Script" path="res://world/boss/boss_arena.gd" id="bossarena"]
 [ext_resource type="PackedScene" path="res://actors/bosses/tooth_fox.tscn" id="foxboss"]
+[ext_resource type="PackedScene" path="res://actors/enemies/gloam_moth.tscn" id="moth"]
+[ext_resource type="PackedScene" path="res://actors/enemies/bell_bearer.tscn" id="bearer"]
+[ext_resource type="PackedScene" path="res://actors/enemies/swollen_pilgrim.tscn" id="bloat"]
+[ext_resource type="PackedScene" path="res://actors/enemies/hollow_penitent.tscn" id="penitent"]
+[ext_resource type="PackedScene" path="res://actors/enemies/drowned_pilgrim.tscn" id="pilgrim"]
+[ext_resource type="PackedScene" path="res://actors/enemies/reliquary_lurker.tscn" id="lurker"]
 
 [node name="LowerHell" type="Node2D"]
 script = ExtResource("level")
 level_id = &"lower_hell"
 display_name = "The Lower Hell"
-bounds = Rect2(0, 0, 13400, 540)
+bounds = Rect2(0, 0, 23100, 540)
 music = &"catacombs"
 music_pitch = 0.42
 map_origin = Vector2(51800, -1750)
@@ -44,7 +50,7 @@ default_spawn = Vector2(130, 480)
 z_index = -10
 script = ExtResource("backdrop")
 theme = 12
-width = 13400.0
+width = 23100.0
 floor_y = 480.0
 ceiling_y = 96.0
 seed_value = 779
@@ -64,12 +70,12 @@ seed_value = 901
 [node name="Ground" type="StaticBody2D" parent="Geometry"]
 position = Vector2(16, 480)
 script = ExtResource("block")
-size = Vector2(13384, 60)
+size = Vector2(23084, 60)
 style = 0
 seed_value = 902
 
 [node name="CliffRight" type="StaticBody2D" parent="Geometry"]
-position = Vector2(13340, 0)
+position = Vector2(23040, 0)
 script = ExtResource("block")
 size = Vector2(60, 540)
 style = 1
@@ -78,7 +84,7 @@ seed_value = 903
 [node name="Ceiling" type="StaticBody2D" parent="Geometry"]
 position = Vector2(0, 40)
 script = ExtResource("block")
-size = Vector2(13400, 56)
+size = Vector2(23100, 56)
 style = 1
 seed_value = 904
 
@@ -855,3 +861,829 @@ gate_height = 96.0
 trigger_offset = 36.0
 trigger_width = 560.0
 victory_text = "THE GATE-FOX YIELDS"
+
+[node name="FoxBulwark" type="StaticBody2D" parent="."]
+position = Vector2(13230, 96)
+script = ExtResource("wall")
+size = Vector2(24, 384)
+wall_id = &"lh_fox_bulwark"
+hits_needed = 9999
+opens_when_boss = &"tooth_fox"
+
+[node name="Candle6" parent="." instance=ExtResource("candle")]
+position = Vector2(13360, 480)
+checkpoint_id = &"lower_hell_candle_6"
+display_name = "After the Fox Candle"
+
+[node name="AfterBrazier" type="Node2D" parent="."]
+position = Vector2(13300, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="StairTablet" type="Area2D" parent="."]
+position = Vector2(13450, 480)
+script = ExtResource("tablet")
+title = "Where the Stair Was"
+text = "The castle goes on past the fox, and upward. The stair that should be here was taken out, step by step, by someone who did not want to be followed. The floor below is teeth. Do not look for a way around."
+
+[node name="StairStep0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(13590, 440)
+script = ExtResource("block")
+size = Vector2(120, 6)
+style = 2
+seed_value = 915
+one_way = true
+
+[node name="StairStep1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(13790, 400)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 916
+one_way = true
+
+[node name="StairStep2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(13964, 360)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 917
+one_way = true
+
+[node name="StairStep3" type="StaticBody2D" parent="Geometry"]
+position = Vector2(14134, 322)
+script = ExtResource("block")
+size = Vector2(100, 6)
+style = 2
+seed_value = 918
+one_way = true
+
+[node name="StairStep4" type="StaticBody2D" parent="Geometry"]
+position = Vector2(14320, 286)
+script = ExtResource("block")
+size = Vector2(80, 6)
+style = 2
+seed_value = 919
+one_way = true
+
+[node name="StairStep5" type="StaticBody2D" parent="Geometry"]
+position = Vector2(14480, 286)
+script = ExtResource("block")
+size = Vector2(150, 6)
+style = 2
+seed_value = 920
+one_way = true
+
+[node name="StairStep6" type="StaticBody2D" parent="Geometry"]
+position = Vector2(14714, 330)
+script = ExtResource("block")
+size = Vector2(80, 6)
+style = 2
+seed_value = 921
+one_way = true
+
+[node name="StairStep7" type="StaticBody2D" parent="Geometry"]
+position = Vector2(14874, 372)
+script = ExtResource("block")
+size = Vector2(80, 6)
+style = 2
+seed_value = 922
+one_way = true
+
+[node name="StairStep8" type="StaticBody2D" parent="Geometry"]
+position = Vector2(15038, 414)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 923
+one_way = true
+
+[node name="StairStep9" type="StaticBody2D" parent="Geometry"]
+position = Vector2(15208, 450)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 924
+one_way = true
+
+[node name="StairStep10" type="StaticBody2D" parent="Geometry"]
+position = Vector2(15382, 450)
+script = ExtResource("block")
+size = Vector2(100, 6)
+style = 2
+seed_value = 925
+one_way = true
+
+[node name="StairStep11" type="StaticBody2D" parent="Geometry"]
+position = Vector2(15562, 410)
+script = ExtResource("block")
+size = Vector2(100, 6)
+style = 2
+seed_value = 926
+one_way = true
+
+[node name="StairStep12" type="StaticBody2D" parent="Geometry"]
+position = Vector2(15746, 372)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 927
+one_way = true
+
+[node name="StairStep13" type="StaticBody2D" parent="Geometry"]
+position = Vector2(15918, 372)
+script = ExtResource("block")
+size = Vector2(110, 6)
+style = 2
+seed_value = 928
+one_way = true
+
+[node name="StairStep14" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16112, 414)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 929
+one_way = true
+
+[node name="StairStep15" type="StaticBody2D" parent="Geometry"]
+position = Vector2(16282, 450)
+script = ExtResource("block")
+size = Vector2(120, 6)
+style = 2
+seed_value = 930
+one_way = true
+
+[node name="StairTeeth" type="Area2D" parent="."]
+position = Vector2(13540, 480)
+script = ExtResource("spikes")
+width = 2882.0
+damage = 20.0
+
+[node name="StairArcher" type="Marker2D" parent="."]
+position = Vector2(14570, 286)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="StairMoth0" type="Marker2D" parent="."]
+position = Vector2(14004, 330)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 90
+start_facing = -1
+
+[node name="StairMoth1" type="Marker2D" parent="."]
+position = Vector2(15078, 380)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 90
+start_facing = -1
+
+[node name="StairMoth2" type="Marker2D" parent="."]
+position = Vector2(15786, 330)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 90
+start_facing = -1
+
+[node name="StairGuard" type="Marker2D" parent="."]
+position = Vector2(15988, 372)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 20
+start_facing = -1
+
+[node name="StairCage0" type="Node2D" parent="."]
+position = Vector2(14174, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="StairCage1" type="Node2D" parent="."]
+position = Vector2(15422, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="StairGargoyle" type="Node2D" parent="."]
+position = Vector2(14961, 480)
+script = ExtResource("prop")
+kind = 7
+
+[node name="Candle7" parent="." instance=ExtResource("candle")]
+position = Vector2(16462, 480)
+checkpoint_id = &"lower_hell_candle_7"
+display_name = "Broken Stair Candle"
+
+[node name="KeepCarpet" type="Node2D" parent="."]
+position = Vector2(16582, 480)
+script = ExtResource("prop")
+kind = 2
+span = 1700.0
+
+[node name="KeepBrazier0" type="Node2D" parent="."]
+position = Vector2(16622, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="KeepA0" type="Marker2D" parent="."]
+position = Vector2(16782, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 60
+start_facing = -1
+
+[node name="KeepA1" type="Marker2D" parent="."]
+position = Vector2(16862, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 50
+start_facing = -1
+
+[node name="KeepA2" type="Marker2D" parent="."]
+position = Vector2(17002, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("cantor")
+patrol_distance = 50
+start_facing = -1
+
+[node name="KeepStatue0" type="Node2D" parent="."]
+position = Vector2(17062, 480)
+script = ExtResource("prop")
+kind = 1
+
+[node name="Parapet0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(17142, 436)
+script = ExtResource("block")
+size = Vector2(220, 44)
+style = 0
+seed_value = 931
+
+[node name="KeepArcher0" type="Marker2D" parent="."]
+position = Vector2(17282, 436)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="KeepB0" type="Marker2D" parent="."]
+position = Vector2(17222, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 60
+start_facing = -1
+
+[node name="KeepJetA" type="Area2D" parent="."]
+position = Vector2(17442, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="KeepJetB" type="Area2D" parent="."]
+position = Vector2(17502, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.0
+
+[node name="KeepJetC" type="Area2D" parent="."]
+position = Vector2(17562, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 2.0
+
+[node name="KeepB1" type="Marker2D" parent="."]
+position = Vector2(17662, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("bearer")
+patrol_distance = 60
+start_facing = -1
+
+[node name="KeepB2" type="Marker2D" parent="."]
+position = Vector2(17742, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pikeman")
+patrol_distance = 60
+start_facing = -1
+
+[node name="KeepBrazier1" type="Node2D" parent="."]
+position = Vector2(17702, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="KeepSpikes" type="Area2D" parent="."]
+position = Vector2(17832, 480)
+script = ExtResource("spikes")
+width = 80.0
+damage = 20.0
+
+[node name="KeepC0" type="Marker2D" parent="."]
+position = Vector2(17942, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 60
+start_facing = -1
+
+[node name="KeepC1" type="Marker2D" parent="."]
+position = Vector2(18022, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 60
+start_facing = -1
+
+[node name="Parapet1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(18042, 440)
+script = ExtResource("block")
+size = Vector2(200, 40)
+style = 0
+seed_value = 932
+
+[node name="KeepArcher1" type="Marker2D" parent="."]
+position = Vector2(18162, 440)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="KeepC2" type="Marker2D" parent="."]
+position = Vector2(18102, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("bloat")
+patrol_distance = 40
+start_facing = -1
+
+[node name="KeepC3" type="Marker2D" parent="."]
+position = Vector2(18242, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("mender")
+patrol_distance = 30
+start_facing = -1
+
+[node name="KeepD0" type="Marker2D" parent="."]
+position = Vector2(16932, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("penitent")
+patrol_distance = 60
+start_facing = -1
+
+[node name="KeepD1" type="Marker2D" parent="."]
+position = Vector2(17122, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("pilgrim")
+patrol_distance = 60
+start_facing = -1
+
+[node name="KeepD2" type="Marker2D" parent="."]
+position = Vector2(17792, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("captain")
+patrol_distance = 60
+start_facing = -1
+
+[node name="KeepD3" type="Marker2D" parent="."]
+position = Vector2(17902, 480)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("lurker")
+patrol_distance = 40
+start_facing = -1
+
+[node name="KeepGargoyle" type="Node2D" parent="."]
+position = Vector2(17362, 480)
+script = ExtResource("prop")
+kind = 7
+
+[node name="KeepCage" type="Node2D" parent="."]
+position = Vector2(17582, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="Chest4" type="Area2D" parent="."]
+position = Vector2(18192, 440)
+script = ExtResource("chest")
+chest_id = &"lower_hell_chest_4"
+count = 3
+embers = 10000
+item = ExtResource("it_draught")
+
+[node name="ChandelierTablet" type="Area2D" parent="."]
+position = Vector2(18382, 480)
+script = ExtResource("tablet")
+title = "Chandeliers"
+text = "The great chandeliers were lowered into the dark and never lit again. Their rings are still there, if you can call that a floor. Nothing here forgives a short jump."
+
+[node name="Chand0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(18512, 440)
+script = ExtResource("block")
+size = Vector2(80, 6)
+style = 2
+seed_value = 933
+one_way = true
+
+[node name="Chand1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(18676, 404)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 934
+one_way = true
+
+[node name="Chand2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(18832, 370)
+script = ExtResource("block")
+size = Vector2(60, 6)
+style = 2
+seed_value = 935
+one_way = true
+
+[node name="Chand3" type="StaticBody2D" parent="Geometry"]
+position = Vector2(18976, 336)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 936
+one_way = true
+
+[node name="Chand4" type="StaticBody2D" parent="Geometry"]
+position = Vector2(19132, 370)
+script = ExtResource("block")
+size = Vector2(60, 6)
+style = 2
+seed_value = 937
+one_way = true
+
+[node name="Chand5" type="StaticBody2D" parent="Geometry"]
+position = Vector2(19276, 404)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 938
+one_way = true
+
+[node name="Chand6" type="StaticBody2D" parent="Geometry"]
+position = Vector2(19432, 370)
+script = ExtResource("block")
+size = Vector2(60, 6)
+style = 2
+seed_value = 939
+one_way = true
+
+[node name="Chand7" type="StaticBody2D" parent="Geometry"]
+position = Vector2(19576, 330)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 940
+one_way = true
+
+[node name="Chand8" type="StaticBody2D" parent="Geometry"]
+position = Vector2(19752, 296)
+script = ExtResource("block")
+size = Vector2(60, 6)
+style = 2
+seed_value = 941
+one_way = true
+
+[node name="Chand9" type="StaticBody2D" parent="Geometry"]
+position = Vector2(19896, 330)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 942
+one_way = true
+
+[node name="Chand10" type="StaticBody2D" parent="Geometry"]
+position = Vector2(20052, 366)
+script = ExtResource("block")
+size = Vector2(60, 6)
+style = 2
+seed_value = 943
+one_way = true
+
+[node name="Chand11" type="StaticBody2D" parent="Geometry"]
+position = Vector2(20196, 402)
+script = ExtResource("block")
+size = Vector2(80, 6)
+style = 2
+seed_value = 944
+one_way = true
+
+[node name="Chand12" type="StaticBody2D" parent="Geometry"]
+position = Vector2(20362, 440)
+script = ExtResource("block")
+size = Vector2(60, 6)
+style = 2
+seed_value = 945
+one_way = true
+
+[node name="Chand13" type="StaticBody2D" parent="Geometry"]
+position = Vector2(20506, 404)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 946
+one_way = true
+
+[node name="Chand14" type="StaticBody2D" parent="Geometry"]
+position = Vector2(20662, 440)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 947
+one_way = true
+
+[node name="ChandTeeth" type="Area2D" parent="."]
+position = Vector2(18462, 480)
+script = ExtResource("spikes")
+width = 2290.0
+damage = 20.0
+
+[node name="ChandJet0" type="Area2D" parent="."]
+position = Vector2(18582, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.0
+
+[node name="ChandJet1" type="Area2D" parent="."]
+position = Vector2(18842, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.9
+
+[node name="ChandJet2" type="Area2D" parent="."]
+position = Vector2(19102, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.8
+
+[node name="ChandJet3" type="Area2D" parent="."]
+position = Vector2(19362, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 2.7
+
+[node name="ChandJet4" type="Area2D" parent="."]
+position = Vector2(19622, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.6000000000000001
+
+[node name="ChandJet5" type="Area2D" parent="."]
+position = Vector2(19882, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 1.5
+
+[node name="ChandJet6" type="Area2D" parent="."]
+position = Vector2(20142, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 2.4000000000000004
+
+[node name="ChandJet7" type="Area2D" parent="."]
+position = Vector2(20402, 480)
+script = ExtResource("jet")
+column = Vector2(14, 56)
+period = 3.0
+phase = 0.2999999999999998
+
+[node name="ChandMoth0" type="Marker2D" parent="."]
+position = Vector2(18862, 340)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 100
+start_facing = -1
+
+[node name="ChandMoth1" type="Marker2D" parent="."]
+position = Vector2(19306, 340)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 100
+start_facing = -1
+
+[node name="ChandMoth2" type="Marker2D" parent="."]
+position = Vector2(19782, 260)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 100
+start_facing = -1
+
+[node name="ChandMoth3" type="Marker2D" parent="."]
+position = Vector2(20226, 340)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 100
+start_facing = -1
+
+[node name="ChandMoth4" type="Marker2D" parent="."]
+position = Vector2(20536, 370)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 100
+start_facing = -1
+
+[node name="ChandCage0" type="Node2D" parent="."]
+position = Vector2(19162, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="ChandCage1" type="Node2D" parent="."]
+position = Vector2(20082, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="ChandBrazier" type="Node2D" parent="."]
+position = Vector2(20752, 480)
+script = ExtResource("prop")
+kind = 0
+
+[node name="Candle8" parent="." instance=ExtResource("candle")]
+position = Vector2(20792, 480)
+checkpoint_id = &"lower_hell_candle_8"
+display_name = "Chandelier Candle"
+
+[node name="BelfryTablet" type="Area2D" parent="."]
+position = Vector2(20912, 480)
+script = ExtResource("tablet")
+title = "The Climb"
+text = "A bell tower with the bell gone. Whoever hung the bell is said to have climbed it every night to be sure it would still ring, and it never rang. Take it a ledge at a time. Every ledge has a guard."
+
+[node name="Belfry0" type="StaticBody2D" parent="Geometry"]
+position = Vector2(20992, 440)
+script = ExtResource("block")
+size = Vector2(110, 20)
+style = 0
+seed_value = 948
+
+[node name="Belfry1" type="StaticBody2D" parent="Geometry"]
+position = Vector2(21182, 400)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 949
+one_way = true
+
+[node name="Belfry2" type="StaticBody2D" parent="Geometry"]
+position = Vector2(21332, 366)
+script = ExtResource("block")
+size = Vector2(170, 20)
+style = 0
+seed_value = 950
+
+[node name="Belfry3" type="StaticBody2D" parent="Geometry"]
+position = Vector2(21582, 334)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 951
+one_way = true
+
+[node name="Belfry4" type="StaticBody2D" parent="Geometry"]
+position = Vector2(21732, 300)
+script = ExtResource("block")
+size = Vector2(60, 6)
+style = 2
+seed_value = 952
+one_way = true
+
+[node name="Belfry5" type="StaticBody2D" parent="Geometry"]
+position = Vector2(21872, 270)
+script = ExtResource("block")
+size = Vector2(180, 20)
+style = 0
+seed_value = 953
+
+[node name="Belfry6" type="StaticBody2D" parent="Geometry"]
+position = Vector2(22132, 306)
+script = ExtResource("block")
+size = Vector2(60, 6)
+style = 2
+seed_value = 954
+one_way = true
+
+[node name="Belfry7" type="StaticBody2D" parent="Geometry"]
+position = Vector2(22272, 342)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 955
+one_way = true
+
+[node name="Belfry8" type="StaticBody2D" parent="Geometry"]
+position = Vector2(22422, 378)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 956
+one_way = true
+
+[node name="Belfry9" type="StaticBody2D" parent="Geometry"]
+position = Vector2(22572, 414)
+script = ExtResource("block")
+size = Vector2(120, 6)
+style = 2
+seed_value = 957
+one_way = true
+
+[node name="BelfryTeeth" type="Area2D" parent="."]
+position = Vector2(20992, 480)
+script = ExtResource("spikes")
+width = 1700.0
+damage = 20.0
+
+[node name="BelfryGuard0" type="Marker2D" parent="."]
+position = Vector2(21422, 366)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("sergeant")
+patrol_distance = 40
+start_facing = -1
+
+[node name="BelfryGuard1" type="Marker2D" parent="."]
+position = Vector2(21942, 270)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("gilded")
+patrol_distance = 40
+start_facing = -1
+
+[node name="BelfryArcher" type="Marker2D" parent="."]
+position = Vector2(22022, 270)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("archer")
+patrol_distance = 20
+start_facing = -1
+
+[node name="BelfryMoth0" type="Marker2D" parent="."]
+position = Vector2(21212, 330)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 100
+start_facing = -1
+
+[node name="BelfryMoth1" type="Marker2D" parent="."]
+position = Vector2(21762, 250)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 100
+start_facing = -1
+
+[node name="BelfryMoth2" type="Marker2D" parent="."]
+position = Vector2(22302, 300)
+script = ExtResource("spawner")
+enemy_scene = ExtResource("moth")
+patrol_distance = 100
+start_facing = -1
+
+[node name="NestA" type="StaticBody2D" parent="Geometry"]
+position = Vector2(21912, 228)
+script = ExtResource("block")
+size = Vector2(70, 6)
+style = 2
+seed_value = 958
+one_way = true
+
+[node name="NestB" type="StaticBody2D" parent="Geometry"]
+position = Vector2(22012, 186)
+script = ExtResource("block")
+size = Vector2(90, 6)
+style = 2
+seed_value = 959
+one_way = true
+
+[node name="ChestKatana" type="Area2D" parent="."]
+position = Vector2(22062, 186)
+script = ExtResource("chest")
+chest_id = &"lower_hell_chest_katana"
+count = 0
+embers = 0
+gear_kind = "weapon"
+gear_id = &"long_katana"
+
+[node name="NestTablet" type="Area2D" parent="."]
+position = Vector2(21892, 270)
+script = ExtResource("tablet")
+title = "Crows"
+text = "Crows nest in the high places, and so did the sentries. The best steel in the castle never went into the armoury. Somebody hid it above the bell, where nobody would climb for it. Nobody who was supposed to."
+
+[node name="BelfryCage" type="Node2D" parent="."]
+position = Vector2(21612, 480)
+script = ExtResource("prop")
+kind = 5
+
+[node name="Candle9" parent="." instance=ExtResource("candle")]
+position = Vector2(22772, 480)
+checkpoint_id = &"lower_hell_candle_9"
+display_name = "Belfry Candle"
+
+[node name="EndTablet" type="Area2D" parent="."]
+position = Vector2(22862, 480)
+script = ExtResource("tablet")
+title = "The Road Does Not End"
+text = "The castle has more rooms than the dark has patience for. This is as far as the road is laid. Rest, then ask the one who laid it where it goes next."

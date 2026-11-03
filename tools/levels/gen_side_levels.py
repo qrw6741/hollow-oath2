@@ -117,7 +117,8 @@ seed_value = {self.seed}''' + ("\none_way = true" if one_way else ""))
         self.block(name, x, y, w, 6, style=2, one_way=True)
 
     def enemy(self, name, scene, x, y, patrol=40.0, facing=-1, when=0):
-        self.things.append(("enemy", name, x, y))
+        if scene != "moth":   # moths fly: they need no floor under their spawn point
+            self.things.append(("enemy", name, x, y))
         self.use("spawner"); self.use(scene)
         self.node(f'''
 [node name="{name}" type="Marker2D" parent="."]

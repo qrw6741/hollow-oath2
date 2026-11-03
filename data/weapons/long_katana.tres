@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://systems/combat/weapon_data.gd" id="1_weapon"]
+[ext_resource type="Resource" path="res://data/attacks/katana_1.tres" id="a0"]
+[ext_resource type="Resource" path="res://data/attacks/katana_heavy.tres" id="a1"]
+[ext_resource type="Resource" path="res://data/attacks/katana_air.tres" id="a2"]
+[ext_resource type="Resource" path="res://data/attacks/katana_riposte.tres" id="a3"]
+[ext_resource type="Resource" path="res://data/attacks/skill_moonlit_draw.tres" id="a4"]
+
+[resource]
+script = ExtResource("1_weapon")
+id = &"long_katana"
+display_name = "Long Katana"
+description = "A blade longer than the arm that draws it, folded until it was nearly nothing. Three quick cuts, the last one falling; a drawing cut that wants a breath first. It reaches farther than any ordinary sword and asks little stamina, but it hits no harder than it should: the skill is in the spacing."
+light_combo_start = ExtResource("a0")
+heavy = ExtResource("a1")
+aerial = ExtResource("a2")
+riposte = ExtResource("a3")
+riposte_multiplier = 1.15
+look = 12
+two_handed = true
+damage_mult = 1.18
+status = &"bleed"
+status_amount = 30.0
+skill = ExtResource("a4")
+skill_cost = 30.0
+parry_window_bonus = 1
+parry_recovery_bonus = 0
