@@ -6,7 +6,10 @@ extends StaticBody2D
 ## TEMPORARY ART: drawn in code.
 
 @export var gate_id: StringName = &"gate"
-@export var requires: PackedStringArray = []
+## Comma-separated switch ids (a plain String on purpose: a PackedStringArray export came through EMPTY in the
+## exported Windows build, so no gate could ever open).
+@export var requires_list := ""
+var requires: PackedStringArray = []
 @export var size := Vector2(44, 384)
 @export var hint := "The gate will not move."
 
@@ -21,6 +24,9 @@ var _rumble := 0.0
 
 
 func _ready() -> void:
+	requires = PackedStringArray()
+	for r in requires_list.split(",", false):
+		requires.append(r.strip_edges())
 	add_to_group(&"puzzle_gates")
 	collision_layer = 1
 	collision_mask = 0

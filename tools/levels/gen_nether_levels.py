@@ -148,7 +148,7 @@ def _gate(L, name, x, gid, requires, hint="The gate will not move."):
 position = Vector2({x}, 480)
 script = ExtResource("pgate")
 gate_id = &"{gid}"
-requires = PackedStringArray({", ".join('"%s"' % r for r in requires)})
+requires_list = "{",".join(requires)}"
 size = Vector2(44, 384)
 hint = "{hint}"''')
 

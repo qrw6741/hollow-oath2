@@ -552,7 +552,7 @@ display_name = "hidden ward"
 position = Vector2(7640, 480)
 script = ExtResource("pgate")
 gate_id = &"lh_gate_1"
-requires = PackedStringArray("lh_lever_a", "lh_lever_b", "lh_lever_c", "lh_lever_d")
+requires_list = "lh_lever_a,lh_lever_b,lh_lever_c,lh_lever_d"
 size = Vector2(44, 384)
 hint = "The gate will not move."
 
@@ -730,7 +730,7 @@ kind = 5
 position = Vector2(10080, 480)
 script = ExtResource("pgate")
 gate_id = &"lh_gate_2"
-requires = PackedStringArray("lh_runes")
+requires_list = "lh_runes"
 size = Vector2(44, 384)
 hint = "The gate will not move."
 
@@ -875,7 +875,7 @@ display_name = "main lever"
 position = Vector2(12330, 480)
 script = ExtResource("pgate")
 gate_id = &"lh_gate_3"
-requires = PackedStringArray("lh_run_x", "lh_run_y", "lh_run_z", "lh_run_main")
+requires_list = "lh_run_x,lh_run_y,lh_run_z,lh_run_main"
 size = Vector2(44, 384)
 hint = "The gate will not move."
 

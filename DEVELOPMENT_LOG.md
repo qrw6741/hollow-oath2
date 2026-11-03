@@ -607,3 +607,8 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - The gate now rises over 2.5 s with a rumble, dust, sparks and a banner ("THE GATE GRINDS OPEN") instead of a quick lift. Gate3 sits right before the Gate-Fox arena (x=12460); the Oath Candle moved to x=12435.
 - Tests: test_fox_gate_walk (on foot: three levers alone do nothing, the main lever opens it, then through the gate into the fight) and an updated test_lower_hell chain (levers -> wall -> main lever -> animated rise).
 - Timed levers still exist as a mechanism (game-time based) but no level uses them now.
+
+## ROOT CAUSE of "the gate never opens" (found by loading the exported package, not the source project)
+- In the exported Windows build every PuzzleGate had `requires` = [] (a PackedStringArray set in the scene came through empty), so `solved()` was never true no matter how many levers were thrown, and the "N / M" counter/gems never drew (which is why the player's screenshot lacked the counter). All source-run tests passed because the source project loads it correctly.
+- Fix: gates take a plain comma-separated String (`requires_list`) and build the array in _ready. Verified by loading the exported .pck (tools/pack_diag): Gate1 4 locks, Gate2 1, Gate3 4.
+- Lesson: test the packaged build, not only the source project. A PackedStringArray export in scenes is not trusted any more.
