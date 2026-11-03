@@ -360,23 +360,34 @@ hits_needed = 3''')
 
     # ---- PUZZLE 3: THE RUN (10500 - 12300): three timed levers, a gate beyond all of them ---------------------
     _prop(L, "P3Brazier0", 10480, BRAZIER)
-    L.tablet("RunTablet", 10560, 480, "One Breath", "THE LAST GATE OPENS ONLY WHEN ALL THREE LEVERS ARE ALIGHT AT ONCE. They spring back: the first will wait the longest, the last hardly at all. Throw them in the order you meet them and do not stop for the fire. If the first goes out before you reach the last, you walk it all again.")
-    _lever(L, "RunLeverX", 10700, 480, "lh_run_x", 30.0, "first lever")
+    L.tablet("RunTablet", 10560, 480, "Three, Then The Stone", "THE GATE OF THE FOX HAS FOUR LOCKS. Three levers stand along this road, shut: open them one by one, in the order you meet them, and mind the fire between. The fourth lock is not a lever you can see. Past the third, a wall sounds hollow; break it, and the main lever waits behind it. Only then will the gate move.")
+    _lever(L, "RunLeverX", 10700, 480, "lh_run_x", 0.0, "first lever")
     L.jet("RunJetA", 10960, 480, 0.0)
     L.jet("RunJetB", 11020, 480, 1.5)
     L.spikes("RunSpikesA", 11160, 480, 80)
     L.enemy("P3Foe0", "gilded", 11330, 480, 40)
     L.block("RunStep", 11440, 452, 100, 28, style=1)
     L.plank("RunLoft", 11530, 410, 170)
-    _lever(L, "RunLeverY", 11640, 410, "lh_run_y", 22.0, "middle lever")
+    _lever(L, "RunLeverY", 11640, 410, "lh_run_y", 0.0, "middle lever")
     L.spikes("RunSpikesB", 11780, 480, 80)
     L.jet("RunJetC", 11900, 480, 0.5)
     L.jet("RunJetD", 11960, 480, 2.0)
     L.enemy("P3Foe1", "sergeant", 11800, 480, 40)
-    _lever(L, "RunLeverZ", 12120, 480, "lh_run_z", 12.0, "last lever")
-    _gate(L, "Gate3", 12220, "lh_gate_3", ["lh_run_x", "lh_run_y", "lh_run_z"])
-    _prop(L, "P3Gargoyle", 12320, GARGOYLE)
-    L.candle("Candle3", 12380, 480, "lower_hell_candle_3", "Fox Stair Candle")
+    _lever(L, "RunLeverZ", 12030, 480, "lh_run_z", 0.0, "third lever")
+    # the fourth lock: a cracked wall closes a low alcove with the MAIN lever in it
+    L.use("wall")
+    L.node('''
+[node name="RunWall" type="StaticBody2D" parent="."]
+position = Vector2(12100, 392)
+script = ExtResource("wall")
+size = Vector2(22, 88)
+wall_id = &"lh_run_wall"
+hits_needed = 3''')
+    L.block("RunAlcoveRoof", 12100, 380, 180, 14, style=0)
+    _lever(L, "RunLeverMain", 12200, 480, "lh_run_main", 0.0, "main lever")
+    _gate(L, "Gate3", 12330, "lh_gate_3", ["lh_run_x", "lh_run_y", "lh_run_z", "lh_run_main"])
+    _prop(L, "P3Gargoyle", 12405, GARGOYLE)
+    L.candle("Candle3", 12435, 480, "lower_hell_candle_3", "Fox Stair Candle")
     L.arena("FoxArena", 12460, 480, "foxboss", "THE GATE-FOX YIELDS", 420, 560)
 
     # ======================= PAST THE FOX: NO MORE BOSSES, ONLY THE ROAD =======================================

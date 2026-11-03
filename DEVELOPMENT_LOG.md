@@ -601,3 +601,9 @@ Milestone 1 already covers most of Milestone 2/3's combat and loop. Remaining be
 - Far props (jets, tablets, candles, levers, runes, gates, braziers) no longer redraw every frame when more than 900 px from the player (`Near.player`, systems/near.gd).
 - Timed levers ran on wall-clock time, so a slow frame rate made them run out before the player arrived (the "glitched levers"). They now count physics ticks (`Puzzle.now_ms`), so slowdown slows them with the player; also lengthened to 30/22/12 s. Test: test_timed_levers_game_time.
 - The fox: killed it in the engine (test_fox_defeat_real): defeat flag, tooth drop, bulwark opens, walk on to the Broken Stair all work. The Tooth Gate is back at the castle entrance (x=960), 11,000 px behind, which is probably what looked like "the gate still closed", so a second door (the Fox's Door, ToothGate2 at x=13290) now sits right past the fox; each has its own saved door flag (tooth_gate, fox_door).
+
+## The Fox's Gate rebuilt (player request: three shut levers, then the wall, then the main lever, then the gate opens into the fox fight)
+- The timed run is gone. Three permanent levers (RunLeverX/Y/Z) start shut; thrown one by one they light one ward each. After the third a cracked wall (RunWall, 3 hits) closes a low alcove with the MAIN lever (RunLeverMain); the gate (Gate3, now at x=12330, four ward gems) only opens when all four are on.
+- The gate now rises over 2.5 s with a rumble, dust, sparks and a banner ("THE GATE GRINDS OPEN") instead of a quick lift. Gate3 sits right before the Gate-Fox arena (x=12460); the Oath Candle moved to x=12435.
+- Tests: test_fox_gate_walk (on foot: three levers alone do nothing, the main lever opens it, then through the gate into the fight) and an updated test_lower_hell chain (levers -> wall -> main lever -> animated rise).
+- Timed levers still exist as a mechanism (game-time based) but no level uses them now.

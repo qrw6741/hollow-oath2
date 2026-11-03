@@ -17,6 +17,7 @@ var _shape: CollisionShape2D
 var _t := 0.0
 var _check := 0
 var _light: PointLight2D
+var _rumble := 0.0
 
 
 func _ready() -> void:
@@ -69,7 +70,7 @@ func open_now() -> void:
 	Audio.sfx_at(&"door_open", global_position, -2.0, 0.7)
 	GameFeel.shake(3.0, 0.9)
 	GameFeel.dust(global_position + Vector2(0, -OPENING), 14)
-	Events.banner_requested.emit("A gate grinds open")
+	Events.banner_requested.emit("THE GATE GRINDS OPEN")
 
 
 func _physics_process(delta: float) -> void:
@@ -81,7 +82,14 @@ func _physics_process(delta: float) -> void:
 			open_now()
 	var target := 1.0 if is_open() else 0.0
 	if not is_equal_approx(_open, target):
-		_open = move_toward(_open, target, delta * 0.55)
+		_open = move_toward(_open, target, delta * 0.4)   # a slow, heavy rise (2.5 s)
+		if target > _open and _open > 0.0:
+			_rumble -= delta
+			if _rumble <= 0.0:
+				_rumble = 0.3
+				GameFeel.shake(2.2, 0.3)
+				GameFeel.dust(global_position + Vector2(randf_range(-18.0, 18.0), -6.0), 5)
+				GameFeel.spark(global_position + Vector2(randf_range(-14.0, 14.0), -OPENING * _open - 10.0), Color(0.7, 0.5, 1.0), 4)
 		if _open > 0.7:
 			_shape.set_deferred(&"disabled", true)
 	_light.energy = 0.55 * (0.5 + 0.5 * sin(_t * 5.0)) * (1.0 - _open) if solved() and not is_open() else 0.0
