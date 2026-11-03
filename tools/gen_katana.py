@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The Long Katana (WeaponLook.KATANA): a balanced, long-reach, fast blade. Light combo is three cuts, the heavy
-is a drawing cut, the skill is Moonlit Draw. Balance target (tools: see DEVELOPMENT_LOG): light-combo DPS ~39 against
+is a drawing cut, the skill is Moonlit Draw. Balance target (see DEVELOPMENT_LOG): steel light-combo DPS ~34.5, ~48 with the flame, against
 27-50 for the other findable weapons, reach "Long", stamina 36 per combo (cheapest of the big blades), bleed 30.
 Writes data/attacks/katana_*.tres, skill_moonlit_draw.tres, data/weapons/long_katana.tres."""
 R = "/root/hollow-oath"
@@ -38,7 +38,7 @@ W = f'''[gd_resource type="Resource" script_class="WeaponData" load_steps=7 form
 script = ExtResource("1_weapon")
 id = &"long_katana"
 display_name = "Long Katana"
-description = "A blade longer than the arm that draws it, folded until it was nearly nothing. Three quick cuts, the last one falling; a drawing cut that wants a breath first. It reaches farther than any ordinary sword and asks little stamina, but it hits no harder than it should: the skill is in the spacing."
+description = "A blade longer than the arm that draws it, folded until it was nearly nothing. Three quick cuts, the last one falling; a drawing cut that wants a breath first. Every swing throws a crescent of fire a little way ahead of the steel, so the blade reaches farther than it looks and what it cuts keeps burning. It asks little stamina; the skill is in the spacing."
 light_combo_start = ExtResource("a0")
 heavy = ExtResource("a1")
 aerial = ExtResource("a2")
@@ -46,7 +46,8 @@ riposte = ExtResource("a3")
 riposte_multiplier = 1.15
 look = 12
 two_handed = true
-damage_mult = 1.18
+damage_mult = 1.05
+swing_fire = 0.4
 status = &"bleed"
 status_amount = 30.0
 skill = ExtResource("a4")

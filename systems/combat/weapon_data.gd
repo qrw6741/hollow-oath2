@@ -22,6 +22,8 @@ extends Resource
 @export var damage_mult := 1.0
 
 @export_group("Jutsu")
+## > 0: every swing also throws a crescent of fire (FireSlash) worth this fraction of the swing's damage, plus burn.
+@export var swing_fire := 0.0
 ## This weapon's own technique (see Jutsu); used on the Art button in place of the equipped Art.
 @export var jutsu: StringName = &""
 @export var jutsu_cost := 40.0

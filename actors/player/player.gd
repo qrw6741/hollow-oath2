@@ -104,6 +104,7 @@ func _ready() -> void:
 	last_safe_position = global_position
 	health.died.connect(_on_died)
 	attack_runner.hit_confirmed.connect(_on_attack_hit)
+	attack_runner.phase_changed.connect(_on_attack_phase)
 	attack_runner.projectile_fired.connect(_fire_player_projectile)
 	Events.boss_defeated.connect(_on_boss_defeated_arts)
 	_add_lantern()
@@ -669,6 +670,23 @@ func _launch_meteor() -> void:
 
 ## The equipped weapon's jutsu. Amaterasu: black flames burst from the floor on both sides of you,
 ## nearest first, and burn whatever stands in them for several seconds.
+## A weapon with swing_fire (the Long Katana) throws a crescent of flame as each swing's active frames begin.
+func _on_attack_phase(p: int) -> void:
+	if weapon == null or weapon.swing_fire <= 0.0 or p != AttackRunner.Phase.ACTIVE or attack_runner.attack == null:
+		return
+	var a := attack_runner.attack
+	var big := 1.0 + 0.5 * clampf(a.damage / 40.0, 0.0, 1.5)
+	var hit := HitData.new()
+	hit.damage = a.damage * weapon.swing_fire * attack_runner.damage_multiplier * attack_runner.damage_bonus
+	hit.poise_damage = 6.0
+	hit.attack_id = &"flame_slash"
+	hit.status = &"burn"
+	hit.status_amount = 14.0
+	hit.jutsu = true
+	var f := FireSlash.spawn(get_parent(), global_position + Vector2(float(facing) * (26.0 + a.hitbox_offset.x * 0.3), 0.0), facing, hit, self, big)
+	Audio.sfx_at(&"skill_cast", global_position, -10.0, 1.6)
+
+
 func _cast_jutsu() -> void:
 	var id: StringName = weapon.jutsu
 	set_focus(focus - weapon.jutsu_cost)

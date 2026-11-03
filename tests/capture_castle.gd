@@ -33,6 +33,8 @@ func _run() -> void:
 	Input.action_release(&"attack_light")
 	await frames(6)
 	await shot("n_katana_swing")
+	await frames(4)
+	await shot("n2_katana_flame")
 	await frames(40)
 	Input.action_press(&"attack_heavy")
 	await frames(2)

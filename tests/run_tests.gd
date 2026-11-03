@@ -5187,8 +5187,9 @@ func test_siege_and_katana() -> void:
 		stam += a.stamina_cost
 	var dps := dmg_total * w.damage_mult / (float(frames_total) / 60.0)
 	check(chain.size() == 3, "three light cuts")
-	check(dps >= 33.0 and dps <= 45.0, "light-combo damage per second is mid-to-high but under the final weapons (%.1f)" % dps)
-	check(w.damage_mult >= 1.1 and w.damage_mult <= 1.24, "damage multiplier in the findable-weapon band (%.2f)" % w.damage_mult)
+	check(dps >= 33.0 and dps <= 38.0, "steel light-combo damage per second is mid-range (%.1f)" % dps)
+	check(w.swing_fire >= 0.3 and w.swing_fire <= 0.5 and dps * (1.0 + w.swing_fire) <= 52.0, "with the flame it stays under the final weapons (%.1f)" % (dps * (1.0 + w.swing_fire)))
+	check(w.damage_mult >= 1.0 and w.damage_mult <= 1.24, "damage multiplier in the findable-weapon band (%.2f)" % w.damage_mult)
 	check(stam <= 40.0, "cheap on stamina (%.0f per combo)" % stam)
 	check(WeaponStats.reach_label(w) == "Long" and WeaponStats.speed_label(w) == "Fast", "long reach, fast first cut")
 	check(w.damage_mult * w.heavy.damage < Weapons.get_weapon(&"unkept_blade").damage_mult * Weapons.get_weapon(&"unkept_blade").heavy.damage, "its heavy is lighter than a greatsword's")
@@ -5207,6 +5208,20 @@ func test_siege_and_katana() -> void:
 	await frames(30)
 	check(e.health.current < hp, "the katana cuts an enemy standing 40 px away")
 	e.queue_free()
+	# the flame: an enemy beyond the blade's reach is still burnt by the crescent each swing throws
+	await place_player(400.0, 480.0, 1)
+	player.stamina.restore_full()
+	await frames(40)
+	var far := await spawn_enemy(508.0, -1)
+	far.health.set_max(99999.0)
+	far.health.restore_full()
+	far.set_physics_process(false)
+	var hp2 := far.health.current
+	await press(&"attack_light")
+	await frames(40)
+	check(far.health.current < hp2, "the katana's fire slash hits an enemy 108 px away, past the blade")
+	check(far.status.buildup[StatusFx.BURN] > 0.0, "and sets it burning")
+	far.queue_free()
 
 
 func test_lower_hell() -> void:
